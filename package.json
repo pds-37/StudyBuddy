@@ -1,0 +1,20 @@
+{
+  "name": "study-buddy-platform",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n web,api -c cyan,magenta \"npm run dev --workspace @study-buddy/web\" \"npm run dev --workspace @study-buddy/api\"",
+    "dev:web": "npm run dev --workspace @study-buddy/web",
+    "dev:api": "npm run dev --workspace @study-buddy/api",
+    "build": "npm run build --workspace @study-buddy/shared && npm run build --workspace @study-buddy/api && npm run build --workspace @study-buddy/web",
+    "typecheck": "npm run typecheck --workspace @study-buddy/shared && npm run typecheck --workspace @study-buddy/api && npm run typecheck --workspace @study-buddy/web"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "typescript": "^5.9.3"
+  }
+}
