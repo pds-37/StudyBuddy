@@ -1,17 +1,22 @@
 {
-  "name": "study-buddy-platform",
-  "version": "1.0.0",
+  "name": "studybuddy-career-copilot",
+  "version": "0.1.0",
   "private": true,
+  "description": "AI Career Copilot monorepo scaffold for StudyBuddy.",
   "workspaces": [
-    "apps/*",
+    "frontend",
+    "backend",
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently -n web,api -c cyan,magenta \"npm run dev --workspace @study-buddy/web\" \"npm run dev --workspace @study-buddy/api\"",
-    "dev:web": "npm run dev --workspace @study-buddy/web",
-    "dev:api": "npm run dev --workspace @study-buddy/api",
-    "build": "npm run build --workspace @study-buddy/shared && npm run build --workspace @study-buddy/api && npm run build --workspace @study-buddy/web",
-    "typecheck": "npm run typecheck --workspace @study-buddy/shared && npm run typecheck --workspace @study-buddy/api && npm run typecheck --workspace @study-buddy/web"
+    "dev": "concurrently -n frontend,backend -c cyan,magenta \"npm run dev --workspace @studybuddy/web\" \"npm run dev --workspace @studybuddy/api\"",
+    "dev:frontend": "npm run dev --workspace @studybuddy/web",
+    "dev:backend": "npm run dev --workspace @studybuddy/api",
+    "dev:web": "npm run dev --workspace @studybuddy/web",
+    "dev:api": "npm run dev --workspace @studybuddy/api",
+    "build": "npm run build --workspace @studybuddy/shared && npm run build --workspace @studybuddy/api && npm run build --workspace @studybuddy/web",
+    "typecheck": "npm run typecheck --workspace @studybuddy/shared && npm run typecheck --workspace @studybuddy/api && npm run typecheck --workspace @studybuddy/web",
+    "clean": "npm run clean --workspace @studybuddy/shared && npm run clean --workspace @studybuddy/api && npm run clean --workspace @studybuddy/web"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",

@@ -1,129 +1,152 @@
-<<<<<<< HEAD
-# StudyBuddy
-StudyBuddy is an AI-powered study companion that helps students turn messy notes into structured knowledge, track their learning progress, and never forget what they study. It intelligently schedules revisions, identifies weak areas, and provides personalized explanations—acting like a smart system that adapts to how you learn.
-=======
-# Study Buddy
+# StudyBuddy AI Career Copilot
 
-Study Buddy is now scaffolded as a PC-first MERN-style app with:
+StudyBuddy is being rebuilt as a web-first AI Career Copilot for students and early-career professionals. This repository is now scaffolded for the new product direction only.
 
-- `apps/web`: React + Vite + React Router
-- `apps/api`: Node.js + Express
-- `packages/shared`: shared study engine types and UI contracts
+This step intentionally includes:
+- the monorepo structure
+- package manifests
+- environment templates
+- placeholder frontend/backend/shared files
+- documentation for where each feature will live
 
-The UI is dark themed and designed around a GPT-like study workflow:
-- Ask Buddy
-- capture notes fast
-- generate roadmaps
-- build a daily return habit through reminders and streaks
+This step intentionally does **not** include:
+- database schema implementation
+- auth logic
+- AI integrations
+- feature logic
 
-## Current Status
+Those will come only after you approve this scaffold.
 
-Implemented and verified:
+## Stack
 
-- workspace monorepo setup
-- dark web shell and navigation
-- auth pages and protected app shell
-- notes flow with server-side Gemini analysis fallback
-- Buddy chat route
-- roadmap generation route
-- reminders and dashboard routes
-- in-memory development store
-- Mongo-ready data abstraction for later Atlas setup
+- Frontend: React.js, TailwindCSS, React Router, Axios, Zustand
+- Backend: Node.js, Express.js, MongoDB via Mongoose
+- Auth: JWT + bcrypt
+- AI: Groq, Google Gemini Flash, HuggingFace
+- Hosting: Vercel (frontend), Render (backend)
+- Shared: TypeScript package for shared types and Zod schemas
 
-Checks passed:
+## Repository Layout
 
-- `npm run typecheck`
-- `npm run build`
-- API smoke test: `GET /api/health` returned `{"status":"ok","database":"memory"}`
-
-## Run On Your PC
-
-Open a terminal in:
-
-```bat
-cd /d "D:\Projects\Personal Notes AI"
+```text
+.
++-- backend/                 # Express backend scaffold
+|   +-- src/
+|   |   +-- config/         # Env parsing, DB bootstrap
+|   |   +-- middlewares/    # Express middleware placeholders
+|   |   +-- modules/        # Feature-first backend modules
+|   |   +-- routes/         # Root router composition
+|   |   +-- scripts/        # Seed/import scripts
+|   |   +-- services/       # AI, vector, and cache service placeholders
+|   |   +-- types/          # Express/global TS types
+|   |   +-- utils/          # Shared backend utilities
+|   |   +-- app.ts          # Express app setup
+|   |   +-- server.ts       # Server entrypoint
+|   +-- .env.example        # Backend env template
+|   +-- package.json        # Backend dependencies/scripts
+|   +-- tsconfig.json       # Backend TS config
++-- frontend/                # React frontend scaffold
+|   +-- public/             # Static assets
+|   +-- src/
+|   |   +-- assets/         # App-local visual assets
+|   |   +-- components/     # Reusable UI, nav, feedback shells
+|   |   +-- features/       # Feature folders for auth, roadmap, notes, jobs, copilot
+|   |   +-- hooks/          # Custom hooks placeholder zone
+|   |   +-- layouts/        # Marketing and app shell layouts
+|   |   +-- lib/            # API client, env helpers, utility functions
+|   |   +-- pages/          # Route-level pages
+|   |   +-- providers/      # React Query and router providers
+|   |   +-- router/         # Router config and protected route wrapper
+|   |   +-- store/          # Zustand root store
+|   |   +-- types/          # Frontend-only types
+|   |   +-- App.tsx         # App root
+|   |   +-- index.css       # Tailwind entry + theme tokens
+|   |   +-- main.tsx        # Vite mount point
+|   +-- .env.example        # Frontend env template
+|   +-- index.html          # Vite HTML entry
+|   +-- package.json        # Frontend dependencies/scripts
+|   +-- postcss.config.cjs
+|   +-- tailwind.config.cjs
+|   +-- tsconfig.json
+|   +-- tsconfig.node.json
+|   +-- vite.config.ts
++-- docs/
+|   +-- scaffold-notes.md    # High-level scaffold notes for the solo-dev build
++-- packages/
+|   +-- shared/              # Shared TS types and Zod schemas
+|       +-- src/
+|       |   +-- constants/   # Cross-app constants
+|       |   +-- schemas/     # Shared Zod schemas
+|       |   +-- types/       # Shared domain types
+|       |   +-- index.ts
+|       +-- package.json
+|       +-- tsconfig.json
++-- .env.example             # Combined env reference for the whole system
++-- .gitignore
++-- package.json             # Workspace root scripts
++-- tsconfig.base.json       # Shared TS compiler base
++-- tsconfig.json            # Root TS references
 ```
 
-Install dependencies:
+## Folder Intent By Feature
 
-```bat
-npm.cmd install
+- `frontend/src/features/auth`: signup, login, token persistence, guards
+- `frontend/src/features/onboarding`: initial user profile and skill input
+- `frontend/src/features/profile`: profile editing and role targeting
+- `frontend/src/features/skill-gap`: gap analysis UI and visualizations
+- `frontend/src/features/roadmap`: roadmap generation and timeline UI
+- `frontend/src/features/notes`: note capture, resource tagging, RAG context
+- `frontend/src/features/jobs`: job feed and job matching UI
+- `frontend/src/features/copilot`: AI career chat workspace
+
+- `backend/src/modules/auth`: auth controllers, routes, validation, services
+- `backend/src/modules/users`: user profile data and onboarding persistence
+- `backend/src/modules/notes`: career notes CRUD and tagging
+- `backend/src/modules/roadmaps`: roadmap storage and generation endpoints
+- `backend/src/modules/jobs`: cached jobs and match scoring
+- `backend/src/modules/skills`: O*NET taxonomy and skill lookup endpoints
+- `backend/src/modules/copilot`: career chat and RAG orchestration
+
+## Environment Setup
+
+1. Copy the root example file if you want a single checklist:
+   - `.env.example`
+2. Create app-specific files when you start local development:
+   - `backend/.env`
+   - `frontend/.env.local`
+
+## Workspace Commands
+
+Install everything from the repo root:
+
+```bash
+npm install
 ```
 
-Start both web and API together:
+Start both apps:
 
-```bat
-npm.cmd run dev
+```bash
+npm run dev
 ```
 
-Then open:
+Start only the frontend:
 
-- Web app: `http://localhost:5173`
-- API health: `http://localhost:4000/api/health`
-
-You can also run them separately:
-
-```bat
-npm.cmd run dev:web
-npm.cmd run dev:api
+```bash
+npm run dev:web
 ```
 
-## Gemini Setup
+Start only the backend:
 
-Create an API env file from the example:
-
-```bat
-copy apps\api\.env.example apps\api\.env
+```bash
+npm run dev:api
 ```
 
-Then put your Gemini key in:
+## What To Review Now
 
-```env
-GEMINI_API_KEY=your_real_gemini_key_here
-```
+For this step, please review:
+- the folder structure
+- the package choices
+- the env variable list
+- the frontend/backend/shared split
 
-Optional values:
-
-```env
-PORT=4000
-CLIENT_URL=http://localhost:5173
-JWT_SECRET=change-me-in-production
-GEMINI_MODEL=gemini-2.5-flash-lite
-MONGODB_URI=
-MONGODB_DB=studybuddy
-```
-
-If `GEMINI_API_KEY` is missing:
-
-- notes still save
-- Buddy chat falls back gracefully
-- roadmap generation returns a helpful error instead of crashing the app
-
-## MongoDB Setup Later
-
-Right now the API runs in memory mode if `MONGODB_URI` is empty.
-
-To switch to MongoDB Atlas later, set:
-
-```env
-MONGODB_URI=your_mongodb_connection_string
-MONGODB_DB=studybuddy
-```
-
-Then restart the API.
-
-## Main Workspace Scripts
-
-At the repo root:
-
-- `npm run dev`
-- `npm run dev:web`
-- `npm run dev:api`
-- `npm run typecheck`
-- `npm run build`
-
-## Notes
-
-- The old Expo prototype files still exist in the repo, but the new active stack is the MERN-style workspace under `apps/` and `packages/`.
-- For public sharing later, keep Gemini server-side only. Do not expose the key in the browser.
->>>>>>> a420bce (Initial Study Buddy web platform)
+Once you approve this scaffold, I will stop here and move to **Step 3: Database Schema** exactly as requested.

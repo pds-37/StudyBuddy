@@ -1,0 +1,12 @@
+import { Router } from "express";
+import { authenticate } from "../../middlewares/authenticate.js";
+import { roadmapsController } from "./roadmaps.controller.js";
+
+export const roadmapsRouter = Router();
+
+roadmapsRouter.use(authenticate);
+
+roadmapsRouter.post("/generate", roadmapsController.generate);
+roadmapsRouter.get("/generate-from-gaps", roadmapsController.generateFromGaps);
+roadmapsRouter.get("/", roadmapsController.get);
+roadmapsRouter.put("/milestones/:milestoneId", roadmapsController.updateMilestone);
