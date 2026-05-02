@@ -27,7 +27,7 @@ function toAuthUser(user: UserDocument) {
     id: String(user._id),
     name: user.name,
     email: user.email,
-    targetRole: user.targetRole,
+    targetRoles: user.targetRoles,
     currentSkills: user.currentSkills,
     experienceLevel: user.experienceLevel,
     onboardingCompleted: user.onboardingCompleted

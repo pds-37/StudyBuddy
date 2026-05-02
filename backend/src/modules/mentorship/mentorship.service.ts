@@ -19,7 +19,7 @@ function toMatch(doc: MentorshipDocument): MentorshipMatch {
 /** Analyzes user profile to find the best mentors and generates AI reasons for the match. */
 async function findMatches(userId: string): Promise<MentorshipMatch[]> {
   const user = await UserModel.findById(userId);
-  if (!user || !user.targetRole) {
+  if (!user || user.targetRoles.length === 0) {
     throw new ApiError(400, "User must have a target role to find mentors");
   }
 
@@ -31,7 +31,7 @@ async function findMatches(userId: string): Promise<MentorshipMatch[]> {
 
   // Generate matches using AI to determine relevance and reasons
   const prompt = `You are an expert mentorship matchmaker. 
-Candidate Target Role: ${user.targetRole}
+Candidate Target Role: ${user.targetRoles[0]}
 Candidate Skills: ${user.currentSkills.join(", ")}
 
 Available Mentors:

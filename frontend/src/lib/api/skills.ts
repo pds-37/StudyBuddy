@@ -1,4 +1,4 @@
-import { client } from "./client";
+import { apiClient as client } from "./client";
 
 export type SkillGapItem = {
   skill: string;

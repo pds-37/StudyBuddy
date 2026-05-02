@@ -11,12 +11,12 @@ function toSession(doc: InterviewDocument): InterviewSession {
 /** Starts a new interview session. */
 async function startSession(userId: string): Promise<InterviewSession> {
   const user = await UserModel.findById(userId);
-  if (!user || !user.targetRole) {
+  if (!user || user.targetRoles.length === 0) {
     throw new ApiError(400, "User must have a target role to start an interview");
   }
 
   // Generate 3 personalized questions (1 general, 1 behavioral, 1 technical)
-  const questionsPrompt = `Generate exactly 3 interview questions for a ${user.targetRole} role. 
+  const questionsPrompt = `Generate exactly 3 interview questions for a ${user.targetRoles[0]} role. 
 The candidate has the following skills: ${user.currentSkills.join(", ")}.
 Question 1: General/Introductory
 Question 2: Behavioral (STAR format expected)
@@ -34,7 +34,7 @@ ONLY output valid JSON.`;
     generatedQuestions = [
       { question: "Tell me about yourself and your background.", category: "general" },
       { question: "Describe a time you faced a difficult challenge at work.", category: "behavioral" },
-      { question: `What are your strongest technical skills relevant to a ${user.targetRole}?`, category: "technical" }
+      { question: `What are your strongest technical skills relevant to a ${user.targetRoles[0]}?`, category: "technical" }
     ];
   }
 
@@ -46,7 +46,7 @@ ONLY output valid JSON.`;
 
   const session = await InterviewModel.create({
     userId,
-    targetRole: user.targetRole,
+    targetRole: user.targetRoles[0],
     status: "in_progress",
     questions
   });

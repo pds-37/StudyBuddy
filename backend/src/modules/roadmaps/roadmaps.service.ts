@@ -141,7 +141,7 @@ async function generateFromSkillGaps(userId: string, timelineWeeks: number = 12)
     throw new ApiError(404, "User not found");
   }
 
-  if (!user.targetRole || user.currentSkills.length === 0) {
+  if (user.targetRoles.length === 0 || user.currentSkills.length === 0) {
     throw new ApiError(400, "Complete onboarding with target role and current skills first");
   }
 
@@ -153,7 +153,7 @@ async function generateFromSkillGaps(userId: string, timelineWeeks: number = 12)
   }));
 
   return generateRoadmap(userId, {
-    targetRole: user.targetRole,
+    targetRole: user.targetRoles[0],
     timelineWeeks,
     skillGaps: skillGapsFormatted
   });

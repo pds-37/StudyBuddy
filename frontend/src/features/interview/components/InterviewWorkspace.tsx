@@ -17,7 +17,7 @@ export function InterviewWorkspace() {
     await startSession();
   };
 
-  if (!user?.targetRole) {
+  if (!user?.targetRoles || user.targetRoles.length === 0) {
     return (
       <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-6 flex items-start gap-4">
         <AlertTriangle className="w-6 h-6 text-amber-400 shrink-0" />
@@ -50,7 +50,7 @@ export function InterviewWorkspace() {
         </div>
         <h2 className="text-2xl font-bold text-white mb-3">AI Interview Simulator</h2>
         <p className="text-slate-400 max-w-lg mx-auto mb-8 leading-relaxed">
-          Practice interviewing for your target role: <strong className="text-white">{user.targetRole}</strong>. 
+          Practice interviewing for your target role: <strong className="text-white">{user.targetRoles[0]}</strong>. 
           The AI will ask behavioral and technical questions and score your answers using the STAR method.
         </p>
         <button

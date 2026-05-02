@@ -65,7 +65,7 @@ export function DashboardPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-4xl font-black tracking-tight text-white mb-2">Welcome back, {user?.name || "User"}</h1>
-          <p className="text-slate-400">Here's what's happening with your <span className="text-white font-semibold">{user?.targetRole || "career setup"}</span> path.</p>
+          <p className="text-slate-400">Here's what's happening with your <span className="text-white font-semibold">{user?.targetRoles?.[0] || "career setup"}</span> path.</p>
         </div>
         {!user?.onboardingCompleted && (
           <Link

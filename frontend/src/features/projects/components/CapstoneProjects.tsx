@@ -12,7 +12,7 @@ export function CapstoneProjects() {
     fetchMatches();
   }, [fetchMatches]);
 
-  if (!user?.targetRole) {
+  if (!user?.targetRoles || user.targetRoles.length === 0) {
     return (
       <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-6">
         <h3 className="text-lg font-medium text-amber-200">Target Role Required</h3>

@@ -19,7 +19,7 @@ function toMatch(doc: ProjectDocument): ProjectMatch {
 /** Analyzes user profile to find the best projects. */
 async function findMatches(userId: string): Promise<ProjectMatch[]> {
   const user = await UserModel.findById(userId);
-  if (!user || !user.targetRole) {
+  if (!user || user.targetRoles.length === 0) {
     throw new ApiError(400, "User must have a target role to find projects");
   }
 
@@ -29,7 +29,7 @@ async function findMatches(userId: string): Promise<ProjectMatch[]> {
   }
 
   const prompt = `You are an expert tech career advisor. 
-Candidate Target Role: ${user.targetRole}
+Candidate Target Role: ${user.targetRoles[0]}
 Candidate Skills: ${user.currentSkills.join(", ")}
 
 Available Projects:
