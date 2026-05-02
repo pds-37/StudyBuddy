@@ -159,10 +159,29 @@ async function generateFromSkillGaps(userId: string, timelineWeeks: number = 12)
   });
 }
 
+/** Generates a quiz for a specific milestone. */
+async function generateQuizForMilestone(userId: string, milestoneId: string) {
+  const roadmap = await RoadmapModel.findOne({ userId, "milestones.id": milestoneId });
+  if (!roadmap) {
+    throw new ApiError(404, "Roadmap or milestone not found");
+  }
+
+  const milestone = roadmap.milestones.find(m => m.id === milestoneId);
+  if (!milestone) {
+    throw new ApiError(404, "Milestone not found");
+  }
+
+  const topic = milestone.title;
+  const targetRole = roadmap.targetRole;
+
+  return groqService.generateQuiz(topic, targetRole);
+}
+
 export const roadmapsService = {
   generateRoadmap,
   generateFromSkillGaps,
   getRoadmap,
   getUserRoadmaps,
-  updateMilestoneStatus
+  updateMilestoneStatus,
+  generateQuizForMilestone
 };

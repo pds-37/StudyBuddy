@@ -11,6 +11,7 @@ import { interviewRouter } from "../modules/interview/interview.routes.js";
 import { mentorshipRouter } from "../modules/mentorship/mentorship.routes.js";
 import { projectRouter } from "../modules/projects/project.routes.js";
 import { notificationRouter } from "../modules/notifications/notification.routes.js";
+import { syncRouter } from "../modules/sync/sync.routes.js";
 
 
 export const apiRouter = Router();
@@ -27,4 +28,5 @@ apiRouter.use("/interview", interviewRouter);
 apiRouter.use("/mentorship", mentorshipRouter);
 apiRouter.use("/projects", projectRouter);
 apiRouter.use("/notifications", notificationRouter);
+apiRouter.use("/sync", syncRouter);
 

@@ -12,6 +12,13 @@ import {
 import { tailorResume } from "../../../lib/api/resume";
 import { cn } from "../../../lib/utils/cn";
 import type { ResumeTailorResult, ResumeTailorTone } from "@studybuddy/shared";
+import * as pdfjsLib from "pdfjs-dist";
+
+// Standard Vite way to load the worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  "pdfjs-dist/build/pdf.worker.min.mjs",
+  import.meta.url
+).toString();
 
 const toneOptions: Array<{ value: ResumeTailorTone; label: string; description: string }> = [
   { value: "impact", label: "Impact", description: "Outcome-first bullets" },
@@ -19,16 +26,7 @@ const toneOptions: Array<{ value: ResumeTailorTone; label: string; description: 
   { value: "concise", label: "Concise", description: "Short and clean" }
 ];
 
-const resumePlaceholder = `SUMMARY
-Frontend developer with experience building React applications...
-
-EXPERIENCE
-- Built dashboard screens using React and TypeScript.
-- Worked with APIs and improved UI components.
-- Collaborated with team members on product features.
-
-PROJECTS
-- StudyBuddy career copilot app...`;
+const resumePlaceholder = `Select a PDF or TXT file to upload.`;
 
 /** Converts API errors into a concise message for the resume form. */
 function getErrorMessage(error: unknown) {
@@ -47,9 +45,10 @@ export function ResumeTailorWorkspace() {
   const [tone, setTone] = useState<ResumeTailorTone>("impact");
   const [result, setResult] = useState<ResumeTailorResult | null>(null);
   const [isLoading, setLoading] = useState(false);
+  const [isParsing, setIsParsing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const canSubmit = targetRole.trim().length >= 2 && currentResume.trim().length >= 80 && !isLoading;
+  const canSubmit = targetRole.trim().length >= 2 && currentResume.trim().length >= 80 && !isLoading && !isParsing;
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -96,6 +95,47 @@ export function ResumeTailorWorkspace() {
     await navigator.clipboard.writeText(text);
   };
 
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsParsing(true);
+    setError(null);
+    setCurrentResume("");
+
+    try {
+      if (file.type === "application/pdf") {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        let fullText = "";
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const textContent = await page.getTextContent();
+          const pageText = textContent.items
+            .map((item: any) => item.str)
+            .join(" ");
+          fullText += pageText + "\\n";
+        }
+        
+        if (!fullText.trim()) {
+          throw new Error("PDF extracted no text content.");
+        }
+        
+        setCurrentResume(fullText);
+      } else if (file.type === "text/plain") {
+        const text = await file.text();
+        setCurrentResume(text);
+      } else {
+        setError("Please upload a valid PDF or TXT file.");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Failed to parse the file. Please ensure it is a valid PDF or text file.");
+    } finally {
+      setIsParsing(false);
+    }
+  };
+
   return (
     <div className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
       <form
@@ -134,15 +174,34 @@ export function ResumeTailorWorkspace() {
         </label>
 
         <label className="mt-5 block">
-          <span className="text-sm font-medium text-slate-200">Current resume text</span>
-          <textarea
-            value={currentResume}
-            onChange={(event) => setCurrentResume(event.target.value)}
-            placeholder={resumePlaceholder}
-            rows={12}
-            className="mt-2 w-full resize-none rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-slate-600 focus:border-cyan/35 focus:bg-black/35"
-          />
-          <span className="mt-2 block text-xs text-slate-500">Minimum 80 characters. Paste text only for now, not a PDF.</span>
+          <span className="text-sm font-medium text-slate-200">Resume Upload</span>
+          <div className="relative mt-2 flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/10 bg-black/25 px-4 py-8 transition hover:border-cyan/35 hover:bg-black/35">
+            <input 
+              type="file" 
+              accept=".pdf,.txt" 
+              onChange={handleFileUpload}
+              className="absolute inset-0 h-full w-full opacity-0 cursor-pointer" 
+              title=""
+            />
+            {isParsing ? (
+              <div className="flex flex-col items-center gap-2">
+                <Loader2 className="h-6 w-6 animate-spin text-cyan" />
+                <span className="text-sm text-slate-400">Extracting text...</span>
+              </div>
+            ) : currentResume ? (
+              <div className="flex flex-col items-center gap-2 text-center">
+                <CheckCircle2 className="h-6 w-6 text-emerald-400" />
+                <span className="text-sm text-slate-200">Resume Parsed Successfully</span>
+                <span className="text-xs text-slate-500">({currentResume.length} characters extracted)</span>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-2 text-center">
+                <FileText className="h-6 w-6 text-slate-400" />
+                <span className="text-sm text-slate-200">Click or drag PDF/TXT here</span>
+                <span className="text-xs text-slate-500">Max size: 5MB</span>
+              </div>
+            )}
+          </div>
         </label>
 
         <div className="mt-5">
@@ -184,7 +243,7 @@ export function ResumeTailorWorkspace() {
         </button>
       </form>
 
-      <div className="rounded-[2rem] border border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.08),transparent_22rem),rgba(255,255,255,0.045)] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl">
+      <div className="rounded-[1.5rem] border border-white/[0.04] bg-ink p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-cyan">Output</p>
@@ -257,10 +316,9 @@ type ResultCardProps = {
   children: ReactNode;
 };
 
-/** Shared frosted output card. */
 function ResultCard({ title, icon, children }: ResultCardProps) {
   return (
-    <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-4">
+    <div className="rounded-[1rem] border border-white/[0.04] bg-black/20 p-4">
       <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-white">
         <span className="grid h-8 w-8 place-items-center rounded-xl bg-cyan/10 text-cyan">{icon}</span>
         {title}
@@ -276,10 +334,9 @@ type ChecklistProps = {
   warning?: boolean;
 };
 
-/** Renders compact result lists for resume guidance. */
 function Checklist({ title, items, warning = false }: ChecklistProps) {
   return (
-    <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-4">
+    <div className="rounded-[1rem] border border-white/[0.04] bg-black/20 p-4">
       <p className="text-sm font-semibold text-white">{title}</p>
       <div className="mt-3 space-y-2">
         {items.length > 0 ? (

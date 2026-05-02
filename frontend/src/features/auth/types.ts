@@ -4,7 +4,7 @@ export type AuthUser = {
   id: string;
   name: string;
   email: string;
-  targetRole: string;
+  targetRoles: string[];
   currentSkills: string[];
   experienceLevel: "beginner" | "intermediate" | "advanced";
   onboardingCompleted: boolean;

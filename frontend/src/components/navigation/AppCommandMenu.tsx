@@ -1,3 +1,4 @@
+import { cn } from "../../lib/utils/cn";
 import { useEffect, useMemo, useState } from "react";
 import { Command } from "cmdk";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -280,10 +281,12 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
                       <Icon className="h-4 w-4" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-white">{action.label}</p>
-                      <p className="truncate text-xs text-slate-400">{action.description}</p>
+                      <p className="truncate text-sm font-semibold tracking-tight text-white">{action.label}</p>
+                      <p className="truncate text-[11px] text-slate-500 font-medium">{action.description}</p>
                     </div>
-                    <ArrowRight className="h-4 w-4 text-slate-500" />
+                    <div className="opacity-0 group-data-[selected=true]:opacity-100 transition-opacity">
+                      <ArrowRight className="h-4 w-4 text-brand" />
+                    </div>
                   </Command.Item>
                 );
               })}

@@ -1,1 +1,1 @@
-export { RoadmapPlaceholder as RoadmapWorkspace } from "./components/RoadmapPlaceholder";
+export { RoadmapWorkspace } from "./components/RoadmapWorkspace";

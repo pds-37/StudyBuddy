@@ -15,7 +15,7 @@
   "include": ["src"],
   "references": [
     {
-      "path": "../packages/shared"
+      "path": "./shared"
     }
   ]
 }

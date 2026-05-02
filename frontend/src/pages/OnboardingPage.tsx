@@ -14,8 +14,12 @@ const experienceLevels = [
 
 /** Converts profile API errors into readable form feedback. */
 function getProfileErrorMessage(error: unknown) {
-  if (isAxiosError<{ message?: string }>(error)) {
-    return error.response?.data?.message ?? "Unable to save your profile right now.";
+  if (isAxiosError<{ message?: string; errors?: any }>(error)) {
+    const data = error.response?.data;
+    if (data?.errors && Array.isArray(data.errors)) {
+      return data.errors.map((err: any) => err.message).join(" | ");
+    }
+    return data?.message ?? "Unable to save your profile right now.";
   }
 
   if (error instanceof Error) {
@@ -31,7 +35,8 @@ export function OnboardingPage() {
   const user = useAppStore((state) => state.user);
   const setUser = useAppStore((state) => state.setUser);
   const [name, setName] = useState(user?.name ?? "");
-  const [targetRole, setTargetRole] = useState(user?.targetRole ?? "");
+  const [targetRoles, setTargetRoles] = useState<string[]>(user?.targetRoles ?? []);
+  const [targetInput, setTargetInput] = useState("");
   const [experienceLevel, setExperienceLevel] = useState(user?.experienceLevel ?? "beginner");
   const [currentSkills, setCurrentSkills] = useState<string[]>(user?.currentSkills ?? []);
   const [skillInput, setSkillInput] = useState("");
@@ -40,8 +45,11 @@ export function OnboardingPage() {
   const [isSubmitting, setSubmitting] = useState(false);
 
   const canSubmit = useMemo(
-    () => name.trim().length >= 2 && targetRole.trim().length >= 2 && currentSkills.length > 0,
-    [currentSkills.length, name, targetRole]
+    () => 
+      name.trim().length >= 2 && 
+      (targetRoles.length > 0 || targetInput.trim().length > 2) && 
+      (currentSkills.length > 0 || skillInput.trim().length > 1),
+    [currentSkills.length, name, skillInput, targetInput, targetRoles.length]
   );
 
   useEffect(() => {
@@ -76,6 +84,19 @@ export function OnboardingPage() {
     setSuggestions([]);
   }
 
+  /** Adds a career goal/target role chip. */
+  function addTargetRole(role: string) {
+    const normalized = role.trim();
+    if (!normalized) return;
+    setTargetRoles(prev => prev.includes(normalized) ? prev : [...prev, normalized]);
+    setTargetInput("");
+  }
+
+  /** Removes a career goal chip. */
+  function removeTargetRole(role: string) {
+    setTargetRoles(prev => prev.filter(r => r !== role));
+  }
+
   /** Removes a skill chip from the current profile draft. */
   function removeSkill(skill: string) {
     setCurrentSkills((existingSkills) => existingSkills.filter((existingSkill) => existingSkill !== skill));
@@ -94,10 +115,26 @@ export function OnboardingPage() {
     setSubmitting(true);
 
     try {
+      // Auto-tag any pending text in the inputs before submitting
+      const finalTargetRoles = [...targetRoles];
+      if (targetInput.trim()) {
+        finalTargetRoles.push(targetInput.trim());
+      }
+
+      const finalSkills = [...currentSkills];
+      if (skillInput.trim()) {
+        finalSkills.push(skillInput.trim());
+      }
+
+      if (finalTargetRoles.length === 0 || finalSkills.length === 0) {
+        setError("Add at least one goal and one skill.");
+        return;
+      }
+
       const profile = await profileApi.updateProfile({
         name,
-        targetRole,
-        currentSkills,
+        targetRoles: finalTargetRoles,
+        currentSkills: finalSkills,
         experienceLevel
       });
       setUser(profile);
@@ -136,15 +173,45 @@ export function OnboardingPage() {
             />
           </label>
 
-          <label className="block">
-            <span className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">Target role</span>
-            <input
-              value={targetRole}
-              onChange={(event) => setTargetRole(event.target.value)}
-              className="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-sm text-white outline-none transition focus:border-brand"
-              placeholder="Frontend Developer, Data Analyst, AI Engineer..."
-            />
-          </label>
+          <div>
+            <span className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">Career Goals / Target Roles</span>
+            <div className="mt-2 rounded-2xl border border-white/10 bg-black/30 p-3">
+              <div className="flex flex-wrap gap-2">
+                {targetRoles.map((role) => (
+                  <button
+                    key={role}
+                    type="button"
+                    onClick={() => removeTargetRole(role)}
+                    className="rounded-full border border-cyan/30 bg-cyan/15 px-3 py-1 text-xs font-semibold text-slate-100"
+                  >
+                    {role} x
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-2 mt-3">
+                <input
+                  value={targetInput}
+                  onChange={(event) => setTargetInput(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.preventDefault();
+                      addTargetRole(targetInput);
+                    }
+                  }}
+                  className="flex-1 bg-transparent px-1 py-2 text-sm text-white outline-none"
+                  placeholder="e.g. Software Developer, Cybersecurity..."
+                />
+                <button
+                  type="button"
+                  onClick={() => addTargetRole(targetInput)}
+                  className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-[10px] font-black uppercase text-slate-400 transition-colors shrink-0"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+            <p className="mt-2 text-[10px] text-slate-500 uppercase tracking-widest">Tip: Add multiple goals to create a hybrid career path.</p>
+          </div>
 
           <div>
             <span className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">Experience</span>
@@ -181,18 +248,27 @@ export function OnboardingPage() {
                   </button>
                 ))}
               </div>
-              <input
-                value={skillInput}
-                onChange={(event) => setSkillInput(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    event.preventDefault();
-                    addSkill(skillInput);
-                  }
-                }}
-                className="mt-3 w-full bg-transparent px-1 py-2 text-sm text-white outline-none"
-                placeholder="Search O*NET skills or press Enter to add your own"
-              />
+              <div className="flex items-center gap-2 mt-3">
+                <input
+                  value={skillInput}
+                  onChange={(event) => setSkillInput(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.preventDefault();
+                      addSkill(skillInput);
+                    }
+                  }}
+                  className="flex-1 bg-transparent px-1 py-2 text-sm text-white outline-none"
+                  placeholder="Search O*NET skills or press Enter to add your own"
+                />
+                <button
+                  type="button"
+                  onClick={() => addSkill(skillInput)}
+                  className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-[10px] font-black uppercase text-slate-400 transition-colors shrink-0"
+                >
+                  Add
+                </button>
+              </div>
             </div>
 
             {suggestions.length > 0 ? (

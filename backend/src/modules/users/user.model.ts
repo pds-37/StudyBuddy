@@ -20,9 +20,9 @@ const userSchema = new Schema(
       required: true,
       trim: true
     },
-    targetRole: {
-      type: String,
-      default: ""
+    targetRoles: {
+      type: [String],
+      default: []
     },
     experienceLevel: {
       type: String,

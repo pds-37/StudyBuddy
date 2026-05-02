@@ -16,7 +16,7 @@
   "exclude": ["src/**/*Old.tsx"],
   "references": [
     {
-      "path": "../packages/shared"
+      "path": "../backend/shared"
     }
   ]
 }

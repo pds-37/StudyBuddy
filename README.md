@@ -1,152 +1,113 @@
-# StudyBuddy AI Career Copilot
+# StudyBuddy — Featuring Veda AI
 
-StudyBuddy is being rebuilt as a web-first AI Career Copilot for students and early-career professionals. This repository is now scaffolded for the new product direction only.
+StudyBuddy is a next-generation AI Career Copilot designed to bridge the gap between your educational notes and professional career goals. Powered by **Veda AI**, it provides contextual guidance, roadmap generation, and skill-gap analysis based on your unique study materials.
 
-This step intentionally includes:
-- the monorepo structure
-- package manifests
-- environment templates
-- placeholder frontend/backend/shared files
-- documentation for where each feature will live
+---
 
-This step intentionally does **not** include:
-- database schema implementation
-- auth logic
-- AI integrations
-- feature logic
+## ✨ Key Features
 
-Those will come only after you approve this scaffold.
+- **🧠 Contextual AI Copilot**: A RAG-powered chat assistant that knows your notes, resume, and target career path.
+- **📊 AI Skill Gap Analysis**: Automatically compares your current skill set against industry-standard role requirements using semantic matching.
+- **🗺️ Dynamic Roadmaps**: Converts identified skill gaps into actionable, week-by-week learning milestones.
+- **💼 Job Matcher**: A live job feed that scores every listing based on your personal skill profile and notes.
+- **💻 C++ Sync Agent**: A lightning-fast, offline-first CLI tool for Windows/Unix that securely syncs your local markdown notes (e.g., from Obsidian/VS Code) to the cloud.
 
-## Stack
+---
 
-- Frontend: React.js, TailwindCSS, React Router, Axios, Zustand
-- Backend: Node.js, Express.js, MongoDB via Mongoose
-- Auth: JWT + bcrypt
-- AI: Groq, Google Gemini Flash, HuggingFace
-- Hosting: Vercel (frontend), Render (backend)
-- Shared: TypeScript package for shared types and Zod schemas
+## 🏗️ Architecture
 
-## Repository Layout
+The project is a Monorepo built for scalability and performance:
 
-```text
-.
-+-- backend/                 # Express backend scaffold
-|   +-- src/
-|   |   +-- config/         # Env parsing, DB bootstrap
-|   |   +-- middlewares/    # Express middleware placeholders
-|   |   +-- modules/        # Feature-first backend modules
-|   |   +-- routes/         # Root router composition
-|   |   +-- scripts/        # Seed/import scripts
-|   |   +-- services/       # AI, vector, and cache service placeholders
-|   |   +-- types/          # Express/global TS types
-|   |   +-- utils/          # Shared backend utilities
-|   |   +-- app.ts          # Express app setup
-|   |   +-- server.ts       # Server entrypoint
-|   +-- .env.example        # Backend env template
-|   +-- package.json        # Backend dependencies/scripts
-|   +-- tsconfig.json       # Backend TS config
-+-- frontend/                # React frontend scaffold
-|   +-- public/             # Static assets
-|   +-- src/
-|   |   +-- assets/         # App-local visual assets
-|   |   +-- components/     # Reusable UI, nav, feedback shells
-|   |   +-- features/       # Feature folders for auth, roadmap, notes, jobs, copilot
-|   |   +-- hooks/          # Custom hooks placeholder zone
-|   |   +-- layouts/        # Marketing and app shell layouts
-|   |   +-- lib/            # API client, env helpers, utility functions
-|   |   +-- pages/          # Route-level pages
-|   |   +-- providers/      # React Query and router providers
-|   |   +-- router/         # Router config and protected route wrapper
-|   |   +-- store/          # Zustand root store
-|   |   +-- types/          # Frontend-only types
-|   |   +-- App.tsx         # App root
-|   |   +-- index.css       # Tailwind entry + theme tokens
-|   |   +-- main.tsx        # Vite mount point
-|   +-- .env.example        # Frontend env template
-|   +-- index.html          # Vite HTML entry
-|   +-- package.json        # Frontend dependencies/scripts
-|   +-- postcss.config.cjs
-|   +-- tailwind.config.cjs
-|   +-- tsconfig.json
-|   +-- tsconfig.node.json
-|   +-- vite.config.ts
-+-- docs/
-|   +-- scaffold-notes.md    # High-level scaffold notes for the solo-dev build
-+-- packages/
-|   +-- shared/              # Shared TS types and Zod schemas
-|       +-- src/
-|       |   +-- constants/   # Cross-app constants
-|       |   +-- schemas/     # Shared Zod schemas
-|       |   +-- types/       # Shared domain types
-|       |   +-- index.ts
-|       +-- package.json
-|       +-- tsconfig.json
-+-- .env.example             # Combined env reference for the whole system
-+-- .gitignore
-+-- package.json             # Workspace root scripts
-+-- tsconfig.base.json       # Shared TS compiler base
-+-- tsconfig.json            # Root TS references
-```
+- **`/frontend`**: React + Vite SPA with TailwindCSS and Framer Motion.
+- **`/backend`**: Node.js + Express.js API with MongoDB and HuggingFace/Gemini/Groq AI integration.
+- **`/backend/cpp-agent`**: A high-performance C++17 CLI tool for local file operations and cloud syncing.
+- **`/packages/shared`**: Shared TypeScript types and Zod schemas for end-to-end type safety.
 
-## Folder Intent By Feature
+---
 
-- `frontend/src/features/auth`: signup, login, token persistence, guards
-- `frontend/src/features/onboarding`: initial user profile and skill input
-- `frontend/src/features/profile`: profile editing and role targeting
-- `frontend/src/features/skill-gap`: gap analysis UI and visualizations
-- `frontend/src/features/roadmap`: roadmap generation and timeline UI
-- `frontend/src/features/notes`: note capture, resource tagging, RAG context
-- `frontend/src/features/jobs`: job feed and job matching UI
-- `frontend/src/features/copilot`: AI career chat workspace
+## 🚀 Getting Started
 
-- `backend/src/modules/auth`: auth controllers, routes, validation, services
-- `backend/src/modules/users`: user profile data and onboarding persistence
-- `backend/src/modules/notes`: career notes CRUD and tagging
-- `backend/src/modules/roadmaps`: roadmap storage and generation endpoints
-- `backend/src/modules/jobs`: cached jobs and match scoring
-- `backend/src/modules/skills`: O*NET taxonomy and skill lookup endpoints
-- `backend/src/modules/copilot`: career chat and RAG orchestration
+### 1. Prerequisites
 
-## Environment Setup
+- [Node.js v18+](https://nodejs.org/)
+- [MongoDB](https://www.mongodb.com/) (Local or Atlas)
+- [Cmake](https://cmake.org/) (Only for building the C++ Agent from source)
 
-1. Copy the root example file if you want a single checklist:
-   - `.env.example`
-2. Create app-specific files when you start local development:
-   - `backend/.env`
-   - `frontend/.env.local`
+### 2. Environment Setup
 
-## Workspace Commands
+1. Copy the example environment file at the root:
+   ```bash
+   cp .env.example .env
+   ```
+2. Fill in your API keys for **Groq**, **Google Gemini**, and **HuggingFace** in the `backend/.env` file.
 
-Install everything from the repo root:
+### 3. Running the Web Platform
 
+Install dependencies:
 ```bash
 npm install
 ```
 
-Start both apps:
-
+Start both backend and frontend in development mode:
 ```bash
 npm run dev
 ```
 
-Start only the frontend:
+The app will be available at `http://localhost:5173`.
 
-```bash
-npm run dev:web
+---
+
+## 💻 Using the C++ Sync Agent (CLI)
+
+The StudyBuddy Agent allows you to manage your notes locally and sync them to your cloud profile.
+
+### Installation (Windows)
+We provide a simple PowerShell script to install the agent:
+```powershell
+powershell -ExecutionPolicy Bypass -File "backend/cpp-agent/install.ps1"
 ```
+After installation, restart your terminal and type `studybuddy help`.
 
-Start only the backend:
+### Initial Setup
+1. **Login** to the StudyBuddy web dashboard.
+2. Go to **Settings** to find your **API Token** and **User ID**.
+3. Configure the CLI:
+   ```bash
+   studybuddy config set sync_url http://localhost:5000/api
+   studybuddy config set auth_token <YOUR_TOKEN>
+   studybuddy config set user_id <YOUR_USER_ID>
+   ```
 
-```bash
-npm run dev:api
-```
+### Commands
+- `studybuddy note add "Title"`: Create a new note from the terminal.
+- `studybuddy sync push`: Securely push local notes to the cloud.
+- `studybuddy sync pull`: Retrieve cloud notes to your local machine.
+- `studybuddy chat`: Start an AI-powered career consultation in your terminal.
 
-## What To Review Now
+---
 
-For this step, please review:
-- the folder structure
-- the package choices
-- the env variable list
-- the frontend/backend/shared split
+## ☁️ Deployment
 
-Once you approve this scaffold, I will stop here and move to **Step 3: Database Schema** exactly as requested.
+The project includes a `render.yaml` blueprint for easy deployment to **Render**.
+
+1. Connect your GitHub repository to Render.
+2. Create a new **Blueprint**.
+3. Render will automatically provision:
+   - The Node.js API Web Service.
+   - The Static Site for the React Frontend.
+   - All necessary build/start commands.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend**: React, TailwindCSS, Zustand, Framer Motion, Lucide Icons.
+- **Backend**: Node.js, Express, Mongoose, Zod, JWT.
+- **AI/ML**: HuggingFace (Embeddings), Groq (LLM Inference), Google Gemini (Roadmap Generation).
+- **CLI**: C++17, CPR (HTTP client), Nlohmann JSON.
+
+---
+
+## 📄 License
+
+MIT © 2026 StudyBuddy AI.

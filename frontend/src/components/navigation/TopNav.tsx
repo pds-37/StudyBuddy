@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Command, Menu, Search, Sparkles, X } from "lucide-react";
+import { Command, Menu, Search, Sparkles, X, Bell } from "lucide-react";
 import { cn } from "../../lib/utils/cn";
 import { useAppStore } from "../../store/app-store";
 import { NotificationsPopover } from "../NotificationsPopover";
@@ -15,238 +15,158 @@ type TopNavProps = {
   onOpenCommand?: () => void;
 };
 
-/** Resolves an in-page landing link from any current route. */
-function getLandingHref(pathname: string, hash: string) {
-  return pathname === "/" ? hash : `/${hash}`;
-}
-
-/** Renders the public navigation and mobile menu for marketing pages. */
 export function TopNav({ onOpenCommand }: TopNavProps) {
   const location = useLocation();
-  const isAuthenticated = useAppStore((state) => state.isAuthenticated);
-  const user = useAppStore((state) => state.user);
+  const { isAuthenticated, user } = useAppStore();
   const [isMenuOpen, setMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const isLandingPage = location.pathname === "/";
-  const showPrimaryAction = !isAuthenticated && location.pathname !== "/auth";
-  const isAppShell = isAuthenticated && !isLandingPage && location.pathname !== "/auth";
+  const isAuthPage = location.pathname.startsWith("/auth");
+  const isAppShell = !isLandingPage && !isAuthPage;
 
-  const primaryAction = isAuthenticated
-    ? { label: "Open app", to: "/dashboard" }
-    : { label: "Start free", to: "/auth" };
-
-  const secondaryAction = isAuthenticated
-    ? { label: "Dashboard", to: "/dashboard" }
-    : location.pathname === "/auth"
-      ? { label: "Back home", to: "/" }
-      : { label: "Sign in", to: "/auth" };
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const userInitials = useMemo(() => {
-    const source = user?.name?.trim() || user?.email?.trim() || "StudyBuddy";
-    return source
-      .split(/\s+/)
-      .slice(0, 2)
-      .map((part) => part[0]?.toUpperCase() ?? "")
-      .join("");
-  }, [user?.email, user?.name]);
+    const source = user?.name || user?.email || "U";
+    return source.substring(0, 2).toUpperCase();
+  }, [user]);
 
   return (
     <header
       className={cn(
-        "sticky z-40 backdrop-blur-xl",
-        isLandingPage ? "top-4 px-5" : "top-0 border-b border-white/6",
-        isAppShell ? "bg-ink/82" : isLandingPage ? "bg-transparent" : "bg-ink/75"
+        "sticky top-0 z-40 w-full transition-all duration-300 h-20 flex items-center shrink-0",
+        isAppShell 
+          ? "bg-obsidian backdrop-blur-xl border-b border-white/[0.08]" 
+          : isScrolled 
+            ? "bg-obsidian/90 backdrop-blur-xl border-b border-white/5 shadow-2xl"
+            : "bg-transparent"
       )}
     >
-      <div
-        className={cn(
-          "mx-auto flex items-center justify-between gap-4 px-5 py-3.5",
-          isAppShell ? "max-w-[1320px]" : "max-w-7xl",
-          isLandingPage &&
-            "rounded-full border border-white/15 bg-white/[0.06] shadow-[0_20px_70px_rgba(0,0,0,0.34),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-2xl"
-        )}
-      >
-        <div className="flex items-center gap-7">
-          <Link to="/" className="flex items-center gap-3 font-semibold text-white">
-            <span
-              className={cn(
-                "grid h-10 w-10 place-items-center overflow-hidden rounded-2xl border border-white/10 bg-white p-0.5",
-                isLandingPage
-                  ? "shadow-[0_0_24px_rgba(56,189,248,0.2)]"
-                  : "shadow-[0_16px_44px_rgba(34,211,238,0.12)]"
-              )}
-            >
-              <img src="/brand/studybuddy-favicon-512.png" alt="" className="h-full w-full rounded-xl object-contain" />
-            </span>
-            <span className="font-display text-lg tracking-tight">StudyBuddy</span>
-          </Link>
-
-          {isLandingPage ? (
-            <nav className="hidden items-center gap-6 md:flex">
-              {landingSections.map((item) => (
-                <a
-                  key={item.label}
-                  href={getLandingHref(location.pathname, item.href)}
-                  className="font-mono text-xs uppercase tracking-[0.18em] text-slate-400 transition hover:text-white"
-                >
-                  {item.label}
-                </a>
-              ))}
-            </nav>
-          ) : isAppShell ? (
-            <div className="hidden items-center gap-3 lg:flex">
-              <button
-                type="button"
-                onClick={onOpenCommand}
-                className="group inline-flex min-w-[300px] items-center justify-between rounded-2xl border border-white/10 bg-white/[0.035] px-3.5 py-2.5 text-left text-sm text-slate-400 transition hover:border-white/20 hover:bg-white/[0.055] hover:text-white"
-              >
-                <span className="flex items-center gap-3">
-                  <Search className="h-4 w-4 text-slate-500 transition group-hover:text-cyan" />
-                  <span>Search or jump to...</span>
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-500">
-                  <Command className="h-3 w-3" />
-                  K
-                </span>
-              </button>
-              <div className="inline-flex items-center gap-2 rounded-2xl border border-cyan/15 bg-cyan/8 px-3 py-2 text-xs text-cyan">
-                <Sparkles className="h-3.5 w-3.5" />
-                {user?.targetRole || "Workspace"}
+      <div className={cn(
+        "mx-auto flex items-center justify-between px-8 w-full",
+        isAppShell ? "max-w-full" : "max-w-7xl"
+      )}>
+        {/* Left Side: Brand or Search */}
+        <div className="flex items-center gap-8 flex-1">
+          {(!isAppShell || isLandingPage) && (
+            <Link to="/" className="flex items-center gap-3 group">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand to-cyan flex items-center justify-center shadow-[0_0_20px_rgba(124,92,255,0.4)] transition-transform group-hover:scale-110">
+                <span className="text-white font-black text-sm">S</span>
               </div>
-            </div>
-          ) : null}
-        </div>
+              <span className="text-white font-black tracking-tight text-xl">StudyBuddy</span>
+            </Link>
+          )}
 
-        <div className="hidden items-center gap-3 md:flex">
-          {isAppShell ? (
-            <>
-              <Link
-                to="/onboarding"
-                className="rounded-2xl border border-white/10 px-4 py-2.5 text-sm text-slate-300 transition hover:border-white/20 hover:text-white"
-              >
-                Edit profile
-              </Link>
+          {isAppShell && (
+            <div className="flex-1 max-w-xl">
               <button
-                type="button"
                 onClick={onOpenCommand}
-                className="rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-2.5 text-sm text-slate-300 transition hover:border-white/20 hover:text-white"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/[0.06] border border-white/[0.15] hover:bg-white/[0.1] hover:border-white/[0.25] transition-all group text-white shadow-lg"
               >
-                Actions
-              </button>
-              <NotificationsPopover />
-              <div className="inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.035] py-1.5 pl-2 pr-3">
-                <span className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-br from-brand via-violet-500 to-cyan text-xs font-semibold text-white">
-                  {userInitials}
-                </span>
-                <div className="hidden text-left xl:block">
-                  <p className="text-sm font-semibold text-white">{user?.name || "StudyBuddy User"}</p>
-                  <p className="max-w-36 truncate text-xs text-slate-500">{user?.email || "Authenticated session"}</p>
+                <Search size={20} className="text-brand shrink-0" />
+                <span className="text-sm font-semibold text-slate-300">Search actions, notes, or roadmaps...</span>
+                <div className="ml-auto flex items-center gap-1.5 px-2 py-1 rounded-lg border border-white/20 bg-white/10 text-[10px] font-black text-white">
+                  <Command size={10} />
+                  <span>K</span>
                 </div>
-              </div>
-            </>
-          ) : (
-            <>
-              <Link
-                to={secondaryAction.to}
-                className="rounded-full border border-white/15 px-5 py-2.5 text-sm text-slate-200 transition hover:border-white/25 hover:text-white"
-              >
-                {secondaryAction.label}
-              </Link>
-              {showPrimaryAction ? (
-                <Link
-                  to={primaryAction.to}
-                  className={cn(
-                    "rounded-full px-5 py-2.5 text-sm font-semibold transition hover:scale-[1.01]",
-                    isLandingPage
-                      ? "bg-white text-slate-950 shadow-[0_12px_40px_rgba(56,189,248,0.12)] hover:bg-sky-100"
-                      : "bg-gradient-to-r from-brand via-violet-500 to-blue-500 text-white"
-                  )}
-                >
-                  {primaryAction.label}
-                </Link>
-              ) : null}
-            </>
+              </button>
+            </div>
           )}
         </div>
 
-        <button
-          type="button"
-          className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/15 text-slate-200 transition hover:border-white/25 hover:text-white md:hidden"
-          onClick={() => setMenuOpen((value) => !value)}
-          aria-expanded={isMenuOpen}
-          aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-        >
-          {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
-      </div>
-
-      <div
-        className={cn(
-          "overflow-hidden border-t border-white/6 transition-[max-height,opacity] duration-300 md:hidden",
-          isMenuOpen ? "max-h-80 opacity-100" : "max-h-0 opacity-0"
-        )}
-      >
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-6 py-4">
-          {isLandingPage
-            ? landingSections.map((item) => (
-                <a
-                  key={item.label}
-                  href={getLandingHref(location.pathname, item.href)}
-                  className="rounded-2xl border border-white/6 px-4 py-3 text-sm text-slate-200 transition hover:border-white/15 hover:text-white"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {item.label}
-                </a>
-              ))
-            : isAppShell ? (
-                <button
-                  type="button"
-                  className="rounded-2xl border border-white/6 px-4 py-3 text-left text-sm text-slate-200 transition hover:border-white/15 hover:text-white"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    onOpenCommand?.();
-                  }}
-                >
-                  Open quick actions
-                </button>
-              ) : null}
-
-          <div className="grid grid-cols-1 gap-3 pt-2">
-            {isAppShell ? (
-              <Link
-                to="/onboarding"
-                className="rounded-2xl border border-white/15 px-4 py-3 text-center text-sm text-slate-200 transition hover:border-white/25 hover:text-white"
-                onClick={() => setMenuOpen(false)}
+        {/* Center: Navigation (Landing Only) */}
+        {isLandingPage && (
+          <nav className="hidden lg:flex items-center gap-10">
+            {landingSections.map((item) => (
+              <a
+                key={item.label}
+                href={item.href}
+                className="text-sm font-bold text-slate-400 hover:text-white transition-all hover:translate-y-[-1px]"
               >
-                Edit profile
+                {item.label}
+              </a>
+            ))}
+          </nav>
+        )}
+
+        {/* Right Side: Actions/Profile */}
+        <div className="flex items-center gap-6 flex-1 justify-end">
+          {isAppShell ? (
+            <div className="flex items-center gap-5">
+              <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand/10 border border-brand/20 text-brand text-[10px] font-black uppercase tracking-widest">
+                <Sparkles size={14} />
+                <span>Pro Member</span>
+              </div>
+              
+              <NotificationsPopover />
+
+              <div className="flex items-center gap-4 pl-4 border-l border-white/5 group cursor-pointer">
+                <div className="text-right hidden sm:block">
+                  <p className="text-sm font-bold text-white group-hover:text-brand transition-colors">{user?.name || "User"}</p>
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Free Tier</p>
+                </div>
+                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-brand to-cyan p-[1px] transition-transform group-hover:scale-105">
+                  <div className="w-full h-full rounded-full bg-obsidian flex items-center justify-center text-white text-xs font-black">
+                    {userInitials}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-4">
+              <Link to="/auth" className="px-5 py-2.5 text-sm font-bold text-slate-400 hover:text-white transition-colors">
+                Log in
               </Link>
-            ) : (
-              <>
-                <Link
-                  to={secondaryAction.to}
-                  className="rounded-2xl border border-white/15 px-4 py-3 text-center text-sm text-slate-200 transition hover:border-white/25 hover:text-white"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {secondaryAction.label}
-                </Link>
-                {showPrimaryAction ? (
-                  <Link
-                    to={primaryAction.to}
-                    className={cn(
-                      "rounded-2xl px-4 py-3 text-center text-sm font-semibold transition hover:scale-[1.01]",
-                      isLandingPage
-                        ? "bg-white text-slate-950 shadow-[0_12px_40px_rgba(56,189,248,0.12)] hover:bg-sky-100"
-                        : "bg-gradient-to-r from-brand via-violet-500 to-blue-500 text-white"
-                    )}
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    {primaryAction.label}
-                  </Link>
-                ) : null}
-              </>
-            )}
-          </div>
+              <Link 
+                to="/auth" 
+                className="px-6 py-3 rounded-full bg-white text-obsidian text-sm font-black hover:bg-slate-200 transition-all hover:scale-105 shadow-[0_10px_30px_rgba(255,255,255,0.15)]"
+              >
+                Get Started
+              </Link>
+            </div>
+          )}
+
+          {/* Mobile Menu Toggle */}
+          <button
+            onClick={() => setMenuOpen(!isMenuOpen)}
+            className="p-2.5 rounded-xl lg:hidden text-slate-400 hover:text-white hover:bg-white/5 transition-all"
+          >
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div className="lg:hidden bg-obsidian border-b border-white/5 px-6 py-6 space-y-4 animate-slide-up">
+           {isLandingPage && landingSections.map((item) => (
+             <a
+               key={item.label}
+               href={item.href}
+               className="block text-lg font-medium text-slate-400 hover:text-white"
+               onClick={() => setMenuOpen(false)}
+             >
+               {item.label}
+             </a>
+           ))}
+           {!isAuthenticated && (
+             <div className="pt-4 space-y-4">
+               <Link to="/auth" className="block w-full py-3 text-center rounded-xl border border-white/10 text-white font-medium">
+                 Sign in
+               </Link>
+               <Link to="/auth" className="block w-full py-3 text-center rounded-xl bg-white text-obsidian font-bold">
+                 Get Started
+               </Link>
+             </div>
+           )}
+        </div>
+      )}
     </header>
   );
 }

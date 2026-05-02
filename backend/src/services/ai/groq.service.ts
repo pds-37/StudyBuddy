@@ -71,6 +71,12 @@ async function generateRoadmap(
     skillTags: string[];
     rationale: string;
     order: number;
+    resources: Array<{
+      title: string;
+      type: "video" | "course" | "article" | "documentation";
+      url: string;
+      author: string;
+    }>;
   }>;
 }> {
   const skillGapsText = skillGaps
@@ -94,6 +100,7 @@ Each milestone should include:
 - Detailed description of what to learn and do
 - Specific skills that will be developed
 - Realistic timeline within the ${timelineWeeks}-week period
+- 1-3 highly specific recommended resources (e.g., specific YouTube creators like "Striver", "NeetCode", "CodeWithHarry", "FreeCodeCamp", or specific documentation/articles). Provide a realistic search URL for them.
 
 Format your response as JSON with this exact structure:
 {
@@ -106,12 +113,20 @@ Format your response as JSON with this exact structure:
       "description": "Detailed description of activities and learning goals",
       "skillTags": ["skill1", "skill2"],
       "rationale": "Why this milestone is important for closing the specific gap",
-      "order": 1
+      "order": 1,
+      "resources": [
+        {
+          "title": "Data Structures Easy to Advanced",
+          "type": "video",
+          "url": "https://www.youtube.com/results?search_query=Data+Structures",
+          "author": "CodeWithHarry"
+        }
+      ]
     }
   ]
 }
 
-Make the roadmap practical, specific, and achievable within the timeline. Focus on high-impact skills that will make the biggest difference for the target role.`;
+Make the roadmap practical, specific, and achievable within the timeline. Focus on high-impact skills that will make the biggest difference for the target role. Crucially, act as a "full mentor" and recommend the absolute best internet tutors and resources.`;
 
   const response = await requestGroq([{ role: "user", content: prompt }], 2000);
 
@@ -252,9 +267,42 @@ async function generateStructuredResponse(prompt: string): Promise<string> {
   return extractJsonPayload(response);
 }
 
+/** Generates a 5-question multiple choice quiz based on a specific topic. */
+async function generateQuiz(topic: string, targetRole: string): Promise<Array<{
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  explanation: string;
+}>> {
+  const prompt = `You are an expert technical interviewer and teacher. Create a 5-question multiple-choice quiz about "${topic}" tailored for someone studying to be a "${targetRole}". 
+
+Return ONLY valid JSON with this exact shape:
+[
+  {
+    "question": "Clear, concise technical question",
+    "options": ["Option A", "Option B", "Option C", "Option D"],
+    "correctAnswer": 0,
+    "explanation": "1-2 sentence explanation of why the answer is correct."
+  }
+]
+
+Make the questions practical and focus on active recall. Do not wrap the JSON in any text or markdown fences. DO NOT include any comments like // in the JSON output.`;
+
+  const response = await requestGroq([{ role: "user", content: prompt }], 1500);
+
+  try {
+    const parsed = JSON.parse(extractJsonPayload(response));
+    return parsed;
+  } catch (error) {
+    console.error("Failed to parse Groq quiz response:", response);
+    throw new Error("Invalid response format from AI service");
+  }
+}
+
 export const groqService = {
   generateRoadmap,
   generateCopilotResponse,
   generateResumeTailoring,
-  generateStructuredResponse
+  generateStructuredResponse,
+  generateQuiz
 };

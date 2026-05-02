@@ -1,5 +1,12 @@
 import { Schema, model, type HydratedDocument, type InferSchemaType } from "mongoose";
 
+const resourceSchema = new Schema({
+  title: { type: String, required: true },
+  type: { type: String, enum: ["video", "course", "article", "documentation"], required: true },
+  url: { type: String, required: true },
+  author: { type: String, required: true }
+});
+
 const roadmapMilestoneSchema = new Schema({
   id: {
     type: String,
@@ -31,6 +38,10 @@ const roadmapMilestoneSchema = new Schema({
   },
   targetDate: {
     type: String
+  },
+  resources: {
+    type: [resourceSchema],
+    default: []
   }
 });
 

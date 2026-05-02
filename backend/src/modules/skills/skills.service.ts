@@ -177,11 +177,17 @@ async function analyzeSkillGap(userId: string) {
     throw new ApiError(404, "User not found.");
   }
 
-  if (!user.targetRole || user.currentSkills.length === 0) {
+  if (user.targetRoles.length === 0 || user.currentSkills.length === 0) {
     throw new ApiError(400, "Complete onboarding before running skill gap analysis.");
   }
 
-  const requiredSkills = getRequiredSkillsForRole(user.targetRole);
+  // Aggregate required skills from all target roles
+  const allRequiredSkills = new Set<string>();
+  for (const role of user.targetRoles) {
+    getRequiredSkillsForRole(role).forEach(skill => allRequiredSkills.add(skill));
+  }
+  
+  const requiredSkills = Array.from(allRequiredSkills);
   const gapItems: SkillGapItem[] = [];
   let provider: "huggingface" | "local-fallback" = "local-fallback";
 
@@ -214,7 +220,7 @@ async function analyzeSkillGap(userId: string) {
   const partialSkills = gapItems.filter((item) => item.status === "partial").map((item) => item.skill);
 
   return {
-    targetRole: user.targetRole,
+    targetRole: user.targetRoles.join(", "),
     experienceLevel: user.experienceLevel,
     currentSkills: user.currentSkills,
     overallScore,

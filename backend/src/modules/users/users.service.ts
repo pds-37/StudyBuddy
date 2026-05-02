@@ -8,7 +8,7 @@ function toProfile(user: UserDocument) {
     id: String(user._id),
     name: user.name,
     email: user.email,
-    targetRole: user.targetRole,
+    targetRoles: user.targetRoles,
     currentSkills: user.currentSkills,
     experienceLevel: user.experienceLevel,
     onboardingCompleted: user.onboardingCompleted
@@ -44,7 +44,7 @@ async function updateProfile(userId: string, payload: UpdateProfileBody) {
     userId,
     {
       name: payload.name,
-      targetRole: payload.targetRole,
+      targetRoles: payload.targetRoles,
       currentSkills: normalizedSkills,
       experienceLevel: payload.experienceLevel,
       onboardingCompleted: true

@@ -3,7 +3,7 @@ import { type AuthUser } from "../auth/types";
 
 export type ProfilePayload = {
   name: string;
-  targetRole: string;
+  targetRoles: string[];
   currentSkills: string[];
   experienceLevel: AuthUser["experienceLevel"];
 };

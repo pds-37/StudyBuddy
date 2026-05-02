@@ -43,3 +43,24 @@ services:
         value: sentence-transformers/all-MiniLM-L6-v2
       - key: HUGGINGFACE_NER_MODEL
         value: dslim/bert-base-NER
+
+  - type: web
+    name: studybuddy-web
+    runtime: static
+    plan: free
+    autoDeployTrigger: commit
+    buildCommand: npm install && npm run build --workspace @studybuddy/shared && npm run build --workspace @studybuddy/web
+    staticPublishPath: frontend/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: studybuddy-api
+          envVarKey: RENDER_EXTERNAL_URL
+          # Note: The Render External URL needs '/api' appended, but Render's native fromService doesn't allow concatenation directly here.
+          # We'll set sync: false so the user can easily copy the backend URL and add /api to it in the Render dashboard.
+        sync: false

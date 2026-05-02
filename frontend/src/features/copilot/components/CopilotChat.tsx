@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { motion } from "framer-motion";
 import {
   AlertCircle,
   Bot,
@@ -9,7 +10,9 @@ import {
   RefreshCw,
   Send,
   Sparkles,
-  UserRound
+  UserRound,
+  PanelLeftClose,
+  PanelLeftOpen
 } from "lucide-react";
 import { cn } from "../../../lib/utils/cn";
 import { useCopilotStore } from "../../../store/copilot-store";
@@ -65,6 +68,7 @@ export function CopilotChat() {
     clearError
   } = useCopilotStore();
 
+   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [draft, setDraft] = useState("");
   const messageRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -127,254 +131,246 @@ export function CopilotChat() {
   };
 
   return (
-    <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.045] shadow-[0_34px_120px_rgba(0,0,0,0.38),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl">
-      <div className="grid min-h-[720px] lg:grid-cols-[300px_minmax(0,1fr)]">
-        <aside className="flex min-h-[320px] flex-col border-b border-white/10 bg-black/20 lg:border-b-0 lg:border-r">
-          <div className="border-b border-white/10 p-4">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-cyan">Conversations</p>
-                <p className="mt-1 text-sm text-slate-500">{conversations.length} saved threads</p>
-              </div>
+    <div className="flex h-full overflow-hidden rounded-[2.5rem] glass border-white/5 bg-obsidian/20 shadow-2xl relative">
+      {/* Sidebar: Conversation History */}
+      <motion.aside 
+        initial={false}
+        animate={{ 
+          width: isSidebarCollapsed ? 0 : 300,
+          opacity: isSidebarCollapsed ? 0 : 1,
+          x: isSidebarCollapsed ? -20 : 0
+        }}
+        className={cn(
+          "flex flex-col border-r border-white/5 bg-ink/40 backdrop-blur-2xl transition-all duration-300 overflow-hidden shrink-0",
+          "hidden lg:flex"
+        )}
+      >
+        <div className="p-6 border-b border-white/5 min-w-[300px]">
+          <button
+            onClick={() => void handleNewConversation()}
+            className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-white text-obsidian font-black text-sm hover:bg-slate-200 transition-all hover:scale-[1.02] shadow-lg"
+          >
+            <Plus size={18} />
+            New Thread
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar min-w-[300px]">
+          {conversations.map((conversation) => {
+            const isActive = currentConversation?._id === conversation._id;
+            return (
               <button
-                type="button"
-                onClick={handleRefresh}
-                disabled={loading}
-                className="grid h-10 w-10 place-items-center rounded-2xl border border-white/10 bg-white/[0.04] text-slate-400 transition hover:border-cyan/30 hover:bg-cyan/10 hover:text-cyan disabled:opacity-50"
-                title="Refresh conversations"
+                key={conversation._id}
+                onClick={() => selectConversation(conversation._id)}
+                className={cn(
+                  "w-full p-4 rounded-2xl text-left transition-all group relative",
+                  isActive 
+                    ? "bg-white/5 border border-white/10 shadow-sm" 
+                    : "hover:bg-white/[0.02] border border-transparent"
+                )}
               >
-                <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
-              </button>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => void handleNewConversation()}
-              disabled={loading || sending}
-              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan to-blue-500 px-4 py-3 text-sm font-semibold text-white shadow-[0_16px_44px_rgba(34,211,238,0.18)] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <Plus className="h-4 w-4" />
-              New chat
-            </button>
-          </div>
-
-          <div className="flex-1 space-y-2 overflow-y-auto p-3">
-            {loading && conversations.length === 0 ? (
-              Array.from({ length: 4 }).map((_, index) => (
-                <div key={index} className="h-20 animate-pulse rounded-2xl border border-white/8 bg-white/[0.035]" />
-              ))
-            ) : conversations.length > 0 ? (
-              conversations.map((conversation) => {
-                const isActive = currentConversation?._id === conversation._id;
-                const title = getConversationTitle(conversation.messages);
-                const messageCount = conversation.messages.filter((message) => message.role !== "system").length;
-
-                return (
-                  <button
-                    key={conversation._id}
-                    type="button"
-                    onClick={() => selectConversation(conversation._id)}
-                    className={cn(
-                      "group w-full rounded-2xl border p-3 text-left transition",
-                      isActive
-                        ? "border-cyan/25 bg-cyan/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-                        : "border-white/8 bg-white/[0.025] hover:border-white/15 hover:bg-white/[0.05]"
-                    )}
-                  >
-                    <div className="flex items-start gap-3">
-                      <span
-                        className={cn(
-                          "grid h-9 w-9 flex-shrink-0 place-items-center rounded-2xl transition",
-                          isActive ? "bg-cyan/15 text-cyan" : "bg-white/[0.04] text-slate-500 group-hover:text-slate-200"
-                        )}
-                      >
-                        <MessageCircle className="h-4 w-4" />
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate text-sm font-semibold text-white">{title}</span>
-                        <span className="mt-1 flex items-center gap-2 text-xs text-slate-500">
-                          <Clock3 className="h-3 w-3" />
-                          {formatDate(conversation.updatedAt)}
-                          <span className="h-1 w-1 rounded-full bg-slate-700" />
-                          {messageCount} msg
-                        </span>
-                      </span>
-                    </div>
-                  </button>
-                );
-              })
-            ) : (
-              <div className="rounded-2xl border border-white/8 bg-white/[0.025] p-4 text-sm leading-6 text-slate-400">
-                No conversations yet. Start one and your threads will appear here.
-              </div>
-            )}
-          </div>
-        </aside>
-
-        <div className="relative flex min-w-0 flex-col bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.08),transparent_22rem)]">
-          <div className="flex flex-col gap-4 border-b border-white/10 bg-black/10 p-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex min-w-0 items-center gap-3">
-              <div className="grid h-12 w-12 flex-shrink-0 place-items-center rounded-2xl border border-cyan/20 bg-cyan/10 text-cyan shadow-[0_0_34px_rgba(34,211,238,0.12)]">
-                <Bot className="h-5 w-5" />
-              </div>
-              <div className="min-w-0">
-                <p className="truncate text-base font-semibold text-white">{activeTitle}</p>
-                <p className="mt-1 text-sm text-slate-500">
-                  {currentConversation ? `${totalMessages} visible messages` : "Create a thread to begin"}
-                </p>
-              </div>
-            </div>
-
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.035] px-3 py-2 text-xs text-slate-400">
-              <span className={cn("h-2 w-2 rounded-full", sending ? "bg-amber-400" : "bg-emerald-400")} />
-              {sending ? "Thinking" : "Ready"}
-            </div>
-          </div>
-
-          {error ? (
-            <div className="mx-4 mt-4 rounded-2xl border border-red-400/20 bg-red-500/10 p-4 text-sm text-red-100">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <span className="inline-flex items-start gap-2">
-                  <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-300" />
-                  {error}
-                </span>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={clearError}
-                    className="rounded-full border border-white/10 px-3 py-1.5 text-xs text-slate-200 transition hover:bg-white/10"
-                  >
-                    Dismiss
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleRefresh}
-                    className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-slate-950 transition hover:bg-slate-100"
-                  >
-                    Retry
-                  </button>
+                {isActive && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-brand rounded-r-full" />}
+                <p className="text-sm font-bold text-white truncate mb-1">{getConversationTitle(conversation.messages)}</p>
+                <div className="flex items-center gap-2 text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+                   <Clock3 size={10} />
+                   {formatDate(conversation.updatedAt)}
                 </div>
-              </div>
-            </div>
-          ) : null}
+              </button>
+            );
+          })}
+        </div>
 
-          <div className="flex-1 overflow-y-auto px-4 py-5">
-            {currentConversation && visibleMessages.length > 0 ? (
-              <div className="mx-auto flex max-w-3xl flex-col gap-4">
-                {visibleMessages.map((message) => (
-                  <ChatMessage key={message.id} message={message} />
-                ))}
+        <div className="p-4 border-t border-white/5 min-w-[300px]">
+          <button
+            onClick={handleRefresh}
+            className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-slate-500 hover:text-white transition-colors text-xs font-bold"
+          >
+            <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+            Sync Conversations
+          </button>
+        </div>
+      </motion.aside>
 
-                {sending ? (
-                  <div className="flex justify-start">
-                    <div className="inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.055] px-4 py-3 text-sm text-slate-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
-                      <Loader2 className="h-4 w-4 animate-spin text-cyan" />
-                      Copilot is reading your context...
-                    </div>
-                  </div>
-                ) : null}
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col min-w-0 relative overflow-hidden">
+        {/* Futuristic Background (Nebula Style) */}
+        <div className="absolute inset-0 -z-10 bg-obsidian overflow-hidden">
+          <motion.div 
+            animate={{ 
+              scale: [1, 1.2, 1],
+              opacity: [0.1, 0.15, 0.1],
+              x: [0, 50, 0],
+              y: [0, 30, 0]
+            }}
+            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+            className="absolute -top-[10%] -left-[10%] w-[60%] h-[60%] rounded-full bg-brand/20 blur-[120px]" 
+          />
+          <motion.div 
+            animate={{ 
+              scale: [1, 1.3, 1],
+              opacity: [0.05, 0.1, 0.05],
+              x: [0, -40, 0],
+              y: [0, -20, 0]
+            }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-cyan/15 blur-[100px]" 
+          />
+        </div>
+        {/* Chat Header */}
+        <header className="px-8 py-4 border-b border-white/5 bg-obsidian/40 backdrop-blur-xl flex items-center justify-between">
+          <div className="flex items-center gap-4">
+             <button 
+               onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+               className="p-2 -ml-2 rounded-lg hover:bg-white/5 text-slate-500 transition-colors hidden lg:block"
+             >
+                {isSidebarCollapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
+             </button>
+             <div className="w-10 h-10 rounded-xl bg-brand/10 border border-brand/20 flex items-center justify-center text-brand">
+                <Bot size={20} />
+             </div>
+             <div>
+                <h2 className="text-sm font-black text-white truncate max-w-[300px]">{activeTitle}</h2>
+                <div className="flex items-center gap-2">
+                   <span className={cn("w-1.5 h-1.5 rounded-full", sending ? "bg-brand animate-pulse" : "bg-emerald-500")} />
+                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{sending ? "Thinking..." : "Connected"}</span>
+                </div>
+             </div>
+          </div>
+          
+          <div className="flex items-center gap-2">
+             <button className="p-2 rounded-lg hover:bg-white/5 text-slate-500 transition-colors">
+                <Sparkles size={18} />
+             </button>
+          </div>
+        </header>
 
-                <div ref={messagesEndRef} />
-              </div>
-            ) : (
-              <div className="grid h-full min-h-[380px] place-items-center">
-                <div className="max-w-xl text-center">
-                  <div className="mx-auto grid h-16 w-16 place-items-center rounded-[1.4rem] border border-cyan/20 bg-cyan/10 text-cyan shadow-[0_0_44px_rgba(34,211,238,0.14)]">
-                    <Sparkles className="h-7 w-7" />
-                  </div>
-                  <h3 className="mt-6 text-2xl font-bold tracking-tight text-white">Start with a career question.</h3>
-                  <p className="mt-3 text-sm leading-7 text-slate-400">
-                    Ask about your roadmap, weak spots, job matches, portfolio proof points, or the next best study sprint.
-                  </p>
-                  <div className="mt-6 flex flex-wrap justify-center gap-2">
-                    {suggestedPrompts.map((prompt) => (
+        {/* Message List */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar px-6 py-10">
+          <div className="max-w-3xl mx-auto space-y-10">
+            {visibleMessages.length === 0 ? (
+              <div className="py-20 text-center animate-fade-in">
+                 <div className="w-20 h-20 rounded-[2rem] bg-brand/10 border border-brand/20 flex items-center justify-center text-brand mx-auto mb-8 shadow-glow">
+                    <Sparkles size={40} />
+                 </div>
+                 <h3 className="text-3xl font-black text-white mb-4 leading-tight">How can I help your <br /> career today?</h3>
+                 <p className="text-slate-400 max-w-md mx-auto leading-relaxed mb-10">
+                    I can help you analyze roadmaps, prep for interviews, or optimize your resume with AI precision.
+                 </p>
+                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {suggestedPrompts.map(prompt => (
                       <button
                         key={prompt}
-                        type="button"
                         onClick={() => setDraft(prompt)}
-                        className="rounded-full border border-white/10 bg-white/[0.035] px-4 py-2 text-xs text-slate-300 transition hover:border-cyan/25 hover:bg-cyan/10 hover:text-white"
+                        className="p-4 rounded-2xl glass border-white/5 bg-white/[0.02] hover:bg-white/[0.05] hover:border-brand/30 transition-all text-xs font-semibold text-slate-300 text-left"
                       >
                         {prompt}
                       </button>
                     ))}
-                  </div>
-                </div>
+                 </div>
               </div>
+            ) : (
+              <>
+                {visibleMessages.map((message) => (
+                  <ChatMessage key={message.id} message={message} />
+                ))}
+                {sending && (
+                  <div className="flex items-start gap-5 animate-pulse">
+                     <div className="w-8 h-8 rounded-lg bg-brand/10 flex items-center justify-center text-brand shrink-0">
+                        <Bot size={16} />
+                     </div>
+                     <div className="space-y-2 pt-1">
+                        <div className="h-2 w-48 bg-white/10 rounded-full" />
+                        <div className="h-2 w-32 bg-white/5 rounded-full" />
+                     </div>
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
+              </>
             )}
           </div>
+        </div>
 
-          <div className="border-t border-white/10 bg-black/20 p-4">
-            <div className="mx-auto max-w-3xl">
-              <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.06] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl">
-                <textarea
-                  ref={messageRef}
-                  value={draft}
-                  onChange={(event) => setDraft(event.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Ask about your skills, roadmap, jobs, or next study sprint..."
-                  className="max-h-40 min-h-[76px] w-full resize-none bg-transparent px-4 py-3 text-sm leading-6 text-white outline-none placeholder:text-slate-500"
-                  rows={2}
-                  disabled={loading || sending}
-                />
-                <div className="flex flex-col gap-3 border-t border-white/8 px-2 pb-1 pt-2 sm:flex-row sm:items-center sm:justify-between">
-                  <p className="text-xs text-slate-500">Press Enter to send. Shift + Enter for a new line.</p>
+        {/* Input Bar */}
+        <div className="px-8 pb-8 pt-2">
+           <div className="max-w-3xl mx-auto relative group">
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-brand to-cyan rounded-[2rem] blur opacity-20 group-focus-within:opacity-50 transition-opacity" />
+              <div className="relative glass border-white/10 bg-ink/80 rounded-[2rem] p-1.5 shadow-[0_20px_50px_rgba(0,0,0,0.4)] overflow-hidden">
+                <div className="flex items-end gap-2 px-2">
+                  <button className="mb-2.5 p-2 rounded-xl hover:bg-white/10 text-slate-400 transition-colors shrink-0">
+                    <Plus size={20} />
+                  </button>
+                  
+                  <textarea
+                    ref={messageRef}
+                    value={draft}
+                    onChange={(e) => setDraft(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Ask Veda anything about your career..."
+                    className="flex-1 bg-transparent px-2 py-4 text-white text-sm outline-none resize-none max-h-40 min-h-[52px] custom-scrollbar placeholder-slate-500"
+                    rows={1}
+                  />
+
                   <button
-                    type="button"
                     onClick={() => void handleSendMessage()}
                     disabled={!draft.trim() || sending}
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-cyan to-blue-500 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_14px_44px_rgba(34,211,238,0.2)] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
+                    className={cn(
+                      "mb-2.5 p-3 rounded-2xl transition-all disabled:opacity-50 disabled:scale-100 active:scale-95 shrink-0",
+                      draft.trim() ? "bg-brand text-white shadow-glow hover:scale-105" : "bg-white/5 text-slate-500"
+                    )}
                   >
-                    {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                    Send
+                    {sending ? <Loader2 size={20} className="animate-spin" /> : <Send size={20} />}
                   </button>
                 </div>
               </div>
-            </div>
-          </div>
+              <p className="mt-3 text-center text-[9px] text-slate-600 font-black uppercase tracking-[0.3em]">
+                Veda AI Insight Engine • Career OS
+              </p>
+           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
 
-type ChatMessageProps = {
-  message: CopilotMessage;
-};
-
-/** Renders one chat message with role-specific SaaS styling. */
-function ChatMessage({ message }: ChatMessageProps) {
+function ChatMessage({ message }: { message: any }) {
   const isUser = message.role === "user";
 
   return (
-    <div className={cn("flex gap-3", isUser ? "justify-end" : "justify-start")}>
-      {!isUser ? (
-        <div className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-2xl border border-cyan/20 bg-cyan/10 text-cyan">
-          <Bot className="h-4 w-4" />
-        </div>
-      ) : null}
-
-      <div
-        className={cn(
-          "max-w-[min(78%,680px)] rounded-[1.35rem] px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]",
-          isUser
-            ? "rounded-tr-md bg-gradient-to-br from-blue-500 to-cyan text-white"
-            : "rounded-tl-md border border-white/10 bg-white/[0.055] text-slate-100 backdrop-blur-xl"
-        )}
-      >
-        <div className="whitespace-pre-wrap text-sm leading-7">{message.content}</div>
-        <div className={cn("mt-2 flex items-center gap-2 text-[11px]", isUser ? "text-blue-100" : "text-slate-500")}>
-          {isUser ? <UserRound className="h-3 w-3" /> : <Bot className="h-3 w-3" />}
-          {isUser ? "You" : "Copilot"}
-          <span className="h-1 w-1 rounded-full bg-current opacity-50" />
-          {formatTime(message.createdAt)}
-        </div>
+    <div className={cn(
+      "flex gap-6 animate-slide-up",
+      isUser ? "flex-row-reverse" : "flex-row"
+    )}>
+      <div className={cn(
+        "w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-lg",
+        isUser 
+          ? "bg-white text-obsidian" 
+          : "bg-brand/10 border border-brand/20 text-brand"
+      )}>
+        {isUser ? <UserRound size={18} /> : <Bot size={18} />}
       </div>
 
-      {isUser ? (
-        <div className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-2xl border border-white/10 bg-white/[0.06] text-slate-300">
-          <UserRound className="h-4 w-4" />
+      <div className={cn(
+        "flex flex-col gap-2 max-w-[85%]",
+        isUser ? "items-end" : "items-start"
+      )}>
+        <div className={cn(
+          "px-6 py-4 rounded-[1.8rem] text-sm leading-relaxed shadow-2xl backdrop-blur-xl transition-all border",
+          isUser 
+            ? "bg-gradient-to-br from-brand to-purple-600 border-white/20 text-white rounded-tr-none shadow-[0_10px_40px_rgba(124,92,255,0.25)]" 
+            : "glass border-white/10 bg-white/[0.05] text-slate-100 rounded-tl-none shadow-black/20"
+        )}>
+          <div className="whitespace-pre-wrap">{message.content}</div>
         </div>
-      ) : null}
+        <div className="flex items-center gap-2 px-2">
+          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+            {isUser ? "You" : "Veda"}
+          </span>
+          <span className="w-1 h-1 rounded-full bg-slate-700" />
+          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+            {formatTime(message.createdAt)}
+          </span>
+        </div>
+      </div>
     </div>
   );
 }

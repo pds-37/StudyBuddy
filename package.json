@@ -6,7 +6,7 @@
   "workspaces": [
     "frontend",
     "backend",
-    "packages/*"
+    "backend/shared"
   ],
   "scripts": {
     "dev": "concurrently -n frontend,backend -c cyan,magenta \"npm run dev --workspace @studybuddy/web\" \"npm run dev --workspace @studybuddy/api\"",

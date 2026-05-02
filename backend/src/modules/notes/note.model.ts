@@ -1,7 +1,14 @@
 import { Schema, model, type HydratedDocument, type InferSchemaType } from "mongoose";
+import { randomUUID } from "crypto";
 
 const noteSchema = new Schema(
   {
+    noteId: {
+      type: String,
+      unique: true,
+      default: () => randomUUID(),
+      index: true
+    },
     userId: {
       type: String,
       required: true,
@@ -27,6 +34,23 @@ const noteSchema = new Schema(
     sourceUrl: {
       type: String,
       trim: true
+    },
+    source: {
+      type: String,
+      enum: ["web", "cli"],
+      default: "web"
+    },
+    syncedAt: {
+      type: Date,
+      default: null
+    },
+    deleted: {
+      type: Boolean,
+      default: false
+    },
+    deletedAt: {
+      type: Date,
+      default: null
     },
     embedding: {
       type: [Number],

@@ -1,130 +1,106 @@
 import { Link } from "react-router-dom";
-import { CheckCircle, Clock, Route, Target } from "lucide-react";
+import { CheckCircle, Clock, Route, Target, Sparkles, ChevronRight } from "lucide-react";
 import type { RoadmapMilestone } from "@studybuddy/shared";
-import { Card } from "../ui/Card";
 import { useRoadmapsStore } from "../../store/roadmaps-store";
+import { cn } from "../../lib/utils/cn";
 
-/** Dashboard widget showing roadmap progress summary. */
 export function RoadmapWidget() {
   const { currentRoadmap, loading } = useRoadmapsStore();
 
   if (!currentRoadmap) {
     return (
-      <Card className="p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="rounded-2xl bg-purple-500/15 p-3 text-purple-300">
-              <Route className="h-5 w-5" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-white">Learning roadmap</h3>
-              <p className="text-sm text-slate-400">No active plan yet</p>
-            </div>
+      <div className="p-10 rounded-[2.5rem] glass border-brand/20 bg-brand/5 text-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid opacity-10" />
+        <div className="relative z-10">
+          <div className="w-16 h-16 rounded-2xl bg-brand/10 flex items-center justify-center text-brand mx-auto mb-6">
+            <Route size={32} />
           </div>
-        </div>
-
-        <div className="mt-8 rounded-[1.5rem] border border-white/8 bg-black/20 p-5 text-center">
-          <Target className="mx-auto h-9 w-9 text-slate-500" />
-          <p className="mt-4 text-base font-semibold text-white">Generate your first roadmap</p>
-          <p className="mt-2 text-sm leading-7 text-slate-400">
-            Turn your strongest skill signals into a sequence of milestones you can actually follow.
+          <h3 className="text-2xl font-bold text-white mb-2">Initialize your path</h3>
+          <p className="text-slate-400 mb-8 max-w-sm mx-auto">
+            You haven't generated a roadmap yet. Let AI build a custom learning journey for you.
           </p>
           <Link
             to="/roadmap"
-            className="mt-5 inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:border-white/20 hover:text-white"
+            className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-brand text-white font-bold hover:scale-105 transition-all shadow-lg"
           >
-            Create roadmap
-            <Route className="h-3.5 w-3.5" />
+            Create Roadmap
+            <Sparkles size={18} />
           </Link>
         </div>
-      </Card>
+      </div>
     );
   }
 
   const completedMilestones = currentRoadmap.milestones.filter(
-    (milestone: RoadmapMilestone) => milestone.status === "completed"
-  ).length;
-  const inProgressMilestones = currentRoadmap.milestones.filter(
-    (milestone: RoadmapMilestone) => milestone.status === "in_progress"
+    (m: RoadmapMilestone) => m.status === "completed"
   ).length;
   const totalMilestones = currentRoadmap.milestones.length;
   const progressPercentage = Math.round((completedMilestones / totalMilestones) * 100);
-  const nextMilestone = currentRoadmap.milestones.find((milestone) => milestone.status !== "completed");
+  const nextMilestone = currentRoadmap.milestones.find((m) => m.status !== "completed");
 
   return (
-    <Card className="p-6">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="rounded-2xl bg-purple-500/15 p-3 text-purple-300">
-            <Route className="h-5 w-5" />
+    <div className="rounded-[2.5rem] glass border-white/5 p-8 bg-white/[0.02] relative overflow-hidden group">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-cyan/5 blur-[100px] -z-10 group-hover:bg-brand/5 transition-colors duration-1000" />
+      
+      <div className="flex items-center justify-between mb-10">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-brand/10 flex items-center justify-center text-brand">
+            <Route size={24} />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-white">Learning roadmap</h3>
-            <p className="text-sm text-slate-400">{currentRoadmap.targetRole}</p>
+            <h3 className="text-xl font-bold text-white">Your Roadmap</h3>
+            <p className="text-sm text-slate-500 uppercase tracking-widest">{currentRoadmap.targetRole}</p>
           </div>
         </div>
-        <Link
-          to="/roadmap"
-          className="rounded-full border border-white/10 px-3 py-1.5 text-xs uppercase tracking-[0.22em] text-slate-300 transition hover:border-white/20 hover:text-white"
+        <Link 
+          to="/roadmap" 
+          className="p-3 rounded-xl bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all"
         >
-          Open
+          <ChevronRight size={20} />
         </Link>
       </div>
 
-      {loading ? (
-        <div className="mt-6 animate-pulse">
-          <div className="h-24 rounded-[1.5rem] bg-white/5" />
-        </div>
-      ) : (
-        <div className="mt-6 space-y-5">
-          <div className="rounded-[1.5rem] border border-white/8 bg-black/20 p-5">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.28em] text-slate-500">Progress</p>
-                <p className="mt-3 font-display text-4xl tracking-tight text-white">{progressPercentage}%</p>
-              </div>
-              <div className="text-right">
-                <p className="text-sm text-slate-400">{completedMilestones} of {totalMilestones} complete</p>
-                <p className="mt-1 text-xs text-slate-500">{currentRoadmap.timelineWeeks} week plan</p>
-              </div>
+      <div className="space-y-8">
+        <div>
+          <div className="flex items-end justify-between mb-4">
+            <div>
+              <span className="text-4xl font-black text-white">{progressPercentage}%</span>
+              <span className="ml-2 text-sm text-slate-500">Completed</span>
             </div>
-
-            <div className="mt-5 h-2 overflow-hidden rounded-full bg-white/10">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-purple-400 to-cyan transition-all"
-                style={{ width: `${progressPercentage}%` }}
-              />
-            </div>
-
-            <div className="mt-4 flex flex-wrap gap-3 text-sm">
-              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-emerald-200">
-                <CheckCircle className="h-4 w-4" />
-                {completedMilestones} done
-              </div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-sky-400/20 bg-sky-400/10 px-3 py-2 text-sky-200">
-                <Clock className="h-4 w-4" />
-                {inProgressMilestones} in progress
-              </div>
-            </div>
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+              {completedMilestones} / {totalMilestones} Milestones
+            </span>
           </div>
+          <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-brand to-cyan transition-all duration-1000 ease-out"
+              style={{ width: `${progressPercentage}%` }}
+            />
+          </div>
+        </div>
 
-          <div className="rounded-[1.35rem] border border-white/8 bg-white/[0.03] p-4">
-            <p className="text-[11px] uppercase tracking-[0.28em] text-slate-500">Next milestone</p>
-            <p className="mt-3 text-base font-semibold text-white">{nextMilestone?.title || "All milestones completed"}</p>
-            <p className="mt-2 text-sm leading-7 text-slate-400">
-              {nextMilestone?.description || "You have completed the active roadmap. Open the roadmap view to plan the next chapter."}
-            </p>
-            {nextMilestone?.rationale && (
-              <div className="mt-4 rounded-xl bg-brand/10 border border-brand/20 p-3">
-                <p className="text-xs font-semibold text-brand uppercase tracking-wider mb-1">AI Rationale</p>
-                <p className="text-sm text-brand/90 leading-relaxed">
-                  {nextMilestone.rationale}
-                </p>
+        <div className="pt-8 border-t border-white/5">
+          <div className="flex items-center gap-2 mb-4 text-xs font-bold text-slate-500 uppercase tracking-widest">
+            <Clock size={12} className="text-cyan" />
+            <span>Up Next</span>
+          </div>
+          <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/5 group-hover:border-brand/20 transition-colors">
+            <p className="text-lg font-bold text-white mb-2">{nextMilestone?.title || "All Caught Up!"}</p>
+            {nextMilestone?.resources && nextMilestone.resources.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-4">
+                {nextMilestone.resources.slice(0, 3).map((resource, i) => (
+                  <span key={i} className="px-3 py-1 rounded-lg bg-white/5 text-[11px] text-slate-400 border border-white/5">
+                    {resource.title}
+                  </span>
+                ))}
+                {nextMilestone.resources.length > 3 && (
+                   <span className="text-[11px] text-slate-500 flex items-center">+{nextMilestone.resources.length - 3} more</span>
+                )}
               </div>
             )}
           </div>
         </div>
-      )}
-    </Card>
+      </div>
+    </div>
   );
 }

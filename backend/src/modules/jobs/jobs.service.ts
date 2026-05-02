@@ -32,7 +32,7 @@ function toJobListing(job: JobDocument, matchScore?: number): EnrichedJobListing
 /** Derives a job-search context from the user's profile or a safe fallback. */
 function buildSearchContext(user: JobsUserProfile, limit: number) {
   const skills = user?.currentSkills ?? [];
-  const role = user?.targetRole?.trim() || skills.slice(0, 2).join(" ") || "software engineer";
+  const role = user?.targetRoles?.join(" ") || skills.slice(0, 2).join(" ") || "software engineer";
   const preferences = user?.preferences ?? {};
   const preferredLocation =
     typeof preferences.jobSearchLocation === "string"
@@ -84,9 +84,18 @@ async function getJobs(userId?: string, limit: number = 20): Promise<JobListing[
   const jobs = liveJobs.length > 0 ? liveJobs : await getStoredJobs(limit);
 
   if (jobs.length === 0) {
+    const hasConfig = Boolean(env.jsearchApiKey || (env.adzunaAppId && env.adzunaAppKey));
+    
+    if (!hasConfig) {
+      throw new ApiError(
+        503,
+        "No live jobs provider is configured. Add JSEARCH_API_KEY or ADZUNA_APP_ID / ADZUNA_APP_KEY to load current market jobs."
+      );
+    }
+
     throw new ApiError(
-      503,
-      "No live jobs provider is configured. Add JSEARCH_API_KEY or ADZUNA_APP_ID / ADZUNA_APP_KEY to load current market jobs."
+      404,
+      `No live jobs found for "${buildSearchContext(user, limit).query}" in ${buildSearchContext(user, limit).location}. Try updating your profile or location.`
     );
   }
 

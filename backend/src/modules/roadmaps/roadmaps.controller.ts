@@ -46,9 +46,21 @@ const updateMilestone: RequestHandler = async (request, response, next) => {
   }
 };
 
+/** Generates a quiz for a milestone. */
+const generateQuiz: RequestHandler = async (request, response, next) => {
+  try {
+    const params = milestoneIdParamSchema.parse(request.params);
+    const quiz = await roadmapsService.generateQuizForMilestone(request.userId ?? "", params.milestoneId);
+    response.json({ quiz });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const roadmapsController = {
   generateFromGaps,
   generate,
   get,
-  updateMilestone
+  updateMilestone,
+  generateQuiz
 };

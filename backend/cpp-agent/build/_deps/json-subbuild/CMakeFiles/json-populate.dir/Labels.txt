@@ -1,0 +1,14 @@
+# Target labels
+ json-populate
+# Source files and their labels
+D:/Projects/Personal Notes AI/backend/cpp-agent/build/_deps/json-subbuild/CMakeFiles/json-populate
+D:/Projects/Personal Notes AI/backend/cpp-agent/build/_deps/json-subbuild/CMakeFiles/json-populate.rule
+D:/Projects/Personal Notes AI/backend/cpp-agent/build/_deps/json-subbuild/CMakeFiles/json-populate-complete.rule
+D:/Projects/Personal Notes AI/backend/cpp-agent/build/_deps/json-subbuild/json-populate-prefix/src/json-populate-stamp/json-populate-build.rule
+D:/Projects/Personal Notes AI/backend/cpp-agent/build/_deps/json-subbuild/json-populate-prefix/src/json-populate-stamp/json-populate-configure.rule
+D:/Projects/Personal Notes AI/backend/cpp-agent/build/_deps/json-subbuild/json-populate-prefix/src/json-populate-stamp/json-populate-download.rule
+D:/Projects/Personal Notes AI/backend/cpp-agent/build/_deps/json-subbuild/json-populate-prefix/src/json-populate-stamp/json-populate-install.rule
+D:/Projects/Personal Notes AI/backend/cpp-agent/build/_deps/json-subbuild/json-populate-prefix/src/json-populate-stamp/json-populate-mkdir.rule
+D:/Projects/Personal Notes AI/backend/cpp-agent/build/_deps/json-subbuild/json-populate-prefix/src/json-populate-stamp/json-populate-patch.rule
+D:/Projects/Personal Notes AI/backend/cpp-agent/build/_deps/json-subbuild/json-populate-prefix/src/json-populate-stamp/json-populate-test.rule
+D:/Projects/Personal Notes AI/backend/cpp-agent/build/_deps/json-subbuild/json-populate-prefix/src/json-populate-stamp/json-populate-update.rule
