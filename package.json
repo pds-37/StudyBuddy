@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "description": "AI Career Copilot monorepo scaffold for StudyBuddy.",
+  "engines": {
+    "node": "22.x"
+  },
   "workspaces": [
     "frontend",
     "backend",
