@@ -65,37 +65,7 @@ export function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[#05070b] text-slate-300 selection:bg-cyan/20 selection:text-white">
-      <header className="sticky top-0 z-40 border-b border-white/8 bg-[#05070b]/88 backdrop-blur-xl">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-6">
-          <Link to="/" className="flex items-center gap-3 text-white">
-            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-sm font-black text-[#101522]">
-              SB
-            </span>
-            <span className="text-xl font-semibold tracking-normal">StudyBuddy</span>
-          </Link>
-
-          <nav className="hidden items-center gap-8 text-sm font-semibold text-slate-400 md:flex">
-            <a href="#workspace" className="hover:text-white">Workspace</a>
-            <a href="#workflow" className="hover:text-white">Workflow</a>
-            <a href="#tools" className="hover:text-white">Tools</a>
-          </nav>
-
-          <div className="flex items-center gap-3">
-            <Link to="/auth" className="hidden text-sm font-semibold text-slate-300 hover:text-white sm:inline-flex">
-              Log in
-            </Link>
-            <Link
-              to={startPath}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-bold text-[#07090d] shadow-[0_16px_40px_rgba(255,255,255,0.12)] transition hover:bg-slate-200"
-            >
-              Get started
-              <ArrowRight size={16} />
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <main>
+      <div>
         <section id="workspace" className="border-b border-white/8">
           <div className="mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:px-6 lg:grid-cols-[0.84fr_1.16fr] lg:py-18 xl:py-20">
             <div className="flex flex-col justify-center">
@@ -212,7 +182,7 @@ export function LandingPage() {
             </Link>
           </div>
         </section>
-      </main>
+      </div>
 
       <footer className="border-t border-white/8">
         <div className="mx-auto grid max-w-7xl gap-8 px-5 py-10 sm:px-6 md:grid-cols-[1fr_auto_auto] md:items-center">
