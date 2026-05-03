@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { listNotes, deleteNote } from "../../../lib/api/notes";
+import { formatRelativeTime } from "../../../lib/utils/date";
 import type { CareerNote } from "@studybuddy/shared";
 
 type NotesListProps = {
@@ -66,7 +67,7 @@ export function NotesList({ refreshTrigger, onEdit }: NotesListProps) {
                 {note.nextReviewAt && (
                   <>
                     <span className="h-1 w-1 rounded-full bg-slate-600" />
-                    <span>Review {new Date(note.nextReviewAt).toLocaleDateString()}</span>
+                    <span>Review {formatRelativeTime(note.nextReviewAt)}</span>
                   </>
                 )}
               </div>

@@ -6,6 +6,7 @@ import { type AuthMode } from "../features/auth/types";
 import { useAppStore } from "../store/app-store";
 import { Shield, Lock, Mail, User as UserIcon, Sparkles } from "lucide-react";
 import { cn } from "../lib/utils/cn";
+import { NebulaBackground } from "../components/common/NebulaBackground";
 
 function getAuthErrorMessage(error: unknown) {
   if (isAxiosError<{ message?: string }>(error)) {
@@ -43,9 +44,7 @@ export function AuthPage() {
 
   return (
     <div className="relative min-h-[calc(100vh-80px)] flex items-center justify-center p-6 overflow-hidden">
-      {/* Background Decor */}
-      <div className="absolute inset-0 bg-grid opacity-10" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand/10 blur-[120px] rounded-full -z-10" />
+      <NebulaBackground showGrid={true} opacity={0.6} />
 
       <div className="w-full max-w-5xl grid lg:grid-cols-2 gap-16 items-center">
         {/* Left Side: Copy */}

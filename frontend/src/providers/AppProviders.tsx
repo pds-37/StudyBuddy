@@ -2,6 +2,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { type ReactNode, useEffect, useState } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { authApi } from "../features/auth/api";
+import { ServerWakeUpLoader } from "../components/common/ServerWakeUpLoader";
+import { Loader2 } from "lucide-react";
 import { useAppStore } from "../store/app-store";
 
 type AppProvidersProps = {
@@ -16,17 +18,52 @@ export function AppProviders({ children }: AppProvidersProps) {
   const hydrateSession = useAppStore((state) => state.hydrateSession);
   const setUser = useAppStore((state) => state.setUser);
 
+  const [isServerCold, setServerCold] = useState(false);
+  const [isReady, setReady] = useState(false);
+
   useEffect(() => {
     hydrateSession();
   }, [hydrateSession]);
 
   useEffect(() => {
-    if (!accessToken) {
+    const checkServer = async () => {
+      const timeout = setTimeout(() => setServerCold(true), 2500);
+      try {
+        // Ping the health endpoint (outside /api)
+        const healthUrl = authApi.apiBaseUrl.replace(/\/api$/, "/health");
+        await fetch(healthUrl);
+        setReady(true);
+      } catch (error) {
+        console.warn("Backend still waking up...", error);
+        // Retry every 3s
+        setTimeout(checkServer, 3000);
+      } finally {
+        clearTimeout(timeout);
+      }
+    };
+
+    void checkServer();
+  }, []);
+
+  useEffect(() => {
+    if (!accessToken || !isReady) {
       return;
     }
 
     void authApi.me().then(setUser).catch(clearSession);
-  }, [accessToken, clearSession, setUser]);
+  }, [accessToken, clearSession, setUser, isReady]);
+
+  if (!isReady && isServerCold) {
+    return <ServerWakeUpLoader />;
+  }
+
+  if (!isReady) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-obsidian">
+        <Loader2 className="animate-spin text-brand" size={32} />
+      </div>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>

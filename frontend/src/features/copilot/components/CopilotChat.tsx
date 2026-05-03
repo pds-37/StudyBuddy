@@ -15,6 +15,8 @@ import {
   PanelLeftOpen
 } from "lucide-react";
 import { cn } from "../../../lib/utils/cn";
+import { NebulaBackground } from "../../../components/common/NebulaBackground";
+import { formatTime, formatDate } from "../../../lib/utils/date";
 import { useCopilotStore } from "../../../store/copilot-store";
 import type { CopilotMessage } from "@studybuddy/shared";
 
@@ -37,21 +39,6 @@ function getConversationTitle(messages: CopilotMessage[]) {
     : firstUserMessage.content;
 }
 
-/** Formats timestamps for message metadata. */
-function formatTime(dateString: string) {
-  return new Date(dateString).toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit"
-  });
-}
-
-/** Formats dates for the conversation list. */
-function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString([], {
-    month: "short",
-    day: "numeric"
-  });
-}
 
 /** Main copilot chat interface component. */
 export function CopilotChat() {
@@ -193,29 +180,7 @@ export function CopilotChat() {
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col min-w-0 relative overflow-hidden">
-        {/* Futuristic Background (Nebula Style) */}
-        <div className="absolute inset-0 -z-10 bg-obsidian overflow-hidden">
-          <motion.div 
-            animate={{ 
-              scale: [1, 1.2, 1],
-              opacity: [0.1, 0.15, 0.1],
-              x: [0, 50, 0],
-              y: [0, 30, 0]
-            }}
-            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-            className="absolute -top-[10%] -left-[10%] w-[60%] h-[60%] rounded-full bg-brand/20 blur-[120px]" 
-          />
-          <motion.div 
-            animate={{ 
-              scale: [1, 1.3, 1],
-              opacity: [0.05, 0.1, 0.05],
-              x: [0, -40, 0],
-              y: [0, -20, 0]
-            }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-cyan/15 blur-[100px]" 
-          />
-        </div>
+        <NebulaBackground opacity={0.4} showGrid={false} />
         {/* Chat Header */}
         <header className="px-8 py-4 border-b border-white/5 bg-obsidian/40 backdrop-blur-xl flex items-center justify-between">
           <div className="flex items-center gap-4">

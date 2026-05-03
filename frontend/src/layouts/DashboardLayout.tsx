@@ -8,6 +8,7 @@ import { useCopilotStore } from "../store/copilot-store";
 import { useJobsStore } from "../store/jobs-store";
 import { useRoadmapsStore } from "../store/roadmaps-store";
 import { GlobalCopilotWidget } from "../features/copilot/components/GlobalCopilotWidget";
+import { NebulaBackground } from "../components/common/NebulaBackground";
 
 const SIDEBAR_COLLAPSED_KEY = "studybuddy_sidebar_collapsed";
 
@@ -40,10 +41,7 @@ export function DashboardLayout() {
 
   return (
     <div className="relative flex h-screen w-full bg-obsidian text-slate-200 overflow-hidden">
-      {/* Background Decor */}
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-grid opacity-20" />
-      <div className="pointer-events-none absolute left-[-10%] top-[-10%] h-[40%] w-[40%] rounded-full bg-brand/10 blur-[120px]" />
-      <div className="pointer-events-none absolute right-[-10%] bottom-[-10%] h-[40%] w-[40%] rounded-full bg-cyan/10 blur-[120px]" />
+      <NebulaBackground />
 
       <aside 
         className={cn(
