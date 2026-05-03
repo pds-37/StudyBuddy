@@ -7,6 +7,16 @@ export type AuthUser = {
   targetRoles: string[];
   currentSkills: string[];
   experienceLevel: "beginner" | "intermediate" | "advanced";
+  subscription?: {
+    plan: "free" | "pro" | "team";
+    status: "trialing" | "active" | "past_due" | "canceled";
+    currentPeriodEnd?: string | null;
+  };
+  usage?: {
+    mentorPlansGenerated: number;
+    aiMessagesThisMonth: number;
+    usageMonth: string;
+  };
   onboardingCompleted: boolean;
 };
 

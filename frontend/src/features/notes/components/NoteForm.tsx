@@ -12,6 +12,7 @@ type NoteFormProps = {
 export function NoteForm({ note, onSuccess, onCancel }: NoteFormProps) {
   const [title, setTitle] = useState(note?.title ?? "");
   const [content, setContent] = useState(note?.content ?? "");
+  const [topic, setTopic] = useState(note?.topic ?? "");
   const [tags, setTags] = useState(note?.tags.join(", ") ?? "");
   const [linkedSkills, setLinkedSkills] = useState(note?.linkedSkills.join(", ") ?? "");
   const [sourceUrl, setSourceUrl] = useState(note?.sourceUrl ?? "");
@@ -35,6 +36,7 @@ export function NoteForm({ note, onSuccess, onCancel }: NoteFormProps) {
       const data = {
         title: title.trim(),
         content: content.trim(),
+        topic: topic.trim() || undefined,
         tags: tags.split(",").map((tag) => tag.trim()).filter(Boolean),
         linkedSkills: linkedSkills.split(",").map((skill) => skill.trim()).filter(Boolean),
         sourceUrl: sourceUrl.trim() || undefined
@@ -85,6 +87,20 @@ export function NoteForm({ note, onSuccess, onCancel }: NoteFormProps) {
           className="mt-1 block w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-white placeholder-slate-400 focus:border-brand focus:outline-none"
           placeholder="Write your note content here..."
           required
+        />
+      </div>
+
+      <div>
+        <label htmlFor="topic" className="block text-sm font-medium text-slate-300">
+          Topic
+        </label>
+        <input
+          id="topic"
+          type="text"
+          value={topic}
+          onChange={(e) => setTopic(e.target.value)}
+          className="mt-1 block w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-white placeholder-slate-400 focus:border-brand focus:outline-none"
+          placeholder="closures, dynamic programming, system design"
         />
       </div>
 

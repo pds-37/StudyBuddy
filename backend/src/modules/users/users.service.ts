@@ -11,6 +11,8 @@ function toProfile(user: UserDocument) {
     targetRoles: user.targetRoles,
     currentSkills: user.currentSkills,
     experienceLevel: user.experienceLevel,
+    subscription: user.subscription,
+    usage: user.usage,
     onboardingCompleted: user.onboardingCompleted
   };
 }

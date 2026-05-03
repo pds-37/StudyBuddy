@@ -4,9 +4,12 @@ import type { CareerNote } from "@studybuddy/shared";
 type CreateNoteRequest = {
   title: string;
   content: string;
+  topic?: string;
   tags?: string[];
   linkedSkills?: string[];
   sourceUrl?: string;
+  strength?: number;
+  nextReviewAt?: string;
 };
 
 type UpdateNoteRequest = Partial<CreateNoteRequest>;

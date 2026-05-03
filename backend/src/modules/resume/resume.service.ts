@@ -13,7 +13,7 @@ async function buildResumeContext(userId: string) {
 
   return [
     `Name: ${user.name}`,
-    `Current target role: ${user.targetRole || "Not provided"}`,
+    `Current target role: ${user.targetRoles.length > 0 ? user.targetRoles.join(", ") : "Not provided"}`,
     `Experience level: ${user.experienceLevel}`,
     `Current skills: ${user.currentSkills.length > 0 ? user.currentSkills.join(", ") : "Not provided"}`,
     `Profile notes: ${JSON.stringify(user.profile ?? {})}`
@@ -29,4 +29,3 @@ async function tailorResume(userId: string, request: ResumeTailorRequest): Promi
 export const resumeService = {
   tailorResume
 };
-

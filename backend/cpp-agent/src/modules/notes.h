@@ -32,4 +32,7 @@ std::optional<Note> findNoteById(const cli::Config& config, const std::string& n
 /** Soft-deletes a note by note_id. */
 bool softDeleteNote(const cli::Config& config, const std::string& note_id);
 
+/** Runs an offline active-recall session for due local notes. */
+void runRecallSession(const cli::Config& config);
+
 } // namespace modules

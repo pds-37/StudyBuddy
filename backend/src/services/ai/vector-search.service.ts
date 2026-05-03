@@ -15,9 +15,15 @@ function toNote(note: any): CareerNote {
     userId: note.userId,
     title: note.title,
     content: note.content,
+    topic: note.topic ?? undefined,
     tags: note.tags,
     linkedSkills: note.linkedSkills,
     sourceUrl: note.sourceUrl,
+    strength: note.strength ?? 0,
+    nextReviewAt: note.nextReviewAt ? note.nextReviewAt.toISOString() : undefined,
+    lastReviewed: note.lastReviewed ? note.lastReviewed.toISOString() : undefined,
+    reviewCount: note.reviewCount ?? 0,
+    lapseCount: note.lapseCount ?? 0,
     createdAt: note.createdAt.toISOString(),
     updatedAt: note.updatedAt.toISOString()
   };

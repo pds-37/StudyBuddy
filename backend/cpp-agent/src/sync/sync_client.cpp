@@ -34,13 +34,26 @@ static json noteToJson(const modules::Note& note) {
     {"user_id",    note.meta.user_id},
     {"title",      note.meta.title},
     {"content",    note.content},
+    {"topic",      note.meta.topic},
     {"tags",       note.meta.tags},
     {"source",     note.meta.source},
     {"created_at", note.meta.created_at},
     {"updated_at", note.meta.updated_at},
     {"synced_at",  note.meta.synced_at.empty() ? json(nullptr) : json(note.meta.synced_at)},
+    {"strength",   note.meta.strength},
+    {"next_review_at", note.meta.next_review_at.empty() ? json(nullptr) : json(note.meta.next_review_at)},
+    {"last_reviewed", note.meta.last_reviewed.empty() ? json(nullptr) : json(note.meta.last_reviewed)},
+    {"review_count", note.meta.review_count},
+    {"lapse_count", note.meta.lapse_count},
     {"deleted",    note.meta.deleted}
   };
+}
+
+static std::string jsonStringOrEmpty(const json& value, const std::string& key) {
+  if (!value.contains(key) || value[key].is_null()) {
+    return "";
+  }
+  return value[key].get<std::string>();
 }
 
 SyncResult pushNotes(const cli::Config& config, const std::vector<modules::Note>& notes) {
@@ -158,10 +171,16 @@ PullResult pullNotes(const cli::Config& config, const std::string& since) {
         note.meta.note_id    = n.value("note_id", "");
         note.meta.user_id    = n.value("user_id", "");
         note.meta.title      = n.value("title", "");
+        note.meta.topic      = n.value("topic", "");
         note.meta.source     = n.value("source", "web");
         note.meta.created_at = n.value("created_at", "");
         note.meta.updated_at = n.value("updated_at", "");
-        note.meta.synced_at  = n.value("synced_at", "");
+        note.meta.synced_at  = jsonStringOrEmpty(n, "synced_at");
+        note.meta.strength   = n.value("strength", 0.25);
+        note.meta.next_review_at = jsonStringOrEmpty(n, "next_review_at");
+        note.meta.last_reviewed  = jsonStringOrEmpty(n, "last_reviewed");
+        note.meta.review_count   = n.value("review_count", 0);
+        note.meta.lapse_count    = n.value("lapse_count", 0);
         note.meta.deleted    = n.value("deleted", false);
 
         if (n.contains("tags") && n["tags"].is_array()) {

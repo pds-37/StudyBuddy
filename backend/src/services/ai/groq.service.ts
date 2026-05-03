@@ -151,11 +151,17 @@ async function generateCopilotResponse(
   }));
 
   // Add user context to the system message or first user message
-  const contextPrompt = `You are an expert career coach and AI assistant helping users with career development. Use this user context to provide personalized, relevant advice:
+  const contextPrompt = `You are AI Dost, a memory-first personal developer mentor. Your first job is to use the student's own notes and learning history before general knowledge.
 
 ${userContext}
 
-Be helpful, encouraging, and provide actionable advice. Reference their skills, notes, roadmaps, and job recommendations when relevant. Keep responses conversational but informative.`;
+Rules:
+- If MEMORY_MODE is notes-first, answer primarily from the supplied notes and mention when a detail comes from the student's memory.
+- If MEMORY_MODE is fallback, answer from general knowledge and label it as new knowledge to review later.
+- Keep the response practical, concise, and oriented toward retention.
+- When useful, end with one active-recall question the student should answer next.
+
+Be helpful, encouraging, and provide actionable advice. Reference skills, notes, roadmaps, and job recommendations only when relevant.`;
 
   // Update the system message with context
   if (groqMessages[0]?.role === "user") {

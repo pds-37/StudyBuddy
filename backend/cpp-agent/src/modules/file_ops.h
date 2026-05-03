@@ -16,6 +16,12 @@ struct NoteFrontmatter {
   std::string created_at;
   std::string updated_at;
   std::string synced_at;       // empty string = not synced
+  std::string topic;
+  double strength = 0.25;
+  std::string next_review_at;
+  std::string last_reviewed;
+  int review_count = 0;
+  int lapse_count = 0;
   bool deleted = false;
 };
 

@@ -7,11 +7,17 @@ export type SyncNotePayload = {
   user_id: string;
   title: string;
   content: string;
+  topic?: string;
   tags: string[];
   source: "cli" | "web";
   created_at: string;
   updated_at: string;
   synced_at: string | null;
+  strength?: number;
+  next_review_at?: string | null;
+  last_reviewed?: string | null;
+  review_count?: number;
+  lapse_count?: number;
   deleted?: boolean;
   deleted_at?: string | null;
 };
@@ -33,11 +39,17 @@ function toSyncShape(doc: NoteDocument) {
     user_id: doc.userId,
     title: doc.title,
     content: doc.content,
+    topic: doc.topic ?? null,
     tags: doc.tags,
     source: doc.source ?? "web",
     created_at: doc.createdAt.toISOString(),
     updated_at: doc.updatedAt.toISOString(),
     synced_at: doc.syncedAt ? doc.syncedAt.toISOString() : null,
+    strength: doc.strength ?? 0,
+    next_review_at: doc.nextReviewAt ? doc.nextReviewAt.toISOString() : null,
+    last_reviewed: doc.lastReviewed ? doc.lastReviewed.toISOString() : null,
+    review_count: doc.reviewCount ?? 0,
+    lapse_count: doc.lapseCount ?? 0,
     deleted: doc.deleted ?? false,
     deleted_at: doc.deletedAt ? doc.deletedAt.toISOString() : null,
   };
@@ -74,9 +86,15 @@ async function pushNotes(userId: string, notes: SyncNotePayload[], lastSync: str
       // Incoming is newer — update server
       existing.title = incoming.title;
       existing.content = incoming.content;
+      existing.topic = incoming.topic;
       existing.tags = incoming.tags;
       existing.source = incoming.source;
       existing.syncedAt = new Date();
+      if (incoming.strength !== undefined) existing.strength = incoming.strength;
+      if (incoming.next_review_at !== undefined) existing.nextReviewAt = incoming.next_review_at ? new Date(incoming.next_review_at) : new Date();
+      if (incoming.last_reviewed !== undefined) existing.lastReviewed = incoming.last_reviewed ? new Date(incoming.last_reviewed) : null;
+      if (incoming.review_count !== undefined) existing.reviewCount = incoming.review_count;
+      if (incoming.lapse_count !== undefined) existing.lapseCount = incoming.lapse_count;
       existing.deleted = incoming.deleted ?? false;
       existing.deletedAt = incoming.deleted_at ? new Date(incoming.deleted_at) : null;
       await existing.save();
@@ -95,9 +113,15 @@ async function pushNotes(userId: string, notes: SyncNotePayload[], lastSync: str
         userId,
         title: incoming.title,
         content: incoming.content,
+        topic: incoming.topic ?? incoming.tags[0],
         tags: incoming.tags,
         source: incoming.source,
         syncedAt: new Date(),
+        strength: incoming.strength ?? 0.25,
+        nextReviewAt: incoming.next_review_at ? new Date(incoming.next_review_at) : new Date(),
+        lastReviewed: incoming.last_reviewed ? new Date(incoming.last_reviewed) : null,
+        reviewCount: incoming.review_count ?? 0,
+        lapseCount: incoming.lapse_count ?? 0,
         deleted: incoming.deleted ?? false,
         deletedAt: incoming.deleted_at ? new Date(incoming.deleted_at) : null,
       });

@@ -10,6 +10,7 @@ import { NotFoundPage } from "../pages/NotFoundPage";
 import { NotesPage } from "../pages/NotesPage";
 import { OnboardingPage } from "../pages/OnboardingPage";
 import { ResumePage } from "../pages/ResumePage";
+import { RecallPage } from "../pages/RecallPage";
 import { RoadmapPage } from "../pages/RoadmapPage";
 import { SkillGapPage } from "../pages/SkillGapPage";
 import { InterviewPage } from "../pages/InterviewPage";
@@ -30,6 +31,7 @@ export function AppRouter() {
           <Route path="/onboarding" element={<OnboardingPage />} />
           <Route path="/skill-gap" element={<SkillGapPage />} />
           <Route path="/notes" element={<NotesPage />} />
+          <Route path="/recall" element={<RecallPage />} />
           <Route path="/jobs" element={<JobsPage />} />
           <Route path="/resume" element={<ResumePage />} />
           <Route path="/roadmap" element={<RoadmapPage />} />

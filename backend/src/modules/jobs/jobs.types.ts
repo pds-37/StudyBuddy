@@ -16,5 +16,6 @@ export type EnrichedJobListing = JobListing & {
 export type JobsUserProfile = {
   currentSkills: string[];
   targetRole?: string;
+  targetRoles?: string[];
   preferences?: Record<string, unknown>;
 } | null;

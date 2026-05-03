@@ -8,6 +8,7 @@ export * from "./schemas/roadmap.schema.js";
 export * from "./types/auth.js";
 export * from "./types/copilot.js";
 export * from "./types/job.js";
+export * from "./types/mentor.js";
 export * from "./types/note.js";
 export * from "./types/resume.js";
 export * from "./types/roadmap.js";

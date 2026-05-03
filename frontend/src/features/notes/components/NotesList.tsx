@@ -59,6 +59,17 @@ export function NotesList({ refreshTrigger, onEdit }: NotesListProps) {
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <h3 className="font-semibold text-white">{note.title}</h3>
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                <span>{note.topic || note.tags[0] || "General"}</span>
+                <span className="h-1 w-1 rounded-full bg-slate-600" />
+                <span>{Math.round(note.strength * 100)}% strength</span>
+                {note.nextReviewAt && (
+                  <>
+                    <span className="h-1 w-1 rounded-full bg-slate-600" />
+                    <span>Review {new Date(note.nextReviewAt).toLocaleDateString()}</span>
+                  </>
+                )}
+              </div>
               <p className="mt-2 text-sm text-slate-300 line-clamp-3">{note.content}</p>
               {note.tags.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-1">

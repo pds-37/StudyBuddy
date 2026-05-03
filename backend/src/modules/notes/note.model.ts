@@ -23,6 +23,11 @@ const noteSchema = new Schema(
       type: String,
       required: true
     },
+    topic: {
+      type: String,
+      trim: true,
+      index: true
+    },
     tags: {
       type: [String],
       default: []
@@ -60,6 +65,30 @@ const noteSchema = new Schema(
       type: String,
       enum: ["huggingface", "local-fallback"],
       default: "local-fallback"
+    },
+    strength: {
+      type: Number,
+      min: 0,
+      max: 1,
+      default: 0.25,
+      index: true
+    },
+    nextReviewAt: {
+      type: Date,
+      default: () => new Date(),
+      index: true
+    },
+    lastReviewed: {
+      type: Date,
+      default: null
+    },
+    reviewCount: {
+      type: Number,
+      default: 0
+    },
+    lapseCount: {
+      type: Number,
+      default: 0
     }
   },
   {

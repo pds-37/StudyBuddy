@@ -41,6 +41,36 @@ const userSchema = new Schema(
       type: Schema.Types.Mixed,
       default: {}
     },
+    subscription: {
+      plan: {
+        type: String,
+        enum: ["free", "pro", "team"],
+        default: "free"
+      },
+      status: {
+        type: String,
+        enum: ["trialing", "active", "past_due", "canceled"],
+        default: "trialing"
+      },
+      currentPeriodEnd: {
+        type: Date,
+        default: null
+      }
+    },
+    usage: {
+      mentorPlansGenerated: {
+        type: Number,
+        default: 0
+      },
+      aiMessagesThisMonth: {
+        type: Number,
+        default: 0
+      },
+      usageMonth: {
+        type: String,
+        default: ""
+      }
+    },
     onboardingCompleted: {
       type: Boolean,
       default: false

@@ -1,199 +1,334 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { 
-  ArrowRight, 
-  Briefcase, 
-  MessageSquare, 
-  Route, 
-  Target, 
-  Users, 
-  FolderKanban, 
+import {
+  ArrowRight,
+  Brain,
+  Briefcase,
+  CheckCircle2,
+  Circle,
+  ClipboardList,
+  GraduationCap,
+  Loader2,
+  MessageSquare,
+  NotebookText,
+  RefreshCw,
+  Route,
+  ShieldCheck,
   Sparkles,
-  Zap,
-  TrendingUp,
-  Clock,
-  ChevronRight
+  Target,
+  Zap
 } from "lucide-react";
-import { RoadmapWidget } from "../components/dashboard";
-import { SyncStatusWidget } from "../features/sync/components/SyncStatusWidget";
-import { MilestoneQuiz } from "../features/roadmaps/components/MilestoneQuiz";
-import { useAppStore } from "../store/app-store";
-import { useCopilotStore } from "../store/copilot-store";
-import { useJobsStore } from "../store/jobs-store";
-import { useRoadmapsStore } from "../store/roadmaps-store";
+import { getMentorToday, updateMentorTaskStatus } from "../lib/api/mentor";
 import { cn } from "../lib/utils/cn";
+import type { MentorTask, MentorTodayPlan } from "@studybuddy/shared";
 
-const setupSteps = [
-  { title: "Target role", icon: Target },
-  { title: "Current skills", icon: Zap },
-  { title: "Experience level", icon: TrendingUp }
-] as const;
+const taskIcons = {
+  onboarding: GraduationCap,
+  skill_gap: Target,
+  roadmap: Route,
+  learn: Brain,
+  recall: Zap,
+  note: NotebookText,
+  project: ClipboardList,
+  interview: MessageSquare,
+  job: Briefcase,
+  reflection: Sparkles
+} as const;
+
+function formatPercent(value: number) {
+  return `${Math.round(value)}%`;
+}
+
+function formatStrength(value: number) {
+  return `${Math.round(value * 100)}%`;
+}
+
+function priorityClass(priority: MentorTask["priority"]) {
+  if (priority === "high") return "border-cyan/30 bg-cyan/10 text-cyan";
+  if (priority === "medium") return "border-brand/30 bg-brand/10 text-brand";
+  return "border-white/10 bg-white/[0.04] text-slate-300";
+}
 
 export function DashboardPage() {
-  const { user } = useAppStore();
-  const jobs = useJobsStore((state) => state.jobs);
-  const currentRoadmap = useRoadmapsStore((state) => state.currentRoadmap);
-  const conversations = useCopilotStore((state) => state.conversations);
+  const [plan, setPlan] = useState<MentorTodayPlan | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const completedMilestones = useMemo(
-    () => currentRoadmap?.milestones.filter((m) => m.status === "completed").length ?? 0,
-    [currentRoadmap]
+  const loadPlan = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const nextPlan = await getMentorToday();
+      setPlan(nextPlan);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load mentor plan");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadPlan();
+  }, []);
+
+  const completedTasks = useMemo(
+    () => plan?.tasks.filter((task) => task.status === "completed").length ?? 0,
+    [plan]
   );
 
-  const nextMilestone = useMemo(
-    () => currentRoadmap?.milestones.find((m) => m.status !== "completed"),
-    [currentRoadmap]
-  );
+  const completeTask = async (task: MentorTask) => {
+    try {
+      setUpdatingTaskId(task.id);
+      const nextPlan = await updateMentorTaskStatus(
+        task.id,
+        task.status === "completed" ? "pending" : "completed"
+      );
+      setPlan(nextPlan);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update task");
+    } finally {
+      setUpdatingTaskId(null);
+    }
+  };
 
-  const stats = [
-    { label: "Skills Tracked", value: String(user?.currentSkills.length ?? 0), icon: Target, color: "text-brand" },
-    { label: "Milestones", value: currentRoadmap ? `${completedMilestones}/${currentRoadmap.milestones.length}` : "0", icon: Route, color: "text-cyan" },
-    { label: "Matched Jobs", value: String(jobs.length), icon: Briefcase, color: "text-emerald-400" },
-    { label: "AI Sessions", value: String(conversations.length), icon: MessageSquare, color: "text-purple-400" }
-  ] as const;
-
-  const quickActions = [
-    { title: "AI Job Matcher", desc: "View tailored opportunities", to: "/jobs", icon: Briefcase, color: "bg-blue-500/10 text-blue-400" },
-    { title: "Expert Network", desc: "Connect with mentors", to: "/mentorship", icon: Users, color: "bg-purple-500/10 text-purple-400" },
-    { title: "Capstone Lab", desc: "Build real projects", to: "/projects", icon: FolderKanban, color: "bg-emerald-500/10 text-emerald-400" },
-    { title: "Ask Veda", desc: "Consult your AI mentor", to: "/copilot", icon: Sparkles, color: "bg-brand/10 text-brand" }
-  ];
+  if (loading && !plan) {
+    return (
+      <div className="flex min-h-[520px] items-center justify-center">
+        <div className="flex items-center gap-3 text-slate-300">
+          <Loader2 className="animate-spin text-brand" size={20} />
+          Loading AI Dost...
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-10 animate-fade-in">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <h1 className="text-4xl font-black tracking-tight text-white mb-2">Welcome back, {user?.name || "User"}</h1>
-          <p className="text-slate-400">Here's what's happening with your <span className="text-white font-semibold">{user?.targetRoles?.[0] || "career setup"}</span> path.</p>
+    <section className="space-y-8">
+      {error && (
+        <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+          {error}
         </div>
-        {!user?.onboardingCompleted && (
-          <Link
-            to="/onboarding"
-            className="px-6 py-3 rounded-xl bg-brand text-white font-bold hover:scale-105 transition-all shadow-[0_0_20px_rgba(124,92,255,0.3)] flex items-center gap-2"
-          >
-            Complete Onboarding
-            <ArrowRight size={18} />
-          </Link>
-        )}
-      </div>
+      )}
 
-      {/* Stats Grid */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <div key={stat.label} className="group p-6 rounded-2xl glass border-white/5 hover:border-white/10 transition-all">
-            <div className="flex items-center justify-between mb-4">
-              <div className={cn("p-2 rounded-lg bg-white/5", stat.color)}>
-                <stat.icon size={20} />
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="rounded-lg border border-white/10 bg-white/[0.04] p-6 lg:p-8">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div className="max-w-3xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.38em] text-cyan">Today</p>
+              <h1 className="mt-3 text-3xl font-semibold leading-tight text-white lg:text-4xl">
+                {plan?.focus ?? "AI Dost mentor plan"}
+              </h1>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300">
+                {plan?.mentorMessage ?? "Your daily mentor plan will appear here."}
+              </p>
+            </div>
+
+            <div className="flex shrink-0 items-center gap-4 rounded-lg border border-white/10 bg-obsidian/40 p-4">
+              <div className="flex h-20 w-20 items-center justify-center rounded-full border border-brand/30 bg-brand/10 text-2xl font-semibold text-white">
+                {plan?.readinessScore ?? 0}
               </div>
-              <TrendingUp size={14} className="text-emerald-500 opacity-50" />
+              <div>
+                <p className="text-sm font-semibold text-white">Readiness</p>
+                <p className="mt-1 text-xs uppercase tracking-[0.24em] text-slate-500">{plan?.journeyStage ?? "setup"}</p>
+                <p className="mt-3 text-xs text-cyan">Next: {plan?.nextUnlock ?? "Roadmap"}</p>
+              </div>
             </div>
-            <p className="text-2xl font-bold text-white mb-1">{stat.value}</p>
-            <p className="text-xs font-medium text-slate-500 uppercase tracking-widest">{stat.label}</p>
           </div>
-        ))}
+
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <Metric label="Notes" value={String(plan?.signals.totalNotes ?? 0)} icon={NotebookText} />
+            <Metric label="Recall Due" value={String(plan?.signals.recallDue ?? 0)} icon={Zap} />
+            <Metric label="Memory" value={formatStrength(plan?.signals.averageMemoryStrength ?? 0)} icon={Brain} />
+            <Metric label="Roadmap" value={formatPercent(plan?.signals.roadmapProgress ?? 0)} icon={Route} />
+          </div>
+        </div>
+
+        <div className="rounded-lg border border-white/10 bg-white/[0.04] p-6">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold text-white">SaaS Workspace</p>
+              <p className="mt-1 text-xs uppercase tracking-[0.24em] text-slate-500">
+                {plan?.subscription.plan ?? "free"} - {plan?.subscription.status ?? "trialing"}
+              </p>
+            </div>
+            <div className="rounded-lg bg-emerald-500/10 p-2 text-emerald-300">
+              <ShieldCheck size={20} />
+            </div>
+          </div>
+
+          <div className="mt-5 space-y-4">
+            <UsageRow
+              label="AI messages"
+              value={plan?.subscription.usage.aiMessagesThisMonth ?? 0}
+              limit={plan?.subscription.limits.aiMessagesPerMonth ?? 100}
+            />
+            <UsageRow
+              label="Notes tracked"
+              value={plan?.subscription.usage.notesTracked ?? 0}
+              limit={plan?.subscription.limits.notes ?? 250}
+            />
+            <UsageRow
+              label="Mentor plans"
+              value={plan?.subscription.usage.mentorPlansGenerated ?? 0}
+              limit={30}
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={() => void loadPlan()}
+            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-white/5"
+          >
+            <RefreshCw size={16} className={cn(loading && "animate-spin")} />
+            Refresh mentor plan
+          </button>
+        </div>
       </div>
 
-      {!user?.onboardingCompleted ? (
-        <div className="grid gap-8 lg:grid-cols-5">
-          <div className="lg:col-span-3 p-10 rounded-[2.5rem] glass border-brand/20 bg-brand/5 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-brand/10 blur-[100px] -z-10" />
-            <h2 className="text-3xl font-bold text-white mb-4">Initialize your Career OS</h2>
-            <p className="text-slate-400 mb-10 max-w-md leading-relaxed">
-              Complete these steps to unlock personalized roadmaps, job matching, and AI-powered mentorship.
-            </p>
-            
-            <div className="space-y-4">
-              {setupSteps.map((step, i) => (
-                <div key={step.title} className="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.03] border border-white/5 group hover:border-white/10 transition-colors">
-                  <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-brand transition-colors">
-                    <step.icon size={20} />
-                  </div>
-                  <span className="font-semibold text-white">{step.title}</span>
-                  <div className="ml-auto w-6 h-6 rounded-full border border-white/10 flex items-center justify-center text-[10px] font-bold text-slate-500">
-                    {i + 1}
-                  </div>
-                </div>
-              ))}
+      <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="rounded-lg border border-white/10 bg-white/[0.04] p-6">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-white">Mission List</h2>
+              <p className="mt-1 text-sm text-slate-400">
+                {completedTasks}/{plan?.tasks.length ?? 0} complete
+              </p>
             </div>
-
             <Link
-              to="/onboarding"
-              className="mt-10 w-full py-4 rounded-2xl bg-white text-obsidian font-black text-center block hover:bg-slate-200 transition-colors"
+              to="/copilot"
+              className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand/90"
             >
-              Start Onboarding Sequence
+              Ask AI Dost
+              <ArrowRight size={16} />
             </Link>
           </div>
 
-          <Link to="/copilot" className="lg:col-span-2 p-10 rounded-[2.5rem] glass border-cyan/20 bg-cyan/5 flex flex-col justify-center text-center group hover:border-cyan/40 transition-all">
-             <div className="w-20 h-20 rounded-3xl bg-cyan/20 flex items-center justify-center text-cyan mx-auto mb-8 shadow-[0_0_30px_rgba(34,211,238,0.2)] group-hover:scale-110 transition-transform">
-                <Sparkles size={40} />
-             </div>
-             <h3 className="text-2xl font-bold text-white mb-4">Veda is ready.</h3>
-             <p className="text-slate-400 leading-relaxed text-sm">
-                Once onboarded, your personal assistant will guide you through every hurdle of your career journey.
-             </p>
-          </Link>
-        </div>
-      ) : (
-        <div className="grid gap-10 lg:grid-cols-3">
-          {/* Main Focus Area */}
-          <div className="lg:col-span-2 space-y-8">
-            <div className="rounded-[2.5rem] overflow-hidden">
-               <RoadmapWidget />
-            </div>
-
-            {nextMilestone && (
-              <div className="rounded-[2.5rem] glass border-white/5 p-8 bg-white/[0.01]">
-                <div className="flex items-center gap-3 mb-6">
-                   <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
-                      <Zap size={18} />
-                   </div>
-                   <h3 className="text-lg font-bold text-white">Active Milestone</h3>
-                </div>
-                <MilestoneQuiz milestoneId={nextMilestone.id} milestoneTitle={nextMilestone.title} />
+          <div className="mt-6 space-y-3">
+            {plan?.tasks.length === 0 ? (
+              <div className="rounded-lg border border-white/10 bg-obsidian/30 p-6 text-sm text-slate-400">
+                No mentor tasks yet.
               </div>
+            ) : (
+              plan?.tasks.map((task) => (
+                <TaskRow
+                  key={task.id}
+                  task={task}
+                  updating={updatingTaskId === task.id}
+                  onToggle={() => void completeTask(task)}
+                />
+              ))
             )}
           </div>
+        </div>
 
-          {/* Sidebar / Shortcuts */}
-          <div className="space-y-8">
-            <div>
-               <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] mb-6 px-2">Quick Actions</h3>
-               <div className="grid gap-4">
-                  {quickActions.map((action) => (
-                    <Link
-                      key={action.to}
-                      to={action.to}
-                      className="group p-4 rounded-2xl glass border-white/5 hover:border-white/20 transition-all flex items-center gap-4"
-                    >
-                      <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110", action.color)}>
-                        <action.icon size={24} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-white text-sm group-hover:text-brand transition-colors">{action.title}</p>
-                        <p className="text-xs text-slate-500 truncate">{action.desc}</p>
-                      </div>
-                      <ChevronRight size={16} className="text-slate-600 group-hover:text-white transition-colors" />
-                    </Link>
-                  ))}
-               </div>
-            </div>
-
-            <SyncStatusWidget />
-
-            <div className="p-8 rounded-[2rem] glass border-brand/20 bg-gradient-to-br from-brand/10 to-transparent">
-               <p className="text-sm font-bold text-brand mb-4 flex items-center gap-2">
-                  <Sparkles size={16} />
-                  Pro Tip
-               </p>
-               <p className="text-sm text-slate-300 leading-relaxed italic">
-                  "Try uploading your latest resume to see how it matches with your target role's skill requirements."
-               </p>
+        <aside className="space-y-6">
+          <div className="rounded-lg border border-white/10 bg-white/[0.04] p-6">
+            <h2 className="text-lg font-semibold text-white">Weak Topics</h2>
+            <div className="mt-4 space-y-3">
+              {(plan?.signals.weakTopics ?? []).length === 0 ? (
+                <p className="text-sm text-slate-400">No weak topics yet.</p>
+              ) : (
+                plan?.signals.weakTopics.slice(0, 4).map((topic) => (
+                  <Link
+                    key={topic.topic}
+                    to="/recall"
+                    className="block rounded-lg border border-white/10 bg-obsidian/30 p-4 hover:border-cyan/30"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-semibold text-white">{topic.topic}</p>
+                      <span className="text-xs text-cyan">{formatStrength(topic.averageStrength)}</span>
+                    </div>
+                    <p className="mt-1 text-xs text-slate-500">{topic.dueCount} due</p>
+                  </Link>
+                ))
+              )}
             </div>
           </div>
+
+          <div className="rounded-lg border border-white/10 bg-white/[0.04] p-6">
+            <h2 className="text-lg font-semibold text-white">Journey Signals</h2>
+            <div className="mt-4 space-y-3 text-sm">
+              <Signal label="Target" value={plan?.signals.targetRoles.join(", ") || "Not set"} />
+              <Signal label="Milestone" value={plan?.signals.activeMilestone || "No active milestone"} />
+              <Signal label="Project" value={plan?.signals.activeProject || "No active project"} />
+              <Signal label="Interview" value={plan?.signals.latestInterviewScore ? `${plan.signals.latestInterviewScore}/10` : "No score yet"} />
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+  );
+}
+
+function Metric({ label, value, icon: Icon }: { label: string; value: string; icon: typeof Brain }) {
+  return (
+    <div className="rounded-lg border border-white/10 bg-obsidian/30 p-4">
+      <div className="flex items-center justify-between">
+        <p className="text-xs uppercase tracking-[0.2em] text-slate-500">{label}</p>
+        <Icon size={16} className="text-cyan" />
+      </div>
+      <p className="mt-3 text-2xl font-semibold text-white">{value}</p>
+    </div>
+  );
+}
+
+function UsageRow({ label, value, limit }: { label: string; value: number; limit: number }) {
+  const percent = Math.min(100, Math.round((value / limit) * 100));
+
+  return (
+    <div>
+      <div className="flex items-center justify-between text-xs">
+        <span className="text-slate-400">{label}</span>
+        <span className="text-slate-300">{value}/{limit}</span>
+      </div>
+      <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
+        <div className="h-full rounded-full bg-cyan" style={{ width: `${percent}%` }} />
+      </div>
+    </div>
+  );
+}
+
+function TaskRow({ task, updating, onToggle }: { task: MentorTask; updating: boolean; onToggle: () => void }) {
+  const Icon = taskIcons[task.type];
+  const isDone = task.status === "completed";
+
+  return (
+    <div className={cn("rounded-lg border p-4 transition-colors", isDone ? "border-emerald-500/20 bg-emerald-500/5" : "border-white/10 bg-obsidian/30")}>
+      <div className="flex items-start gap-4">
+        <button
+          type="button"
+          onClick={onToggle}
+          className="mt-1 text-slate-400 hover:text-white"
+          aria-label={isDone ? "Mark task pending" : "Mark task complete"}
+        >
+          {updating ? <Loader2 className="animate-spin" size={20} /> : isDone ? <CheckCircle2 className="text-emerald-300" size={20} /> : <Circle size={20} />}
+        </button>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={cn("inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs font-semibold", priorityClass(task.priority))}>
+              <Icon size={12} />
+              {task.priority}
+            </span>
+            <span className="text-xs text-slate-500">{task.estimatedMinutes} min</span>
+          </div>
+          <h3 className={cn("mt-3 text-base font-semibold", isDone ? "text-slate-400 line-through" : "text-white")}>{task.title}</h3>
+          <p className="mt-1 text-sm leading-6 text-slate-400">{task.description}</p>
+          <p className="mt-2 text-xs text-cyan">{task.reason}</p>
         </div>
-      )}
+        <Link to={task.href} className="shrink-0 rounded-lg border border-white/10 p-2 text-slate-400 hover:bg-white/5 hover:text-white">
+          <ArrowRight size={16} />
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function Signal({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-start justify-between gap-4 rounded-lg bg-obsidian/30 px-3 py-2">
+      <span className="text-slate-500">{label}</span>
+      <span className="max-w-[180px] text-right text-slate-200">{value}</span>
     </div>
   );
 }

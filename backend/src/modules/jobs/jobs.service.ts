@@ -32,7 +32,7 @@ function toJobListing(job: JobDocument, matchScore?: number): EnrichedJobListing
 /** Derives a job-search context from the user's profile or a safe fallback. */
 function buildSearchContext(user: JobsUserProfile, limit: number) {
   const skills = user?.currentSkills ?? [];
-  const role = user?.targetRoles?.join(" ") || skills.slice(0, 2).join(" ") || "software engineer";
+  const role = user?.targetRoles?.join(" ") || user?.targetRole || skills.slice(0, 2).join(" ") || "software engineer";
   const preferences = user?.preferences ?? {};
   const preferredLocation =
     typeof preferences.jobSearchLocation === "string"

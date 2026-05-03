@@ -6,9 +6,12 @@ import type { CareerNote } from "@studybuddy/shared";
 type CreateNoteData = {
   title: string;
   content: string;
+  topic?: string;
   tags?: string[];
   linkedSkills?: string[];
   sourceUrl?: string;
+  strength?: number;
+  nextReviewAt?: string;
 };
 
 type UpdateNoteData = Partial<CreateNoteData>;
@@ -27,9 +30,15 @@ function toNote(note: NoteDocument): CareerNote {
     userId: note.userId,
     title: note.title,
     content: note.content,
+    topic: note.topic ?? undefined,
     tags: note.tags,
     linkedSkills: note.linkedSkills,
     sourceUrl: note.sourceUrl ?? undefined,
+    strength: note.strength ?? 0,
+    nextReviewAt: note.nextReviewAt ? note.nextReviewAt.toISOString() : undefined,
+    lastReviewed: note.lastReviewed ? note.lastReviewed.toISOString() : undefined,
+    reviewCount: note.reviewCount ?? 0,
+    lapseCount: note.lapseCount ?? 0,
     createdAt: note.createdAt.toISOString(),
     updatedAt: note.updatedAt.toISOString()
   };
@@ -41,9 +50,12 @@ async function createNote(userId: string, data: CreateNoteData): Promise<CareerN
     userId,
     title: data.title,
     content: data.content,
+    topic: data.topic ?? data.tags?.[0],
     tags: data.tags ?? [],
     linkedSkills: data.linkedSkills ?? [],
-    sourceUrl: data.sourceUrl
+    sourceUrl: data.sourceUrl,
+    strength: data.strength ?? 0.25,
+    nextReviewAt: data.nextReviewAt ? new Date(data.nextReviewAt) : new Date()
   });
 
   // Generate embedding for the new note asynchronously
@@ -72,9 +84,12 @@ async function updateNote(userId: string, noteId: string, data: UpdateNoteData):
     {
       ...(data.title !== undefined && { title: data.title }),
       ...(data.content !== undefined && { content: data.content }),
+      ...(data.topic !== undefined && { topic: data.topic }),
       ...(data.tags !== undefined && { tags: data.tags }),
       ...(data.linkedSkills !== undefined && { linkedSkills: data.linkedSkills }),
-      ...(data.sourceUrl !== undefined && { sourceUrl: data.sourceUrl })
+      ...(data.sourceUrl !== undefined && { sourceUrl: data.sourceUrl }),
+      ...(data.strength !== undefined && { strength: data.strength }),
+      ...(data.nextReviewAt !== undefined && { nextReviewAt: new Date(data.nextReviewAt) })
     },
     { new: true, runValidators: true }
   );
@@ -103,7 +118,7 @@ async function deleteNote(userId: string, noteId: string): Promise<void> {
 
 /** Lists notes for the user with optional filtering. */
 async function listNotes(userId: string, query: NotesQuery): Promise<{ notes: CareerNote[]; total: number }> {
-  const filter: any = { userId };
+  const filter: any = { userId, deleted: { $ne: true } };
 
   if (query.tags) {
     filter.tags = { $in: query.tags.split(",").map(tag => tag.trim()) };

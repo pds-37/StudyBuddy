@@ -25,6 +25,7 @@ void printHelp() {
     note list                               List all local notes
     note search "query"                     Search notes by keyword
     note delete <note_id>                   Soft-delete a note
+    recall start                            Run offline active recall
 
     sync push                               Push unsynced notes to web
     sync pull                               Pull notes from web
@@ -215,6 +216,14 @@ void executeCommand(Config& config, const std::string& input) {
     }
     else {
       std::cout << "  Unknown sync command. Try: sync push | sync pull | sync status\n";
+    }
+  }
+
+  else if (cmd.module == "recall") {
+    if (cmd.action == "start") {
+      modules::runRecallSession(config);
+    } else {
+      std::cout << "  Try: recall start\n";
     }
   }
 

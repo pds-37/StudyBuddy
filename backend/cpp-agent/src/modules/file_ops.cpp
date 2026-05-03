@@ -101,6 +101,12 @@ static std::string serializeFrontmatter(const NoteFrontmatter& meta) {
   out << YAML::Key << "created_at" << YAML::Value << meta.created_at;
   out << YAML::Key << "updated_at" << YAML::Value << meta.updated_at;
   out << YAML::Key << "synced_at"  << YAML::Value << meta.synced_at;
+  out << YAML::Key << "topic"      << YAML::Value << meta.topic;
+  out << YAML::Key << "strength"   << YAML::Value << meta.strength;
+  out << YAML::Key << "next_review_at" << YAML::Value << meta.next_review_at;
+  out << YAML::Key << "last_reviewed"  << YAML::Value << meta.last_reviewed;
+  out << YAML::Key << "review_count"   << YAML::Value << meta.review_count;
+  out << YAML::Key << "lapse_count"    << YAML::Value << meta.lapse_count;
   out << YAML::Key << "deleted"    << YAML::Value << meta.deleted;
   out << YAML::EndMap;
 
@@ -117,6 +123,12 @@ static NoteFrontmatter parseFrontmatter(const YAML::Node& node) {
   if (node["created_at"]) meta.created_at = node["created_at"].as<std::string>("");
   if (node["updated_at"]) meta.updated_at = node["updated_at"].as<std::string>("");
   if (node["synced_at"])  meta.synced_at  = node["synced_at"].as<std::string>("");
+  if (node["topic"])      meta.topic      = node["topic"].as<std::string>("");
+  if (node["strength"])   meta.strength   = node["strength"].as<double>(0.25);
+  if (node["next_review_at"]) meta.next_review_at = node["next_review_at"].as<std::string>("");
+  if (node["last_reviewed"])  meta.last_reviewed  = node["last_reviewed"].as<std::string>("");
+  if (node["review_count"])   meta.review_count   = node["review_count"].as<int>(0);
+  if (node["lapse_count"])    meta.lapse_count    = node["lapse_count"].as<int>(0);
   if (node["deleted"])    meta.deleted    = node["deleted"].as<bool>(false);
   return meta;
 }
