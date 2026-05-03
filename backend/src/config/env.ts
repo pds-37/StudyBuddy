@@ -51,7 +51,7 @@ function readRegexListEnv(key: string) {
 export const env = {
   nodeEnv: readEnv("NODE_ENV", "development"),
   port: Number(readEnv("PORT", "5000")),
-  clientOrigins: readListEnv("CLIENT_ORIGIN", ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"]),
+  clientOrigins: readListEnv("CLIENT_ORIGIN", ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "https://study-buddy-frontend-kappa.vercel.app"]),
   clientOriginRegexes: readRegexListEnv("CLIENT_ORIGIN_REGEX"),
   mongoUri: readEnv("MONGODB_URI", "mongodb://127.0.0.1:27017/studybuddy-career-copilot"),
   mongoDbName: readEnv("MONGODB_DB_NAME", "studybuddy_career_copilot"),
