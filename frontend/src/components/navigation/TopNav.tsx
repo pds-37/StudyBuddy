@@ -43,6 +43,10 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
         "sticky top-0 z-40 w-full transition-all duration-300 h-20 flex items-center shrink-0",
         isAppShell 
           ? "bg-obsidian backdrop-blur-xl border-b border-white/[0.08]" 
+          : isLandingPage
+            ? isScrolled
+              ? "bg-white/85 backdrop-blur-xl border-b border-[#d8e3e4] shadow-[0_12px_32px_rgba(32,53,61,0.08)]"
+              : "bg-white/55 backdrop-blur-xl border-b border-transparent"
           : isScrolled 
             ? "bg-obsidian/90 backdrop-blur-xl border-b border-white/5 shadow-2xl"
             : "bg-transparent"
@@ -56,10 +60,15 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
         <div className="flex items-center gap-8 flex-1">
           {(!isAppShell || isLandingPage) && (
             <Link to="/" className="flex items-center gap-3 group">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand to-cyan flex items-center justify-center shadow-[0_0_20px_rgba(124,92,255,0.4)] transition-transform group-hover:scale-110">
+              <div className={cn(
+                "w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110",
+                isLandingPage
+                  ? "bg-[#158c83] text-white shadow-[0_10px_24px_rgba(21,140,131,0.22)]"
+                  : "bg-gradient-to-br from-brand to-cyan shadow-[0_0_20px_rgba(124,92,255,0.4)]"
+              )}>
                 <span className="text-white font-black text-sm">S</span>
               </div>
-              <span className="text-white font-black tracking-tight text-xl">StudyBuddy</span>
+              <span className={cn("font-black tracking-tight text-xl", isLandingPage ? "text-[#102229]" : "text-white")}>StudyBuddy</span>
             </Link>
           )}
 
@@ -87,7 +96,10 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
               <a
                 key={item.label}
                 href={item.href}
-                className="text-sm font-bold text-slate-400 hover:text-white transition-all hover:translate-y-[-1px]"
+                className={cn(
+                  "text-sm font-bold transition-all hover:translate-y-[-1px]",
+                  isLandingPage ? "text-[#53656d] hover:text-[#0e6f69]" : "text-slate-400 hover:text-white"
+                )}
               >
                 {item.label}
               </a>
@@ -120,12 +132,20 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
             </div>
           ) : (
             <div className="flex items-center gap-4">
-              <Link to="/auth" className="px-5 py-2.5 text-sm font-bold text-slate-400 hover:text-white transition-colors">
+              <Link to="/auth" className={cn(
+                "px-5 py-2.5 text-sm font-bold transition-colors",
+                isLandingPage ? "text-[#53656d] hover:text-[#0e6f69]" : "text-slate-400 hover:text-white"
+              )}>
                 Log in
               </Link>
               <Link 
                 to="/auth" 
-                className="px-6 py-3 rounded-full bg-white text-obsidian text-sm font-black hover:bg-slate-200 transition-all hover:scale-105 shadow-[0_10px_30px_rgba(255,255,255,0.15)]"
+                className={cn(
+                  "px-6 py-3 rounded-full text-sm font-black transition-all hover:scale-105",
+                  isLandingPage
+                    ? "bg-[#158c83] text-white hover:bg-[#0e6f69] shadow-[0_12px_28px_rgba(21,140,131,0.2)]"
+                    : "bg-white text-obsidian hover:bg-slate-200 shadow-[0_10px_30px_rgba(255,255,255,0.15)]"
+                )}
               >
                 Get Started
               </Link>
