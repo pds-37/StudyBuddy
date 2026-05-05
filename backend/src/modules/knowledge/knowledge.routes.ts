@@ -6,7 +6,7 @@ const router = Router();
 
 router.get("/graph", authenticate, async (req, res, next) => {
   try {
-    const graph = await knowledgeService.getGraph((req as any).user!.id);
+    const graph = await knowledgeService.getGraph(req.userId!);
     res.json(graph);
   } catch (error) {
     next(error);

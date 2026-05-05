@@ -12,7 +12,7 @@ router.post("/confidence", authenticate, async (req, res, next) => {
       return res.status(400).json({ message: "noteId and confidence are required" });
     }
 
-    const item = await MemoryEngine.registerConfidence((req as any).user!.id, noteId, confidence);
+    const item = await MemoryEngine.registerConfidence(req.userId!, noteId, confidence);
     res.json(item);
   } catch (error) {
     next(error);

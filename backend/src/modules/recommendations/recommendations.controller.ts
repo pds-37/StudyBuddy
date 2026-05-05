@@ -4,8 +4,7 @@ import { NudgingEngine } from "../../engines/nudging.engine.js";
 
 export const getNextBestAction = async (req: Request, res: Response) => {
   try {
-    // Assuming you have an auth middleware that sets req.user
-    const userId = (req as any).user?.id || (req as any).user?._id;
+    const userId = req.userId;
     
     if (!userId) {
        return res.status(401).json({ error: "Unauthorized" });
