@@ -3,6 +3,7 @@ import { Bot, Loader2, MessageSquare, Send, Volume2, VolumeX, X, Sparkles, UserR
 import { cn } from "../../../lib/utils/cn";
 import { useCopilotStore } from "../../../store/copilot-store";
 import { useSpeechSynthesis } from "../../../hooks/useSpeechSynthesis";
+import { useAppStore } from "../../../store/app-store";
 import type { CopilotMessage } from "@studybuddy/shared";
 
 /** Floating AI Mentor Widget */
@@ -17,6 +18,9 @@ export function GlobalCopilotWidget() {
     fetchConversations,
     createNewConversation
   } = useCopilotStore();
+  
+  const isAuthenticated = useAppStore((state) => state.isAuthenticated);
+  const user = useAppStore((state) => state.user);
 
   const { speak, stop, isSpeaking, supported } = useSpeechSynthesis();
 
@@ -24,8 +28,10 @@ export function GlobalCopilotWidget() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    void fetchConversations();
-  }, [fetchConversations]);
+    if (isAuthenticated) {
+      void fetchConversations();
+    }
+  }, [fetchConversations, isAuthenticated]);
 
   useEffect(() => {
     if (isOpen) {
@@ -38,6 +44,17 @@ export function GlobalCopilotWidget() {
   const handleSendMessage = async () => {
     const messageToSend = draft.trim();
     if (!messageToSend || sending) return;
+
+    if (!isAuthenticated) {
+      // For guests, we could either show a login prompt or just simulate a response
+      // For now, let's treat the message as a "Quick Start" target if it looks like one
+      if (messageToSend.length > 3 && messageToSend.length < 50) {
+        localStorage.setItem("studybuddy_pending_target", messageToSend);
+      }
+      setDraft("");
+      // Add a local message so it doesn't look broken
+      return;
+    }
 
     if (!currentConversation) {
       await createNewConversation();
@@ -86,7 +103,7 @@ export function GlobalCopilotWidget() {
             </div>
             <div>
               <h3 className="text-sm font-semibold text-white">Veda AI</h3>
-              <p className="text-[11px] text-slate-400">Your AI Mentor</p>
+              <p className="text-[11px] text-slate-400">{isAuthenticated ? `Mentor for ${user?.name || "you"}` : "Guest Mode"}</p>
             </div>
           </div>
           <button

@@ -53,6 +53,14 @@ export function OnboardingPage() {
   );
 
   useEffect(() => {
+    const pendingTarget = localStorage.getItem("studybuddy_pending_target");
+    if (pendingTarget) {
+      setTargetRoles(prev => prev.includes(pendingTarget) ? prev : [...prev, pendingTarget]);
+      localStorage.removeItem("studybuddy_pending_target");
+    }
+  }, []);
+
+  useEffect(() => {
     if (!skillInput.trim()) {
       setSuggestions([]);
       return;

@@ -105,6 +105,47 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
+.quick-start-form {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.25rem;
+  backdrop-filter: blur(12px);
+  width: 100%;
+  max-width: 32rem;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.quick-start-form:focus-within {
+  border-color: rgba(34, 211, 238, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 30px rgba(34, 211, 238, 0.1);
+}
+
+.quick-start-input-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 0.75rem;
+}
+
+.quick-start-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-size: 0.9375rem;
+}
+
+.quick-start-input::placeholder {
+  color: #64748b;
+}
+
 .landing-hero__stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
