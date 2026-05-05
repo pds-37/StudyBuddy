@@ -3,7 +3,6 @@ import {
   ArrowRight,
   Brain,
   Briefcase,
-  CheckCircle2,
   ChevronRight,
   FileText,
   Github,
@@ -11,8 +10,6 @@ import {
   Linkedin,
   ListChecks,
   MessageCircle,
-  MessageSquare,
-  NotebookText,
   Play,
   Route,
   ShieldCheck,
@@ -21,42 +18,47 @@ import {
   TerminalSquare
 } from "lucide-react";
 import { useAppStore } from "../store/app-store";
+import { motion as Motion } from "framer-motion";
+import "./LandingPage.css";
 
-const metrics = [
-  { label: "Readiness", value: "72%", detail: "+18 this month" },
-  { label: "Recall due", value: "6", detail: "2 high priority" },
-  { label: "Roadmap", value: "41%", detail: "Frontend track" }
-];
-
-const mentorTasks = [
-  { title: "Clear JavaScript closures recall", type: "Recall", icon: Brain, done: false },
-  { title: "Ship one project improvement", type: "Build", icon: ListChecks, done: false },
-  { title: "Rewrite async rendering note", type: "Notes", icon: NotebookText, done: true }
-];
-
-const workflow = [
+const features = [
   {
-    icon: TerminalSquare,
-    title: "Local-first notes",
-    text: "Keep studying in Markdown. The CLI syncs your strongest material into the cloud workspace."
+    icon: Brain,
+    title: "Smarter recall",
+    text: "Spaced repetition for your notes. StudyBuddy knows when you're about to forget a concept."
   },
   {
     icon: Target,
-    title: "Role-aware diagnosis",
-    text: "StudyBuddy compares your notes, skills, and resume against the role you actually want."
+    title: "Career-aware AI",
+    text: "Your AI mentor, Veda, understands your career goals and guides your study accordingly."
   },
   {
-    icon: Route,
-    title: "Daily execution",
-    text: "The dashboard turns gaps into recall, roadmap, project, and interview tasks."
+    icon: Briefcase,
+    title: "Resume-to-Role",
+    text: "Turn your study proofs into role-specific bullet points that recruiters actually care about."
   }
 ];
 
-const surfaces = [
-  { icon: MessageSquare, title: "Ask Veda", text: "Answers with your notes and career context." },
-  { icon: FileText, title: "Resume Tailor", text: "Turns proof points into role-specific bullets." },
-  { icon: Briefcase, title: "Job Match", text: "Ranks jobs by fit and missing evidence." },
-  { icon: GraduationCap, title: "Interview Prep", text: "Practice answers against weak topics." }
+const steps = [
+  {
+    title: "Sync your notes",
+    text: "Keep writing in Markdown. Our CLI syncs your local vault into the cloud workspace."
+  },
+  {
+    title: "Define your target",
+    text: "Tell StudyBuddy the role you want. It analyzes your notes against industry expectations."
+  },
+  {
+    title: "Execute daily",
+    text: "Follow your dashboard tasks: recall, projects, and interview prep tailored to your gaps."
+  }
+];
+
+const trustItems = [
+  "Local-first Markdown",
+  "Built for developers",
+  "Privacy by design",
+  "AI-driven execution"
 ];
 
 export function LandingPage() {
@@ -64,276 +66,221 @@ export function LandingPage() {
   const startPath = isAuthenticated ? "/dashboard" : "/auth";
 
   return (
-    <div className="min-h-screen bg-[#05070b] text-slate-300 selection:bg-cyan/20 selection:text-white">
-      <div>
-        <section id="workspace" className="border-b border-white/8">
-          <div className="mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:px-6 lg:grid-cols-[0.84fr_1.16fr] lg:py-18 xl:py-20">
-            <div className="flex flex-col justify-center">
-              <div className="inline-flex w-fit items-center gap-2 rounded-lg border border-emerald-400/20 bg-emerald-400/8 px-3 py-2 text-xs font-bold uppercase tracking-[0.18em] text-emerald-300">
-                <ShieldCheck size={15} />
-                AI career workspace
-              </div>
+    <div className="landing-page">
+      <main className="landing-main">
+        <section className="landing-hero" id="home">
+          <div className="landing-hero__copy">
+            <Motion.span 
+              className="landing-kicker"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Sparkles size={16} />
+              AI career workspace
+            </Motion.span>
+            <Motion.h1 
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
+              Turn scattered study notes into a daily career plan.
+            </Motion.h1>
+            <Motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              StudyBuddy connects your notes, resume, roadmap, recall queue, and AI mentor so the next useful task is always obvious.
+            </Motion.p>
 
-              <h1 className="mt-7 max-w-3xl text-4xl font-semibold leading-[1.03] tracking-normal text-white sm:text-5xl lg:text-6xl">
-                Turn scattered study notes into a daily career plan.
-              </h1>
-
-              <p className="mt-6 max-w-2xl text-base leading-8 text-slate-400 sm:text-lg">
-                StudyBuddy connects your notes, resume, roadmap, recall queue, and AI mentor so the next useful task is always obvious.
-              </p>
-
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link
-                  to={startPath}
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-cyan px-5 py-3 text-sm font-bold text-[#041014] transition hover:bg-cyan/90"
-                >
-                  Open workspace
-                  <ArrowRight size={17} />
-                </Link>
-                <a
-                  href="#workflow"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/10 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/5"
-                >
-                  See workflow
-                  <Play size={16} />
-                </a>
-              </div>
-
-              <div className="mt-8 grid gap-3 sm:grid-cols-3">
-                {metrics.map((metric) => (
-                  <div key={metric.label} className="rounded-lg border border-white/10 bg-white/[0.035] p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{metric.label}</p>
-                    <p className="mt-3 text-2xl font-semibold text-white">{metric.value}</p>
-                    <p className="mt-1 text-xs text-slate-400">{metric.detail}</p>
-                  </div>
-                ))}
-              </div>
+            <div className="landing-hero__actions">
+              <Link to={startPath} className="btn-primary">
+                Open workspace
+                <ArrowRight size={18} />
+              </Link>
+              <a href="#features" className="btn-secondary">
+                See workflow
+                <Play size={16} />
+              </a>
             </div>
 
-            <ProductPreview />
+            <div className="landing-hero__stats">
+              <div className="landing-stat">
+                <strong>10x</strong>
+                <span>Faster recall</span>
+              </div>
+              <div className="landing-stat">
+                <strong>1 App</strong>
+                <span>For all career loops</span>
+              </div>
+              <div className="landing-stat">
+                <strong>Role-first</strong>
+                <span>Career context</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="landing-hero__visual" aria-hidden="true">
+            <Motion.div 
+              className="landing-cluster landing-cluster--primary"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+            >
+              <div className="landing-cluster__badge">
+                <ShieldCheck size={16} />
+                Ready for role
+              </div>
+              <strong>72% Readiness</strong>
+              <span>+18 points this month</span>
+            </Motion.div>
+            
+            <Motion.div 
+              className="landing-cluster landing-cluster--secondary"
+              initial={{ x: 50, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+            >
+              <ListChecks size={16} />
+              6 Recall tasks due
+            </Motion.div>
+
+            <Motion.div 
+              className="landing-cluster landing-cluster--accent"
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.7 }}
+            >
+              <TerminalSquare size={16} />
+              Sync: 12 notes added
+            </Motion.div>
+
+            <div className="landing-orbit landing-orbit--one" />
+            <div className="landing-orbit landing-orbit--two" />
           </div>
         </section>
 
-        <section id="workflow" className="mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:py-20">
-          <div className="grid gap-8 lg:grid-cols-[0.7fr_1.3fr] lg:items-end">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.22em] text-cyan">Workflow</p>
-              <h2 className="mt-3 text-3xl font-semibold leading-tight text-white sm:text-4xl">
-                Built around the way developers actually learn.
-              </h2>
-            </div>
-            <p className="max-w-3xl text-base leading-7 text-slate-400">
-              The product starts with your existing study habits, then adds structure: diagnosis, spaced recall, project proof, and interview practice.
+        <section className="landing-trust" aria-label="Trust bar">
+          {trustItems.map((item, index) => (
+            <Motion.span 
+              key={item} 
+              className="landing-trust__pill"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+            >
+              {item}
+            </Motion.span>
+          ))}
+        </section>
+
+        <section className="landing-features" id="features">
+          <div className="landing-section-head">
+            <span className="eyebrow">Why StudyBuddy?</span>
+            <h2>Built for developers, not just for notes.</h2>
+            <p>
+              Traditional note apps are where ideas go to die. StudyBuddy turns your knowledge 
+              into career progression through active feedback loops.
             </p>
           </div>
 
-          <div className="mt-10 grid gap-4 md:grid-cols-3">
-            {workflow.map((item) => (
-              <article key={item.title} className="rounded-lg border border-white/10 bg-white/[0.035] p-6">
-                <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-white text-[#071016]">
-                  <item.icon size={21} />
+          <Motion.div 
+            className="landing-feature-grid"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, staggerChildren: 0.2 }}
+          >
+            {features.map((feature, index) => (
+              <Motion.article 
+                key={feature.title} 
+                className="feature-card"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <div className="feature-icon">
+                  <feature.icon size={20} />
                 </div>
-                <h3 className="mt-5 text-lg font-semibold text-white">{item.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-slate-400">{item.text}</p>
-              </article>
+                <h3>{feature.title}</h3>
+                <p>{feature.text}</p>
+              </Motion.article>
+            ))}
+          </Motion.div>
+        </section>
+
+        <section className="landing-howto" id="how-to-use">
+          <div className="landing-section-head">
+            <span className="eyebrow">How it works</span>
+            <h2>Three steps to a clearer career path.</h2>
+            <p>
+              StudyBuddy integrates with your existing workflow, adding a layer of 
+              intelligence that plans your daily execution.
+            </p>
+          </div>
+
+          <div className="landing-howto__grid">
+            {steps.map((step, index) => (
+              <Motion.article 
+                key={step.title} 
+                className="howto-card"
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.15 }}
+              >
+                <span className="howto-step">Step {index + 1}</span>
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
+              </Motion.article>
             ))}
           </div>
         </section>
 
-        <section id="tools" className="border-y border-white/8 bg-white/[0.018]">
-          <div className="mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:py-20">
-            <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[0.22em] text-emerald-300">Tools</p>
-                <h2 className="mt-3 text-3xl font-semibold text-white sm:text-4xl">One workspace, four job-search loops.</h2>
-              </div>
-              <Link to={startPath} className="inline-flex items-center gap-2 text-sm font-bold text-cyan hover:text-white">
-                Start now
-                <ChevronRight size={16} />
-              </Link>
-            </div>
-
-            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {surfaces.map((surface) => (
-                <article key={surface.title} className="rounded-lg border border-white/10 bg-[#080d12] p-5">
-                  <surface.icon className="text-cyan" size={22} />
-                  <h3 className="mt-5 text-base font-semibold text-white">{surface.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-slate-400">{surface.text}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:py-20">
-          <div className="rounded-lg border border-white/10 bg-[linear-gradient(135deg,rgba(34,211,238,0.12),rgba(16,185,129,0.08)_45%,rgba(255,255,255,0.04))] p-6 sm:p-8 lg:flex lg:items-center lg:justify-between">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.22em] text-cyan">Ready when you are</p>
-              <h2 className="mt-3 max-w-2xl text-2xl font-semibold leading-tight text-white sm:text-3xl">
-                Bring your notes in, choose a target role, and let StudyBuddy plan the next move.
-              </h2>
-            </div>
-            <Link
-              to={startPath}
-              className="mt-6 inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-bold text-[#07090d] hover:bg-slate-200 lg:mt-0"
-            >
-              Launch StudyBuddy
-              <ArrowRight size={17} />
-            </Link>
-          </div>
-        </section>
-      </div>
-
-      <footer className="border-t border-white/8">
-        <div className="mx-auto grid max-w-7xl gap-8 px-5 py-10 sm:px-6 md:grid-cols-[1fr_auto_auto] md:items-center">
+        <section className="landing-cta">
           <div>
-            <strong className="text-lg font-semibold text-white">StudyBuddy</strong>
-            <p className="mt-2 max-w-md text-sm leading-6 text-slate-500">
-              AI mentor, recall trainer, and career planning workspace for technical learners.
+            <span className="eyebrow">Ready to start?</span>
+            <h2>Turn study chaos into a clear career system.</h2>
+            <p>
+              Join other developers using StudyBuddy to bridge their skill gaps and 
+              land their dream roles with precision.
             </p>
           </div>
-          <div className="flex gap-5 text-sm text-slate-400">
-            <Link to="/auth" className="hover:text-white">Login</Link>
-            <a href="#tools" className="hover:text-white">Tools</a>
-            <a href="#workflow" className="hover:text-white">Workflow</a>
+          <Link to={startPath} className="btn-primary">
+            Launch StudyBuddy
+            <ArrowRight size={18} />
+          </Link>
+        </section>
+      </main>
+
+      <footer className="landing-footer max-w-7xl mx-auto px-6">
+        <div className="footer-brand">
+          <strong>StudyBuddy</strong>
+          <p>AI mentor, recall trainer, and career planning workspace for technical learners.</p>
+        </div>
+        <div className="footer-nav">
+          <Link to="/">Home</Link>
+          <a href="#features">Features</a>
+          <Link to="/auth">Login</Link>
+        </div>
+        <div className="footer-meta">
+          <div className="flex gap-4">
+            <a href="https://www.linkedin.com/in/priyanshu-tiwari-pds37" target="_blank" rel="noopener noreferrer">
+              <Linkedin size={20} />
+            </a>
+            <a href="#">
+              <Github size={20} />
+            </a>
+            <a href="#">
+              <MessageCircle size={20} />
+            </a>
           </div>
-          <div className="flex gap-3 text-slate-400">
-            <a href="#" aria-label="GitHub" className="rounded-lg border border-white/10 p-2 hover:text-white">
-              <Github size={17} />
-            </a>
-            <a href="https://www.linkedin.com/in/priyanshu-tiwari-pds37" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="rounded-lg border border-white/10 p-2 hover:text-white">
-              <Linkedin size={17} />
-            </a>
-            <a href="#" aria-label="Discord" className="rounded-lg border border-white/10 p-2 hover:text-white">
-              <MessageCircle size={17} />
-            </a>
-          </div>
+          <p className="mt-4 text-xs text-slate-500">Copyright 2026 StudyBuddy</p>
         </div>
       </footer>
-    </div>
-  );
-}
-
-function ProductPreview() {
-  return (
-    <div className="rounded-lg border border-white/10 bg-[#080d12] p-3 shadow-2xl shadow-black/40">
-      <div className="rounded-md border border-white/10 bg-[#0d141b]">
-        <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-          <div className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
-            <span className="h-2.5 w-2.5 rounded-full bg-amber-300" />
-            <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
-          </div>
-          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Today</span>
-        </div>
-
-        <div className="grid min-h-[520px] lg:grid-cols-[190px_1fr]">
-          <aside className="hidden border-r border-white/10 p-4 lg:block">
-            <div className="mb-5 rounded-lg bg-cyan/10 p-3 text-cyan">
-              <Sparkles size={18} />
-              <p className="mt-2 text-xs font-bold uppercase tracking-[0.16em]">AI Dost</p>
-            </div>
-            {["Dashboard", "Recall", "Roadmap", "Resume", "Jobs"].map((item, index) => (
-              <div
-                key={item}
-                className={`mb-2 rounded-lg px-3 py-2 text-sm ${index === 0 ? "bg-white text-[#071016] font-semibold" : "text-slate-400"}`}
-              >
-                {item}
-              </div>
-            ))}
-          </aside>
-
-          <div className="p-4 sm:p-5">
-            <div className="grid gap-4 xl:grid-cols-[1fr_240px]">
-              <section className="rounded-lg border border-white/10 bg-[#101821] p-5">
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-cyan">Mentor focus</p>
-                <h3 className="mt-3 text-2xl font-semibold text-white">Patch weak topic: async React</h3>
-                <p className="mt-3 text-sm leading-6 text-slate-400">
-                  Review the note, answer from memory, then turn the idea into one portfolio commit.
-                </p>
-
-                <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                  <MiniStat label="Memory" value="54%" />
-                  <MiniStat label="Roadmap" value="41%" />
-                  <MiniStat label="Interview" value="7/10" />
-                </div>
-              </section>
-
-              <section className="rounded-lg border border-white/10 bg-[#101821] p-5">
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-300">Readiness</p>
-                <div className="mt-5 flex items-end gap-3">
-                  <span className="text-5xl font-semibold text-white">72</span>
-                  <span className="pb-2 text-sm text-emerald-300">+8</span>
-                </div>
-                <div className="mt-5 h-2 rounded-full bg-white/10">
-                  <div className="h-full w-[72%] rounded-full bg-emerald-300" />
-                </div>
-              </section>
-            </div>
-
-            <section className="mt-4 rounded-lg border border-white/10 bg-[#101821] p-5">
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-white">Mission list</h3>
-                <span className="text-xs text-slate-500">3 tasks</span>
-              </div>
-
-              <div className="mt-4 space-y-3">
-                {mentorTasks.map((task) => (
-                  <div key={task.title} className="flex items-center gap-3 rounded-lg bg-[#0b1118] p-3">
-                    <span className={`flex h-8 w-8 items-center justify-center rounded-lg ${task.done ? "bg-emerald-300 text-[#071016]" : "bg-cyan/10 text-cyan"}`}>
-                      {task.done ? <CheckCircle2 size={17} /> : <task.icon size={17} />}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className={`truncate text-sm font-semibold ${task.done ? "text-slate-500 line-through" : "text-white"}`}>{task.title}</p>
-                      <p className="text-xs text-slate-500">{task.type}</p>
-                    </div>
-                    <ChevronRight className="text-slate-600" size={16} />
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            <div className="mt-4 grid gap-4 md:grid-cols-2">
-              <section className="rounded-lg border border-white/10 bg-[#101821] p-5">
-                <h3 className="font-semibold text-white">Weak topics</h3>
-                <TopicBar label="Async rendering" value="54%" width="54%" color="bg-amber-300" />
-                <TopicBar label="System design" value="61%" width="61%" color="bg-cyan" />
-                <TopicBar label="Resume proof" value="76%" width="76%" color="bg-emerald-300" />
-              </section>
-
-              <section className="rounded-lg border border-white/10 bg-[#101821] p-5">
-                <h3 className="font-semibold text-white">Veda note</h3>
-                <p className="mt-4 text-sm leading-6 text-slate-400">
-                  Your project evidence is improving. Add one measurable result before applying to more frontend roles.
-                </p>
-              </section>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function MiniStat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-lg bg-[#0b1118] p-3">
-      <p className="text-xs text-slate-500">{label}</p>
-      <p className="mt-1 text-lg font-semibold text-white">{value}</p>
-    </div>
-  );
-}
-
-function TopicBar({ label, value, width, color }: { label: string; value: string; width: string; color: string }) {
-  return (
-    <div className="mt-4">
-      <div className="flex items-center justify-between text-xs">
-        <span className="text-slate-400">{label}</span>
-        <span className="text-slate-500">{value}</span>
-      </div>
-      <div className="mt-2 h-2 rounded-full bg-white/10">
-        <div className={`h-full rounded-full ${color}`} style={{ width }} />
-      </div>
     </div>
   );
 }

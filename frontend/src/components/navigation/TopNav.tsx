@@ -6,9 +6,9 @@ import { useAppStore } from "../../store/app-store";
 import { NotificationsPopover } from "../NotificationsPopover";
 
 const landingSections = [
-  { label: "Workspace", href: "#workspace" },
-  { label: "Workflow", href: "#workflow" },
-  { label: "Tools", href: "#tools" }
+  { label: "Home", href: "#home" },
+  { label: "Features", href: "#features" },
+  { label: "How it works", href: "#how-to-use" }
 ] as const;
 
 type TopNavProps = {
