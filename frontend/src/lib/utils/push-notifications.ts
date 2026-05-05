@@ -1,4 +1,5 @@
 import { apiClient } from "../api/client";
+import { env } from "../constants/env";
 
 /**
  * Registers the service worker and subscribes to push notifications.
@@ -15,7 +16,7 @@ export async function subscribeToPushNotifications() {
 
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: 'BPr7C...' // In a real app, fetch this from the backend
+      applicationServerKey: env.vapidPublicKey
     });
 
     await apiClient.post('/notifications/subscribe', { subscription });
