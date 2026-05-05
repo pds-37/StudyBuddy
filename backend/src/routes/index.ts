@@ -14,7 +14,10 @@ import { projectRouter } from "../modules/projects/project.routes.js";
 import { notificationRouter } from "../modules/notifications/notification.routes.js";
 import { recallRouter } from "../modules/recall/recall.routes.js";
 import { syncRouter } from "../modules/sync/sync.routes.js";
-
+import { recommendationsRouter } from "../modules/recommendations/recommendations.routes.js";
+import { behaviorRouter } from "../modules/behavior/behavior.routes.js";
+import knowledgeRouter from "../modules/knowledge/knowledge.routes.js";
+import memoryRouter from "../modules/memory/memory.routes.js";
 
 export const apiRouter = Router();
 
@@ -33,3 +36,7 @@ apiRouter.use("/mentorship", mentorshipRouter);
 apiRouter.use("/projects", projectRouter);
 apiRouter.use("/notifications", notificationRouter);
 apiRouter.use("/sync", syncRouter);
+apiRouter.use("/recommendations", recommendationsRouter);
+apiRouter.use("/behavior", behaviorRouter);
+apiRouter.use("/knowledge", knowledgeRouter);
+apiRouter.use("/memory", memoryRouter);

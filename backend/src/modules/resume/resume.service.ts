@@ -1,4 +1,4 @@
-import { groqService } from "../../services/ai/groq.service.js";
+import { AIOrchestrator } from "../../core/ai-orchestrator.js";
 import { ApiError } from "../../utils/api-error.js";
 import { UserModel } from "../users/user.model.js";
 import type { ResumeTailorRequest, ResumeTailorResult } from "@studybuddy/shared";
@@ -23,7 +23,7 @@ async function buildResumeContext(userId: string) {
 /** Tailors a resume to a target job role using the configured AI provider. */
 async function tailorResume(userId: string, request: ResumeTailorRequest): Promise<ResumeTailorResult> {
   const userContext = await buildResumeContext(userId);
-  return groqService.generateResumeTailoring(request, userContext);
+  return AIOrchestrator.tailorResume(request, userContext);
 }
 
 export const resumeService = {

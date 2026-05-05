@@ -6,6 +6,7 @@ import { skillsService } from "../skills/skills.service.js";
 import { UserModel, type UserDocument } from "../users/user.model.js";
 import { recallService } from "../recall/recall.service.js";
 import { ApiError } from "../../utils/api-error.js";
+import { NudgingEngine } from "../../engines/nudging.engine.js";
 import { MentorDailyPlanModel, type MentorDailyPlanDocument } from "./mentor.model.js";
 import type {
   MentorJourneyStage,
@@ -452,6 +453,11 @@ async function getTodayPlan(userId: string): Promise<MentorTodayPlan> {
   const date = todayKey();
   const previous = await MentorDailyPlanModel.findOne({ userId, date });
   const { signals, skillGap } = await loadSignals(userId, user);
+  
+  // Trigger Nudging Engine checks
+  void NudgingEngine.checkTaskHoarding(userId);
+  void NudgingEngine.checkInactivity(userId);
+
   const stage = decideStage(user, signals, skillGap);
   const nextTasks = applyPreviousStatuses(buildTasks(date, user, signals, skillGap, stage), previous);
   const subscription = buildSubscription(user, signals.totalNotes);

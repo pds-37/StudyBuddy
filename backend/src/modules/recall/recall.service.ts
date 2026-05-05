@@ -1,4 +1,5 @@
 import { NoteModel, type NoteDocument } from "../notes/note.model.js";
+import { MemoryEngine } from "../../engines/memory.engine.js";
 import { ApiError } from "../../utils/api-error.js";
 import type { CareerNote, RecallGrade, RecallPrompt, RecallReviewResult, WeakTopic } from "@studybuddy/shared";
 
@@ -169,6 +170,10 @@ async function reviewNote(
   }
 
   await note.save();
+  
+  // Sync with the new SM-2 Memory Engine architecture
+  const qualityScore = grade === "good" ? 5 : grade === "weak" ? 3 : 1;
+  await MemoryEngine.processRecall(userId, noteId, qualityScore).catch(e => console.error("MemoryEngine error:", e));
 
   return {
     note: toNote(note),

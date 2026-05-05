@@ -2,7 +2,7 @@ import { RoadmapModel, type RoadmapDocument } from "./roadmap.model.js";
 import { UserModel } from "../users/user.model.js";
 import { skillsService } from "../skills/skills.service.js";
 import { notesService } from "../notes/notes.service.js";
-import { groqService } from "../../services/ai/groq.service.js";
+import { AIOrchestrator } from "../../core/ai-orchestrator.js";
 import { ApiError } from "../../utils/api-error.js";
 import type { Roadmap, RoadmapMilestone } from "@studybuddy/shared";
 
@@ -54,11 +54,12 @@ async function generateRoadmap(userId: string, request: GenerateRoadmapRequest):
   }
 
   // Generate roadmap using AI
-  const aiRoadmap = await groqService.generateRoadmap(
+  const aiRoadmap = await AIOrchestrator.generateRoadmap(
     request.targetRole,
     request.timelineWeeks,
     request.skillGaps,
-    userNotes
+    userNotes,
+    user.behaviorProfile
   );
 
   // Create roadmap document
@@ -174,7 +175,7 @@ async function generateQuizForMilestone(userId: string, milestoneId: string) {
   const topic = milestone.title;
   const targetRole = roadmap.targetRole;
 
-  return groqService.generateQuiz(topic, targetRole);
+  return AIOrchestrator.generateQuiz(topic, targetRole);
 }
 
 export const roadmapsService = {

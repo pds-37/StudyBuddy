@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { FolderGit2, Check, ExternalLink, Clock, Target, Sparkles } from "lucide-react";
 import { useProjectsStore } from "../../../store/projects-store";
 import { useAppStore } from "../../../store/app-store";
+import { logBehavior } from "../../../lib/api/behavior";
 import { Link } from "react-router-dom";
 
 export function CapstoneProjects() {
@@ -99,7 +100,10 @@ export function CapstoneProjects() {
 
                 {match.status === "recommended" && (
                   <button
-                    onClick={() => updateStatus(match.id, "in_progress")}
+                    onClick={async () => {
+                      await updateStatus(match.id, "in_progress");
+                      await logBehavior("project_started", { projectId: match.project.id, title: match.project.title });
+                    }}
                     className="w-full bg-white text-black py-2.5 rounded-lg text-sm font-medium hover:bg-slate-200 transition"
                   >
                     Start Project
@@ -107,7 +111,10 @@ export function CapstoneProjects() {
                 )}
                 {match.status === "in_progress" && (
                   <button
-                    onClick={() => updateStatus(match.id, "completed")}
+                    onClick={async () => {
+                      await updateStatus(match.id, "completed");
+                      await logBehavior("project_completed", { projectId: match.project.id, title: match.project.title });
+                    }}
                     className="w-full bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30 py-2.5 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2"
                   >
                     <Check className="w-4 h-4" />

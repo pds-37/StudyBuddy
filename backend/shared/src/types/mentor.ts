@@ -24,7 +24,7 @@ export type MentorTaskType =
   | "job"
   | "reflection";
 
-export type MentorTaskStatus = "pending" | "completed" | "skipped";
+export type MentorTaskStatus = "pending" | "in_progress" | "completed" | "skipped";
 
 export type MentorTask = {
   id: string;

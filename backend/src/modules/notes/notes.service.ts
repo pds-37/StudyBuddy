@@ -1,4 +1,5 @@
 import { NoteModel, type NoteDocument } from "./note.model.js";
+import { MemoryItemModel } from "../memory/memory.model.js";
 import { ApiError } from "../../utils/api-error.js";
 import { vectorSearchService } from "../../services/ai/vector-search.service.js";
 import type { CareerNote } from "@studybuddy/shared";
@@ -62,6 +63,18 @@ async function createNote(userId: string, data: CreateNoteData): Promise<CareerN
   // We don't await this to avoid blocking the response
   vectorSearchService.updateNoteEmbedding(note._id.toString(), userId)
     .catch(error => console.error("Failed to generate embedding for new note:", error));
+
+  // Initialize a MemoryItem for Spaced Repetition tracking
+  await MemoryItemModel.create({
+    userId,
+    noteId: note._id.toString(),
+    content: note.content.substring(0, 150), // brief snippet
+    nextReview: new Date(), // start review cycle immediately
+    strength: 0,
+    interval: 1,
+    repetitions: 0,
+    easeFactor: 2.5
+  }).catch(error => console.error("Failed to create MemoryItem for note:", error));
 
   return toNote(note);
 }

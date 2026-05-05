@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Brain, CheckCircle2, Loader2, RotateCcw, XCircle } from "lucide-react";
 import { getDueRecallPrompts, getRecallStats, reviewRecallAnswer, type RecallStats } from "../lib/api/recall";
+import { logBehavior } from "../lib/api/behavior";
 import type { RecallGrade, RecallPrompt, RecallReviewResult } from "@studybuddy/shared";
 
 function formatPercent(value: number) {
@@ -49,6 +50,10 @@ export function RecallPage() {
       setError(null);
       const review = await reviewRecallAnswer({ noteId: activePrompt.noteId, answer: answer.trim(), grade });
       setResult(review);
+      
+      // Log the behavior for the Behavior Engine
+      await logBehavior("revision_completed", { noteId: activePrompt.noteId, grade: review.grade });
+      
       setPrompts((current) => current.slice(1));
       setAnswer("");
       const nextStats = await getRecallStats();

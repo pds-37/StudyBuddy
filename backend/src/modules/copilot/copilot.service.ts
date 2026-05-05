@@ -1,5 +1,5 @@
 import { CopilotConversation } from "./copilot.model.js";
-import { groqService } from "../../services/ai/groq.service.js";
+import { AIOrchestrator } from "../../core/ai-orchestrator.js";
 import { notesService } from "../notes/notes.service.js";
 import { mentorService } from "../mentor/mentor.service.js";
 import { skillsService } from "../skills/skills.service.js";
@@ -7,6 +7,7 @@ import { roadmapsService } from "../roadmaps/roadmaps.service.js";
 import { jobsService } from "../jobs/jobs.service.js";
 import { usersService } from "../users/users.service.js";
 import { UserModel } from "../users/user.model.js";
+import { RecommendationEngine } from "../../engines/recommendation.engine.js";
 import type { CopilotMessage, JobListing, Roadmap } from "@studybuddy/shared";
 
 /** Creates a new conversation for a user. */
@@ -16,7 +17,7 @@ async function createConversation(userId: string): Promise<string> {
     messages: [{
       id: "system-1",
       role: "system",
-      content: "You are an expert career coach and AI assistant. Help users with their career development, skill building, job search, and learning roadmaps. Be helpful, encouraging, and provide actionable advice.",
+      content: "You are Veda AI, an execution-focused mentor and study buddy. Your core philosophy is 'making sure the user does not fail their own plan.' You track their behavior, intervene when needed, and adapt continuously. Use the user's behavior profile and 'next best action' to make highly contextual, proactive suggestions (e.g., 'Need help with today's DP task?'). Be concise, encouraging, and highly actionable.",
       createdAt: new Date().toISOString()
     }]
   });
@@ -70,7 +71,7 @@ async function sendMessage(
   const userContext = await buildUserContext(userId, message, noteContext);
 
   // Generate AI response
-  const aiResponse = await groqService.generateCopilotResponse(
+  const aiResponse = await AIOrchestrator.getMentorResponse(
     conversation.messages,
     userContext
   );
@@ -128,21 +129,33 @@ async function incrementAiUsage(userId: string) {
 /** Builds comprehensive user context for AI responses. */
 async function buildUserContext(userId: string, currentQuery?: string, knownNoteContext?: string): Promise<string> {
   try {
-    const [profile, skillGapAnalysis, notesResult, roadmap, jobs, mentorPlan] = await Promise.all([
+    const [profile, skillGapAnalysis, notesResult, roadmap, jobs, mentorPlan, nextAction] = await Promise.all([
       usersService.getProfile(userId).catch(() => null),
       skillsService.analyzeSkillGap(userId).catch(() => null),
       notesService.listNotes(userId, { limit: 5, offset: 0 }).catch(() => ({ notes: [], total: 0 })),
       roadmapsService.getRoadmap(userId).catch(() => null),
       jobsService.getJobs(userId, 5).catch(() => []),
-      mentorService.getTodayPlan(userId).catch(() => null)
+      mentorService.getTodayPlan(userId).catch(() => null),
+      RecommendationEngine.getNextBestAction(userId).catch(() => null)
     ]);
 
     const notes = notesResult.notes;
     const context: string[] = [];
 
-    // User profile
+    // User profile & Behavior
     if (profile) {
       context.push(`User Profile: ${profile.name || "Unknown"}, Target Roles: ${profile.targetRoles?.join(", ") || "Not specified"}, Experience: ${profile.experienceLevel}`);
+      
+      const user = await UserModel.findById(userId);
+      if (user && user.behaviorProfile) {
+        context.push(`User Behavior Profile: Consistency Score is ${user.behaviorProfile.consistencyScore}%, Skip Rate is ${user.behaviorProfile.skipRate}%.`);
+      }
+    }
+
+    // Next Best Action
+    if (nextAction) {
+      const actionName = (nextAction.data as any)?.title || (nextAction.data as any)?.content?.substring(0, 50) || nextAction.action;
+      context.push(`Veda AI Recommendation Engine's Next Best Action: ${nextAction.reason}. The user should focus on: ${actionName}. Suggest this to the user!`);
     }
 
     if (mentorPlan) {

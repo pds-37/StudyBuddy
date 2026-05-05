@@ -41,6 +41,16 @@ const userSchema = new Schema(
       type: Schema.Types.Mixed,
       default: {}
     },
+    availableHours: {
+      type: Number,
+      default: 10
+    },
+    behaviorProfile: {
+      consistencyScore: { type: Number, default: 0 },
+      skipRate: { type: Number, default: 0 },
+      avgSessionTime: { type: Number, default: 0 },
+      preferredStudyTime: { type: String, default: "evening" }
+    },
     subscription: {
       plan: {
         type: String,
@@ -74,6 +84,10 @@ const userSchema = new Schema(
     onboardingCompleted: {
       type: Boolean,
       default: false
+    },
+    pushSubscriptions: {
+      type: [Schema.Types.Mixed],
+      default: []
     }
   },
   {

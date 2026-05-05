@@ -60,7 +60,8 @@ async function generateRoadmap(
   targetRole: string,
   timelineWeeks: number,
   skillGaps: Array<{ skill: string; gapScore: number }>,
-  userNotes?: string
+  userNotes?: string,
+  behaviorProfile?: any
 ): Promise<{
   title: string;
   rationale: string;
@@ -92,6 +93,11 @@ async function generateRoadmap(
 Key information:
 - Current skill gaps (highest priority first):
 ${skillGapsText}${notesContext}
+
+${behaviorProfile ? `Behavior Insights:
+- Consistency Score: ${behaviorProfile.consistencyScore}%
+- Skip Rate: ${behaviorProfile.skipRate}%
+Adaptive Instruction: ${behaviorProfile.consistencyScore < 50 ? "The user is struggling with consistency. Create shorter, more manageable milestones with frequent 'easy wins' to build momentum." : "The user is highly consistent. Make milestones challenging and project-heavy to maximize growth."}` : ""}
 
 Generate a structured roadmap with ${Math.min(8, Math.ceil(timelineWeeks / 4))} milestones that will help close these skill gaps and prepare for the target role.
 

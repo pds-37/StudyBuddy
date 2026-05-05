@@ -10,6 +10,7 @@ import {
   Wand2
 } from "lucide-react";
 import { tailorResume } from "../../../lib/api/resume";
+import { logBehavior } from "../../../lib/api/behavior";
 import { cn } from "../../../lib/utils/cn";
 import type { ResumeTailorResult, ResumeTailorTone } from "@studybuddy/shared";
 import * as pdfjsLib from "pdfjs-dist";
@@ -68,6 +69,7 @@ export function ResumeTailorWorkspace() {
         tone
       });
       setResult(tailored);
+      await logBehavior("resume_tailored", { targetRole, tone });
     } catch (requestError) {
       setError(getErrorMessage(requestError));
     } finally {

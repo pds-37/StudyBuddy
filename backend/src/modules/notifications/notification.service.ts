@@ -1,4 +1,6 @@
 import { NotificationModel, type NotificationDocument } from "./notification.model.js";
+import { UserModel } from "../users/user.model.js";
+import { sendPushNotification } from "../../utils/push.js";
 import { ApiError } from "../../utils/api-error.js";
 import type { AppNotification } from "@studybuddy/shared";
 
@@ -44,7 +46,36 @@ async function createNotification(
     link,
     read: false
   });
+
+  // Also send push notification if user has subscriptions
+  void sendPushToUser(userId, title, message);
+
   return toNotification(notification);
+}
+
+async function registerSubscription(userId: string, subscription: any) {
+  await UserModel.findByIdAndUpdate(userId, {
+    $addToSet: { pushSubscriptions: subscription }
+  });
+}
+
+async function sendPushToUser(userId: string, title: string, body: string) {
+  const user = await UserModel.findById(userId);
+  if (!user || !user.pushSubscriptions || user.pushSubscriptions.length === 0) return;
+
+  const results = await Promise.allSettled(
+    user.pushSubscriptions.map(sub => sendPushNotification(sub, { title, body }))
+  );
+
+  // Clean up failed subscriptions
+  const failedIndices = results
+    .map((res, i) => (res.status === "rejected" ? i : -1))
+    .filter(i => i !== -1);
+
+  if (failedIndices.length > 0) {
+    const newSubscriptions = user.pushSubscriptions.filter((_, i) => !failedIndices.includes(i));
+    await UserModel.findByIdAndUpdate(userId, { pushSubscriptions: newSubscriptions });
+  }
 }
 
 export const notificationService = {
@@ -52,5 +83,7 @@ export const notificationService = {
   getUnreadCount,
   markAsRead,
   markAllAsRead,
-  createNotification
+  createNotification,
+  registerSubscription,
+  sendPushToUser
 };

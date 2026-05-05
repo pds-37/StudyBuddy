@@ -15,7 +15,8 @@ import {
   Users,
   Settings,
   LogOut,
-  ChevronRight
+  ChevronRight,
+  Network
 } from "lucide-react";
 import { useAppStore } from "../../store/app-store";
 import { useCopilotStore } from "../../store/copilot-store";
@@ -34,6 +35,7 @@ const navigation = [
   { name: "Projects", href: "/projects", icon: FolderKanban },
   { name: "Resume", href: "/resume", icon: FilePenLine },
   { name: "Skill Gap", href: "/skill-gap", icon: Target },
+  { name: "Knowledge", href: "/knowledge", icon: Network },
 ] as const;
 
 type SidebarNavProps = {

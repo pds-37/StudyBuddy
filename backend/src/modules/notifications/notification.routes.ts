@@ -10,3 +10,4 @@ notificationRouter.get("/", notificationController.getNotifications);
 notificationRouter.get("/unread", notificationController.getUnreadCount);
 notificationRouter.patch("/:id/read", notificationController.markAsRead);
 notificationRouter.post("/read-all", notificationController.markAllAsRead);
+notificationRouter.post("/subscribe", notificationController.registerPushSubscription);

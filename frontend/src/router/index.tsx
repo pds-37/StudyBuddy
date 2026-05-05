@@ -1,48 +1,67 @@
+import { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 import { DashboardLayout } from "../layouts/DashboardLayout";
 import { MarketingLayout } from "../layouts/MarketingLayout";
-import { AuthPage } from "../pages/AuthPage";
-import { CopilotPage } from "../pages/CopilotPage";
-import { DashboardPage } from "../pages/DashboardPage";
-import { JobsPage } from "../pages/JobsPage";
-import { LandingPage } from "../pages/LandingPage";
-import { NotFoundPage } from "../pages/NotFoundPage";
-import { NotesPage } from "../pages/NotesPage";
-import { OnboardingPage } from "../pages/OnboardingPage";
-import { ResumePage } from "../pages/ResumePage";
-import { RecallPage } from "../pages/RecallPage";
-import { RoadmapPage } from "../pages/RoadmapPage";
-import { SkillGapPage } from "../pages/SkillGapPage";
-import { InterviewPage } from "../pages/InterviewPage";
-import { MentorshipPage } from "../pages/MentorshipPage";
-import { ProjectsPage } from "../pages/ProjectsPage";
+import { Loader2 } from "lucide-react";
 import { ProtectedRoute } from "./ProtectedRoute";
+
+// Lazy-loaded pages
+const AuthPage = lazy(() => import("../pages/AuthPage").then(m => ({ default: m.AuthPage })));
+const CopilotPage = lazy(() => import("../pages/CopilotPage").then(m => ({ default: m.CopilotPage })));
+const DashboardPage = lazy(() => import("../pages/DashboardPage").then(m => ({ default: m.DashboardPage })));
+const JobsPage = lazy(() => import("../pages/JobsPage").then(m => ({ default: m.JobsPage })));
+const LandingPage = lazy(() => import("../pages/LandingPage").then(m => ({ default: m.LandingPage })));
+const NotFoundPage = lazy(() => import("../pages/NotFoundPage").then(m => ({ default: m.NotFoundPage })));
+const NotesPage = lazy(() => import("../pages/NotesPage").then(m => ({ default: m.NotesPage })));
+const OnboardingPage = lazy(() => import("../pages/OnboardingPage").then(m => ({ default: m.OnboardingPage })));
+const ResumePage = lazy(() => import("../pages/ResumePage").then(m => ({ default: m.ResumePage })));
+const RecallPage = lazy(() => import("../pages/RecallPage").then(m => ({ default: m.RecallPage })));
+const RoadmapPage = lazy(() => import("../pages/RoadmapPage").then(m => ({ default: m.RoadmapPage })));
+const SkillGapPage = lazy(() => import("../pages/SkillGapPage").then(m => ({ default: m.SkillGapPage })));
+const InterviewPage = lazy(() => import("../pages/InterviewPage").then(m => ({ default: m.InterviewPage })));
+const MentorshipPage = lazy(() => import("../pages/MentorshipPage").then(m => ({ default: m.MentorshipPage })));
+const ProjectsPage = lazy(() => import("../pages/ProjectsPage").then(m => ({ default: m.ProjectsPage })));
+const StudyPage = lazy(() => import("../pages/StudyPage").then(m => ({ default: m.StudyPage })));
+const KnowledgePage = lazy(() => import("../pages/KnowledgePage").then(m => ({ default: m.KnowledgePage })));
+
+function PageLoader() {
+  return (
+    <div className="flex h-screen w-full items-center justify-center bg-obsidian">
+      <Loader2 className="h-8 w-8 animate-spin text-brand" />
+    </div>
+  );
+}
+
 
 /** Defines the app route skeleton before feature implementation begins. */
 export function AppRouter() {
   return (
-    <Routes>
-      <Route element={<MarketingLayout />}>
-        <Route index element={<LandingPage />} />
-        <Route path="/auth" element={<AuthPage />} />
-      </Route>
-      <Route element={<ProtectedRoute />}>
-        <Route element={<DashboardLayout />}>
-          <Route path="/onboarding" element={<OnboardingPage />} />
-          <Route path="/skill-gap" element={<SkillGapPage />} />
-          <Route path="/notes" element={<NotesPage />} />
-          <Route path="/recall" element={<RecallPage />} />
-          <Route path="/jobs" element={<JobsPage />} />
-          <Route path="/resume" element={<ResumePage />} />
-          <Route path="/roadmap" element={<RoadmapPage />} />
-          <Route path="/copilot" element={<CopilotPage />} />
-          <Route path="/interview" element={<InterviewPage />} />
-          <Route path="/mentorship" element={<MentorshipPage />} />
-          <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
+        <Route element={<MarketingLayout />}>
+          <Route index element={<LandingPage />} />
+          <Route path="/auth" element={<AuthPage />} />
         </Route>
-      </Route>
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+        <Route element={<ProtectedRoute />}>
+          <Route element={<DashboardLayout />}>
+            <Route path="/onboarding" element={<OnboardingPage />} />
+            <Route path="/skill-gap" element={<SkillGapPage />} />
+            <Route path="/notes" element={<NotesPage />} />
+            <Route path="/recall" element={<RecallPage />} />
+            <Route path="/jobs" element={<JobsPage />} />
+            <Route path="/resume" element={<ResumePage />} />
+            <Route path="/roadmap" element={<RoadmapPage />} />
+            <Route path="/copilot" element={<CopilotPage />} />
+            <Route path="/interview" element={<InterviewPage />} />
+            <Route path="/mentorship" element={<MentorshipPage />} />
+            <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/study/:taskId" element={<StudyPage />} />
+            <Route path="/knowledge" element={<KnowledgePage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+          </Route>
+        </Route>
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </Suspense>
   );
 }

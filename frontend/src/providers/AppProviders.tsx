@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { authApi } from "../features/auth/api";
 import { ServerWakeUpLoader } from "../components/common/ServerWakeUpLoader";
 import { Loader2 } from "lucide-react";
+import { env } from "../lib/constants/env";
 import { useAppStore } from "../store/app-store";
 
 type AppProvidersProps = {
@@ -30,7 +31,7 @@ export function AppProviders({ children }: AppProvidersProps) {
       const timeout = setTimeout(() => setServerCold(true), 2500);
       try {
         // Ping the health endpoint (outside /api)
-        const healthUrl = authApi.apiBaseUrl.replace(/\/api$/, "/health");
+        const healthUrl = env.apiBaseUrl.replace(/\/api$/, "/health");
         await fetch(healthUrl);
         setReady(true);
       } catch (error) {

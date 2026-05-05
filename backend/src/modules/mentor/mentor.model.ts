@@ -14,7 +14,7 @@ const mentorTaskSchema = new Schema(
     priority: { type: String, enum: ["high", "medium", "low"], required: true },
     estimatedMinutes: { type: Number, required: true },
     href: { type: String, required: true },
-    status: { type: String, enum: ["pending", "completed", "skipped"], default: "pending" },
+    status: { type: String, enum: ["pending", "in_progress", "completed", "skipped"], default: "pending" },
     completedAt: { type: Date, default: null }
   },
   { _id: false }

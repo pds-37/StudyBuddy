@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { notificationService } from "./notification.service.js";
+import { ApiError } from "../../utils/api-error.js";
 
 export const getNotifications = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -32,6 +33,17 @@ export const markAllAsRead = async (req: Request, res: Response, next: NextFunct
   try {
     await notificationService.markAllAsRead(req.userId!);
     res.json({ success: true });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const registerPushSubscription = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { subscription } = req.body;
+    if (!subscription) throw new ApiError(400, "Subscription is required");
+    await notificationService.registerSubscription(req.userId!, subscription);
+    res.status(204).end();
   } catch (error) {
     next(error);
   }

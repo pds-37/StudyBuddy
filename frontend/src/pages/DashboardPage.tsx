@@ -19,6 +19,9 @@ import {
   Zap
 } from "lucide-react";
 import { getMentorToday, updateMentorTaskStatus } from "../lib/api/mentor";
+import { getNextBestAction, type NextBestAction } from "../lib/api/recommendations";
+import { getBehaviorProfile, logBehavior, type BehaviorProfile } from "../lib/api/behavior";
+import { subscribeToPushNotifications, getNotificationPermission } from "../lib/utils/push-notifications";
 import { cn } from "../lib/utils/cn";
 import type { MentorTask, MentorTodayPlan } from "@studybuddy/shared";
 
@@ -51,7 +54,10 @@ function priorityClass(priority: MentorTask["priority"]) {
 
 export function DashboardPage() {
   const [plan, setPlan] = useState<MentorTodayPlan | null>(null);
+  const [bestAction, setBestAction] = useState<NextBestAction | null>(null);
+  const [behavior, setBehavior] = useState<BehaviorProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showPushPrompt, setShowPushPrompt] = useState(false);
   const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,8 +65,14 @@ export function DashboardPage() {
     try {
       setLoading(true);
       setError(null);
-      const nextPlan = await getMentorToday();
+      const [nextPlan, action, profile] = await Promise.all([
+        getMentorToday(),
+        getNextBestAction(),
+        getBehaviorProfile()
+      ]);
       setPlan(nextPlan);
+      setBestAction(action);
+      setBehavior(profile);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load mentor plan");
     } finally {
@@ -70,7 +82,17 @@ export function DashboardPage() {
 
   useEffect(() => {
     void loadPlan();
+    
+    // Check for push notification permission
+    if (getNotificationPermission() === "default") {
+      setShowPushPrompt(true);
+    }
   }, []);
+
+  const handleEnableNotifications = async () => {
+    const success = await subscribeToPushNotifications();
+    if (success) setShowPushPrompt(false);
+  };
 
   const completedTasks = useMemo(
     () => plan?.tasks.filter((task) => task.status === "completed").length ?? 0,
@@ -80,10 +102,18 @@ export function DashboardPage() {
   const completeTask = async (task: MentorTask) => {
     try {
       setUpdatingTaskId(task.id);
+      const isCompleting = task.status !== "completed";
       const nextPlan = await updateMentorTaskStatus(
         task.id,
-        task.status === "completed" ? "pending" : "completed"
+        isCompleting ? "completed" : "pending"
       );
+      
+      if (isCompleting) {
+        await logBehavior("task_completed", { taskId: task.id, type: task.type });
+      } else {
+        await logBehavior("task_skipped", { taskId: task.id, type: task.type });
+      }
+      
       setPlan(nextPlan);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update task");
@@ -105,9 +135,82 @@ export function DashboardPage() {
 
   return (
     <section className="space-y-8">
+      {showPushPrompt && (
+        <div 
+          className="rounded-3xl border border-brand/20 bg-brand/5 p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_0_50px_rgba(124,92,255,0.1)] animate-in fade-in slide-in-from-top-4 duration-500"
+        >
+          <div className="flex items-center gap-4 text-center sm:text-left">
+            <div className="w-12 h-12 rounded-2xl bg-brand/20 flex items-center justify-center text-brand shrink-0">
+              <Zap size={24} />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-white">Enable Proactive Nudges</h3>
+              <p className="text-sm text-slate-400">Let Veda AI alert you when you're falling behind or have knowledge about to fade.</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <button 
+              onClick={() => setShowPushPrompt(false)}
+              className="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-white/5 text-slate-400 text-sm font-bold hover:bg-white/10 transition"
+            >
+              Later
+            </button>
+            <button 
+              onClick={handleEnableNotifications}
+              className="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-brand text-white text-sm font-bold shadow-lg shadow-brand/20 hover:bg-brand/90 transition"
+            >
+              Enable Now
+            </button>
+          </div>
+        </div>
+      )}
       {error && (
         <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
           {error}
+        </div>
+      )}
+
+      {bestAction && (
+        <div className="relative overflow-hidden rounded-xl border border-cyan/30 bg-gradient-to-r from-cyan/20 via-cyan/5 to-transparent p-6 shadow-[0_0_40px_-10px_rgba(34,211,238,0.15)]">
+          <div className="flex items-start gap-4">
+            <div className="flex shrink-0 items-center justify-center rounded-full bg-cyan/20 p-3 text-cyan">
+              <Brain size={24} />
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan/80">Veda AI Recommendation</p>
+              <h2 className="mt-1 text-xl font-bold text-white">Your Next Best Action</h2>
+              <p className="mt-2 text-sm leading-relaxed text-slate-300">
+                {bestAction.reason}
+              </p>
+              
+              <div className="mt-4">
+                {bestAction.action === "task" && bestAction.data && (
+                  <button className="inline-flex items-center gap-2 rounded-lg bg-cyan px-4 py-2 text-sm font-semibold text-slate-900 transition-colors hover:bg-cyan/90">
+                    <Target size={16} />
+                    Start: {bestAction.data.title || "Next Task"}
+                  </button>
+                )}
+                {bestAction.action === "revision" && (
+                  <Link to="/recall" className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-slate-900 transition-colors hover:bg-emerald-400">
+                    <Zap size={16} />
+                    Start Quick Revision
+                  </Link>
+                )}
+                {bestAction.action === "generate" && (
+                  <Link to="/roadmap" className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand/90">
+                    <Route size={16} />
+                    Generate Next Roadmap
+                  </Link>
+                )}
+                {bestAction.action === "recalibrate" && (
+                  <Link to="/onboarding" className="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-slate-900 transition-colors hover:bg-amber-400">
+                    <RefreshCw size={16} />
+                    Recalibrate Roadmap
+                  </Link>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -249,6 +352,8 @@ export function DashboardPage() {
           <div className="rounded-lg border border-white/10 bg-white/[0.04] p-6">
             <h2 className="text-lg font-semibold text-white">Journey Signals</h2>
             <div className="mt-4 space-y-3 text-sm">
+              <Signal label="Consistency Score" value={behavior ? `${behavior.consistencyScore}%` : "0%"} />
+              <Signal label="Skip Rate" value={behavior ? `${behavior.skipRate}%` : "0%"} />
               <Signal label="Target" value={plan?.signals.targetRoles.join(", ") || "Not set"} />
               <Signal label="Milestone" value={plan?.signals.activeMilestone || "No active milestone"} />
               <Signal label="Project" value={plan?.signals.activeProject || "No active project"} />
@@ -316,7 +421,7 @@ function TaskRow({ task, updating, onToggle }: { task: MentorTask; updating: boo
           <p className="mt-1 text-sm leading-6 text-slate-400">{task.description}</p>
           <p className="mt-2 text-xs text-cyan">{task.reason}</p>
         </div>
-        <Link to={task.href} className="shrink-0 rounded-lg border border-white/10 p-2 text-slate-400 hover:bg-white/5 hover:text-white">
+        <Link to={`/study/${task.id}`} className="shrink-0 rounded-lg border border-white/10 p-2 text-slate-400 hover:bg-white/5 hover:text-white">
           <ArrowRight size={16} />
         </Link>
       </div>
