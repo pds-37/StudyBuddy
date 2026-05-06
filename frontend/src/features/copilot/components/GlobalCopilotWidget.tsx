@@ -8,12 +8,12 @@ import type { CopilotMessage } from "@studybuddy/shared";
 
 /** Floating AI Mentor Widget */
 export function GlobalCopilotWidget() {
-  const [isOpen, setIsOpen] = useState(false);
-  
   const {
     currentConversation,
     loading,
     sending,
+    isWidgetOpen: isOpen,
+    setIsWidgetOpen: setIsOpen,
     sendMessage: storeSendMessage,
     fetchConversations,
     createNewConversation
@@ -77,17 +77,6 @@ export function GlobalCopilotWidget() {
 
   return (
     <>
-      {/* Floating Action Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={cn(
-          "fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-brand to-cyan shadow-[0_0_40px_rgba(34,211,238,0.3)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_60px_rgba(34,211,238,0.5)]",
-          isOpen && "rotate-90 scale-0 opacity-0"
-        )}
-      >
-        <Sparkles className="h-6 w-6 text-white" />
-      </button>
-
       {/* AI Chat Drawer / Popover */}
       <div
         className={cn(

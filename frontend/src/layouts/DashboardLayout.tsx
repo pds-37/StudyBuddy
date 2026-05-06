@@ -9,6 +9,7 @@ import { useJobsStore } from "../store/jobs-store";
 import { useRoadmapsStore } from "../store/roadmaps-store";
 import { GlobalCopilotWidget } from "../features/copilot/components/GlobalCopilotWidget";
 import { NebulaBackground } from "../components/common/NebulaBackground";
+import { FloatingVedaPill } from "../components/navigation/FloatingVedaPill";
 
 const SIDEBAR_COLLAPSED_KEY = "studybuddy_sidebar_collapsed";
 
@@ -57,9 +58,9 @@ export function DashboardLayout() {
 
       <div className="flex h-full min-w-0 flex-1 flex-col overflow-hidden">
         <TopNav onOpenCommand={() => setCommandOpen(true)} />
-        <main className="flex-1 overflow-y-auto scroll-smooth custom-scrollbar">
-          <div className="flex h-full flex-col p-6 lg:p-10">
-            <div className="max-w-[1600px] mx-auto w-full flex-1 min-h-0 animate-fade-in">
+        <main className="flex-1 overflow-y-auto scroll-smooth custom-scrollbar overflow-x-hidden">
+          <div className="flex h-full flex-col p-4 lg:p-8">
+            <div className="max-w-[1600px] mx-auto w-full flex-1 min-h-0 animate-fade-in overflow-x-hidden">
               <Outlet />
             </div>
           </div>
@@ -67,7 +68,12 @@ export function DashboardLayout() {
       </div>
 
       <AppCommandMenu open={isCommandOpen} onOpenChange={setCommandOpen} />
-      {!isVedaPage && <GlobalCopilotWidget />}
+      {!isVedaPage && (
+        <>
+          <FloatingVedaPill />
+          <GlobalCopilotWidget />
+        </>
+      )}
     </div>
   );
 }

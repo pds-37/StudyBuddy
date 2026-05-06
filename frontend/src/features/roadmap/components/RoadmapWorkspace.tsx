@@ -254,23 +254,7 @@ export function RoadmapWorkspace() {
         </aside>
       </div>
 
-      {/* ─── NEXT BEST ACTION FLOATING CTA ─── */}
-      <Motion.div 
-        className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50"
-        initial={{ y: 100 }}
-        animate={{ y: 0 }}
-      >
-        <button className="flex items-center gap-4 px-8 py-4 rounded-full bg-slate-900 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-xl group hover:border-cyan-400/30 transition-all">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-[0_0_20px_rgba(34,211,238,0.3)]">
-            <Sparkles className="w-5 h-5 text-white" />
-          </div>
-          <div className="text-left">
-            <p className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest leading-none mb-1">Veda Assistant</p>
-            <p className="text-sm font-bold text-white leading-none">What should I do right now?</p>
-          </div>
-          <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all" />
-        </button>
-      </Motion.div>
+
     </div>
   );
 }

@@ -8,10 +8,12 @@ type CopilotState = {
   currentConversation: Conversation | null;
   loading: boolean;
   sending: boolean;
+  isWidgetOpen: boolean;
   error: string | null;
   lastFetched: number | null;
 
   // Actions
+  setIsWidgetOpen: (open: boolean) => void;
   fetchConversations: (force?: boolean) => Promise<void>;
   createNewConversation: () => Promise<string | null>;
   sendMessage: (message: string) => Promise<CopilotMessage | null>;
@@ -27,8 +29,11 @@ export const useCopilotStore = create<CopilotState>((set, get) => ({
   currentConversation: null,
   loading: false,
   sending: false,
+  isWidgetOpen: false,
   error: null,
   lastFetched: null,
+
+  setIsWidgetOpen: (open) => set({ isWidgetOpen: open }),
 
   fetchConversations: async (force = false) => {
     const state = get();
