@@ -59,8 +59,8 @@ export function SidebarNav({ isCollapsed = false, onToggleCollapsed }: SidebarNa
       )}>
         {!isCollapsed ? (
           <div className="flex items-center justify-between w-full">
-            <Link to="/" className="flex items-center gap-3 group animate-fade-in">
-              <img src="/brand/studybuddy-logo.png" alt="StudyBuddy VEDA AI MENTOR" className="h-12 w-auto object-contain" />
+            <Link to="/" className="flex items-center group animate-fade-in pl-1">
+              <img src="/brand/studybuddy-logo.png" alt="StudyBuddy VEDA AI MENTOR" className="h-14 w-auto object-contain scale-[1.15] origin-left" />
             </Link>
             <button
               onClick={onToggleCollapsed}

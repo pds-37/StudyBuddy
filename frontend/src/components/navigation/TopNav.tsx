@@ -55,8 +55,8 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
         {/* Left Side: Brand or Search */}
         <div className="flex items-center gap-8 flex-1">
           {(!isAppShell || isLandingPage) && (
-            <Link to="/" className="flex items-center gap-3 group">
-              <img src="/brand/studybuddy-logo.png" alt="StudyBuddy Logo" className="h-10 w-auto object-contain" />
+            <Link to="/" className="flex items-center group">
+              <img src="/brand/studybuddy-logo.png" alt="StudyBuddy Logo" className="h-16 w-auto object-contain scale-[1.2] origin-left drop-shadow-lg" />
             </Link>
           )}
 
