@@ -8,6 +8,7 @@ import { useAppStore } from "../store/app-store";
 import { Shield, Lock, Mail, User as UserIcon, Sparkles, Route, Target, Briefcase } from "lucide-react";
 import { cn } from "../lib/utils/cn";
 import { NebulaBackground } from "../components/common/NebulaBackground";
+import "./AuthPage.css";
 
 function getAuthErrorMessage(error: unknown) {
   if (isAxiosError<{ message?: string }>(error)) {
