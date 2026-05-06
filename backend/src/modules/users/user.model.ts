@@ -29,6 +29,8 @@ export interface IUser {
   };
   onboardingCompleted: boolean;
   pushSubscriptions: any[];
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const userSchema = new Schema<IUser>(
