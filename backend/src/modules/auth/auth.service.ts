@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import axios from "axios";
 import jwt, { type JwtPayload, type SignOptions } from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
 import { env } from "../../config/env.js";
@@ -162,14 +163,14 @@ async function googleLogin(token: string): Promise<AuthResult> {
       googleId = payload?.sub;
     } catch (idTokenError) {
       // If ID Token verification fails, try as Access Token by fetching userinfo
-      const response = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${token}`);
-      if (!response.ok) {
+      try {
+        const { data } = await axios.get(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${token}`);
+        email = data.email;
+        name = data.name;
+        googleId = data.sub;
+      } catch (accessTokenError) {
         throw new ApiError(401, "Google authentication failed: Invalid token.");
       }
-      const data = (await response.json()) as { email: string; name: string; sub: string };
-      email = data.email;
-      name = data.name;
-      googleId = data.sub;
     }
 
     if (!email || !googleId) {
