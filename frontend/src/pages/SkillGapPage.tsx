@@ -18,6 +18,7 @@ import { SkillMatrixCard, ReadinessRing } from "../features/skills/components/In
 import { type SkillGapAnalysis } from "../features/skills/types";
 import { cn } from "../lib/utils/cn";
 
+
 export function SkillGapPage() {
   const { data, isLoading, error } = useQuery<SkillGapAnalysis>({
     queryKey: ["skill-gap"],
@@ -37,14 +38,14 @@ export function SkillGapPage() {
     return (
       <div className="flex flex-col items-center justify-center h-full relative z-10 px-8 text-center">
          <NebulaBackground opacity={0.3} />
-         <div className="w-24 h-24 rounded-full bg-brand/10 border border-brand/20 flex items-center justify-center text-brand mb-8">
+         <div className="w-24 h-24 rounded-full bg-brand/10 border border-brand/20 flex items-center justify-center text-brand mb-8 shadow-[0_0_50px_rgba(124,92,255,0.2)]">
             <Target size={40} />
          </div>
-         <h1 className="text-4xl font-black text-white mb-4">Set Your Trajectory</h1>
-         <p className="text-slate-400 font-medium max-w-md mx-auto mb-8">
-           Complete onboarding to define your target role. Veda will track your readiness and build an adaptive learning path.
+         <h1 className="text-4xl font-black text-white mb-4 tracking-tight">Set Your Trajectory</h1>
+         <p className="text-slate-400 font-medium max-w-md mx-auto mb-8 leading-relaxed">
+            Complete onboarding to define your target role. Veda will track your readiness and build an adaptive learning path tailored to your goals.
          </p>
-         <Link to="/onboarding" className="px-8 py-4 rounded-2xl bg-brand text-white font-black text-xs uppercase tracking-widest shadow-glow hover:scale-105 transition-transform">
+         <Link to="/onboarding" className="px-10 py-5 rounded-2xl bg-brand text-white font-black text-xs uppercase tracking-widest shadow-[0_20px_40px_rgba(124,92,255,0.3)] hover:scale-105 transition-all">
             Configure Career Profile
          </Link>
       </div>
@@ -52,128 +53,165 @@ export function SkillGapPage() {
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden relative">
-      <NebulaBackground opacity={0.15} showGrid={false} />
+    <div className="flex flex-col min-h-full relative pb-20">
+      <NebulaBackground opacity={0.1} showGrid={false} />
 
-      {/* ─── TOP SECTION: CAREER READINESS ─── */}
-      <header className="shrink-0 px-8 py-8 border-b border-white/[0.06] bg-obsidian/40 backdrop-blur-3xl z-20">
-         <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-12">
-            <div className="flex-1">
-               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand/10 border border-brand/20 text-[10px] font-black text-brand uppercase tracking-widest mb-4">
-                  <Activity size={12} /> AI Career Intelligence
-               </div>
-               <h1 className="text-4xl font-black text-white tracking-tight mb-2">{data.targetRole}</h1>
-               <p className="text-slate-400 font-medium">{data.careerTrajectory || "Analyzing trajectory..."}</p>
-            </div>
-            
-            <div className="flex items-center gap-8 bg-white/[0.02] border border-white/5 p-6 rounded-[2.5rem]">
-               <ReadinessRing score={data.overallScore || 0} label="Readiness" />
-               <div className="w-px h-16 bg-white/10" />
-               <div className="space-y-4 min-w-[200px]">
-                  <MiniMetric label="Learning Foundation" value={data.readiness?.learningFoundation || "Medium"} />
-                  <MiniMetric label="Problem Solving" value={data.readiness?.problemSolving || "Medium"} />
-                  <MiniMetric label="Interview Confidence" value={data.readiness?.interviewConfidence || "Low"} />
-               </div>
-            </div>
-         </div>
-      </header>
-
-      <div className="flex-1 flex overflow-hidden">
-        {/* ─── LEFT/CENTER PANEL: SKILL MATRIX & GAPS ─── */}
-        <main className="flex-1 flex flex-col min-w-0 bg-ink/10 relative overflow-y-auto custom-scrollbar p-8">
-           <div className="max-w-[1000px] mx-auto space-y-12">
+      {/* ─── HERO HEADER: CAREER STATUS ─── */}
+      <Motion.header 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative z-20 mb-10"
+      >
+        <div className="rounded-[3rem] p-10 bg-gradient-to-br from-white/[0.05] to-transparent border border-white/[0.08] backdrop-blur-xl shadow-2xl relative overflow-hidden group">
+           {/* Decorative Elements */}
+           <div className="absolute top-0 right-0 w-96 h-96 bg-brand/10 blur-[120px] -mr-48 -mt-48 rounded-full" />
+           <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan/5 blur-[100px] -ml-32 -mb-32 rounded-full" />
+           
+           <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
+              <div className="flex-1 text-center lg:text-left">
+                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand/10 border border-brand/20 text-[10px] font-black text-brand uppercase tracking-[0.2em] mb-6">
+                    <Activity size={14} className="animate-pulse" /> AI Career Intelligence
+                 </div>
+                 <h1 className="text-5xl lg:text-6xl font-black text-white tracking-tighter mb-4 leading-none">
+                   {data.targetRole}
+                 </h1>
+                 <p className="text-slate-400 text-lg font-medium max-w-2xl">
+                    {data.careerTrajectory || "Veda is currently analyzing your behavior and learning patterns to predict your career trajectory."}
+                 </p>
+              </div>
               
-              {/* Role Matching */}
-              <section>
-                 <h2 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-6 flex items-center gap-2">
-                    <Briefcase size={14} /> Role Matching Analysis
-                 </h2>
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {(data.roleMatches || []).map((match, i) => (
-                      <div key={i} className="p-5 rounded-3xl bg-white/[0.02] border border-white/5 hover:border-white/10 transition-colors">
-                         <div className="flex items-center justify-between mb-2">
-                            <span className="font-bold text-white">{match.role}</span>
-                            <span className="text-brand font-black">{match.matchPercentage}%</span>
+              <div className="flex flex-col sm:flex-row items-center gap-8 bg-black/40 border border-white/5 p-8 rounded-[2.5rem] backdrop-blur-md">
+                 <ReadinessRing score={data.overallScore || 0} label="Readiness" />
+                 <div className="hidden sm:block w-px h-24 bg-white/10" />
+                 <div className="grid grid-cols-1 gap-5 min-w-[220px]">
+                    <MiniMetric label="Learning Foundation" value={data.readiness?.learningFoundation || "Medium"} />
+                    <MiniMetric label="Problem Solving" value={data.readiness?.problemSolving || "Medium"} />
+                    <MiniMetric label="Interview Confidence" value={data.readiness?.interviewConfidence || "Low"} />
+                 </div>
+              </div>
+           </div>
+        </div>
+      </Motion.header>
+
+      <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-10 relative z-10">
+        {/* ─── MAIN CONTENT ─── */}
+        <div className="space-y-12">
+           
+           {/* Market Alignment Section */}
+           <section className="space-y-6">
+              <div className="flex items-center gap-3 px-2">
+                 <div className="p-2 rounded-xl bg-cyan-400/10 text-cyan-400 border border-cyan-400/20">
+                    <Briefcase size={18} />
+                 </div>
+                 <div>
+                    <h2 className="text-lg font-black text-white tracking-tight">Market Alignment Analysis</h2>
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">How you stack up against real-world roles</p>
+                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 {(data.roleMatches || []).map((match, i) => (
+                   <Motion.div 
+                     key={i} 
+                     initial={{ opacity: 0, scale: 0.95 }}
+                     animate={{ opacity: 1, scale: 1 }}
+                     transition={{ delay: i * 0.1 }}
+                     className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 hover:border-brand/30 transition-all group shadow-xl"
+                   >
+                      <div className="flex items-center justify-between mb-4">
+                         <span className="text-xl font-black text-white group-hover:text-brand transition-colors">{match.role}</span>
+                         <div className="px-3 py-1 rounded-full bg-brand/10 border border-brand/20 text-xs font-black text-brand">
+                            {match.matchPercentage}%
                          </div>
-                         <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">
-                            Est. Ready in {match.estimatedTimelineMonths} Months
-                         </div>
-                         <div className="flex gap-2">
-                            {match.blockers.slice(0,2).map(b => (
-                               <span key={b} className="px-2 py-1 rounded-lg bg-red-400/10 text-red-400 text-[9px] font-bold uppercase">{b}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-[0.1em] mb-6">
+                         <Clock size={12} className="text-cyan-400" /> Est. Ready in {match.estimatedTimelineMonths} Months
+                      </div>
+                      <div className="space-y-3">
+                         <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Critical Gaps</p>
+                         <div className="flex flex-wrap gap-2">
+                            {match.blockers.map(b => (
+                               <span key={b} className="px-3 py-1.5 rounded-xl bg-red-400/5 text-red-400 text-[10px] font-bold border border-red-400/10">{b}</span>
                             ))}
                          </div>
                       </div>
-                    ))}
-                 </div>
-              </section>
+                   </Motion.div>
+                 ))}
+              </div>
+           </section>
 
-              {/* Skill Matrix */}
-              <section>
-                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] flex items-center gap-2">
-                       <Brain size={14} /> AI Skill Intelligence Matrix
-                    </h2>
+           {/* Technical Mastery Matrix */}
+           <section className="space-y-6">
+              <div className="flex items-center gap-3 px-2">
+                 <div className="p-2 rounded-xl bg-purple-400/10 text-purple-400 border border-purple-400/20">
+                    <Brain size={18} />
                  </div>
-                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {(data.gaps || []).map((gap, i) => (
-                      <SkillMatrixCard key={gap.skill} gap={gap} />
-                    ))}
+                 <div>
+                    <h2 className="text-lg font-black text-white tracking-tight">Technical Mastery Matrix</h2>
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Multi-dimensional skill intelligence</p>
                  </div>
-              </section>
+              </div>
 
-           </div>
-        </main>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                 {(data.gaps || []).map((gap, i) => (
+                   <SkillMatrixCard key={gap.skill} gap={gap} />
+                 ))}
+              </div>
+           </section>
 
-        {/* ─── RIGHT PANEL: MENTOR INSIGHTS ─── */}
-        <aside className="w-96 shrink-0 border-l border-white/[0.06] bg-ink/20 backdrop-blur-3xl overflow-y-auto custom-scrollbar z-10 hidden xl:block">
-           <div className="p-8 space-y-10">
-              
-              {/* Blockers */}
-              <section>
-                 <h3 className="text-[10px] font-black text-red-400 uppercase tracking-[0.3em] mb-6 flex items-center gap-2">
-                    <ShieldAlert size={14} /> Critical Blockers
-                 </h3>
-                 <div className="space-y-4">
-                    {(data.blockers || []).map((blocker, i) => (
-                      <div key={i} className="p-4 rounded-2xl bg-red-400/5 border border-red-400/10 text-xs font-medium text-red-200 leading-relaxed">
+        </div>
+
+        {/* ─── SIDEBAR: AI MENTOR PANELS ─── */}
+        <aside className="space-y-8">
+           
+           {/* Recovery Plan - High Priority */}
+           {data.recommendations?.recoveryPlan && (
+             <section className="p-8 rounded-[3rem] bg-gradient-to-br from-brand/20 to-brand/5 border border-brand/30 relative overflow-hidden group shadow-[0_20px_50px_rgba(124,92,255,0.1)]">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-3xl -mr-16 -mt-16 rounded-full" />
+                <h3 className="text-sm font-black text-white uppercase tracking-[0.2em] mb-4 flex items-center gap-2 relative z-10">
+                   <Zap size={18} className="text-brand fill-brand" /> Recovery Strategy
+                </h3>
+                <p className="text-xs text-slate-300 leading-relaxed mb-8 relative z-10 font-medium">
+                   {data.recommendations.recoveryPlan}
+                </p>
+                <button className="w-full py-4 rounded-2xl bg-brand text-white text-[10px] font-black uppercase tracking-widest shadow-[0_15px_30px_rgba(124,92,255,0.4)] relative z-10 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all">
+                   Adopt Strategy <ArrowRight size={14} />
+                </button>
+             </section>
+           )}
+
+           {/* Blockers Panel */}
+           <section className="p-8 rounded-[3rem] bg-white/[0.02] border border-white/[0.06] backdrop-blur-md">
+              <h3 className="text-[10px] font-black text-red-400 uppercase tracking-[0.3em] mb-8 flex items-center gap-2">
+                 <ShieldAlert size={16} /> Critical Blockers
+              </h3>
+              <div className="space-y-4">
+                 {(data.blockers || []).map((blocker, i) => (
+                   <div key={i} className="group p-5 rounded-2xl bg-red-400/[0.03] border border-red-400/10 hover:bg-red-400/[0.06] transition-all">
+                      <p className="text-[11px] font-medium text-red-200 leading-relaxed">
                          {blocker}
-                      </div>
-                    ))}
-                 </div>
-              </section>
+                      </p>
+                   </div>
+                 ))}
+              </div>
+           </section>
 
-              {/* Predictive Insights */}
-              <section>
-                 <h3 className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.3em] mb-6 flex items-center gap-2">
-                    <TrendingUp size={14} /> Predictive Insights
-                 </h3>
-                 <div className="space-y-4">
-                    {(data.predictiveInsights || []).map((insight, i) => (
-                      <div key={i} className="p-4 rounded-2xl bg-cyan-400/5 border border-cyan-400/10 text-xs font-medium text-cyan-200 leading-relaxed">
+           {/* Predictive Insights Panel */}
+           <section className="p-8 rounded-[3rem] bg-white/[0.02] border border-white/[0.06] backdrop-blur-md">
+              <h3 className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.3em] mb-8 flex items-center gap-2">
+                 <TrendingUp size={16} /> Predictive Insights
+              </h3>
+              <div className="space-y-4">
+                 {(data.predictiveInsights || []).map((insight, i) => (
+                   <div key={i} className="p-5 rounded-2xl bg-cyan-400/[0.03] border border-cyan-400/10 hover:bg-cyan-400/[0.06] transition-all">
+                      <p className="text-[11px] font-medium text-cyan-100 leading-relaxed">
                          {insight}
-                      </div>
-                    ))}
-                 </div>
-              </section>
+                      </p>
+                   </div>
+                 ))}
+              </div>
+           </section>
 
-              {/* Recovery Plan */}
-              {data.recommendations?.recoveryPlan && (
-                <section className="p-6 rounded-[2.5rem] bg-brand/10 border border-brand/20 relative overflow-hidden group">
-                   <div className="absolute inset-0 bg-gradient-to-br from-brand/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                   <h3 className="text-xs font-black text-white uppercase tracking-widest mb-3 flex items-center gap-2 relative z-10">
-                      <Zap size={14} className="text-brand" /> Recovery Plan
-                   </h3>
-                   <p className="text-[11px] text-slate-300 leading-relaxed mb-6 relative z-10">
-                      {data.recommendations.recoveryPlan}
-                   </p>
-                   <button className="w-full py-3 rounded-2xl bg-brand text-white text-[10px] font-black uppercase tracking-widest shadow-glow relative z-10 flex items-center justify-center gap-2 hover:scale-105 transition-transform">
-                      Adopt Strategy <ArrowRight size={14} />
-                   </button>
-                </section>
-              )}
-
-           </div>
         </aside>
       </div>
     </div>

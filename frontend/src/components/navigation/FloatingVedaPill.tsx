@@ -36,8 +36,8 @@ export function FloatingVedaPill() {
 
           {!isReduced && (
             <Motion.div 
-              initial={{ opacity: 0, w: 0 }}
-              animate={{ opacity: 1, w: "auto" }}
+              initial={{ opacity: 0, width: 0 }}
+              animate={{ opacity: 1, width: "auto" }}
               className="text-left flex items-center gap-4 overflow-hidden"
             >
               <div>
