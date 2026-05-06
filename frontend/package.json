@@ -14,6 +14,7 @@
     "clean": "rimraf dist"
   },
   "dependencies": {
+    "@react-oauth/google": "^0.13.5",
     "@studybuddy/shared": "0.1.0",
     "@tanstack/react-query": "^5.90.5",
     "axios": "^1.12.2",

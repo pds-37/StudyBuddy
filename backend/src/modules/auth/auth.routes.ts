@@ -8,4 +8,5 @@ authRouter.post("/signup", authController.signup);
 authRouter.post("/login", authController.login);
 authRouter.post("/refresh", authController.refresh);
 authRouter.post("/logout", authController.logout);
+authRouter.post("/google", authController.googleLogin);
 authRouter.get("/me", authenticate, authController.me);

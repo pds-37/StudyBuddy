@@ -30,10 +30,17 @@ async function logout() {
   await apiClient.post("/auth/logout");
 }
 
+/** Authenticates with Google and returns JWT tokens. */
+async function googleLogin(idToken: string) {
+  const response = await apiClient.post<AuthResponse>("/auth/google", { idToken });
+  return response.data;
+}
+
 export const authApi = {
   signup,
   login,
   me,
   refresh,
-  logout
+  logout,
+  googleLogin
 };

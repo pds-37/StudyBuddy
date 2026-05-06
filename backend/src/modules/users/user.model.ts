@@ -10,9 +10,15 @@ const userSchema = new Schema(
       trim: true,
       index: true
     },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
+      index: true
+    },
     passwordHash: {
       type: String,
-      required: true,
+      required: function() { return !this.googleId; },
       select: false
     },
     name: {

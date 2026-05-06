@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { type ReactNode, useEffect, useState } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { authApi } from "../features/auth/api";
@@ -68,7 +69,9 @@ export function AppProviders({ children }: AppProvidersProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>{children}</BrowserRouter>
+      <GoogleOAuthProvider clientId={env.googleClientId}>
+        <BrowserRouter>{children}</BrowserRouter>
+      </GoogleOAuthProvider>
     </QueryClientProvider>
   );
 }

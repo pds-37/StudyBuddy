@@ -57,10 +57,26 @@ const logout: RequestHandler = (_request, response) => {
   response.json({ message: "Logged out." });
 };
 
+/** Handles Google authentication. */
+const googleLogin: RequestHandler = async (request, response, next) => {
+  try {
+    const { idToken } = request.body;
+    if (!idToken) {
+      response.status(400).json({ message: "Google ID token is required." });
+      return;
+    }
+    const result = await authService.googleLogin(idToken);
+    response.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const authController = {
   signup,
   login,
   me,
   refresh,
-  logout
+  logout,
+  googleLogin
 };

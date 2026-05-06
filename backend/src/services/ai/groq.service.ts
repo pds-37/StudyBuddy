@@ -18,7 +18,7 @@ type GroqChatResponse = {
 const GROQ_CHAT_COMPLETIONS_URL = "https://api.groq.com/openai/v1/chat/completions";
 
 /** Sends a chat-completions request to Groq's OpenAI-compatible API. */
-async function requestGroq(messages: GroqMessage[], maxTokens: number) {
+async function requestGroq(messages: GroqMessage[], maxTokens: number, model: string = "llama-3.1-8b-instant") {
   if (!env.groqApiKey) {
     throw new Error("Groq API key is not configured.");
   }
@@ -26,7 +26,7 @@ async function requestGroq(messages: GroqMessage[], maxTokens: number) {
   const response = await axios.post<GroqChatResponse>(
     GROQ_CHAT_COMPLETIONS_URL,
     {
-      model: "llama-3.1-8b-instant",
+      model,
       temperature: 0.7,
       max_tokens: maxTokens,
       messages
@@ -163,7 +163,7 @@ Format your response as JSON with this exact structure:
 
 Make the roadmap practical, specific, and achievable within the timeline. Focus on high-impact skills that will make the biggest difference for the target role. Crucially, act as a "full mentor" and recommend the absolute best internet tutors and resources.`;
 
-  const response = await requestGroq([{ role: "user", content: prompt }], 2000);
+  const response = await requestGroq([{ role: "user", content: prompt }], 2000, "llama-3.3-70b-versatile");
 
   try {
     const parsed = JSON.parse(extractJsonPayload(response));
@@ -177,7 +177,8 @@ Make the roadmap practical, specific, and achievable within the timeline. Focus 
 /** Generates an AI response for copilot chat using conversation history and user context. */
 async function generateCopilotResponse(
   messages: CopilotMessage[],
-  userContext: string
+  userContext: string,
+  model: string = "llama-3.1-8b-instant"
 ): Promise<string> {
   // Convert messages to Groq format
   const groqMessages: GroqMessage[] = messages.map((msg) => ({
@@ -208,7 +209,7 @@ Be helpful, encouraging, and provide actionable advice. Reference skills, notes,
     groqMessages[0].content = contextPrompt;
   }
 
-  return requestGroq(groqMessages, 1000);
+  return requestGroq(groqMessages, 1000, model);
 }
 
 /** Normalizes the model's resume tailoring JSON into the public response shape. */

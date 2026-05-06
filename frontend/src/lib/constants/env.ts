@@ -3,5 +3,6 @@ const rawApiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:500
 export const env = {
   appName: import.meta.env.VITE_APP_NAME ?? "StudyBuddy",
   apiBaseUrl: rawApiBaseUrl.endsWith("/api") ? rawApiBaseUrl : `${rawApiBaseUrl}/api`,
-  vapidPublicKey: "BNfNZ5jlAnRrUaP6jWqOKY2Ngvqs1nVIxjQ2_a_jMU-S99jIk_yP972B6ApsygIwJ9nvaGQ9NBy6biMVPBWi3Pg"
+  vapidPublicKey: "BNfNZ5jlAnRrUaP6jWqOKY2Ngvqs1nVIxjQ2_a_jMU-S99jIk_yP972B6ApsygIwJ9nvaGQ9NBy6biMVPBWi3Pg",
+  googleClientId: import.meta.env.VITE_GOOGLE_CLIENT_ID ?? ""
 } as const;

@@ -1,9 +1,12 @@
 import bcrypt from "bcryptjs";
 import jwt, { type JwtPayload, type SignOptions } from "jsonwebtoken";
+import { OAuth2Client } from "google-auth-library";
 import { env } from "../../config/env.js";
 import { ApiError } from "../../utils/api-error.js";
 import { UserModel, type UserDocument } from "../users/user.model.js";
 import { type LoginBody, type SignupBody } from "./auth.validation.js";
+
+const googleClient = new OAuth2Client(env.googleClientId);
 
 type TokenPayload = {
   userId: string;
@@ -140,10 +143,58 @@ async function refresh(refreshToken: string): Promise<AuthResult> {
   };
 }
 
+/** Verifies a Google ID token and returns auth tokens for the user. */
+async function googleLogin(idToken: string): Promise<AuthResult> {
+  try {
+    const ticket = await googleClient.verifyIdToken({
+      idToken,
+      audience: env.googleClientId
+    });
+
+    const payload = ticket.getPayload();
+    if (!payload || !payload.email) {
+      throw new ApiError(401, "Invalid Google token payload.");
+    }
+
+    const { email, name, sub: googleId } = payload;
+    const normalizedEmail = email.toLowerCase();
+
+    let user = await UserModel.findOne({
+      $or: [{ googleId }, { email: normalizedEmail }]
+    });
+
+    if (!user) {
+      // Create new user if they don't exist
+      user = await UserModel.create({
+        email: normalizedEmail,
+        name: name || "Google User",
+        googleId,
+        onboardingCompleted: false
+      });
+    } else if (!user.googleId) {
+      // Link Google account to existing email account
+      user.googleId = googleId;
+      await user.save();
+    }
+
+    const tokens = createTokenPair(String(user._id));
+
+    return {
+      user: toAuthUser(user as unknown as UserDocument),
+      ...tokens
+    };
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    console.error("Google auth error:", error);
+    throw new ApiError(401, "Google authentication failed.");
+  }
+}
+
 export const authService = {
   signup,
   login,
   getMe,
   refresh,
-  verifyAccessToken
+  verifyAccessToken,
+  googleLogin
 };

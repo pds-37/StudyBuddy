@@ -103,7 +103,10 @@ export function GlobalCopilotWidget() {
             </div>
             <div>
               <h3 className="text-sm font-semibold text-white">Veda AI</h3>
-              <p className="text-[11px] text-slate-400">{isAuthenticated ? `Mentor for ${user?.name || "you"}` : "Guest Mode"}</p>
+              <div className="flex items-center gap-1.5">
+                <p className="text-[11px] text-slate-400">{isAuthenticated ? `Mentor for ${user?.name || "you"}` : "Guest Mode"}</p>
+                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-brand/10 border border-brand/20 text-brand font-bold uppercase tracking-tighter">Llama 3.1</span>
+              </div>
             </div>
           </div>
           <button

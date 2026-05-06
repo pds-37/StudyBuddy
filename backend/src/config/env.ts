@@ -79,5 +79,7 @@ export const env = {
   adzunaAppId: readEnv("ADZUNA_APP_ID", ""),
   adzunaAppKey: readEnv("ADZUNA_APP_KEY", ""),
   adzunaCountry: readEnv("ADZUNA_COUNTRY", "in"),
+  googleClientId: readEnv("GOOGLE_CLIENT_ID", ""),
+  googleClientSecret: readEnv("GOOGLE_CLIENT_SECRET", ""),
   logLevel: readEnv("LOG_LEVEL", "dev")
 } as const;
