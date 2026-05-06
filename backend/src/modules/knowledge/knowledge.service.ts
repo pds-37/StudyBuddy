@@ -52,22 +52,15 @@ async function getGraph(userId: string): Promise<KnowledgeGraph> {
     }
   });
 
-  // 2. Process Roadmap Milestones
-  if (roadmap) {
-    roadmap.milestones.forEach(milestone => {
-      nodes.push({
-        id: `milestone-${milestone.id}`,
-        type: "milestone",
-        label: milestone.title,
-        val: 15
-      });
-
-      // Link milestones to skills
-      milestone.skillTags.forEach(skill => {
-        skillSet.add(skill);
-        links.push({
-          source: `milestone-${milestone.id}`,
-          target: `skill-${skill}`
+  // 2. Process Roadmap Missions
+  if (roadmap && roadmap.phases) {
+    (roadmap.phases as any[]).forEach(phase => {
+      (phase.missions as any[]).forEach(mission => {
+        nodes.push({
+          id: `mission-${mission.id}`,
+          type: "milestone",
+          label: mission.title,
+          val: 15
         });
       });
     });

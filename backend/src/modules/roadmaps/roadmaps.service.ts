@@ -4,7 +4,7 @@ import { skillsService } from "../skills/skills.service.js";
 import { notesService } from "../notes/notes.service.js";
 import { AIOrchestrator } from "../../core/ai-orchestrator.js";
 import { ApiError } from "../../utils/api-error.js";
-import type { Roadmap, RoadmapMilestone } from "@studybuddy/shared";
+import type { Roadmap } from "@studybuddy/shared";
 
 type GenerateRoadmapRequest = {
   targetRole: string;
@@ -21,8 +21,8 @@ function toRoadmap(roadmap: RoadmapDocument): Roadmap {
     targetRole: roadmap.targetRole,
     readinessScore: roadmap.readinessScore,
     consistencyScore: roadmap.consistencyScore,
-    currentPhaseId: roadmap.currentPhaseId,
-    nextMilestone: roadmap.nextMilestone,
+    currentPhaseId: roadmap.currentPhaseId ?? undefined,
+    nextMilestone: roadmap.nextMilestone ?? undefined,
     phases: (roadmap.phases as any[]).map(phase => ({
       id: phase.id,
       title: phase.title,
@@ -120,7 +120,7 @@ async function generateFromSkillGaps(userId: string, timelineWeeks: number = 12)
 
   // Get skill gaps
   const skillGapAnalysis = await skillsService.analyzeSkillGap(userId);
-  const skillGapsFormatted = skillGapAnalysis.gaps.map((item) => ({
+  const skillGapsFormatted = skillGapAnalysis.gaps.map((item: any) => ({
     skill: item.skill,
     gapScore: item.gapScore
   }));

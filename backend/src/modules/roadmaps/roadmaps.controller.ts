@@ -37,7 +37,7 @@ const updateTaskStatus: RequestHandler = async (request, response, next) => {
   try {
     const { taskId } = request.params;
     const { status } = request.body;
-    const roadmap = await roadmapsService.updateTaskStatus(request.userId ?? "", taskId, status);
+    const roadmap = await roadmapsService.updateTaskStatus(request.userId as string ?? "", taskId as string, status);
     response.json({ roadmap });
   } catch (error) {
     next(error);
@@ -48,7 +48,7 @@ const updateTaskStatus: RequestHandler = async (request, response, next) => {
 const generateQuiz: RequestHandler = async (request, response, next) => {
   try {
     const { taskId } = request.params;
-    const quiz = await roadmapsService.generateQuizForTask(request.userId ?? "", taskId);
+    const quiz = await roadmapsService.generateQuizForTask(request.userId as string ?? "", taskId as string);
     response.json({ quiz });
   } catch (error) {
     next(error);
@@ -60,7 +60,7 @@ const rate: RequestHandler = async (request, response, next) => {
   try {
     const { roadmapId } = request.params;
     const { rating, feedback } = request.body;
-    const roadmap = await roadmapsService.rateRoadmap(request.userId ?? "", roadmapId, rating, feedback);
+    const roadmap = await roadmapsService.rateRoadmap(request.userId as string ?? "", roadmapId as string, rating, feedback);
     response.json({ roadmap });
   } catch (error) {
     next(error);

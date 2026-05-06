@@ -192,12 +192,16 @@ async function buildUserContext(userId: string, currentQuery?: string, knownNote
 
     // Active roadmap
     if (roadmap) {
-      const milestones = roadmap.milestones
-        .filter((milestone) => milestone.status !== "completed")
-        .slice(0, 3)
-        .map((milestone) => milestone.title)
-        .join(", ");
-      context.push(`Current Roadmap: ${roadmap.title}, Active Milestones: ${milestones}`);
+      const activeMissions: string[] = [];
+      for (const phase of roadmap.phases || []) {
+        for (const mission of phase.missions || []) {
+          if (mission.status !== "completed") {
+            activeMissions.push(mission.title);
+          }
+        }
+      }
+      const missionsStr = activeMissions.slice(0, 3).join(", ");
+      context.push(`Current Roadmap: ${roadmap.title}, Active Missions: ${missionsStr}`);
     }
 
     // Job matches

@@ -41,7 +41,7 @@ function toSyncShape(doc: NoteDocument) {
     content: doc.content,
     topic: doc.topic ?? null,
     tags: doc.tags,
-    source: doc.source ?? "web",
+    source: doc.sourceType === "web" ? "web" : "cli",
     created_at: doc.createdAt.toISOString(),
     updated_at: doc.updatedAt.toISOString(),
     synced_at: doc.syncedAt ? doc.syncedAt.toISOString() : null,
@@ -88,7 +88,7 @@ async function pushNotes(userId: string, notes: SyncNotePayload[], lastSync: str
       existing.content = incoming.content;
       existing.topic = incoming.topic;
       existing.tags = incoming.tags;
-      existing.source = incoming.source;
+      existing.sourceType = incoming.source === "cli" ? "manual" : "web";
       existing.syncedAt = new Date();
       if (incoming.strength !== undefined) existing.strength = incoming.strength;
       if (incoming.next_review_at !== undefined) existing.nextReviewAt = incoming.next_review_at ? new Date(incoming.next_review_at) : new Date();
@@ -115,7 +115,7 @@ async function pushNotes(userId: string, notes: SyncNotePayload[], lastSync: str
         content: incoming.content,
         topic: incoming.topic ?? incoming.tags[0],
         tags: incoming.tags,
-        source: incoming.source,
+        sourceType: incoming.source === "cli" ? "manual" : "web",
         syncedAt: new Date(),
         strength: incoming.strength ?? 0.25,
         nextReviewAt: incoming.next_review_at ? new Date(incoming.next_review_at) : new Date(),
@@ -159,11 +159,11 @@ async function pullNotes(userId: string, since: string | null): Promise<PullResu
 
 /** Returns sync health/status information for the given user. */
 async function getSyncStatus(userId: string) {
-  const lastPushed = await NoteModel.findOne({ userId, source: "cli" })
+  const lastPushed = await NoteModel.findOne({ userId, sourceType: "manual" })
     .sort({ syncedAt: -1 })
     .select("syncedAt");
 
-  const lastPulled = await NoteModel.findOne({ userId, source: "web" })
+  const lastPulled = await NoteModel.findOne({ userId, sourceType: "web" })
     .sort({ updatedAt: -1 })
     .select("updatedAt");
 

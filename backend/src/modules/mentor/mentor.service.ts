@@ -71,16 +71,35 @@ function clampScore(value: number) {
 }
 
 function roadmapProgress(roadmap: RoadmapDocument | null) {
-  if (!roadmap || roadmap.milestones.length === 0) {
+  if (!roadmap || !roadmap.phases || roadmap.phases.length === 0) {
     return 0;
   }
 
-  const completed = roadmap.milestones.filter((milestone) => milestone.status === "completed").length;
-  return Math.round((completed / roadmap.milestones.length) * 100);
+  let totalTasks = 0;
+  let completedTasks = 0;
+
+  for (const phase of roadmap.phases as any[]) {
+    for (const mission of phase.missions as any[]) {
+      const tasks = mission.tasks || [];
+      totalTasks += tasks.length;
+      completedTasks += tasks.filter((t: any) => t.status === "completed").length;
+    }
+  }
+
+  if (totalTasks === 0) return 0;
+  return Math.round((completedTasks / totalTasks) * 100);
 }
 
 function activeMilestoneTitle(roadmap: RoadmapDocument | null) {
-  return roadmap?.milestones.find((milestone) => milestone.status !== "completed")?.title;
+  if (!roadmap) return undefined;
+  for (const phase of roadmap.phases as any[]) {
+    for (const mission of phase.missions as any[]) {
+      if (mission.status === "in_progress" || mission.status === "not_started") {
+        return mission.title;
+      }
+    }
+  }
+  return undefined;
 }
 
 function getPlan(user: MentorUser): SaaSPlan {
