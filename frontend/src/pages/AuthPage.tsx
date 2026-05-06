@@ -5,7 +5,7 @@ import { useGoogleLogin, GoogleLogin } from "@react-oauth/google";
 import { authApi } from "../features/auth/api";
 import { type AuthMode } from "../features/auth/types";
 import { useAppStore } from "../store/app-store";
-import { Shield, Lock, Mail, User as UserIcon, Sparkles } from "lucide-react";
+import { Shield, Lock, Mail, User as UserIcon, Sparkles, Route, Target, Briefcase } from "lucide-react";
 import { cn } from "../lib/utils/cn";
 import { NebulaBackground } from "../components/common/NebulaBackground";
 
