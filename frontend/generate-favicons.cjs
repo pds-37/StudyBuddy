@@ -1,11 +1,11 @@
 const Jimp = require('jimp');
 
-Jimp.read('d:/Projects/Personal Notes AI/frontend/public/brand/studybuddy-logo.png')
+// Use the new favicon source provided by the user
+const sourceImage = 'd:/Projects/Personal Notes AI/frontend/public/brand/studybuddy-favicon-512.png';
+
+Jimp.read(sourceImage)
   .then(img => {
-    const height = img.bitmap.height;
-    // Crop a square from the left side (the sphere)
-    img.crop(0, 0, height, height);
-    
+    // It's already square, so just write it
     img.write('d:/Projects/Personal Notes AI/frontend/public/favicon.png');
     
     // Resize for smaller favicons
@@ -13,8 +13,8 @@ Jimp.read('d:/Projects/Personal Notes AI/frontend/public/brand/studybuddy-logo.p
     img.clone().resize(32, 32).write('d:/Projects/Personal Notes AI/frontend/public/favicon-32x32.png');
     img.clone().resize(180, 180).write('d:/Projects/Personal Notes AI/frontend/public/apple-touch-icon.png');
     
-    console.log("Done generating favicons!");
+    console.log("Done updating favicons from new source!");
   })
   .catch(err => {
-    console.error(err);
+    console.error("Error generating favicons:", err);
   });
