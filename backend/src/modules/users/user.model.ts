@@ -1,6 +1,37 @@
-import { Schema, model, type InferSchemaType } from "mongoose";
+import { Schema, model, type InferSchemaType, type Document } from "mongoose";
 
-const userSchema = new Schema(
+export interface IUser {
+  email: string;
+  googleId?: string;
+  passwordHash?: string;
+  name: string;
+  targetRoles: string[];
+  experienceLevel: "beginner" | "intermediate" | "advanced";
+  currentSkills: string[];
+  profile: Record<string, any>;
+  preferences: Record<string, any>;
+  availableHours: number;
+  behaviorProfile: {
+    consistencyScore: number;
+    skipRate: number;
+    avgSessionTime: number;
+    preferredStudyTime: string;
+  };
+  subscription: {
+    plan: "free" | "pro" | "team";
+    status: "trialing" | "active" | "past_due" | "canceled";
+    currentPeriodEnd: Date | null;
+  };
+  usage: {
+    mentorPlansGenerated: number;
+    aiMessagesThisMonth: number;
+    usageMonth: string;
+  };
+  onboardingCompleted: boolean;
+  pushSubscriptions: any[];
+}
+
+const userSchema = new Schema<IUser>(
   {
     email: {
       type: String,
@@ -18,7 +49,7 @@ const userSchema = new Schema(
     },
     passwordHash: {
       type: String,
-      required: function() { return !this.googleId; },
+      required: function(this: IUser) { return !this.googleId; },
       select: false
     },
     name: {
@@ -101,8 +132,6 @@ const userSchema = new Schema(
   }
 );
 
-export type UserDocument = InferSchemaType<typeof userSchema> & {
-  _id: unknown;
-};
+export type UserDocument = Document & IUser & { _id: any };
 
-export const UserModel = model("User", userSchema);
+export const UserModel = model<IUser>("User", userSchema);

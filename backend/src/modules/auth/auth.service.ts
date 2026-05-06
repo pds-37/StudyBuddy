@@ -86,6 +86,10 @@ async function login(payload: LoginBody): Promise<AuthResult> {
     throw new ApiError(401, "Invalid email or password.");
   }
 
+  if (!user.passwordHash) {
+    throw new ApiError(401, "This account uses Google Sign-In. Please use the Google button to log in.");
+  }
+
   const isPasswordValid = await bcrypt.compare(payload.password, user.passwordHash);
 
   if (!isPasswordValid) {
