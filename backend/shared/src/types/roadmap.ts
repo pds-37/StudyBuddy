@@ -27,4 +27,6 @@ export type Roadmap = {
   timelineWeeks: number;
   rationale?: string;
   milestones: RoadmapMilestone[];
+  rating?: number;
+  feedback?: string;
 };

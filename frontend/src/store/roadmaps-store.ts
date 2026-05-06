@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { getRoadmap, generateRoadmapFromGaps } from "../lib/api/roadmaps";
+import { getRoadmap, generateRoadmapFromGaps, rateRoadmap as apiRateRoadmap } from "../lib/api/roadmaps";
 import { getApiErrorMessage } from "../lib/api/error";
 import type { Roadmap } from "@studybuddy/shared";
 
@@ -17,6 +17,7 @@ type RoadmapsState = {
   setCurrentRoadmap: (roadmap: Roadmap | null) => void;
   clearError: () => void;
   refreshRoadmaps: () => Promise<void>;
+  rateRoadmap: (roadmapId: string, rating: number, feedback?: string) => Promise<void>;
 };
 
 /** Zustand store for roadmaps state management. */
@@ -88,5 +89,20 @@ export const useRoadmapsStore = create<RoadmapsState>((set, get) => ({
 
   refreshRoadmaps: async () => {
     await get().fetchRoadmaps(true);
+  },
+  
+  rateRoadmap: async (roadmapId, rating, feedback) => {
+    try {
+      const updatedRoadmap = await apiRateRoadmap(roadmapId, rating, feedback);
+      set((state) => ({
+        roadmaps: state.roadmaps.map((r) => (r.id === roadmapId ? updatedRoadmap : r)),
+        currentRoadmap: state.currentRoadmap?.id === roadmapId ? updatedRoadmap : state.currentRoadmap,
+        error: null
+      }));
+    } catch (error) {
+      set({
+        error: getApiErrorMessage(error, "Failed to submit rating")
+      });
+    }
   }
 }));

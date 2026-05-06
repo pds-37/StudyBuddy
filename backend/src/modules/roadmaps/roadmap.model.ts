@@ -72,6 +72,14 @@ const roadmapSchema = new Schema(
     milestones: {
       type: [roadmapMilestoneSchema],
       default: []
+    },
+    rating: {
+      type: Number,
+      min: 1,
+      max: 5
+    },
+    feedback: {
+      type: String
     }
   },
   {

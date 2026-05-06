@@ -9,5 +9,6 @@ roadmapsRouter.use(authenticate);
 roadmapsRouter.post("/generate", roadmapsController.generate);
 roadmapsRouter.get("/generate-from-gaps", roadmapsController.generateFromGaps);
 roadmapsRouter.get("/", roadmapsController.get);
-roadmapsRouter.put("/milestones/:milestoneId", roadmapsController.updateMilestone);
+roadmapsRouter.patch("/milestones/:milestoneId", roadmapsController.updateMilestone);
 roadmapsRouter.get("/milestones/:milestoneId/quiz", roadmapsController.generateQuiz);
+roadmapsRouter.patch("/:roadmapId/rate", roadmapsController.rate);

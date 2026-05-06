@@ -21,6 +21,8 @@ function toRoadmap(roadmap: RoadmapDocument): Roadmap {
     targetRole: roadmap.targetRole,
     timelineWeeks: roadmap.timelineWeeks,
     rationale: roadmap.rationale ?? undefined,
+    rating: roadmap.rating,
+    feedback: roadmap.feedback,
     milestones: roadmap.milestones.map(milestone => ({
       id: milestone.id,
       title: milestone.title,
@@ -178,11 +180,27 @@ async function generateQuizForMilestone(userId: string, milestoneId: string) {
   return AIOrchestrator.generateQuiz(topic, targetRole);
 }
 
+/** Submits a rating and feedback for a roadmap. */
+async function rateRoadmap(userId: string, roadmapId: string, rating: number, feedback?: string) {
+  const roadmap = await RoadmapModel.findOneAndUpdate(
+    { _id: roadmapId, userId },
+    { $set: { rating, feedback } },
+    { new: true }
+  );
+
+  if (!roadmap) {
+    throw new ApiError(404, "Roadmap not found.");
+  }
+
+  return toRoadmap(roadmap);
+}
+
 export const roadmapsService = {
   generateRoadmap,
   generateFromSkillGaps,
   getRoadmap,
   getUserRoadmaps,
   updateMilestoneStatus,
-  generateQuizForMilestone
+  generateQuizForMilestone,
+  rateRoadmap
 };

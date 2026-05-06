@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { updateMilestone } from "../../../lib/api/roadmaps";
 import type { Roadmap, RoadmapMilestone } from "@studybuddy/shared";
+import { RoadmapRating } from "./RoadmapRating";
 
 type RoadmapViewerProps = {
   roadmap: Roadmap;
@@ -133,6 +134,14 @@ export function RoadmapViewer({ roadmap, onUpdate }: RoadmapViewerProps) {
               </div>
             </div>
           ))}
+      </div>
+
+      <div className="mt-12 pt-12 border-t border-white/[0.06]">
+        <RoadmapRating 
+          roadmapId={roadmap.id} 
+          initialRating={roadmap.rating} 
+          initialFeedback={roadmap.feedback} 
+        />
       </div>
     </div>
   );

@@ -46,3 +46,11 @@ export async function updateMilestone(milestoneId: string, status: RoadmapMilest
   const response = await apiClient.put<RoadmapResponse>(`/roadmaps/milestones/${milestoneId}`, { status });
   return response.data.roadmap;
 }
+/** Submits a rating and feedback for a roadmap. */
+export async function rateRoadmap(roadmapId: string, rating: number, feedback?: string) {
+  const { data } = await apiClient.patch<{ roadmap: Roadmap }>(`/roadmaps/${roadmapId}/rate`, {
+    rating,
+    feedback
+  });
+  return data.roadmap;
+}

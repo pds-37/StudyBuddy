@@ -1,6 +1,6 @@
 import { type RequestHandler } from "express";
 import { roadmapsService } from "./roadmaps.service.js";
-import { generateRoadmapSchema, updateMilestoneSchema, milestoneIdParamSchema, generateFromGapsSchema } from "./roadmaps.validation.js";
+import { generateRoadmapSchema, updateMilestoneSchema, milestoneIdParamSchema, generateFromGapsSchema, roadmapIdParamSchema, rateRoadmapSchema } from "./roadmaps.validation.js";
 
 /** Generates a new roadmap from skill gaps. */
 const generateFromGaps: RequestHandler = async (request, response, next) => {
@@ -57,10 +57,23 @@ const generateQuiz: RequestHandler = async (request, response, next) => {
   }
 };
 
+/** Submits a rating for a roadmap. */
+const rate: RequestHandler = async (request, response, next) => {
+  try {
+    const params = roadmapIdParamSchema.parse(request.params);
+    const body = rateRoadmapSchema.parse(request.body);
+    const roadmap = await roadmapsService.rateRoadmap(request.userId ?? "", params.roadmapId, body.rating, body.feedback);
+    response.json({ roadmap });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const roadmapsController = {
   generateFromGaps,
   generate,
   get,
   updateMilestone,
-  generateQuiz
+  generateQuiz,
+  rate
 };

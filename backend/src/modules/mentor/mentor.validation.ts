@@ -5,5 +5,5 @@ export const mentorTaskParamSchema = z.object({
 });
 
 export const mentorTaskStatusSchema = z.object({
-  status: z.enum(["completed", "skipped", "pending"]).default("completed")
+  status: z.enum(["completed", "skipped", "pending", "in_progress"]).default("completed")
 });

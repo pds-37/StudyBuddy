@@ -49,10 +49,20 @@ async function requestGroq(messages: GroqMessage[], maxTokens: number) {
   return content;
 }
 
-/** Extracts a raw JSON block even when the model wraps it in markdown fences. */
+/** Extracts a raw JSON block even when the model wraps it in markdown fences or commentary. */
 function extractJsonPayload(content: string) {
   const fenced = content.match(/```json\s*([\s\S]*?)```/i) ?? content.match(/```\s*([\s\S]*?)```/i);
-  return fenced?.[1]?.trim() ?? content.trim();
+  if (fenced) return fenced[1].trim();
+
+  // Fallback: Find the first '{' and last '}'
+  const start = content.indexOf("{");
+  const end = content.lastIndexOf("}");
+  
+  if (start !== -1 && end !== -1 && end > start) {
+    return content.slice(start, end + 1).trim();
+  }
+
+  return content.trim();
 }
 
 /** Generates a personalized career roadmap using Groq Llama3. */

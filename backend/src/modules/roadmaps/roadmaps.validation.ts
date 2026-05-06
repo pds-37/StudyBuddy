@@ -14,3 +14,12 @@ export const milestoneIdParamSchema = z.object({
 export const generateFromGapsSchema = z.object({
   timelineWeeks: z.coerce.number().int().min(1).max(104).default(12)
 });
+
+export const roadmapIdParamSchema = z.object({
+  roadmapId: z.string().min(1)
+});
+
+export const rateRoadmapSchema = z.object({
+  rating: z.number().int().min(1).max(5),
+  feedback: z.string().optional()
+});
