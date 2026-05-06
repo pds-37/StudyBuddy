@@ -26,6 +26,23 @@ export function AuthPage() {
   const [error, setError] = useState("");
   const [isSubmitting, setSubmitting] = useState(false);
 
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setError("");
+      setSubmitting(true);
+      try {
+        const result = await authApi.googleLogin(tokenResponse.access_token);
+        setSession(result.accessToken, result.refreshToken, result.user);
+        navigate(result.user.onboardingCompleted ? "/dashboard" : "/onboarding", { replace: true });
+      } catch (requestError) {
+        setError(getAuthErrorMessage(requestError));
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    onError: () => setError("Google login failed.")
+  });
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
@@ -43,177 +60,140 @@ export function AuthPage() {
     }
   }
 
-  const handleGoogleAuth = async (credentialResponse: any) => {
-    if (!credentialResponse.credential) return;
-    
-    setError("");
-    setSubmitting(true);
-    try {
-      const result = await authApi.googleLogin(credentialResponse.credential);
-      setSession(result.accessToken, result.refreshToken, result.user);
-      navigate(result.user.onboardingCompleted ? "/dashboard" : "/onboarding", { replace: true });
-    } catch (requestError) {
-      setError(getAuthErrorMessage(requestError));
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   return (
-    <div className="relative min-h-[calc(100vh-80px)] flex items-center justify-center p-6 overflow-hidden">
-      <NebulaBackground showGrid={true} opacity={0.6} />
-
-      <div className="w-full max-w-5xl grid lg:grid-cols-2 gap-16 items-center">
-        {/* Left Side: Copy */}
-        <div className="hidden lg:block space-y-8 animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand/10 border border-brand/20 text-brand text-xs font-bold uppercase tracking-widest">
-            <Shield size={14} />
-            Secure Career OS
+    <div className="auth-page">
+      <div className="auth-page__glow" />
+      
+      <div className="auth-shell">
+        <section className="auth-brand-panel">
+          <div className="auth-eyebrow">
+            <Sparkles size={14} />
+            Career OS
           </div>
-          <h1 className="text-6xl font-black tracking-tight text-white leading-[1.1]">
-            Build your <span className="text-gradient">future</span> <br /> with confidence.
-          </h1>
-          <p className="text-lg text-slate-400 leading-relaxed max-w-md">
+          <h1>Build your future with confidence.</h1>
+          <p>
             Join 10,000+ professionals using AI to navigate their career paths with precision.
           </p>
-          <div className="space-y-4">
+          
+          <div className="auth-trust-grid">
             {[
-              "Personalized Learning Roadmaps",
-              "AI-Powered Mock Interviews",
-              "Direct Industry Mentorship"
-            ].map((feature) => (
-              <div key={feature} className="flex items-center gap-3 text-slate-300">
-                <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400">
-                  <Sparkles size={12} />
+              { icon: Route, label: "Personalized Learning Roadmaps" },
+              { icon: Target, label: "AI-Powered Mock Interviews" },
+              { icon: Briefcase, label: "Direct Industry Mentorship" }
+            ].map((item) => (
+              <div key={item.label} className="auth-trust-item">
+                <div className="auth-trust-icon">
+                  <item.icon size={18} />
                 </div>
-                <span className="text-sm font-medium">{feature}</span>
+                <span>{item.label}</span>
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* Right Side: Form */}
-        <div className="animate-slide-up">
-          <form onSubmit={handleSubmit} className="glass p-8 md:p-10 rounded-[2.5rem] border-white/10 relative">
-            <div className="flex flex-col items-center mb-10">
-               <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand to-cyan flex items-center justify-center text-white mb-6 shadow-lg">
-                  <Lock size={24} />
-               </div>
-               <h2 className="text-2xl font-bold text-white mb-2">{mode === "signup" ? "Create Account" : "Welcome Back"}</h2>
-               <p className="text-sm text-slate-500">Enter your details to access your workspace.</p>
-            </div>
+        <section className="auth-card">
+          <div className="auth-card-head">
+            <h2 className="text-2xl font-bold text-white">Welcome to StudyBuddy</h2>
+            <p className="text-slate-500 text-sm mt-1">Enter your details to access your workspace.</p>
+          </div>
 
-            <div className="flex p-1 rounded-2xl bg-white/[0.03] border border-white/5 mb-8">
-               <button
-                 type="button"
-                 onClick={() => setMode("signup")}
-                 className={cn(
-                   "flex-1 py-2.5 rounded-xl text-sm font-bold transition-all",
-                   mode === "signup" ? "bg-white text-obsidian shadow-lg" : "text-slate-500 hover:text-white"
-                 )}
-               >
-                 Signup
-               </button>
-               <button
-                 type="button"
-                 onClick={() => setMode("login")}
-                 className={cn(
-                   "flex-1 py-2.5 rounded-xl text-sm font-bold transition-all",
-                   mode === "login" ? "bg-white text-obsidian shadow-lg" : "text-slate-500 hover:text-white"
-                 )}
-               >
-                 Login
-               </button>
-            </div>
+          <div className="auth-tabs">
+            <button 
+              className={cn("auth-tab", mode === "signup" && "active")}
+              onClick={() => setMode("signup")}
+            >
+              Sign Up
+            </button>
+            <button 
+              className={cn("auth-tab", mode === "login" && "active")}
+              onClick={() => setMode("login")}
+            >
+              Login
+            </button>
+          </div>
 
-            <div className="space-y-4 mb-8">
-              <div className="w-full flex justify-center">
-                <GoogleLogin
-                  onSuccess={handleGoogleAuth}
-                  onError={() => setError("Google login failed.")}
-                  theme="filled_black"
-                  shape="pill"
-                  width="100%"
-                  text="continue_with"
+          <button 
+            className="google-btn-custom"
+            onClick={() => googleLogin()}
+            disabled={isSubmitting}
+          >
+            <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" alt="Google" width={20} />
+            Continue with Google
+          </button>
+
+          <div className="auth-divider">
+            <span>or email</span>
+          </div>
+
+          <form onSubmit={handleSubmit} className="auth-form">
+            {mode === "signup" && (
+              <div className="auth-input-group">
+                <label>Full Name</label>
+                <div className="auth-input-wrap">
+                  <UserIcon size={18} />
+                  <input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="auth-input"
+                    placeholder="John Doe"
+                    required
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="auth-input-group">
+              <label>Email Address</label>
+              <div className="auth-input-wrap">
+                <Mail size={18} />
+                <input
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="auth-input"
+                  placeholder="you@example.com"
+                  required
+                  type="email"
                 />
               </div>
-              
-              <div className="flex items-center gap-4 py-2">
-                <div className="flex-1 h-px bg-white/10"></div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Or with Email</span>
-                <div className="flex-1 h-px bg-white/10"></div>
-              </div>
             </div>
 
-            <div className="space-y-6">
-              {mode === "signup" && (
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Full Name</label>
-                  <div className="relative">
-                    <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
-                    <input
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-white text-sm outline-none focus:border-brand transition-colors"
-                      placeholder="John Doe"
-                      required
-                    />
-                  </div>
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Email Address</label>
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
-                  <input
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-white text-sm outline-none focus:border-brand transition-colors"
-                    placeholder="john@example.com"
-                    required
-                    type="email"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Password</label>
-                <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
-                  <input
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-white text-sm outline-none focus:border-brand transition-colors"
-                    placeholder="••••••••"
-                    required
-                    minLength={8}
-                    type="password"
-                  />
-                </div>
+            <div className="auth-input-group">
+              <label>Password</label>
+              <div className="auth-input-wrap">
+                <Lock size={18} />
+                <input
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="auth-input"
+                  placeholder="••••••••"
+                  required
+                  minLength={8}
+                  type="password"
+                />
               </div>
             </div>
 
             {error && (
-              <div className="mt-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-medium animate-shake">
+              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-medium">
                 {error}
               </div>
             )}
 
             <button
               disabled={isSubmitting}
-              className="mt-10 w-full py-4 rounded-2xl bg-brand text-white font-black text-lg hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_10px_30px_rgba(124,92,255,0.4)]"
+              className="btn-auth-submit"
               type="submit"
             >
-              {isSubmitting ? "Authenticating..." : mode === "signup" ? "Get Started" : "Enter Workspace"}
+              {isSubmitting ? "Wait a moment..." : mode === "signup" ? "Create Account" : "Enter Workspace"}
             </button>
-
-            <p className="mt-8 text-center text-xs text-slate-500">
-              By continuing, you agree to our <Link to="#" className="text-white hover:underline">Terms of Service</Link> and <Link to="#" className="text-white hover:underline">Privacy Policy</Link>.
-            </p>
           </form>
-        </div>
+
+          <p className="auth-footer">
+            By continuing, you agree to our <Link to="#">Terms</Link> and <Link to="#">Privacy</Link>.
+          </p>
+        </section>
       </div>
     </div>
   );
 }
+

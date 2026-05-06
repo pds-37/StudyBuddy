@@ -143,20 +143,39 @@ async function refresh(refreshToken: string): Promise<AuthResult> {
   };
 }
 
-/** Verifies a Google ID token and returns auth tokens for the user. */
-async function googleLogin(idToken: string): Promise<AuthResult> {
+/** Verifies a Google token (ID Token or Access Token) and returns auth tokens for the user. */
+async function googleLogin(token: string): Promise<AuthResult> {
   try {
-    const ticket = await googleClient.verifyIdToken({
-      idToken,
-      audience: env.googleClientId
-    });
+    let email: string | undefined;
+    let name: string | undefined;
+    let googleId: string | undefined;
 
-    const payload = ticket.getPayload();
-    if (!payload || !payload.email) {
+    // Try to verify as ID Token first
+    try {
+      const ticket = await googleClient.verifyIdToken({
+        idToken: token,
+        audience: env.googleClientId
+      });
+      const payload = ticket.getPayload();
+      email = payload?.email;
+      name = payload?.name;
+      googleId = payload?.sub;
+    } catch (idTokenError) {
+      // If ID Token verification fails, try as Access Token by fetching userinfo
+      const response = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${token}`);
+      if (!response.ok) {
+        throw new ApiError(401, "Google authentication failed: Invalid token.");
+      }
+      const data = (await response.json()) as { email: string; name: string; sub: string };
+      email = data.email;
+      name = data.name;
+      googleId = data.sub;
+    }
+
+    if (!email || !googleId) {
       throw new ApiError(401, "Invalid Google token payload.");
     }
 
-    const { email, name, sub: googleId } = payload;
     const normalizedEmail = email.toLowerCase();
 
     let user = await UserModel.findOne({
