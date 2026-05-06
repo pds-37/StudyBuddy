@@ -1,11 +1,10 @@
 import { Link } from "react-router-dom";
 import { CheckCircle, Clock, Route, Target, Sparkles, ChevronRight } from "lucide-react";
-import type { RoadmapMilestone } from "@studybuddy/shared";
 import { useRoadmapsStore } from "../../store/roadmaps-store";
 import { cn } from "../../lib/utils/cn";
 
 export function RoadmapWidget() {
-  const { currentRoadmap, loading } = useRoadmapsStore();
+  const { currentRoadmap } = useRoadmapsStore();
 
   if (!currentRoadmap) {
     return (
@@ -23,7 +22,7 @@ export function RoadmapWidget() {
             to="/roadmap"
             className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-brand text-white font-bold hover:scale-105 transition-all shadow-lg"
           >
-            Create Roadmap
+            Create Mission
             <Sparkles size={18} />
           </Link>
         </div>
@@ -31,16 +30,25 @@ export function RoadmapWidget() {
     );
   }
 
-  const completedMilestones = currentRoadmap.milestones.filter(
-    (m: RoadmapMilestone) => m.status === "completed"
-  ).length;
-  const totalMilestones = currentRoadmap.milestones.length;
-  const progressPercentage = Math.round((completedMilestones / totalMilestones) * 100);
-  const nextMilestone = currentRoadmap.milestones.find((m) => m.status !== "completed");
+  // Calculate overall progress across all tasks
+  let totalTasks = 0;
+  let completedTasks = 0;
+  currentRoadmap.phases?.forEach(p => {
+    p.missions?.forEach(m => {
+      totalTasks += m.tasks?.length || 0;
+      completedTasks += m.tasks?.filter(t => t.status === "completed").length || 0;
+    });
+  });
+
+  const progressPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+  
+  // Get active mission
+  const activePhase = currentRoadmap.phases?.find(p => p.id === currentRoadmap.currentPhaseId) || currentRoadmap.phases?.[0];
+  const nextMission = activePhase?.missions?.find(m => m.status === "in_progress") || activePhase?.missions?.[0];
 
   return (
     <div className="rounded-[2.5rem] glass border-white/5 p-8 bg-white/[0.02] relative overflow-hidden group">
-      <div className="absolute top-0 right-0 w-64 h-64 bg-cyan/5 blur-[100px] -z-10 group-hover:bg-brand/5 transition-colors duration-1000" />
+      <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 blur-[100px] -z-10 group-hover:bg-brand/5 transition-colors duration-1000" />
       
       <div className="flex items-center justify-between mb-10">
         <div className="flex items-center gap-4">
@@ -48,7 +56,7 @@ export function RoadmapWidget() {
             <Route size={24} />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-white">Your Roadmap</h3>
+            <h3 className="text-xl font-bold text-white">Active Mission</h3>
             <p className="text-sm text-slate-500 uppercase tracking-widest">{currentRoadmap.targetRole}</p>
           </div>
         </div>
@@ -65,39 +73,28 @@ export function RoadmapWidget() {
           <div className="flex items-end justify-between mb-4">
             <div>
               <span className="text-4xl font-black text-white">{progressPercentage}%</span>
-              <span className="ml-2 text-sm text-slate-500">Completed</span>
+              <span className="ml-2 text-sm text-slate-500">Execution</span>
             </div>
             <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-              {completedMilestones} / {totalMilestones} Milestones
+              {completedTasks} / {totalTasks} Tasks
             </span>
           </div>
           <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-brand to-cyan transition-all duration-1000 ease-out"
+              className="h-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-1000 ease-out"
               style={{ width: `${progressPercentage}%` }}
             />
           </div>
         </div>
 
         <div className="pt-8 border-t border-white/5">
-          <div className="flex items-center gap-2 mb-4 text-xs font-bold text-slate-500 uppercase tracking-widest">
-            <Clock size={12} className="text-cyan" />
-            <span>Up Next</span>
+          <div className="flex items-center gap-2 mb-4 text-xs font-bold text-cyan-400 uppercase tracking-widest">
+            <Clock size={12} />
+            <span>Current Focus</span>
           </div>
-          <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/5 group-hover:border-brand/20 transition-colors">
-            <p className="text-lg font-bold text-white mb-2">{nextMilestone?.title || "All Caught Up!"}</p>
-            {nextMilestone?.resources && nextMilestone.resources.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-4">
-                {nextMilestone.resources.slice(0, 3).map((resource, i) => (
-                  <span key={i} className="px-3 py-1 rounded-lg bg-white/5 text-[11px] text-slate-400 border border-white/5">
-                    {resource.title}
-                  </span>
-                ))}
-                {nextMilestone.resources.length > 3 && (
-                   <span className="text-[11px] text-slate-500 flex items-center">+{nextMilestone.resources.length - 3} more</span>
-                )}
-              </div>
-            )}
+          <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/5 group-hover:border-cyan-400/20 transition-colors">
+            <p className="text-lg font-bold text-white mb-2">{nextMission?.title || "Mission Accomplished!"}</p>
+            <p className="text-xs text-slate-400 line-clamp-2">{nextMission?.description || "Standby for new objectives."}</p>
           </div>
         </div>
       </div>

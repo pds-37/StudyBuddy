@@ -260,7 +260,7 @@ export function CopilotChat() {
                          <div className="space-y-3 pt-2">
                             <div className="flex gap-2">
                                <div className="w-2 h-2 rounded-full bg-brand/40 animate-bounce" style={{ animationDelay: '0ms' }} />
-                               <div className="w-2 h-2 rounded-full bg-brand/40 animate-bounce" style={{ animationDelay: '150ms' }} style={{ animationDelay: '150ms' }} />
+                               <div className="w-2 h-2 rounded-full bg-brand/40 animate-bounce" style={{ animationDelay: '150ms' }} />
                                <div className="w-2 h-2 rounded-full bg-brand/40 animate-bounce" style={{ animationDelay: '300ms' }} />
                             </div>
                             <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Veda is analyzing context...</p>
@@ -279,7 +279,7 @@ export function CopilotChat() {
                 <div className="flex flex-wrap gap-2 mb-6">
                    <SuggestionChip icon={Target} label="Next Best Action" onClick={() => handleSendMessage("What should I do right now?")} />
                    <SuggestionChip icon={AlertCircle} label="Why am I stuck?" onClick={() => handleSendMessage("Analyze why I am stuck and suggest a recovery plan.")} />
-                   <SuggestionChip icon={Clock} label="1-Hour Session" onClick={() => handleSendMessage("Create a 1-hour adaptive study session for my current goals.")} />
+                   <SuggestionChip icon={Clock3} label="1-Hour Session" onClick={() => handleSendMessage("Create a 1-hour adaptive study session for my current goals.")} />
                 </div>
 
                 <div className="relative group">
@@ -338,8 +338,8 @@ export function CopilotChat() {
                  <div className="space-y-6">
                     <LiveInsight 
                       label="Burnout Indicator" 
-                      value={user?.behaviorProfile?.skipRate > 30 ? "High Risk" : "Stable"} 
-                      color={user?.behaviorProfile?.skipRate > 30 ? "text-red-400" : "text-emerald-400"}
+                      value={(user as any)?.behaviorProfile?.skipRate > 30 ? "High Risk" : "Stable"} 
+                      color={(user as any)?.behaviorProfile?.skipRate > 30 ? "text-red-400" : "text-emerald-400"}
                       description="Your skip rate increased by 12% this week. Consider a rest session."
                     />
                     

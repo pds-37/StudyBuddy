@@ -16,6 +16,7 @@ import { skillsApi } from "../features/skills/api";
 import { NebulaBackground } from "../components/common/NebulaBackground";
 import { SkillMatrixCard, ReadinessRing } from "../features/skills/components/IntelligenceComponents";
 import { type SkillGapAnalysis } from "../features/skills/types";
+import { cn } from "../lib/utils/cn";
 
 export function SkillGapPage() {
   const { data, isLoading, error } = useQuery<SkillGapAnalysis>({

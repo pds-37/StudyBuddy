@@ -15,7 +15,8 @@ import {
   AlertCircle,
   TrendingUp,
   Flame,
-  LayoutDashboard
+  LayoutDashboard,
+  BookOpen
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useRoadmapsStore } from "../../../store/roadmaps-store";
@@ -91,7 +92,7 @@ export function RoadmapWorkspace() {
         />
         <MetricCard 
           label="Consistency" 
-          value={currentRoadmap?.consistencyScore > 70 ? "High" : currentRoadmap?.consistencyScore > 40 ? "Medium" : "Developing"} 
+          value={(currentRoadmap?.consistencyScore ?? 0) > 70 ? "High" : (currentRoadmap?.consistencyScore ?? 0) > 40 ? "Medium" : "Developing"} 
           icon={Flame} 
           color="text-orange-400"
         />
@@ -220,7 +221,7 @@ export function RoadmapWorkspace() {
             </div>
 
             <div className="space-y-4">
-              {currentRoadmap.insights.map((insight, i) => (
+              {currentRoadmap?.insights?.map((insight, i) => (
                 <InsightCard key={i} insight={insight} />
               ))}
             </div>

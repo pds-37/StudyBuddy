@@ -50,7 +50,7 @@ export function NotesPage() {
     let result = notes;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      result = result.filter(n => 
+      result = result.filter((n: any) => 
         n.title.toLowerCase().includes(q) || 
         n.content.toLowerCase().includes(q) ||
         n.topic?.toLowerCase().includes(q)
@@ -177,11 +177,11 @@ export function NotesPage() {
                    </div>
                  ) : (
                    <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-8">
-                      {filteredNotes.map((note, i) => (
+                      {filteredNotes.map((note: any, i: number) => (
                         <IntelligentNoteCard 
                           key={note.id} 
                           note={note} 
-                          onAction={(action) => console.log(action, note.id)} 
+                          onAction={(action: string) => console.log(action, note.id)} 
                         />
                       ))}
                    </div>
