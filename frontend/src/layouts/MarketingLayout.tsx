@@ -1,3 +1,4 @@
+import { Outlet } from "react-router-dom";
 import { TopNav } from "../components/navigation/TopNav";
 import { GlobalCopilotWidget } from "../features/copilot/components/GlobalCopilotWidget";
 
