@@ -125,7 +125,7 @@ const userSchema = new Schema<IUser>(
     pushSubscriptions: {
       type: [Schema.Types.Mixed],
       default: []
-    }
+    } as any,
   },
   {
     timestamps: true
