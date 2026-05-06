@@ -56,10 +56,7 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
         <div className="flex items-center gap-8 flex-1">
           {(!isAppShell || isLandingPage) && (
             <Link to="/" className="flex items-center gap-3 group">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand to-cyan flex items-center justify-center shadow-[0_0_20px_rgba(124,92,255,0.4)] transition-transform group-hover:scale-110">
-                <span className="text-white font-black text-sm">S</span>
-              </div>
-              <span className="text-white font-black tracking-tight text-xl">StudyBuddy</span>
+              <img src="/brand/studybuddy-logo.png" alt="StudyBuddy Logo" className="h-10 w-auto object-contain" />
             </Link>
           )}
 
