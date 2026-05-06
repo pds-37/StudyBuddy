@@ -5,7 +5,7 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { authApi } from "../features/auth/api";
 import { type AuthMode } from "../features/auth/types";
 import { useAppStore } from "../store/app-store";
-import { Shield, Lock, Mail, User as UserIcon, Sparkles, ArrowRight } from "lucide-react";
+import { Shield, Lock, Mail, User as UserIcon, Sparkles, ArrowRight, Target } from "lucide-react";
 import { cn } from "../lib/utils/cn";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 import "./AuthPage.css";
