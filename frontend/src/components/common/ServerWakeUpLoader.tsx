@@ -29,12 +29,16 @@ export function ServerWakeUpLoader() {
 
       <div className="relative z-10 flex flex-col items-center max-w-md px-6 text-center">
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="w-24 h-24 rounded-[2.5rem] bg-brand/10 border border-brand/20 flex items-center justify-center text-brand mb-10 shadow-glow"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="mb-12"
         >
-          <Zap size={48} className="animate-pulse" />
+          <img 
+            src="/brand/studybuddy-logo.png" 
+            alt="StudyBuddy" 
+            className="h-24 w-auto object-contain drop-shadow-[0_0_30px_rgba(124,92,255,0.3)]" 
+          />
         </motion.div>
 
         <h1 className="text-4xl font-black text-white mb-4 tracking-tight">Waking Up Veda AI</h1>
