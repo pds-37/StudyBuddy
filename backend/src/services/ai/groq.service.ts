@@ -51,13 +51,32 @@ async function requestGroq(messages: GroqMessage[], maxTokens: number) {
 
 /** Extracts a raw JSON block even when the model wraps it in markdown fences or commentary. */
 function extractJsonPayload(content: string) {
-  const fenced = content.match(/```json\s*([\s\S]*?)```/i) ?? content.match(/```\s*([\s\S]*?)```/i);
+  // First attempt: Markdown blocks
+  const fenced = content.match(/```(?:json)?\s*([\s\S]*?)```/i);
   if (fenced) return fenced[1].trim();
 
-  // Fallback: Find the first '{' and last '}'
-  const start = content.indexOf("{");
-  const end = content.lastIndexOf("}");
-  
+  // Second attempt: Find the outer-most structural markers
+  const firstBrace = content.indexOf('{');
+  const firstBracket = content.indexOf('[');
+  const lastBrace = content.lastIndexOf('}');
+  const lastBracket = content.lastIndexOf(']');
+
+  // We want the start to be the earliest of { or [
+  let start = -1;
+  if (firstBrace !== -1 && firstBracket !== -1) {
+    start = Math.min(firstBrace, firstBracket);
+  } else {
+    start = firstBrace !== -1 ? firstBrace : firstBracket;
+  }
+
+  // We want the end to be the latest of } or ]
+  let end = -1;
+  if (lastBrace !== -1 && lastBracket !== -1) {
+    end = Math.max(lastBrace, lastBracket);
+  } else {
+    end = lastBrace !== -1 ? lastBrace : lastBracket;
+  }
+
   if (start !== -1 && end !== -1 && end > start) {
     return content.slice(start, end + 1).trim();
   }

@@ -21,8 +21,8 @@ function toRoadmap(roadmap: RoadmapDocument): Roadmap {
     targetRole: roadmap.targetRole,
     timelineWeeks: roadmap.timelineWeeks,
     rationale: roadmap.rationale ?? undefined,
-    rating: roadmap.rating,
-    feedback: roadmap.feedback,
+    rating: roadmap.rating ?? undefined,
+    feedback: roadmap.feedback ?? undefined,
     milestones: roadmap.milestones.map(milestone => ({
       id: milestone.id,
       title: milestone.title,
