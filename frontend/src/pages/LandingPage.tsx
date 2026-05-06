@@ -19,8 +19,6 @@ import {
 } from "lucide-react";
 import { useAppStore } from "../store/app-store";
 import { motion as Motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
-import { useState, type FormEvent } from "react";
 import "./LandingPage.css";
 
 const features = [
@@ -64,18 +62,7 @@ const trustItems = [
 ];
 
 export function LandingPage() {
-  const navigate = useNavigate();
   const isAuthenticated = useAppStore((state) => state.isAuthenticated);
-  const [targetInput, setTargetInput] = useState("");
-  
-  const handleQuickStart = (e: FormEvent) => {
-    e.preventDefault();
-    if (targetInput.trim()) {
-      localStorage.setItem("studybuddy_pending_target", targetInput.trim());
-    }
-    navigate(isAuthenticated ? "/dashboard" : "/auth");
-  };
-
   const startPath = isAuthenticated ? "/dashboard" : "/auth";
 
   return (
@@ -108,29 +95,10 @@ export function LandingPage() {
             </Motion.p>
 
             <div className="landing-hero__actions">
-              {!isAuthenticated ? (
-                <form onSubmit={handleQuickStart} className="quick-start-form">
-                  <div className="quick-start-input-wrap">
-                    <Target size={18} className="text-cyan" />
-                    <input 
-                      type="text" 
-                      placeholder="What's your dream role? (e.g. AI Engineer)"
-                      className="quick-start-input"
-                      value={targetInput}
-                      onChange={(e) => setTargetInput(e.target.value)}
-                    />
-                  </div>
-                  <button type="submit" className="btn-primary">
-                    Get Started
-                    <ArrowRight size={18} />
-                  </button>
-                </form>
-              ) : (
-                <Link to="/dashboard" className="btn-primary">
-                  Go to Dashboard
-                  <ArrowRight size={18} />
-                </Link>
-              )}
+              <Link to={startPath} className="btn-primary">
+                Open workspace
+                <ArrowRight size={18} />
+              </Link>
               <a href="#features" className="btn-secondary">
                 See workflow
                 <Play size={16} />
