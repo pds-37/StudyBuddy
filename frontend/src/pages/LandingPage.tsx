@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useAppStore } from "../store/app-store";
 import { motion as Motion } from "framer-motion";
+import { HeroVisualization } from "./HeroVisualization";
 import "./LandingPage.css";
 
 const features = [
@@ -121,44 +122,7 @@ export function LandingPage() {
             </div>
           </div>
 
-          <div className="landing-hero__visual" aria-hidden="true">
-            <Motion.div 
-              className="landing-cluster landing-cluster--primary"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-            >
-              <div className="landing-cluster__badge">
-                <ShieldCheck size={16} />
-                Ready for role
-              </div>
-              <strong>72% Readiness</strong>
-              <span>+18 points this month</span>
-            </Motion.div>
-            
-            <Motion.div 
-              className="landing-cluster landing-cluster--secondary"
-              initial={{ x: 50, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.5 }}
-            >
-              <ListChecks size={16} />
-              6 Recall tasks due
-            </Motion.div>
-
-            <Motion.div 
-              className="landing-cluster landing-cluster--accent"
-              initial={{ y: 50, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.7 }}
-            >
-              <TerminalSquare size={16} />
-              Sync: 12 notes added
-            </Motion.div>
-
-            <div className="landing-orbit landing-orbit--one" />
-            <div className="landing-orbit landing-orbit--two" />
-          </div>
+          <HeroVisualization />
         </section>
 
         <section className="landing-trust" aria-label="Trust bar">
