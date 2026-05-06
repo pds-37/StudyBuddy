@@ -18,6 +18,7 @@ type RoadmapsState = {
   clearError: () => void;
   refreshRoadmaps: () => Promise<void>;
   rateRoadmap: (roadmapId: string, rating: number, feedback?: string) => Promise<void>;
+  updateTaskStatus: (taskId: string, status: "pending" | "completed" | "skipped") => Promise<void>;
 };
 
 /** Zustand store for roadmaps state management. */
@@ -102,6 +103,22 @@ export const useRoadmapsStore = create<RoadmapsState>((set, get) => ({
     } catch (error) {
       set({
         error: getApiErrorMessage(error, "Failed to submit rating")
+      });
+    }
+  },
+
+  updateTaskStatus: async (taskId, status) => {
+    try {
+      const { updateTaskStatus: apiUpdateTaskStatus } = await import("../lib/api/roadmaps");
+      const updatedRoadmap = await apiUpdateTaskStatus(taskId, status);
+      set((state) => ({
+        roadmaps: state.roadmaps.map((r) => (r.id === updatedRoadmap.id ? updatedRoadmap : r)),
+        currentRoadmap: updatedRoadmap,
+        error: null
+      }));
+    } catch (error) {
+      set({
+        error: getApiErrorMessage(error, "Failed to update task status")
       });
     }
   }

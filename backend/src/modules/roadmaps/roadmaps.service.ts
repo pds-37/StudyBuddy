@@ -19,20 +19,46 @@ function toRoadmap(roadmap: RoadmapDocument): Roadmap {
     userId: roadmap.userId,
     title: roadmap.title,
     targetRole: roadmap.targetRole,
-    timelineWeeks: roadmap.timelineWeeks,
-    rationale: roadmap.rationale ?? undefined,
-    rating: roadmap.rating ?? undefined,
-    feedback: roadmap.feedback ?? undefined,
-    milestones: roadmap.milestones.map(milestone => ({
-      id: milestone.id,
-      title: milestone.title,
-      description: milestone.description,
-      skillTags: milestone.skillTags,
-      status: milestone.status as RoadmapMilestone["status"],
-      rationale: milestone.rationale ?? undefined,
-      order: milestone.order,
-      targetDate: milestone.targetDate ?? undefined
-    }))
+    readinessScore: roadmap.readinessScore,
+    consistencyScore: roadmap.consistencyScore,
+    currentPhaseId: roadmap.currentPhaseId,
+    nextMilestone: roadmap.nextMilestone,
+    phases: (roadmap.phases as any[]).map(phase => ({
+      id: phase.id,
+      title: phase.title,
+      description: phase.description,
+      status: phase.status,
+      estimatedWeeks: phase.estimatedWeeks,
+      difficulty: phase.difficulty,
+      checkpoints: phase.checkpoints,
+      missions: (phase.missions as any[]).map(mission => ({
+        id: mission.id,
+        weekNumber: mission.weekNumber,
+        title: mission.title,
+        description: mission.description,
+        whyItMatters: mission.whyItMatters,
+        outcome: mission.outcome,
+        commonMistakes: mission.commonMistakes,
+        status: mission.status,
+        tasks: (mission.tasks as any[]).map(task => ({
+          id: task.id,
+          title: task.title,
+          type: task.type,
+          durationMinutes: task.durationMinutes,
+          difficulty: task.difficulty,
+          status: task.status,
+          aiHint: task.aiHint,
+          completedAt: task.completedAt?.toISOString()
+        }))
+      }))
+    })),
+    insights: (roadmap.insights as any[]).map(insight => ({
+      type: insight.type,
+      message: insight.message,
+      actionLabel: insight.actionLabel,
+      actionUrl: insight.actionUrl
+    })),
+    updatedAt: (roadmap as any).updatedAt.toISOString()
   };
 }
 
@@ -46,22 +72,22 @@ async function generateRoadmap(userId: string, request: GenerateRoadmapRequest):
   // Get user's notes for context
   let userNotes = "";
   try {
-    const notesResult = await notesService.listNotes(userId, { limit: 20, offset: 0 });
+    const notesResult = await notesService.listNotes(userId, { limit: 10, offset: 0 });
     userNotes = notesResult.notes
-      .slice(0, 5) // Limit to most recent 5 notes
       .map(note => `${note.title}: ${note.content}`)
       .join("\n\n");
   } catch (error) {
     console.warn("Could not fetch user notes for roadmap generation:", error);
   }
 
-  // Generate roadmap using AI
+  // Generate adaptive mission using AI
   const aiRoadmap = await AIOrchestrator.generateRoadmap(
     request.targetRole,
     request.timelineWeeks,
     request.skillGaps,
     userNotes,
-    user.behaviorProfile
+    user.behaviorProfile,
+    user.preferences?.learningStyle
   );
 
   // Create roadmap document
@@ -69,73 +95,17 @@ async function generateRoadmap(userId: string, request: GenerateRoadmapRequest):
     userId,
     title: aiRoadmap.title,
     targetRole: request.targetRole,
-    timelineWeeks: request.timelineWeeks,
-    rationale: aiRoadmap.rationale,
-    milestones: aiRoadmap.milestones.map((milestone, index) => ({
-      id: milestone.id,
-      title: milestone.title,
-      description: milestone.description,
-      skillTags: milestone.skillTags,
-      rationale: milestone.rationale,
-      status: "not_started" as const,
-      order: milestone.order,
-      targetDate: calculateTargetDate(request.timelineWeeks, milestone.order, aiRoadmap.milestones.length)
-    }))
+    readinessScore: aiRoadmap.readinessScore,
+    consistencyScore: aiRoadmap.consistencyScore,
+    currentPhaseId: aiRoadmap.currentPhaseId,
+    nextMilestone: aiRoadmap.nextMilestone,
+    phases: aiRoadmap.phases,
+    insights: aiRoadmap.insights
   });
 
   return toRoadmap(roadmap);
 }
 
-/** Calculates target date for a milestone based on order and total timeline. */
-function calculateTargetDate(totalWeeks: number, order: number, totalMilestones: number): string {
-  const weeksPerMilestone = Math.ceil(totalWeeks / totalMilestones);
-  const milestoneWeek = (order - 1) * weeksPerMilestone + Math.ceil(weeksPerMilestone / 2);
-  const targetDate = new Date();
-  targetDate.setDate(targetDate.getDate() + (milestoneWeek * 7));
-  return targetDate.toISOString().split('T')[0]; // YYYY-MM-DD format
-}
-
-/** Retrieves the user's current roadmap. */
-async function getRoadmap(userId: string): Promise<Roadmap | null> {
-  const roadmap = await RoadmapModel.findOne({ userId }).sort({ createdAt: -1 });
-  return roadmap ? toRoadmap(roadmap) : null;
-}
-
-/** Retrieves all saved roadmaps for a user, newest first. */
-async function getUserRoadmaps(userId: string): Promise<Roadmap[]> {
-  const roadmaps = await RoadmapModel.find({ userId }).sort({ createdAt: -1 });
-  return roadmaps.map(toRoadmap);
-}
-
-/** Updates milestone status. */
-async function updateMilestoneStatus(
-  userId: string,
-  milestoneId: string,
-  status: RoadmapMilestone["status"]
-): Promise<Roadmap> {
-  const roadmap = await RoadmapModel.findOneAndUpdate(
-    { userId, "milestones.id": milestoneId },
-    { $set: { "milestones.$.status": status } },
-    { new: true }
-  );
-
-  if (!roadmap) {
-    throw new ApiError(404, "Roadmap or milestone not found");
-  }
-
-  if (status === "completed") {
-    const { notificationService } = await import("../notifications/notification.service.js");
-    await notificationService.createNotification(
-      userId,
-      "Milestone Completed! 🎉",
-      "Great job completing a milestone! Your adaptive pathway has been updated.",
-      "success",
-      "/roadmap"
-    );
-  }
-
-  return toRoadmap(roadmap);
-}
 
 /** Generates a roadmap based on user's current skill gaps. */
 async function generateFromSkillGaps(userId: string, timelineWeeks: number = 12): Promise<Roadmap> {
@@ -162,22 +132,90 @@ async function generateFromSkillGaps(userId: string, timelineWeeks: number = 12)
   });
 }
 
-/** Generates a quiz for a specific milestone. */
-async function generateQuizForMilestone(userId: string, milestoneId: string) {
-  const roadmap = await RoadmapModel.findOne({ userId, "milestones.id": milestoneId });
+
+/** Retrieves the user's current roadmap. */
+async function getRoadmap(userId: string): Promise<Roadmap | null> {
+  const roadmap = await RoadmapModel.findOne({ userId }).sort({ createdAt: -1 });
+  return roadmap ? toRoadmap(roadmap) : null;
+}
+
+/** Retrieves all saved roadmaps for a user, newest first. */
+async function getUserRoadmaps(userId: string): Promise<Roadmap[]> {
+  const roadmaps = await RoadmapModel.find({ userId }).sort({ createdAt: -1 });
+  return roadmaps.map(toRoadmap);
+}
+
+/** Updates task status within the roadmap hierarchy. */
+async function updateTaskStatus(
+  userId: string,
+  taskId: string,
+  status: "pending" | "completed" | "skipped"
+): Promise<Roadmap> {
+  const roadmap = await RoadmapModel.findOne({ userId });
   if (!roadmap) {
-    throw new ApiError(404, "Roadmap or milestone not found");
+    throw new ApiError(404, "Roadmap not found");
   }
 
-  const milestone = roadmap.milestones.find(m => m.id === milestoneId);
-  if (!milestone) {
-    throw new ApiError(404, "Milestone not found");
+  let taskFound = false;
+  for (const phase of roadmap.phases as any[]) {
+    for (const mission of phase.missions as any[]) {
+      for (const task of mission.tasks as any[]) {
+        if (task.id === taskId) {
+          task.status = status;
+          if (status === "completed") task.completedAt = new Date();
+          taskFound = true;
+          break;
+        }
+      }
+      if (taskFound) break;
+    }
+    if (taskFound) break;
   }
 
-  const topic = milestone.title;
-  const targetRole = roadmap.targetRole;
+  if (!taskFound) {
+    throw new ApiError(404, "Task not found in roadmap");
+  }
 
-  return AIOrchestrator.generateQuiz(topic, targetRole);
+  await roadmap.save();
+
+  if (status === "completed") {
+    const { notificationService } = await import("../notifications/notification.service.js");
+    await notificationService.createNotification(
+      userId,
+      "Mission Progress! 🚀",
+      "You've completed a daily task. Keep the momentum going!",
+      "success",
+      "/roadmap"
+    );
+  }
+
+  return toRoadmap(roadmap);
+}
+
+/** Generates a quiz for a specific task. */
+async function generateQuizForTask(userId: string, taskId: string) {
+  const roadmap = await RoadmapModel.findOne({ userId });
+  if (!roadmap) {
+    throw new ApiError(404, "Roadmap not found");
+  }
+
+  let taskTitle = "";
+  for (const phase of roadmap.phases as any[]) {
+    for (const mission of phase.missions as any[]) {
+      const task = (mission.tasks as any[]).find(t => t.id === taskId);
+      if (task) {
+        taskTitle = task.title;
+        break;
+      }
+    }
+    if (taskTitle) break;
+  }
+
+  if (!taskTitle) {
+    throw new ApiError(404, "Task not found");
+  }
+
+  return AIOrchestrator.generateQuiz(taskTitle, roadmap.targetRole);
 }
 
 /** Submits a rating and feedback for a roadmap. */
@@ -200,7 +238,8 @@ export const roadmapsService = {
   generateFromSkillGaps,
   getRoadmap,
   getUserRoadmaps,
-  updateMilestoneStatus,
-  generateQuizForMilestone,
+  updateTaskStatus,
+  generateQuizForTask,
   rateRoadmap
 };
+

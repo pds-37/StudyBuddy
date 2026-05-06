@@ -90,24 +90,16 @@ async function generateRoadmap(
   timelineWeeks: number,
   skillGaps: Array<{ skill: string; gapScore: number }>,
   userNotes?: string,
-  behaviorProfile?: any
+  behaviorProfile?: any,
+  learningStyle?: string
 ): Promise<{
   title: string;
-  rationale: string;
-  milestones: Array<{
-    id: string;
-    title: string;
-    description: string;
-    skillTags: string[];
-    rationale: string;
-    order: number;
-    resources: Array<{
-      title: string;
-      type: "video" | "course" | "article" | "documentation";
-      url: string;
-      author: string;
-    }>;
-  }>;
+  readinessScore: number;
+  consistencyScore: number;
+  currentPhaseId: string;
+  nextMilestone: string;
+  phases: any[];
+  insights: any[];
 }> {
   const skillGapsText = skillGaps
     .sort((a, b) => b.gapScore - a.gapScore)
@@ -117,53 +109,83 @@ async function generateRoadmap(
 
   const notesContext = userNotes ? `\n\nUser's learning notes and context:\n${userNotes}` : "";
 
-  const prompt = `You are an expert career coach. Create a personalized learning roadmap for someone targeting the role of "${targetRole}" over ${timelineWeeks} weeks.
+  const prompt = `You are Veda, an advanced AI Mentor. Your task is to generate a highly adaptive "Career Learning Mission" for a student targeting the role of "${targetRole}".
 
-Key information:
-- Current skill gaps (highest priority first):
+CONTEXT:
+- Target Role: ${targetRole}
+- Timeline: ${timelineWeeks} weeks
+- Skill Gaps:
 ${skillGapsText}${notesContext}
-
-${behaviorProfile ? `Behavior Insights:
-- Consistency Score: ${behaviorProfile.consistencyScore}%
+${behaviorProfile ? `- Consistency Score: ${behaviorProfile.consistencyScore}%
 - Skip Rate: ${behaviorProfile.skipRate}%
-Adaptive Instruction: ${behaviorProfile.consistencyScore < 50 ? "The user is struggling with consistency. Create shorter, more manageable milestones with frequent 'easy wins' to build momentum." : "The user is highly consistent. Make milestones challenging and project-heavy to maximize growth."}` : ""}
+- Learning Style: ${learningStyle || "Adaptive"}` : ""}
 
-Generate a structured roadmap with ${Math.min(8, Math.ceil(timelineWeeks / 4))} milestones that will help close these skill gaps and prepare for the target role.
+PHILOSOPHY:
+Do NOT generate a static roadmap. Generate a living execution engine.
+- Divide the journey into 4-6 Strategic Phases.
+- Each phase must contain Weekly Missions.
+- Each mission must contain Daily Execution Tasks (highly actionable).
+- Integrate "Memory + Recall" tasks automatically.
 
-Each milestone should include:
-- A clear, actionable title
-- Detailed description of what to learn and do
-- Specific skills that will be developed
-- Realistic timeline within the ${timelineWeeks}-week period
-- 1-3 highly specific recommended resources (e.g., specific YouTube creators like "Striver", "NeetCode", "CodeWithHarry", "FreeCodeCamp", or specific documentation/articles). Provide a realistic search URL for them.
-
-Format your response as JSON with this exact structure:
+RESPONSE STRUCTURE (JSON):
 {
-  "title": "Roadmap title",
-  "rationale": "Overall explanation of why this pathway is the best fit for their skills",
-  "milestones": [
+  "title": "A cinematic mission title",
+  "readinessScore": 15, // initial estimation 0-100
+  "consistencyScore": ${behaviorProfile?.consistencyScore || 50},
+  "currentPhaseId": "phase-1",
+  "nextMilestone": "Short title of the first major checkpoint",
+  "phases": [
     {
-      "id": "milestone-1",
-      "title": "Milestone title",
-      "description": "Detailed description of activities and learning goals",
-      "skillTags": ["skill1", "skill2"],
-      "rationale": "Why this milestone is important for closing the specific gap",
-      "order": 1,
-      "resources": [
+      "id": "phase-1",
+      "title": "Phase Title (e.g., Foundations)",
+      "description": "Strategic overview",
+      "status": "unlocked",
+      "estimatedWeeks": 4,
+      "difficulty": "beginner",
+      "checkpoints": ["Milestone 1", "Milestone 2"],
+      "missions": [
         {
-          "title": "Data Structures Easy to Advanced",
-          "type": "video",
-          "url": "https://www.youtube.com/results?search_query=Data+Structures",
-          "author": "CodeWithHarry"
+          "id": "mission-w1",
+          "weekNumber": 1,
+          "title": "Weekly Mission Title",
+          "description": "What we achieve this week",
+          "whyItMatters": "Contextual importance",
+          "outcome": "Measurable result",
+          "commonMistakes": ["Mistake 1"],
+          "status": "not_started",
+          "tasks": [
+            {
+              "id": "t1",
+              "title": "Actionable daily task (e.g., Implement BFS)",
+              "type": "learn", // learn | practice | revise | project
+              "durationMinutes": 90,
+              "difficulty": "easy", // easy | medium | hard
+              "aiHint": "Mentor tip for this specific task"
+            }
+          ]
         }
       ]
+    }
+  ],
+  "insights": [
+    {
+      "type": "behavior", // behavior | performance | recommendation
+      "message": "AI-driven personal insight (e.g., 'You perform better with visual content.')",
+      "actionLabel": "Quick Action",
+      "actionUrl": "/dashboard"
     }
   ]
 }
 
-Make the roadmap practical, specific, and achievable within the timeline. Focus on high-impact skills that will make the biggest difference for the target role. Crucially, act as a "full mentor" and recommend the absolute best internet tutors and resources.`;
+RULES:
+1. Ensure tasks are granular. Instead of "Learn React", use "Implement a counter with useState".
+2. Mix task types: 40% Learn, 40% Practice, 20% Revise.
+3. Be behavior-aware: ${behaviorProfile?.consistencyScore < 40 ? "User struggles with consistency. Keep tasks under 45 mins and add more 'Revision' to build confidence." : "User is high-performing. Make tasks 90-120 mins and project-heavy."}
+4. Use cinematic, encouraging language.
+5. Provide ONLY valid JSON.`;
 
-  const response = await requestGroq([{ role: "user", content: prompt }], 2000, "llama-3.3-70b-versatile");
+  const response = await requestGroq([{ role: "user", content: prompt }], 3000, "llama-3.3-70b-versatile");
+
 
   try {
     const parsed = JSON.parse(extractJsonPayload(response));

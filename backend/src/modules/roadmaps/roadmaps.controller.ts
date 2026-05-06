@@ -1,30 +1,28 @@
 import { type RequestHandler } from "express";
 import { roadmapsService } from "./roadmaps.service.js";
-import { generateRoadmapSchema, updateMilestoneSchema, milestoneIdParamSchema, generateFromGapsSchema, roadmapIdParamSchema, rateRoadmapSchema } from "./roadmaps.validation.js";
 
-/** Generates a new roadmap from skill gaps. */
-const generateFromGaps: RequestHandler = async (request, response, next) => {
-  try {
-    const query = generateFromGapsSchema.parse(request.query);
-    const roadmap = await roadmapsService.generateFromSkillGaps(request.userId ?? "", query.timelineWeeks);
-    response.status(201).json({ roadmap });
-  } catch (error) {
-    next(error);
-  }
-};
-
-/** Generates a custom roadmap with provided parameters. */
+/** Generates a roadmap for the user. */
 const generate: RequestHandler = async (request, response, next) => {
   try {
-    const body = generateRoadmapSchema.parse(request.body);
-    const roadmap = await roadmapsService.generateRoadmap(request.userId ?? "", body);
-    response.status(201).json({ roadmap });
+    const roadmap = await roadmapsService.generateRoadmap(request.userId ?? "", request.body);
+    response.json({ roadmap });
   } catch (error) {
     next(error);
   }
 };
 
-/** Retrieves the user's current roadmap. */
+/** Generates a roadmap from current skill gaps. */
+const generateFromGaps: RequestHandler = async (request, response, next) => {
+  try {
+    const timelineWeeks = request.query.timelineWeeks ? Number(request.query.timelineWeeks) : undefined;
+    const roadmap = await roadmapsService.generateFromSkillGaps(request.userId ?? "", timelineWeeks);
+    response.json({ roadmap });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/** Returns the user's current roadmap. */
 const get: RequestHandler = async (request, response, next) => {
   try {
     const roadmap = await roadmapsService.getRoadmap(request.userId ?? "");
@@ -34,23 +32,23 @@ const get: RequestHandler = async (request, response, next) => {
   }
 };
 
-/** Updates a milestone's status. */
-const updateMilestone: RequestHandler = async (request, response, next) => {
+/** Updates task status. */
+const updateTaskStatus: RequestHandler = async (request, response, next) => {
   try {
-    const params = milestoneIdParamSchema.parse(request.params);
-    const body = updateMilestoneSchema.parse(request.body);
-    const roadmap = await roadmapsService.updateMilestoneStatus(request.userId ?? "", params.milestoneId, body.status);
+    const { taskId } = request.params;
+    const { status } = request.body;
+    const roadmap = await roadmapsService.updateTaskStatus(request.userId ?? "", taskId, status);
     response.json({ roadmap });
   } catch (error) {
     next(error);
   }
 };
 
-/** Generates a quiz for a milestone. */
+/** Generates a quiz for a topic. */
 const generateQuiz: RequestHandler = async (request, response, next) => {
   try {
-    const params = milestoneIdParamSchema.parse(request.params);
-    const quiz = await roadmapsService.generateQuizForMilestone(request.userId ?? "", params.milestoneId);
+    const { taskId } = request.params;
+    const quiz = await roadmapsService.generateQuizForTask(request.userId ?? "", taskId);
     response.json({ quiz });
   } catch (error) {
     next(error);
@@ -60,9 +58,9 @@ const generateQuiz: RequestHandler = async (request, response, next) => {
 /** Submits a rating for a roadmap. */
 const rate: RequestHandler = async (request, response, next) => {
   try {
-    const params = roadmapIdParamSchema.parse(request.params);
-    const body = rateRoadmapSchema.parse(request.body);
-    const roadmap = await roadmapsService.rateRoadmap(request.userId ?? "", params.roadmapId, body.rating, body.feedback);
+    const { roadmapId } = request.params;
+    const { rating, feedback } = request.body;
+    const roadmap = await roadmapsService.rateRoadmap(request.userId ?? "", roadmapId, rating, feedback);
     response.json({ roadmap });
   } catch (error) {
     next(error);
@@ -70,10 +68,10 @@ const rate: RequestHandler = async (request, response, next) => {
 };
 
 export const roadmapsController = {
-  generateFromGaps,
   generate,
+  generateFromGaps,
   get,
-  updateMilestone,
+  updateTaskStatus,
   generateQuiz,
   rate
 };

@@ -1,5 +1,5 @@
 import { apiClient } from "./client";
-import type { Roadmap, RoadmapMilestoneStatus } from "@studybuddy/shared";
+import type { Roadmap, RoadmapTaskStatus } from "@studybuddy/shared";
 
 type RoadmapResponse = {
   roadmap: Roadmap;
@@ -9,10 +9,6 @@ type GenerateRoadmapRequest = {
   targetRole: string;
   timelineWeeks: number;
   skillGaps: Array<{ skill: string; gapScore: number }>;
-};
-
-type UpdateMilestoneRequest = {
-  status: RoadmapMilestoneStatus;
 };
 
 /** Generates a roadmap from the user's current skill gaps. */
@@ -41,11 +37,12 @@ export async function getRoadmap(): Promise<Roadmap | null> {
   }
 }
 
-/** Updates a milestone's status. */
-export async function updateMilestone(milestoneId: string, status: RoadmapMilestoneStatus): Promise<Roadmap> {
-  const response = await apiClient.put<RoadmapResponse>(`/roadmaps/milestones/${milestoneId}`, { status });
+/** Updates a task's status. */
+export async function updateTaskStatus(taskId: string, status: RoadmapTaskStatus): Promise<Roadmap> {
+  const response = await apiClient.patch<RoadmapResponse>(`/roadmaps/tasks/${taskId}`, { status });
   return response.data.roadmap;
 }
+
 /** Submits a rating and feedback for a roadmap. */
 export async function rateRoadmap(roadmapId: string, rating: number, feedback?: string) {
   const { data } = await apiClient.patch<{ roadmap: Roadmap }>(`/roadmaps/${roadmapId}/rate`, {
