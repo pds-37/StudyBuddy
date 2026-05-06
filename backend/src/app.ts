@@ -42,6 +42,10 @@ export function createApp() {
     response.json({ status: "ok", service: "studybuddy-api" });
   });
 
+  app.get("/api/test", (_request, response) => {
+    response.json({ message: "API is reachable" });
+  });
+
   app.use("/api", apiRouter);
   app.use(notFound);
   app.use(errorHandler);
