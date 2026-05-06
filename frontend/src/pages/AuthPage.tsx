@@ -94,6 +94,7 @@ export function AuthPage() {
 
         <section className="auth-card">
           <div className="auth-card-head">
+            <img src="/brand/studybuddy-logo.png" alt="StudyBuddy Logo" className="h-10 w-auto mb-4 object-contain" />
             <h2 className="text-2xl font-bold text-white">Welcome to StudyBuddy</h2>
             <p className="text-slate-500 text-sm mt-1">Enter your details to access your workspace.</p>
           </div>

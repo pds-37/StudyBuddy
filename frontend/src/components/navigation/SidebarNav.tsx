@@ -20,7 +20,6 @@ import { useCopilotStore } from "../../store/copilot-store";
 import { useJobsStore } from "../../store/jobs-store";
 import { useRoadmapsStore } from "../../store/roadmaps-store";
 import { cn } from "../../lib/utils/cn";
-import { Logo } from "../ui/Logo";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -61,11 +60,7 @@ export function SidebarNav({ isCollapsed = false, onToggleCollapsed }: SidebarNa
         {!isCollapsed ? (
           <div className="flex items-center justify-between w-full">
             <Link to="/" className="flex items-center gap-3 group animate-fade-in">
-              <Logo size="md" />
-              <div className="flex flex-col">
-                <span className="text-white font-black tracking-tight text-lg leading-none">StudyBuddy</span>
-                <span className="text-[10px] text-brand font-bold uppercase tracking-widest mt-1">Veda AI Mentor</span>
-              </div>
+              <img src="/brand/studybuddy-logo.png" alt="StudyBuddy VEDA AI MENTOR" className="h-12 w-auto object-contain" />
             </Link>
             <button
               onClick={onToggleCollapsed}
@@ -79,7 +74,9 @@ export function SidebarNav({ isCollapsed = false, onToggleCollapsed }: SidebarNa
             onClick={onToggleCollapsed}
             className="transition-transform hover:scale-105"
           >
-            <Logo size="md" />
+            <div className="w-12 h-12 overflow-hidden rounded-xl bg-transparent">
+              <img src="/brand/studybuddy-logo.png" alt="StudyBuddy" className="h-full w-auto max-w-none object-cover object-left" />
+            </div>
           </button>
         )}
       </div>

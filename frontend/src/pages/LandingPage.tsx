@@ -222,7 +222,7 @@ export function LandingPage() {
 
       <footer className="landing-footer max-w-7xl mx-auto px-6">
         <div className="footer-brand">
-          <strong>StudyBuddy</strong>
+          <img src="/brand/studybuddy-logo.png" alt="StudyBuddy Logo" className="h-10 w-auto object-contain mb-4" />
           <p>AI mentor, recall trainer, and career planning workspace for technical learners.</p>
         </div>
         <div className="footer-nav">
