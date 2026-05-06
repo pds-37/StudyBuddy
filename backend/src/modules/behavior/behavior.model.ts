@@ -9,7 +9,17 @@ const behaviorLogSchema = new Schema(
     },
     action: {
       type: String,
-      enum: ["task_completed", "task_skipped", "login", "revision_completed", "roadmap_generated"],
+      enum: [
+        "task_completed",
+        "task_skipped",
+        "login",
+        "revision_completed",
+        "roadmap_generated",
+        "session_started",
+        "resume_tailored",
+        "project_started",
+        "project_completed"
+      ],
       required: true,
       index: true
     },
