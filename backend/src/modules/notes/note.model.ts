@@ -40,10 +40,14 @@ const noteSchema = new Schema(
       type: String,
       trim: true
     },
-    source: {
+    sourceType: {
       type: String,
-      enum: ["web", "cli"],
-      default: "web"
+      enum: ["manual", "pdf", "image", "web", "youtube"],
+      default: "manual"
+    },
+    metadata: {
+      type: Schema.Types.Mixed,
+      default: {}
     },
     syncedAt: {
       type: Date,

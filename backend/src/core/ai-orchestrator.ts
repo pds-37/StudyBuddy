@@ -12,7 +12,7 @@ export class AIOrchestrator {
    * Generates a response for the AI Mentor (Copilot).
    * Typically uses Groq for low-latency conversational experience.
    */
-  static async getMentorResponse(messages: CopilotMessage[], userContext: string): Promise<string> {
+  static async getMentorResponse(messages: CopilotMessage[], userContext: string): Promise<{ content: string; metadata: any }> {
     return groqService.generateCopilotResponse(messages, userContext);
   }
 
@@ -25,11 +25,13 @@ export class AIOrchestrator {
     timelineWeeks: number,
     skillGaps: Array<{ skill: string; gapScore: number }>,
     userNotes?: string,
-    behaviorProfile?: any
+    behaviorProfile?: any,
+    learningStyle?: string
   ) {
     // Logic to switch between models based on context size or user tier
-    return groqService.generateRoadmap(targetRole, timelineWeeks, skillGaps, userNotes, behaviorProfile);
+    return groqService.generateRoadmap(targetRole, timelineWeeks, skillGaps, userNotes, behaviorProfile, learningStyle);
   }
+
 
   /**
    * Generates a technical quiz.
@@ -55,5 +57,11 @@ export class AIOrchestrator {
       insight: "User tends to skip Data Structures tasks on Monday mornings.",
       recommendation: "Move heavy tasks to Tuesday evening."
     };
+  }
+  /**
+   * Generates an intelligent Skill Gap Report.
+   */
+  static async generateSkillIntelligenceReport(targetRole: string, rawGaps: any[], userContext: string) {
+    return groqService.generateSkillIntelligenceReport(targetRole, rawGaps, userContext);
   }
 }

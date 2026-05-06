@@ -169,6 +169,10 @@ async function searchSkills(query: string, limit: number) {
   return searchDefaultSkills(trimmedQuery, limit);
 }
 
+import { AIOrchestrator } from "../../core/ai-orchestrator.js";
+import { notesService } from "../notes/notes.service.js";
+import { roadmapsService } from "../roadmaps/roadmaps.service.js";
+
 /** Analyzes current user skills against the target role's required skills. */
 async function analyzeSkillGap(userId: string) {
   const user = await UserModel.findById(userId);
@@ -189,15 +193,15 @@ async function analyzeSkillGap(userId: string) {
   
   const requiredSkills = Array.from(allRequiredSkills);
   const gapItems: SkillGapItem[] = [];
-  let provider: "huggingface" | "local-fallback" = "local-fallback";
+  let provider: "huggingface" | "local-fallback" | "veda-ai" = "local-fallback";
 
   for (const requiredSkill of requiredSkills) {
     const exactMatch = user.currentSkills.find((skill) => normalizeSkillName(skill) === normalizeSkillName(requiredSkill));
     const match: SkillMatch = exactMatch
-      ? { skill: exactMatch, similarity: 1, provider }
+      ? { skill: exactMatch, similarity: 1, provider: "local-fallback" }
       : await embeddingsService.findBestSkillMatch(requiredSkill, user.currentSkills);
 
-    provider = match.provider;
+    if (match.provider === "huggingface") provider = "veda-ai";
 
     const userScore = similarityToScore(match.similarity);
     const gapScore = Math.max(0, 100 - userScore);
@@ -214,28 +218,85 @@ async function analyzeSkillGap(userId: string) {
     });
   }
 
-  const overallScore =
-    gapItems.length === 0 ? 0 : Math.round(gapItems.reduce((total, item) => total + item.userScore, 0) / gapItems.length);
-  const missingSkills = gapItems.filter((item) => item.status === "missing").map((item) => item.skill);
-  const partialSkills = gapItems.filter((item) => item.status === "partial").map((item) => item.skill);
+  // Gather user context for AI Intelligence
+  let userContext = `Experience: ${user.experienceLevel}\n`;
+  if (user.behaviorProfile) {
+    userContext += `Consistency Score: ${user.behaviorProfile.consistencyScore}%\nSkip Rate: ${user.behaviorProfile.skipRate}%\n`;
+  }
 
-  return {
-    targetRole: user.targetRoles.join(", "),
-    experienceLevel: user.experienceLevel,
-    currentSkills: user.currentSkills,
-    overallScore,
-    provider,
-    gaps: gapItems.sort((left, right) => right.gapScore - left.gapScore),
-    recommendations: {
-      nextSkills: gapItems
-        .filter((item) => item.priority === "high")
-        .slice(0, 3)
-        .map((item) => item.skill),
-      missingSkills,
-      partialSkills
+  try {
+    const [notesData, roadmap] = await Promise.all([
+      notesService.listNotes(userId, { limit: 10, offset: 0 }).catch(() => ({ notes: [] })),
+      roadmapsService.getRoadmap(userId).catch(() => null)
+    ]);
+
+    if (notesData.notes.length > 0) {
+      const topConcepts = notesData.notes.map(n => n.topic || "Unknown").join(", ");
+      userContext += `Recent Learning Topics: ${topConcepts}\n`;
     }
-  };
+
+    if (roadmap) {
+      const pendingTasks = roadmap.phases?.flatMap(p => p.missions).flatMap(m => m.tasks).filter(t => t.status !== "completed").length || 0;
+      userContext += `Roadmap Pending Tasks: ${pendingTasks}\n`;
+    }
+  } catch (err) {
+    console.error("Error gathering context for skill intelligence:", err);
+  }
+
+  // Generate the AI Intelligence Report
+  try {
+    const report = await AIOrchestrator.generateSkillIntelligenceReport(
+      user.targetRoles.join(", "),
+      gapItems,
+      userContext
+    );
+    
+    // Inject user's current skills into the response so UI has it
+    report.currentSkills = user.currentSkills;
+    return report;
+
+  } catch (error) {
+    console.error("AI Skill Intelligence failed, falling back to basic analysis:", error);
+    
+    const overallScore =
+      gapItems.length === 0 ? 0 : Math.round(gapItems.reduce((total, item) => total + item.userScore, 0) / gapItems.length);
+    const missingSkills = gapItems.filter((item) => item.status === "missing").map((item) => item.skill);
+    const partialSkills = gapItems.filter((item) => item.status === "partial").map((item) => item.skill);
+
+    return {
+      targetRole: user.targetRoles.join(", "),
+      experienceLevel: user.experienceLevel,
+      currentSkills: user.currentSkills,
+      overallScore,
+      provider,
+      readiness: { learningFoundation: "Medium", problemSolving: "Medium", projectDepth: "Medium", interviewConfidence: "Medium" },
+      roleMatches: [],
+      gaps: gapItems.sort((left, right) => right.gapScore - left.gapScore).map(gap => ({
+        ...gap,
+        status: gap.status === "missing" ? "weak" : gap.status,
+        dimensions: {
+          confidence: gap.userScore,
+          retention: Math.max(0, gap.userScore - 20),
+          interviewReady: Math.max(0, gap.userScore - 30),
+          practical: gap.userScore,
+          momentum: "stagnating"
+        }
+      })),
+      blockers: [],
+      careerTrajectory: "Analysis unavailable.",
+      predictiveInsights: [],
+      recommendations: {
+        nextSkills: gapItems
+          .filter((item) => item.priority === "high")
+          .slice(0, 3)
+          .map((item) => item.skill),
+        recoveryPlan: undefined
+      }
+
+    };
+  }
 }
+
 
 /** Seeds the starter skill list into MongoDB without duplicating existing skills. */
 async function seedDefaultSkills() {

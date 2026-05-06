@@ -196,43 +196,97 @@ RULES:
   }
 }
 
-/** Generates an AI response for copilot chat using conversation history and user context. */
+/** Generates a personalized mentor response for copilot chat. */
 async function generateCopilotResponse(
   messages: CopilotMessage[],
   userContext: string,
-  model: string = "llama-3.1-8b-instant"
-): Promise<string> {
+  model: string = "llama-3.3-70b-versatile"
+): Promise<{
+  content: string;
+  metadata: any;
+}> {
   // Convert messages to Groq format
   const groqMessages: GroqMessage[] = messages.map((msg) => ({
     role: msg.role === "assistant" ? "assistant" : msg.role === "system" ? "system" : "user",
     content: msg.content
   }));
 
-  // Add user context to the system message or first user message
-  const contextPrompt = `You are AI Dost, a memory-first personal developer mentor. Your first job is to use the student's own notes and learning history before general knowledge.
+  const systemPrompt = `You are Veda, an elite AI Career Mentor and adaptive execution coach. You represent the "Learning Operating System" for the student.
 
+CORE PHILOSOPHY:
+- Be proactive, not just reactive.
+- Deeply analyze behavioral signals from the user context.
+- Explain WHY you are giving a recommendation.
+- Always provide immediate next actions.
+
+USER CONTEXT:
 ${userContext}
 
-Rules:
-- If MEMORY_MODE is notes-first, answer primarily from the supplied notes and mention when a detail comes from the student's memory.
-- If MEMORY_MODE is fallback, answer from general knowledge and label it as new knowledge to review later.
-- Keep the response practical, concise, and oriented toward retention.
-- When useful, end with one active-recall question the student should answer next.
+RESPONSE STRUCTURE (JSON):
+You must respond with a JSON object that follows this structure:
+{
+  "content": "A concise, empathetic, and expert natural language response. Avoid generic fluff. Use markdown for lists or bolding.",
+  "metadata": {
+    "behaviorAnalysis": "Insight into the user's current state (e.g., 'Consistency is dropping', 'Strong recall on React', 'High burnout risk').",
+    "cards": [
+      {
+        "type": "insight" | "mission" | "focus_sprint" | "recall_challenge" | "warning" | "analysis" | "recovery",
+        "title": "Short catchy title",
+        "description": "Contextual detail",
+        "actionLabel": "Button text",
+        "actionUrl": "/optional-link",
+        "data": {} // Type specific details
+      }
+    ],
+    "nextBestAction": {
+      "label": "Brief actionable label",
+      "description": "Why they should do this now",
+      "type": "learn" | "revise" | "practice" | "rest" | "project"
+    }
+  }
+}
 
-Be helpful, encouraging, and provide actionable advice. Reference skills, notes, roadmaps, and job recommendations only when relevant.`;
+CARD TYPES:
+- insight: Behavioral or progress insights.
+- mission: Specific roadmap-linked missions.
+- focus_sprint: 20-60 min focused study session.
+- recall_challenge: A quick active recall question or quiz.
+- warning: Burnout or consistency drop alerts.
+- analysis: "Why am I stuck?" diagnosis.
+- recovery: Plan to get back on track after a break.
 
-  // Update the system message with context
-  if (groqMessages[0]?.role === "user") {
-    groqMessages.unshift({
-      role: "system",
-      content: contextPrompt
-    });
-  } else if (groqMessages[0]?.role === "system") {
-    groqMessages[0].content = contextPrompt;
+RULES:
+1. Don't use plain text. Use the JSON structure.
+2. Be extremely specific. Instead of "Practice more", say "Solve 2 BFS problems on LeetCode".
+3. Use the student's name if available in context.
+4. Keep the 'content' field as the primary conversational part.
+5. Provide ONLY valid JSON.`;
+
+  // Update or add system message
+  const systemMsgIdx = groqMessages.findIndex(m => m.role === "system");
+  if (systemMsgIdx !== -1) {
+    groqMessages[systemMsgIdx].content = systemPrompt;
+  } else {
+    groqMessages.unshift({ role: "system", content: systemPrompt });
   }
 
-  return requestGroq(groqMessages, 1000, model);
+  const response = await requestGroq(groqMessages, 2500, model);
+
+  try {
+    const parsed = JSON.parse(extractJsonPayload(response));
+    return {
+      content: parsed.content || "I'm processing your request.",
+      metadata: parsed.metadata || {}
+    };
+  } catch (error) {
+    console.error("Failed to parse Veda Copilot response:", response);
+    return {
+      content: response, // Fallback to raw response if JSON fails
+      metadata: {}
+    };
+  }
 }
+
 
 /** Normalizes the model's resume tailoring JSON into the public response shape. */
 function normalizeResumeTailorResult(value: unknown): ResumeTailorResult {
@@ -363,10 +417,146 @@ Make the questions practical and focus on active recall. Do not wrap the JSON in
   }
 }
 
+/** Analyzes a note to extract structured knowledge and memory reinforcements. */
+async function analyzeNote(
+  title: string,
+  content: string,
+  userContext: string
+): Promise<{
+  topic: string;
+  summary: string;
+  concepts: string[];
+  flashcards: Array<{ question: string; answer: string }>;
+  interviewRelevance: {
+    frequency: "low" | "medium" | "high";
+    importance: number;
+    usageContext: string;
+  };
+  tags: string[];
+}> {
+  const prompt = `You are Veda, an AI Knowledge Engineer. Your task is to transform a raw learning note into structured knowledge for a student's "Second Brain".
+  
+NOTE TITLE: ${title}
+NOTE CONTENT:
+${content}
+
+USER CONTEXT:
+${userContext}
+
+RESPONSE STRUCTURE (JSON):
+{
+  "topic": "Main high-level topic (e.g., 'Data Structures', 'React Hooks')",
+  "summary": "A concise, high-impact summary of the key concepts.",
+  "concepts": ["Concept 1", "Concept 2"],
+  "flashcards": [
+    { "question": "Active recall question", "answer": "Concise answer" }
+  ],
+  "interviewRelevance": {
+    "frequency": "low" | "medium" | "high",
+    "importance": 85, // 0-100 score
+    "usageContext": "How this is usually asked in technical interviews"
+  },
+  "tags": ["Tag1", "Tag2"]
+}
+
+RULES:
+1. Generate 3-5 high-quality flashcards for active recall.
+2. Ensure the summary is helpful for quick review.
+3. Tags should be consistent and professional.
+4. Provide ONLY valid JSON.`;
+
+  const response = await requestGroq([{ role: "user", content: prompt }], 2000, "llama-3.3-70b-versatile");
+
+  try {
+    return JSON.parse(extractJsonPayload(response));
+  } catch (error) {
+    console.error("Failed to parse note analysis response:", response);
+    throw new Error("Invalid response format from AI note analysis");
+  }
+}
+
+/** Generates a comprehensive AI Skill Intelligence Report. */
+async function generateSkillIntelligenceReport(
+  targetRole: string,
+  rawGaps: Array<any>,
+  userContext: string
+): Promise<any> {
+  const prompt = `You are Veda, an AI Career Intelligence Engine. Analyze the student's skills, learning behavior, and memory retention to generate a realistic "Career Readiness Report" for the role of ${targetRole}.
+
+USER CONTEXT (Behavior, Notes, Roadmap, Recall):
+${userContext}
+
+RAW GAP DATA (Baselines):
+${JSON.stringify(rawGaps, null, 2)}
+
+RESPONSE STRUCTURE (JSON):
+{
+  "targetRole": "${targetRole}",
+  "overallScore": 65, // 0-100 holistic readiness
+  "readiness": {
+    "learningFoundation": "Medium", // Weak, Medium, Strong
+    "problemSolving": "Weak",
+    "projectDepth": "Medium",
+    "interviewConfidence": "Weak"
+  },
+  "roleMatches": [
+    {
+      "role": "Startup Intern",
+      "matchPercentage": 75,
+      "strengths": ["React", "Git"],
+      "blockers": ["System Design"],
+      "estimatedTimelineMonths": 2
+    }
+  ],
+  "gaps": [
+    {
+      "skill": "Dynamic Programming",
+      "category": "Algorithms",
+      "status": "weak", // strong, partial, weak
+      "dimensions": {
+        "confidence": 40,
+        "retention": 30,
+        "interviewReady": 20,
+        "practical": 10,
+        "momentum": "declining" // stagnating, improving, declining
+      },
+      "gapScore": 80,
+      "userScore": 20
+    }
+  ],
+  "blockers": ["You struggle to retain Dynamic Programming concepts due to inconsistent revision."],
+  "careerTrajectory": "At your current pace, you will be internship-ready in ~4 months.",
+  "predictiveInsights": ["If consistency drops further, DSA retention will decay rapidly next week."],
+  "recommendations": {
+    "nextSkills": ["Dynamic Programming", "System Design"],
+    "recoveryPlan": "Focus heavily on spaced repetition for DSA before learning new frameworks."
+  },
+  "provider": "veda-ai"
+}
+
+RULES:
+1. Provide deep, honest analysis. Do not just say 100% ready.
+2. Ensure dimensions (confidence, retention, etc.) reflect the USER CONTEXT provided. If they skip tasks, retention/momentum should be lower.
+3. Provide ONLY valid JSON matching the exact structure.`;
+
+  const response = await requestGroq([{ role: "user", content: prompt }], 3000, "llama-3.3-70b-versatile");
+
+  try {
+    return JSON.parse(extractJsonPayload(response));
+  } catch (error) {
+    console.error("Failed to parse AI skill intelligence response:", response);
+    throw new Error("Invalid response format from AI skill analysis");
+  }
+}
+
 export const groqService = {
   generateRoadmap,
   generateCopilotResponse,
   generateResumeTailoring,
   generateStructuredResponse,
-  generateQuiz
+  generateQuiz,
+  analyzeNote,
+  generateSkillIntelligenceReport
 };
+
+

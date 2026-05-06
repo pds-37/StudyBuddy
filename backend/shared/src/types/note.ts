@@ -1,3 +1,24 @@
+export type NoteFlashcard = {
+  question: string;
+  answer: string;
+};
+
+export type NoteAIMetadata = {
+  summary: string;
+  concepts: string[];
+  flashcards: NoteFlashcard[];
+  retentionStrength: number; // 0-100
+  roadmapLink?: {
+    phaseId: string;
+    contributionScore: number;
+  };
+  interviewRelevance: {
+    frequency: "low" | "medium" | "high";
+    importance: number; // 0-100
+    usageContext: string;
+  };
+};
+
 export type CareerNote = {
   id: string;
   userId: string;
@@ -7,7 +28,9 @@ export type CareerNote = {
   tags: string[];
   linkedSkills: string[];
   sourceUrl?: string;
+  sourceType?: "manual" | "pdf" | "image" | "web" | "youtube";
   strength: number;
+  metadata?: NoteAIMetadata;
   nextReviewAt?: string;
   lastReviewed?: string;
   reviewCount: number;
@@ -15,6 +38,7 @@ export type CareerNote = {
   createdAt: string;
   updatedAt: string;
 };
+
 
 export type RecallGrade = "good" | "weak" | "wrong";
 

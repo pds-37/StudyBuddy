@@ -7,15 +7,12 @@ import {
   LayoutDashboard,
   MessageSquare,
   PanelLeftClose,
-  PanelLeftOpen,
   Route,
   Target,
-  User,
-  FolderKanban,
   Users,
+  FolderKanban,
   Settings,
   LogOut,
-  ChevronRight,
   Network
 } from "lucide-react";
 import { useAppStore } from "../../store/app-store";
@@ -23,6 +20,7 @@ import { useCopilotStore } from "../../store/copilot-store";
 import { useJobsStore } from "../../store/jobs-store";
 import { useRoadmapsStore } from "../../store/roadmaps-store";
 import { cn } from "../../lib/utils/cn";
+import { Logo } from "../ui/Logo";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -47,10 +45,7 @@ export function SidebarNav({ isCollapsed = false, onToggleCollapsed }: SidebarNa
   const location = useLocation();
   const { user } = useAppStore();
   const clearSession = useAppStore((state) => state.clearSession);
-  const jobs = useJobsStore((state) => state.jobs);
-  const currentRoadmap = useRoadmapsStore((state) => state.currentRoadmap);
-  const conversations = useCopilotStore((state) => state.conversations);
-
+  
   const userInitials = (user?.name || user?.email || "U").substring(0, 2).toUpperCase();
 
   return (
@@ -66,9 +61,7 @@ export function SidebarNav({ isCollapsed = false, onToggleCollapsed }: SidebarNa
         {!isCollapsed ? (
           <div className="flex items-center justify-between w-full">
             <Link to="/" className="flex items-center gap-3 group animate-fade-in">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand to-cyan flex items-center justify-center shadow-[0_0_20px_rgba(124,92,255,0.4)] transition-transform group-hover:scale-105">
-                <span className="text-white font-black text-lg">S</span>
-              </div>
+              <Logo size="md" />
               <div className="flex flex-col">
                 <span className="text-white font-black tracking-tight text-lg leading-none">StudyBuddy</span>
                 <span className="text-[10px] text-brand font-bold uppercase tracking-widest mt-1">Veda AI Mentor</span>
@@ -84,9 +77,9 @@ export function SidebarNav({ isCollapsed = false, onToggleCollapsed }: SidebarNa
         ) : (
           <button
             onClick={onToggleCollapsed}
-            className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand to-cyan flex items-center justify-center shadow-[0_0_20px_rgba(124,92,255,0.4)] hover:scale-105 transition-transform"
+            className="transition-transform hover:scale-105"
           >
-            <span className="text-white font-black text-lg">S</span>
+            <Logo size="md" />
           </button>
         )}
       </div>

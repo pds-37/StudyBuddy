@@ -76,10 +76,10 @@ async function sendMessage(
     userContext
   );
 
-  if (!noteContext) {
+  if (!noteContext && typeof aiResponse.content === 'string') {
     await notesService.createNote(userId, {
       title: `AI fallback: ${message.slice(0, 72)}`,
-      content: aiResponse,
+      content: aiResponse.content,
       topic: "ai-fallback",
       tags: ["ai-fallback", "needs-review"],
       linkedSkills: [],
@@ -90,7 +90,8 @@ async function sendMessage(
   const assistantMessage: CopilotMessage = {
     id: `assistant-${Date.now()}`,
     role: "assistant",
-    content: aiResponse,
+    content: aiResponse.content,
+    metadata: aiResponse.metadata,
     createdAt: new Date().toISOString()
   };
 
@@ -101,6 +102,7 @@ async function sendMessage(
 
   return assistantMessage;
 }
+
 
 async function incrementAiUsage(userId: string) {
   const user = await UserModel.findById(userId);

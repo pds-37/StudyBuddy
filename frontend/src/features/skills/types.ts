@@ -6,27 +6,51 @@ export type SkillSuggestion = {
   aliases: string[];
 };
 
+export type SkillDimension = {
+  confidence: number;
+  retention: number;
+  interviewReady: number;
+  practical: number;
+  momentum: "stagnating" | "improving" | "declining";
+};
+
 export type SkillGapItem = {
   skill: string;
   category: string;
-  requiredScore: number;
-  userScore: number;
+  status: "strong" | "partial" | "weak";
+  dimensions: SkillDimension;
   gapScore: number;
-  matchedUserSkill: string | null;
-  status: "strong" | "partial" | "missing";
-  priority: "high" | "medium" | "low";
+  userScore: number;
+};
+
+export type CareerReadiness = {
+  learningFoundation: "Weak" | "Medium" | "Strong";
+  problemSolving: "Weak" | "Medium" | "Strong";
+  projectDepth: "Weak" | "Medium" | "Strong";
+  interviewConfidence: "Weak" | "Medium" | "Strong";
+};
+
+export type RoleMatch = {
+  role: string;
+  matchPercentage: number;
+  strengths: string[];
+  blockers: string[];
+  estimatedTimelineMonths: number;
 };
 
 export type SkillGapAnalysis = {
   targetRole: string;
-  experienceLevel: "beginner" | "intermediate" | "advanced";
   currentSkills: string[];
   overallScore: number;
-  provider: "huggingface" | "local-fallback";
+  readiness: CareerReadiness;
+  roleMatches: RoleMatch[];
   gaps: SkillGapItem[];
+  blockers: string[];
+  careerTrajectory: string;
+  predictiveInsights: string[];
   recommendations: {
     nextSkills: string[];
-    missingSkills: string[];
-    partialSkills: string[];
+    recoveryPlan?: string;
   };
+  provider: "huggingface" | "local-fallback" | "veda-ai";
 };

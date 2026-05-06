@@ -24,6 +24,9 @@ type NotesQuery = {
   offset: number;
 };
 
+import { groqService } from "../../services/ai/groq.service.js";
+import { usersService } from "../users/users.service.js";
+
 /** Converts a note document to the public API shape. */
 function toNote(note: NoteDocument): CareerNote {
   return {
@@ -35,7 +38,9 @@ function toNote(note: NoteDocument): CareerNote {
     tags: note.tags,
     linkedSkills: note.linkedSkills,
     sourceUrl: note.sourceUrl ?? undefined,
+    sourceType: note.sourceType as any,
     strength: note.strength ?? 0,
+    metadata: note.metadata,
     nextReviewAt: note.nextReviewAt ? note.nextReviewAt.toISOString() : undefined,
     lastReviewed: note.lastReviewed ? note.lastReviewed.toISOString() : undefined,
     reviewCount: note.reviewCount ?? 0,
@@ -59,17 +64,61 @@ async function createNote(userId: string, data: CreateNoteData): Promise<CareerN
     nextReviewAt: data.nextReviewAt ? new Date(data.nextReviewAt) : new Date()
   });
 
+  // Start AI analysis pipeline asynchronously
+  (async () => {
+    try {
+      const profile = await usersService.getProfile(userId).catch(() => null);
+      const userContext = profile ? `Target roles: ${profile.targetRoles?.join(", ")}` : "";
+      
+      const analysis = await groqService.analyzeNote(note.title, note.content, userContext);
+      
+      await NoteModel.updateOne(
+        { _id: note._id },
+        { 
+          $set: { 
+            metadata: {
+              summary: analysis.summary,
+              concepts: analysis.concepts,
+              flashcards: analysis.flashcards,
+              retentionStrength: 50, // Initial
+              interviewRelevance: analysis.interviewRelevance
+            },
+            topic: analysis.topic,
+            tags: [...new Set([...note.tags, ...analysis.tags])]
+          } 
+        }
+      );
+
+      // Initialize MemoryItems for flashcards
+      if (analysis.flashcards && analysis.flashcards.length > 0) {
+        await Promise.all(analysis.flashcards.map(card => 
+          MemoryItemModel.create({
+            userId,
+            noteId: note._id.toString(),
+            content: `Q: ${card.question} | A: ${card.answer}`,
+            nextReview: new Date(),
+            strength: 0,
+            interval: 1,
+            repetitions: 0,
+            easeFactor: 2.5
+          })
+        ));
+      }
+    } catch (error) {
+      console.error("AI Analysis Pipeline failed for note:", note._id, error);
+    }
+  })();
+
   // Generate embedding for the new note asynchronously
-  // We don't await this to avoid blocking the response
   vectorSearchService.updateNoteEmbedding(note._id.toString(), userId)
     .catch(error => console.error("Failed to generate embedding for new note:", error));
 
-  // Initialize a MemoryItem for Spaced Repetition tracking
+  // Initialize a MemoryItem for the note itself
   await MemoryItemModel.create({
     userId,
     noteId: note._id.toString(),
-    content: note.content.substring(0, 150), // brief snippet
-    nextReview: new Date(), // start review cycle immediately
+    content: note.content.substring(0, 150),
+    nextReview: new Date(),
     strength: 0,
     interval: 1,
     repetitions: 0,
@@ -78,6 +127,7 @@ async function createNote(userId: string, data: CreateNoteData): Promise<CareerN
 
   return toNote(note);
 }
+
 
 /** Retrieves a single note by ID, ensuring it belongs to the user. */
 async function getNote(userId: string, noteId: string): Promise<CareerNote> {

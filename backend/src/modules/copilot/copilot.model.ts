@@ -12,6 +12,7 @@ const copilotMessageSchema = new Schema({
   id: { type: String, required: true },
   role: { type: String, enum: ["user", "assistant", "system"], required: true },
   content: { type: String, required: true },
+  metadata: { type: Schema.Types.Mixed },
   createdAt: { type: String, required: true }
 }, { _id: false });
 
