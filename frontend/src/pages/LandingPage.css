@@ -40,13 +40,13 @@
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   border-radius: 9999px;
-  background: rgba(34, 211, 238, 0.1);
-  color: #22d3ee;
+  background: rgba(40, 176, 243, 0.1);
+  color: var(--cyan);
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  border: 1px solid rgba(34, 211, 238, 0.2);
+  border: 1px solid rgba(40, 176, 243, 0.2);
 }
 
 .landing-hero__copy h1 {
@@ -77,14 +77,14 @@
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   border-radius: 0.75rem;
-  background: #22d3ee;
+  background: var(--cyan);
   color: #05070b;
   font-weight: 700;
   transition: all 0.2s;
 }
 
 .btn-primary:hover {
-  background: #06b6d4;
+  background: #1a9ad9;
   transform: translateY(-2px);
 }
 
@@ -138,14 +138,14 @@
   height: 38rem;
   border-radius: 2.5rem;
   background: 
-    radial-gradient(circle at 70% 30%, rgba(124, 92, 255, 0.15), transparent 50%),
-    radial-gradient(circle at 30% 70%, rgba(34, 211, 238, 0.1), transparent 50%),
+    radial-gradient(circle at 70% 30%, rgba(202, 138, 247, 0.15), transparent 50%),
+    radial-gradient(circle at 30% 70%, rgba(40, 176, 243, 0.1), transparent 50%),
     rgba(255, 255, 255, 0.01);
   border: 1px solid rgba(255, 255, 255, 0.08);
   overflow: hidden;
   box-shadow: 
     0 40px 100px rgba(0, 0, 0, 0.6),
-    inset 0 0 80px rgba(34, 211, 238, 0.03);
+    inset 0 0 80px rgba(40, 176, 243, 0.03);
 }
 
 .landing-orbit {
@@ -184,7 +184,7 @@
   gap: 0.5rem;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #22d3ee;
+  color: var(--cyan);
 }
 
 @keyframes float {
@@ -218,7 +218,7 @@
   height: 0.5rem;
   margin-right: 0.75rem;
   border-radius: 50%;
-  background: linear-gradient(135deg, #22d3ee, #7c5cff);
+  background: linear-gradient(135deg, var(--cyan), var(--brand));
 }
 
 .landing-features {
@@ -231,7 +231,7 @@
 }
 
 .eyebrow {
-  color: #22d3ee;
+  color: var(--cyan);
   font-size: 0.875rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -265,7 +265,7 @@
 
 .feature-card:hover {
   background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(34, 211, 238, 0.3);
+  border-color: rgba(40, 176, 243, 0.3);
   transform: translateY(-5px);
 }
 
@@ -276,8 +276,8 @@
   align-items: center;
   justify-content: center;
   border-radius: 0.75rem;
-  background: rgba(34, 211, 238, 0.1);
-  color: #22d3ee;
+  background: rgba(40, 176, 243, 0.1);
+  color: var(--cyan);
 }
 
 .feature-card h3 {
@@ -313,8 +313,8 @@
   display: inline-block;
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
-  background: rgba(124, 92, 255, 0.1);
-  color: #a78bfa;
+  background: rgba(202, 138, 247, 0.1);
+  color: #e0b3ff;
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -337,7 +337,7 @@
   padding: 4rem;
   border-radius: 2rem;
   background: linear-gradient(135deg, #101b2d, #05070b);
-  border: 1px solid rgba(34, 211, 238, 0.2);
+  border: 1px solid rgba(40, 176, 243, 0.2);
   display: flex;
   align-items: center;
   justify-content: space-between;

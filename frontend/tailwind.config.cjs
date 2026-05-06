@@ -9,8 +9,8 @@ module.exports = {
         panel: "#09090b",
         card: "#09090b",
         line: "#18181b",
-        brand: "#7c5cff",
-        cyan: "#22d3ee",
+        brand: "#ca8af7",
+        cyan: "#28b0f3",
         sun: "#f6c453"
       },
       fontFamily: {
@@ -19,7 +19,7 @@ module.exports = {
         mono: ["IBM Plex Mono", "ui-monospace", "SFMono-Regular", "monospace"]
       },
       boxShadow: {
-        glow: "0 28px 120px rgba(124, 92, 255, 0.2), 0 10px 30px rgba(34, 211, 238, 0.08)"
+        glow: "0 28px 120px rgba(202, 138, 247, 0.2), 0 10px 30px rgba(40, 176, 243, 0.08)"
       },
       animation: {
         'pulse-glow': 'pulse-glow 4s ease-in-out infinite',
