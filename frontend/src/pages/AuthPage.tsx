@@ -24,6 +24,7 @@ export function AuthPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isSubmitting, setSubmitting] = useState(false);
 
@@ -169,10 +170,18 @@ export function AuthPage() {
                   placeholder="••••••••"
                   required
                   minLength={8}
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                 />
+                <button 
+                  type="button" 
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 text-slate-500 hover:text-white transition-colors"
+                >
+                  {showPassword ? <Shield size={16} /> : <Lock size={16} />}
+                </button>
               </div>
             </div>
+
 
             {error && (
               <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-medium">

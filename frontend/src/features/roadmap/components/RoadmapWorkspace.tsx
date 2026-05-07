@@ -388,9 +388,13 @@ function TaskCard({ task, onToggle, delay }: { task: RoadmapTask; onToggle: () =
         )}
       </div>
 
-      <button className="opacity-0 group-hover:opacity-100 p-2 text-slate-500 hover:text-white transition">
+      <Link 
+        to={`/study/${task.id}`}
+        className="opacity-0 group-hover:opacity-100 p-2 text-slate-500 hover:text-white transition"
+      >
         <ArrowRight className="w-4 h-4" />
-      </button>
+      </Link>
+
     </Motion.div>
   );
 }

@@ -41,10 +41,24 @@ export function NotesPage() {
   const [activeCollection, setActiveCollection] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [isInsightsVisible, setIsInsightsVisible] = useState(true);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [newNote, setNewNote] = useState({ title: "", content: "", topic: "", tags: [] });
+
+  const { createNote } = useNotesStore();
 
   useEffect(() => {
     void fetchNotes();
   }, [fetchNotes]);
+
+  const handleCreateNote = async () => {
+    if (!newNote.title || !newNote.content) return;
+    await createNote({
+      ...newNote,
+      tags: typeof newNote.tags === 'string' ? (newNote.tags as string).split(',').map(t => t.trim()) : newNote.tags
+    });
+    setIsCreateModalOpen(false);
+    setNewNote({ title: "", content: "", topic: "", tags: [] });
+  };
 
   const filteredNotes = useMemo(() => {
     let result = notes;
@@ -74,10 +88,14 @@ export function NotesPage() {
                   <p className="text-slate-400 text-sm mt-1 font-medium italic">Transforming scattered learning into structured long-term mastery.</p>
                </div>
                <div className="flex items-center gap-4">
-                  <button className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-white text-obsidian font-black text-xs uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-glow">
+                  <button 
+                    onClick={() => setIsCreateModalOpen(true)}
+                    className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-white text-obsidian font-black text-xs uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-glow"
+                  >
                      <PlusCircle size={18} /> Ingest Knowledge
                   </button>
                </div>
+
             </div>
 
             <KnowledgeMetrics 
@@ -165,16 +183,19 @@ export function NotesPage() {
                       <p className="text-xs font-black text-slate-500 uppercase tracking-widest">Synchronizing Knowledge Graph...</p>
                    </div>
                  ) : filteredNotes.length === 0 ? (
-                   <div className="text-center py-40">
-                      <div className="w-20 h-20 rounded-[2rem] bg-brand/10 border border-brand/20 flex items-center justify-center text-brand mx-auto mb-8">
-                         <Brain size={40} />
-                      </div>
-                      <h2 className="text-2xl font-black text-white mb-2">No concepts captured yet.</h2>
-                      <p className="text-slate-500 text-sm mb-10 max-w-sm mx-auto font-medium">Ingest your first note, PDF, or video to start building your second brain.</p>
-                      <button className="px-8 py-4 rounded-2xl bg-brand text-white font-black text-xs uppercase tracking-widest shadow-glow">
-                         Add First Concept
-                      </button>
-                   </div>
+                    <div className="text-center py-40">
+                       <div className="w-20 h-20 rounded-[2rem] bg-brand/10 border border-brand/20 flex items-center justify-center text-brand mx-auto mb-8">
+                          <Brain size={40} />
+                       </div>
+                       <h2 className="text-2xl font-black text-white mb-2">No concepts captured yet.</h2>
+                       <p className="text-slate-500 text-sm mb-10 max-w-sm mx-auto font-medium">Ingest your first note, PDF, or video to start building your second brain.</p>
+                       <button 
+                        onClick={() => setIsCreateModalOpen(true)}
+                        className="px-8 py-4 rounded-2xl bg-brand text-white font-black text-xs uppercase tracking-widest shadow-glow"
+                       >
+                          Add First Concept
+                       </button>
+                    </div>
                  ) : (
                    <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-8">
                       {filteredNotes.map((note: any, i: number) => (
@@ -208,25 +229,119 @@ export function NotesPage() {
                          <DigestItem label="Revise Graph BFS" time="5 mins" icon={History} color="text-amber-400" />
                          <DigestItem label="Review DP Tables" time="10 mins" icon={Target} color="text-red-400" />
                          <DigestItem label="Mock Concept: React Hooks" time="15 mins" icon={Brain} color="text-purple-400" />
-                      </div>
-                   </div>
-
-                   <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-brand/10 to-purple-600/10 border border-brand/20 relative overflow-hidden group cursor-pointer">
-                      <div className="relative z-10">
-                         <h4 className="text-sm font-black text-white uppercase tracking-widest mb-2 flex items-center gap-2">
-                            <Sparkles size={16} className="text-brand" /> Mastery Level Up
-                         </h4>
-                         <p className="text-xs text-slate-400 leading-relaxed font-medium">
-                            You've captured 12 system design concepts this week. Ready for a mock interview?
-                         </p>
-                      </div>
-                   </div>
-                </div>
-             </Motion.aside>
-           )}
-        </AnimatePresence>
+                            <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-brand/10 to-purple-600/10 border border-brand/20 relative overflow-hidden group cursor-pointer">
+                       <div className="relative z-10">
+                          <h4 className="text-sm font-black text-white uppercase tracking-widest mb-2 flex items-center gap-2">
+                             <Sparkles size={16} className="text-brand" /> Mastery Level Up
+                          </h4>
+                          <p className="text-xs text-slate-400 leading-relaxed font-medium">
+                             You've captured 12 system design concepts this week. Ready for a mock interview?
+                          </p>
+                       </div>
+                    </div>
+                 </div>
+              </Motion.aside>
+            )}
+         </AnimatePresence>
       </div>
+
+      {/* ─── CREATE NOTE MODAL ─── */}
+      <AnimatePresence>
+        {isCreateModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <Motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsCreateModalOpen(false)}
+              className="absolute inset-0 bg-obsidian/80 backdrop-blur-xl"
+            />
+            <Motion.div 
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="relative w-full max-w-2xl bg-panel border border-white/10 rounded-[3rem] p-10 shadow-2xl overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 p-10 opacity-5">
+                <Brain size={200} className="text-brand" />
+              </div>
+
+              <div className="relative z-10 space-y-8">
+                <div>
+                  <h2 className="text-2xl font-black text-white tracking-tight">Ingest New Knowledge</h2>
+                  <p className="text-slate-400 text-sm mt-1">Add a new concept to Veda's memory engine.</p>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Concept Title</label>
+                    <input 
+                      autoFocus
+                      placeholder="e.g., React Lifecycle Hooks"
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 text-white placeholder-slate-600 focus:border-brand/40 transition-all outline-none"
+                      value={newNote.title}
+                      onChange={e => setNewNote({ ...newNote, title: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Topic</label>
+                      <input 
+                        placeholder="e.g., Frontend"
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 text-sm text-white placeholder-slate-600 focus:border-brand/40 transition-all outline-none"
+                        value={newNote.topic}
+                        onChange={e => setNewNote({ ...newNote, topic: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Tags (comma separated)</label>
+                      <input 
+                        placeholder="e.g., react, hooks, interview"
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 text-sm text-white placeholder-slate-600 focus:border-brand/40 transition-all outline-none"
+                        onChange={e => setNewNote({ ...newNote, tags: e.target.value as any })}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Content</label>
+                    <textarea 
+                      placeholder="Explain the concept in detail..."
+                      rows={6}
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 text-sm text-white placeholder-slate-600 focus:border-brand/40 transition-all outline-none resize-none"
+                      value={newNote.content}
+                      onChange={e => setNewNote({ ...newNote, content: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <button 
+                    onClick={() => setIsCreateModalOpen(false)}
+                    className="flex-1 py-4 rounded-2xl bg-white/[0.05] text-slate-400 font-black text-[10px] uppercase tracking-widest hover:text-white transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={handleCreateNote}
+                    disabled={!newNote.title || !newNote.content}
+                    className="flex-[2] py-4 rounded-2xl bg-brand text-white font-black text-[10px] uppercase tracking-widest shadow-glow disabled:opacity-50 disabled:shadow-none transition-all"
+                  >
+                    Sync to Veda Brain
+                  </button>
+                </div>
+              </div>
+            </Motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
+       </div>
+        )}
+      </AnimatePresence>
+    </div>
+
   );
 }
 

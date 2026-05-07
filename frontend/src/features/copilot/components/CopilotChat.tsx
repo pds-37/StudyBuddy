@@ -135,11 +135,12 @@ export function CopilotChat() {
           </div>
 
           <div className="hidden lg:flex items-center gap-8">
-             <TopMetric label="Focus Score" value="74%" icon={Zap} color="text-blue-400" />
-             <TopMetric label="Recall Health" value="Good" icon={Brain} color="text-purple-400" />
-             <TopMetric label="Consistency" value="High" icon={Flame} color="text-orange-400" />
-             <TopMetric label="Burnout Risk" value="Low" icon={ShieldAlert} color="text-emerald-400" />
+             <TopMetric label="Focus Score" value={`${(user as any)?.behaviorProfile?.consistencyScore || 0}%`} icon={Zap} color="text-blue-400" />
+             <TopMetric label="Recall Health" value={(user as any)?.behaviorProfile?.recallMomentum > 0 ? "Good" : "Learning"} icon={Brain} color="text-purple-400" />
+             <TopMetric label="Consistency" value={(user as any)?.behaviorProfile?.consistencyScore > 70 ? "High" : "Medium"} icon={Flame} color="text-orange-400" />
+             <TopMetric label="Burnout Risk" value={(user as any)?.behaviorProfile?.skipRate > 30 ? "High" : "Low"} icon={ShieldAlert} color="text-emerald-400" />
           </div>
+
         </div>
 
         <div className="flex items-center gap-4">
@@ -175,7 +176,11 @@ export function CopilotChat() {
                 <h3 className="px-2 text-[10px] font-black text-slate-600 uppercase tracking-[0.3em]">Categories</h3>
                 <div className="grid grid-cols-1 gap-2">
                    {categories.map(cat => (
-                     <button key={cat.id} className="w-full p-3 rounded-xl hover:bg-white/[0.03] flex items-center gap-3 transition-colors group">
+                     <button 
+                        key={cat.id} 
+                        onClick={() => handleSendMessage(`Analyze my ${cat.label} progress and suggest next steps.`)}
+                        className="w-full p-3 rounded-xl hover:bg-white/[0.03] flex items-center gap-3 transition-colors group"
+                     >
                         <cat.icon size={16} className={cn(cat.color, "group-hover:scale-110 transition-transform")} />
                         <span className="text-[11px] font-bold text-slate-400 group-hover:text-white transition-colors">{cat.label}</span>
                      </button>

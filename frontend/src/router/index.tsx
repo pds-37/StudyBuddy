@@ -23,6 +23,8 @@ const MentorshipPage = lazy(() => import("../pages/MentorshipPage").then(m => ({
 const ProjectsPage = lazy(() => import("../pages/ProjectsPage").then(m => ({ default: m.ProjectsPage })));
 const StudyPage = lazy(() => import("../pages/StudyPage").then(m => ({ default: m.StudyPage })));
 const KnowledgePage = lazy(() => import("../pages/KnowledgePage").then(m => ({ default: m.KnowledgePage })));
+const SettingsPage = lazy(() => import("../pages/SettingsPage").then(m => ({ default: m.SettingsPage })));
+
 
 function PageLoader() {
   return (
@@ -56,8 +58,10 @@ export function AppRouter() {
             <Route path="/mentorship" element={<MentorshipPage />} />
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/study/:taskId" element={<StudyPage />} />
-            <Route path="/knowledge" element={<KnowledgePage />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
+             <Route path="/knowledge" element={<KnowledgePage />} />
+             <Route path="/settings" element={<SettingsPage />} />
+             <Route path="/dashboard" element={<DashboardPage />} />
+
           </Route>
         </Route>
         <Route path="*" element={<NotFoundPage />} />

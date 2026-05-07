@@ -15,7 +15,9 @@ import {
   LogOut,
   Network
 } from "lucide-react";
+import { ThemeToggle } from "../common/ThemeToggle";
 import { useAppStore } from "../../store/app-store";
+
 import { useCopilotStore } from "../../store/copilot-store";
 import { useJobsStore } from "../../store/jobs-store";
 import { useRoadmapsStore } from "../../store/roadmaps-store";
@@ -142,10 +144,15 @@ export function SidebarNav({ isCollapsed = false, onToggleCollapsed }: SidebarNa
             </div>
             
             <div className="flex items-center gap-2">
-              <button className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/5 text-slate-400 hover:text-white transition-all text-xs font-bold">
+              <Link 
+                to="/settings"
+                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/5 text-slate-400 hover:text-white transition-all text-xs font-bold"
+              >
                 <Settings size={14} />
                 Settings
-              </button>
+              </Link>
+              <ThemeToggle />
+
               <button 
                 onClick={() => clearSession?.()}
                 className="p-3 rounded-xl bg-white/[0.03] hover:bg-red-500/10 border border-white/5 text-slate-400 hover:text-red-400 transition-all"
@@ -161,9 +168,14 @@ export function SidebarNav({ isCollapsed = false, onToggleCollapsed }: SidebarNa
                   {userInitials}
                 </div>
              </div>
-             <button className="p-3 rounded-xl hover:bg-white/5 text-slate-500 hover:text-white transition-colors">
+             <Link 
+                to="/settings"
+                className="p-3 rounded-xl hover:bg-white/5 text-slate-500 hover:text-white transition-colors"
+              >
                <Settings size={20} />
-             </button>
+             </Link>
+
+             <ThemeToggle />
              <button 
                 onClick={() => clearSession?.()}
                 className="p-3 rounded-xl hover:bg-red-500/10 text-slate-500 hover:text-red-400 transition-colors"

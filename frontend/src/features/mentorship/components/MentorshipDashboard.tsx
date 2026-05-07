@@ -1,8 +1,11 @@
 import { useEffect } from "react";
-import { Users, Check, X, Building2, Briefcase, Sparkles } from "lucide-react";
+import { Users, Check, X, Building2, Briefcase, Sparkles, MessageSquare } from "lucide-react";
+
 import { useMentorshipStore } from "../../../store/mentorship-store";
+import { useCopilotStore } from "../../../store/copilot-store";
 import { useAppStore } from "../../../store/app-store";
 import { Link } from "react-router-dom";
+
 
 export function MentorshipDashboard() {
   const { matches, loading, error, fetchMatches, updateStatus } = useMentorshipStore();
@@ -99,10 +102,24 @@ export function MentorshipDashboard() {
                 </button>
               </div>
             ) : match.status === "accepted" ? (
-              <div className="bg-green-500/10 text-green-400 text-sm font-medium py-2 rounded-lg text-center flex items-center justify-center gap-2">
-                <Check className="w-4 h-4" />
-                Request Sent
+              <div className="space-y-3">
+                <div className="bg-green-500/10 text-green-400 text-sm font-medium py-2 rounded-lg text-center flex items-center justify-center gap-2">
+                  <Check className="w-4 h-4" />
+                  Mentorship Active
+                </div>
+                <Link
+                  to="/copilot"
+                  onClick={() => {
+                    const { sendMessage } = useCopilotStore.getState();
+                    void sendMessage(`I'm now being mentored by ${match.mentor.name}, who is a ${match.mentor.role} at ${match.mentor.company}. Can you help me prepare a first message to them or suggest how I can best learn from their expertise in ${match.mentor.role}?`);
+                  }}
+                  className="w-full flex items-center justify-center gap-2 bg-brand text-white py-3 rounded-xl text-xs font-bold uppercase tracking-widest hover:scale-[1.02] transition shadow-lg shadow-brand/20"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  Chat about Mentor
+                </Link>
               </div>
+
             ) : (
               <div className="bg-slate-800/50 text-slate-500 text-sm font-medium py-2 rounded-lg text-center">
                 Declined

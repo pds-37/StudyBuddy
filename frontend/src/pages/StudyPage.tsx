@@ -268,14 +268,31 @@ export function StudyPage() {
               ))}
             </div>
 
-            <div className="mt-6 pt-4 border-t border-white/5">
+            <div className="mt-6 pt-4 border-t border-white/5 space-y-4">
+              <div className="relative">
+                <input 
+                  type="text"
+                  placeholder="Ask Veda about this task..."
+                  className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand/50 transition-all"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                      void sendMessage(e.currentTarget.value);
+                      e.currentTarget.value = "";
+                    }
+                  }}
+                />
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 px-2 py-1 rounded-md bg-white/[0.05] border border-white/5 text-[9px] font-bold text-slate-500 uppercase tracking-widest">
+                  Enter
+                </div>
+              </div>
               <button 
                 onClick={() => navigate("/copilot")}
-                className="w-full py-3 rounded-xl bg-white/[0.05] text-sm font-semibold text-slate-300 hover:bg-white/[0.1] transition"
+                className="w-full py-2 text-xs font-bold text-slate-500 hover:text-brand transition-colors text-center"
               >
-                Open Full Veda Chat
+                Open Full Veda Experience →
               </button>
             </div>
+
           </div>
 
           <button
