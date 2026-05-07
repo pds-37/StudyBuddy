@@ -134,7 +134,8 @@ export function DashboardPage() {
   }
 
   return (
-    <section className="space-y-8">
+    <section className="space-y-12">
+
       {showPushPrompt && (
         <div 
           className="rounded-3xl border border-brand/20 bg-brand/5 p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_0_50px_rgba(124,92,255,0.1)] animate-in fade-in slide-in-from-top-4 duration-500"
@@ -214,7 +215,8 @@ export function DashboardPage() {
         </div>
       )}
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="grid gap-10 xl:grid-cols-[minmax(0,1fr)_360px]">
+
         <div className="rounded-lg border border-white/10 bg-white/[0.04] p-6 lg:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-3xl">
@@ -289,7 +291,8 @@ export function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="grid gap-12 xl:grid-cols-[minmax(0,1fr)_360px]">
+
         <div className="rounded-lg border border-white/10 bg-white/[0.04] p-6">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>

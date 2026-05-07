@@ -7,7 +7,9 @@ export type CapstoneProject = {
   requiredSkills: string[];
   difficulty: "beginner" | "intermediate" | "advanced";
   estimatedHours: number;
+  implementationPlan?: string[];
 };
+
 
 export type ProjectMatch = {
   id: string;

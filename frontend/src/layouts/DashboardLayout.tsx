@@ -46,7 +46,7 @@ export function DashboardLayout() {
 
       <aside 
         className={cn(
-          "relative hidden h-full shrink-0 border-r border-white/[0.06] bg-ink/50 backdrop-blur-xl md:block transition-all duration-500 ease-in-out overflow-hidden",
+          "relative hidden h-full shrink-0 border-r border-white/[0.06] bg-ink/50 backdrop-blur-xl md:block transition-all duration-500 ease-in-out overflow-hidden z-20",
           isSidebarCollapsed ? "w-[84px]" : "w-[280px]"
         )}
       >
@@ -56,16 +56,17 @@ export function DashboardLayout() {
         />
       </aside>
 
-      <div className="flex h-full min-w-0 flex-1 flex-col overflow-hidden">
+      <div className="flex h-full min-w-0 flex-1 flex-col overflow-hidden relative z-10">
         <TopNav onOpenCommand={() => setCommandOpen(true)} />
         <main className="flex-1 overflow-y-auto scroll-smooth custom-scrollbar overflow-x-hidden">
-          <div className="flex h-full flex-col p-4 lg:p-8">
+          <div className="flex min-h-full flex-col p-6 lg:p-12">
             <div className="max-w-[1600px] mx-auto w-full flex-1 min-h-0 animate-fade-in overflow-x-hidden">
               <Outlet />
             </div>
           </div>
         </main>
       </div>
+
 
       <AppCommandMenu open={isCommandOpen} onOpenChange={setCommandOpen} />
       {!isVedaPage && (

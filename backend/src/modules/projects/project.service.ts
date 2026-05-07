@@ -6,11 +6,76 @@ import type { ProjectMatch, CapstoneProject } from "@studybuddy/shared";
 
 // Mock database of capstone projects
 const MOCK_PROJECTS: CapstoneProject[] = [
-  { id: "p1", title: "Build a scalable e-commerce API", company: "Stripe", industry: "FinTech", description: "Design and implement a scalable microservices architecture for an e-commerce platform.", requiredSkills: ["Node.js", "System Design", "PostgreSQL"], difficulty: "advanced", estimatedHours: 40 },
-  { id: "p2", title: "Design a real-time collaborative editor", company: "Figma", industry: "SaaS", description: "Create a React-based collaborative text editor using WebSockets and CRDTs.", requiredSkills: ["React", "TypeScript", "WebSockets"], difficulty: "intermediate", estimatedHours: 30 },
-  { id: "p3", title: "Develop a churn prediction model", company: "Netflix", industry: "Entertainment", description: "Use machine learning to predict user churn based on viewing history.", requiredSkills: ["Python", "Machine Learning", "Pandas"], difficulty: "intermediate", estimatedHours: 35 },
-  { id: "p4", title: "Create a responsive portfolio website", company: "Open Source", industry: "Technology", description: "Build a fully responsive and accessible personal portfolio website.", requiredSkills: ["HTML", "CSS", "JavaScript"], difficulty: "beginner", estimatedHours: 15 }
+  { 
+    id: "p1", 
+    title: "Build a scalable e-commerce API", 
+    company: "Stripe", 
+    industry: "FinTech", 
+    description: "Design and implement a scalable microservices architecture for an e-commerce platform.", 
+    requiredSkills: ["Node.js", "System Design", "PostgreSQL"], 
+    difficulty: "advanced", 
+    estimatedHours: 40,
+    implementationPlan: [
+      "Define API contract using OpenAPI/Swagger.",
+      "Set up PostgreSQL with Prisma for data modeling.",
+      "Implement core services: Auth, Catalog, and Orders.",
+      "Integrate Redis for caching frequent product queries.",
+      "Add Docker support for containerized deployment."
+    ]
+  },
+  { 
+    id: "p2", 
+    title: "Design a real-time collaborative editor", 
+    company: "Figma", 
+    industry: "SaaS", 
+    description: "Create a React-based collaborative text editor using WebSockets and CRDTs.", 
+    requiredSkills: ["React", "TypeScript", "WebSockets"], 
+    difficulty: "intermediate", 
+    estimatedHours: 30,
+    implementationPlan: [
+      "Initialize React app with TypeScript and TipTap/Lexical.",
+      "Set up WebSocket server using Socket.io.",
+      "Implement Yjs (CRDT) for conflict-free merging.",
+      "Add user presence indicators (avatars/cursors).",
+      "Sync document state to local storage for offline support."
+    ]
+  },
+  { 
+    id: "p3", 
+    title: "Develop a churn prediction model", 
+    company: "Netflix", 
+    industry: "Entertainment", 
+    description: "Use machine learning to predict user churn based on viewing history.", 
+    requiredSkills: ["Python", "Machine Learning", "Pandas"], 
+    difficulty: "intermediate", 
+    estimatedHours: 35,
+    implementationPlan: [
+      "Preprocess the viewing history dataset using Pandas.",
+      "Perform exploratory data analysis (EDA) for trends.",
+      "Train a Random Forest or XGBoost classification model.",
+      "Evaluate using Precision-Recall curves and F1-score.",
+      "Create a simple Flask/FastAPI endpoint for predictions."
+    ]
+  },
+  { 
+    id: "p4", 
+    title: "Create a responsive portfolio website", 
+    company: "Open Source", 
+    industry: "Technology", 
+    description: "Build a fully responsive and accessible personal portfolio website.", 
+    requiredSkills: ["HTML", "CSS", "JavaScript"], 
+    difficulty: "beginner", 
+    estimatedHours: 15,
+    implementationPlan: [
+      "Wireframe the layout for Mobile and Desktop.",
+      "Write semantic HTML structure with ARIA roles.",
+      "Apply responsive CSS using Grid and Flexbox.",
+      "Add scroll-into-view animations with Intersection Observer.",
+      "Optimize assets and deploy via Vercel/GitHub Pages."
+    ]
+  }
 ];
+
 
 function toMatch(doc: ProjectDocument): ProjectMatch {
   return doc.toJSON() as unknown as ProjectMatch;

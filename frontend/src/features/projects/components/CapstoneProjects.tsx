@@ -81,7 +81,32 @@ export function CapstoneProjects() {
                     ))}
                   </ul>
                 </div>
+
+                {match.project.implementationPlan && match.project.implementationPlan.length > 0 && (
+                  <div className="bg-white/[0.02] rounded-2xl p-5 border border-white/[0.04] space-y-4">
+                    <div className="flex items-center gap-2 text-sm font-bold text-white mb-2">
+                      <Sparkles className="w-4 h-4 text-brand" />
+                      Implementation Plan
+                    </div>
+                    <div className="space-y-4">
+                      {match.project.implementationPlan.map((step, i) => (
+                        <div key={i} className="flex gap-4">
+                          <div className="flex flex-col items-center shrink-0">
+                            <div className="w-6 h-6 rounded-lg bg-brand/10 border border-brand/20 flex items-center justify-center text-[10px] font-black text-brand shadow-[0_0_15px_rgba(202,138,247,0.1)]">
+                              {i + 1}
+                            </div>
+                            {i !== (match.project.implementationPlan?.length || 0) - 1 && (
+                              <div className="w-[1px] flex-1 bg-white/5 my-1.5" />
+                            )}
+                          </div>
+                          <p className="text-sm text-slate-400 leading-relaxed pt-0.5">{step}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
+
 
               <div className="md:w-64 shrink-0 space-y-4">
                 <div className="grid grid-cols-2 gap-3">

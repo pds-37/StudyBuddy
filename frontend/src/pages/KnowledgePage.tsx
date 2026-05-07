@@ -70,7 +70,8 @@ export function KnowledgePage() {
   const nodeMap = new Map(nodesWithPos.map(n => [n.id, n]));
 
   return (
-    <div className="h-[calc(100vh-120px)] flex flex-col space-y-6 animate-fade-in overflow-hidden relative">
+    <div className="h-[calc(100vh-120px)] flex flex-col pt-4 space-y-8 animate-fade-in overflow-hidden relative">
+
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between relative z-10">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
