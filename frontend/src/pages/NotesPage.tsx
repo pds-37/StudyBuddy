@@ -37,14 +37,12 @@ const collections = [
 ];
 
 export function NotesPage() {
-  const { notes, loading, fetchNotes } = useNotesStore();
+  const { notes, loading, fetchNotes, createNote } = useNotesStore();
   const [activeCollection, setActiveCollection] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [isInsightsVisible, setIsInsightsVisible] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [newNote, setNewNote] = useState({ title: "", content: "", topic: "", tags: [] });
-
-  const { createNote } = useNotesStore();
 
   useEffect(() => {
     void fetchNotes();
