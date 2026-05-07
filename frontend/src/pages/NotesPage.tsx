@@ -230,17 +230,19 @@ export function NotesPage() {
                          <DigestItem label="Review DP Tables" time="10 mins" icon={Target} color="text-red-400" />
                          <DigestItem label="Mock Concept: React Hooks" time="15 mins" icon={Brain} color="text-purple-400" />
                             <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-brand/10 to-purple-600/10 border border-brand/20 relative overflow-hidden group cursor-pointer">
-                       <div className="relative z-10">
-                          <h4 className="text-sm font-black text-white uppercase tracking-widest mb-2 flex items-center gap-2">
-                             <Sparkles size={16} className="text-brand" /> Mastery Level Up
-                          </h4>
-                          <p className="text-xs text-slate-400 leading-relaxed font-medium">
-                             You've captured 12 system design concepts this week. Ready for a mock interview?
-                          </p>
-                       </div>
-                    </div>
-                 </div>
-              </Motion.aside>
+                               <div className="relative z-10">
+                                  <h4 className="text-sm font-black text-white uppercase tracking-widest mb-2 flex items-center gap-2">
+                                     <Sparkles size={16} className="text-brand" /> Mastery Level Up
+                                  </h4>
+                                  <p className="text-xs text-slate-400 leading-relaxed font-medium">
+                                     You've captured 12 system design concepts this week. Ready for a mock interview?
+                                  </p>
+                               </div>
+                            </div>
+                         </div>
+                      </div>
+                   </div>
+                </Motion.aside>
             )}
          </AnimatePresence>
       </div>
@@ -334,10 +336,6 @@ export function NotesPage() {
               </div>
             </Motion.div>
           </div>
-        )}
-      </AnimatePresence>
-    </div>
-       </div>
         )}
       </AnimatePresence>
     </div>
