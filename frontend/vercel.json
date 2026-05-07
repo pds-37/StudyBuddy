@@ -3,10 +3,44 @@
   "installCommand": "cd .. && npm install --include=optional",
   "buildCommand": "cd .. && npm run build --workspace @studybuddy/shared && npm run build --workspace @studybuddy/web",
   "outputDirectory": "dist",
+  "headers": [
+    {
+      "source": "/index.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/sw.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/assets/(.*)",
+      "destination": "/assets/$1"
+    },
+    {
+      "source": "/((?!assets/|favicon|sw.js|manifest.webmanifest|brand/).*)",
       "destination": "/index.html"
     }
   ]
 }
+
