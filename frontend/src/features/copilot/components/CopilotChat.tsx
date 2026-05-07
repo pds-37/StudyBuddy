@@ -31,6 +31,8 @@ import { formatTime, formatDate } from "../../../lib/utils/date";
 import { useCopilotStore } from "../../../store/copilot-store";
 import { useAppStore } from "../../../store/app-store";
 import type { CopilotMessage } from "@studybuddy/shared";
+import * as notesApi from "../../../lib/api/notes";
+
 import { 
   InsightCard, 
   MissionCard, 
@@ -461,13 +463,30 @@ function MentorMessage({ message, index }: { message: any; index: number }) {
         isUser ? "items-end" : "items-start"
       )}>
         <div className={cn(
-          "px-8 py-5 rounded-[2.2rem] text-sm leading-relaxed shadow-2xl backdrop-blur-3xl transition-all border",
+          "px-8 py-5 rounded-[2.2rem] text-sm leading-relaxed shadow-2xl backdrop-blur-3xl transition-all border group/msg relative",
           isUser 
             ? "bg-gradient-to-br from-brand to-purple-600 border-white/20 text-white rounded-tr-none" 
             : "glass border-white/10 bg-white/[0.03] text-slate-100 rounded-tl-none"
         )}>
           <div className="whitespace-pre-wrap font-medium">{message.content}</div>
+          
+          {!isUser && metadata?.saveableNote && (
+            <button
+              onClick={() => {
+                notesApi.createNote(metadata.saveableNote).then(() => {
+                  alert("Knowledge saved to your notes! 🧠");
+                }).catch(err => {
+                  console.error("Failed to save note:", err);
+                });
+              }}
+              className="absolute -bottom-3 -right-3 px-3 py-1.5 rounded-full bg-emerald-500 text-obsidian text-[9px] font-black uppercase tracking-widest opacity-0 group-hover/msg:opacity-100 transition-all hover:scale-105 shadow-lg flex items-center gap-1.5 z-20"
+            >
+              <Plus size={10} /> Save to Note
+            </button>
+          )}
+
         </div>
+
 
         {/* RICH METADATA CARDS */}
         {!isUser && metadata && (

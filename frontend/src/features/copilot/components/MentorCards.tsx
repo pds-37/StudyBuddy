@@ -40,7 +40,7 @@ export function InsightCard({ title, description, actionLabel, actionUrl }: any)
   );
 }
 
-export function MissionCard({ title, description }: any) {
+export function MissionCard({ title, description, onClick }: any) {
   return (
     <Motion.div 
       initial={{ opacity: 0, scale: 0.95 }}
@@ -48,14 +48,17 @@ export function MissionCard({ title, description }: any) {
       className="p-6 rounded-[2.5rem] border border-cyan-400/20 bg-cyan-400/5 relative overflow-hidden group"
     >
       <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-400/10 blur-[50px] -mr-16 -mt-16 rounded-full" />
-      <div className="relative z-10">
+      <div className="relative z-20">
         <div className="flex items-center gap-2 mb-4">
           <Target size={16} className="text-cyan-400" />
           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-400">Roadmap Mission</span>
         </div>
         <h4 className="text-xl font-black text-white mb-2">{title}</h4>
         <p className="text-sm text-slate-300 leading-relaxed mb-6">{description}</p>
-        <button className="w-full py-3 rounded-2xl bg-cyan-400 text-obsidian text-xs font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-glow">
+        <button 
+          onClick={onClick || (() => window.location.href = '/roadmap')}
+          className="w-full py-3 rounded-2xl bg-cyan text-slate-950 text-xs font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-glow relative z-30"
+        >
            Execute Mission
         </button>
       </div>
@@ -63,12 +66,12 @@ export function MissionCard({ title, description }: any) {
   );
 }
 
-export function FocusSprintCard({ title, data }: any) {
+export function FocusSprintCard({ title, data, onClick }: any) {
   return (
     <Motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-6 rounded-[2.5rem] border border-purple-500/20 bg-purple-500/5 backdrop-blur-xl"
+      className="p-6 rounded-[2.5rem] border border-purple-500/20 bg-purple-500/5 backdrop-blur-xl relative z-20"
     >
       <div className="flex items-center gap-3 mb-4">
          <div className="p-2 rounded-xl bg-purple-500/20 text-purple-400">
@@ -85,19 +88,22 @@ export function FocusSprintCard({ title, data }: any) {
             <Target size={14} /> {data?.difficulty || "Medium"}
          </div>
       </div>
-      <button className="w-full py-3 rounded-2xl bg-purple-500 text-white text-xs font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-[0_0_20px_rgba(168,85,247,0.3)]">
+      <button 
+        onClick={onClick || (() => window.location.href = '/focus')}
+        className="w-full py-3 rounded-2xl bg-purple-500 text-white text-xs font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-[0_0_20px_rgba(168,85,247,0.3)] relative z-30"
+      >
          Start Focus Session
       </button>
     </Motion.div>
   );
 }
 
-export function RecallChallenge({ title, data }: any) {
+export function RecallChallenge({ title, data, onClick }: any) {
   return (
     <Motion.div 
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
-      className="p-6 rounded-[2.5rem] border border-amber-400/20 bg-amber-400/5"
+      className="p-6 rounded-[2.5rem] border border-amber-400/20 bg-amber-400/5 relative z-20"
     >
       <div className="flex items-center gap-2 mb-4 text-amber-400">
         <Brain size={18} />
@@ -108,7 +114,11 @@ export function RecallChallenge({ title, data }: any) {
       </p>
       <div className="grid gap-2">
         {data?.options?.map((option: string, i: number) => (
-           <button key={i} className="w-full p-4 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-amber-400/40 hover:bg-white/[0.06] transition-all text-sm font-medium text-slate-300 text-left group flex items-center justify-between">
+           <button 
+            key={i} 
+            onClick={() => onClick?.(option)}
+            className="w-full p-4 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-amber-400/40 hover:bg-white/[0.06] transition-all text-sm font-medium text-slate-300 text-left group flex items-center justify-between relative z-30"
+           >
               {option}
               <div className="w-5 h-5 rounded-full border border-white/10 group-hover:border-amber-400/40" />
            </button>
@@ -123,7 +133,7 @@ export function WarningCard({ title, description }: any) {
     <Motion.div 
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-5 rounded-3xl bg-red-500/5 border border-red-500/20 flex gap-4"
+      className="p-5 rounded-3xl bg-red-500/5 border border-red-500/20 flex gap-4 relative z-20"
     >
       <div className="shrink-0 p-3 rounded-2xl bg-red-500/10 text-red-400">
         <AlertCircle size={20} />
@@ -136,12 +146,12 @@ export function WarningCard({ title, description }: any) {
   );
 }
 
-export function RecoveryPlanCard({ title, description }: any) {
+export function RecoveryPlanCard({ title, description, onClick }: any) {
   return (
     <Motion.div 
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="p-6 rounded-[2.5rem] border border-emerald-400/20 bg-emerald-400/5"
+      className="p-6 rounded-[2.5rem] border border-emerald-400/20 bg-emerald-400/5 relative z-20"
     >
       <div className="flex items-center gap-2 mb-4 text-emerald-400">
         <RefreshCw size={18} />
@@ -149,9 +159,13 @@ export function RecoveryPlanCard({ title, description }: any) {
       </div>
       <h4 className="text-xl font-black text-white mb-2">{title}</h4>
       <p className="text-sm text-slate-300 leading-relaxed mb-6">{description}</p>
-      <button className="w-full py-3 rounded-2xl bg-emerald-500 text-obsidian text-xs font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all">
-         Initialize Recovery
+      <button 
+        onClick={onClick || (() => window.location.href = '/dashboard')}
+        className="w-full py-3 rounded-2xl bg-emerald-400 text-slate-950 text-xs font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all relative z-30"
+      >
+         Adopt Strategy
       </button>
     </Motion.div>
   );
 }
+

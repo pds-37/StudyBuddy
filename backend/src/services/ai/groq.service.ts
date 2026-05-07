@@ -242,9 +242,16 @@ You must respond with a JSON object that follows this structure:
       "label": "Brief actionable label",
       "description": "Why they should do this now",
       "type": "learn" | "revise" | "practice" | "rest" | "project"
+    },
+    "saveableNote": {
+      "title": "Clean technical title",
+      "content": "Refined, factual knowledge/summary without conversational fluff. Suitable for long-term study.",
+      "topic": "Main category",
+      "tags": ["tag1", "tag2"]
     }
   }
 }
+
 
 CARD TYPES:
 - insight: Behavioral or progress insights.

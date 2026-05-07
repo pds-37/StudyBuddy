@@ -93,6 +93,15 @@ export function OnboardingPage() {
         experienceLevel: data.experienceLevel,
       });
       setUser(profile);
+      
+      // Automatically trigger roadmap generation after onboarding
+      try {
+        const { generateRoadmapFromGaps } = await import("../lib/api/roadmaps");
+        await generateRoadmapFromGaps(12); // Generate 12-week roadmap
+      } catch (genErr) {
+        console.error("Failed to auto-generate roadmap:", genErr);
+      }
+
       navigate("/dashboard", { replace: true });
     } catch (err) {
       setError(getProfileErrorMessage(err));

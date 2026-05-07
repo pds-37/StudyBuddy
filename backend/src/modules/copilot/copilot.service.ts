@@ -76,16 +76,9 @@ async function sendMessage(
     userContext
   );
 
-  if (!noteContext && typeof aiResponse.content === 'string') {
-    await notesService.createNote(userId, {
-      title: `AI fallback: ${message.slice(0, 72)}`,
-      content: aiResponse.content,
-      topic: "ai-fallback",
-      tags: ["ai-fallback", "needs-review"],
-      linkedSkills: [],
-      strength: 0.15
-    });
-  }
+  // REMOVED: Automatic note generation on fallback. 
+  // User now chooses what to save via the UI.
+
 
   const assistantMessage: CopilotMessage = {
     id: `assistant-${Date.now()}`,
@@ -159,6 +152,7 @@ async function buildUserContext(userId: string, currentQuery?: string, knownNote
       const actionName = (nextAction.data as any)?.title || (nextAction.data as any)?.content?.substring(0, 50) || nextAction.action;
       context.push(`Veda AI Recommendation Engine's Next Best Action: ${nextAction.reason}. The user should focus on: ${actionName}. Suggest this to the user!`);
     }
+
 
     if (mentorPlan) {
       const mentorTasks = mentorPlan.tasks

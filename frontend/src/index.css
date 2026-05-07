@@ -10,6 +10,10 @@
   --bg-obsidian: #05070A;
   --bg-ink: #0D1117;
   --bg-panel: #161B22;
+  --bg-card: rgba(255, 255, 255, 0.02);
+  --border-main: rgba(255, 255, 255, 0.06);
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
   --brand: #ca8af7;
   --brand-glow: rgba(202, 138, 247, 0.3);
   --cyan: #28b0f3;
@@ -18,9 +22,30 @@
   --glass-border: rgba(255, 255, 255, 0.08);
   
   background: var(--bg-obsidian);
-  color: #F8FAFC;
+  color: var(--text-primary);
   font-family: 'Satoshi', 'Inter', system-ui, sans-serif;
 }
+
+.light {
+  color-scheme: light;
+  --bg-obsidian: #F8FAFC;
+  --bg-ink: #FFFFFF;
+  --bg-panel: #F1F5F9;
+  --bg-card: rgba(0, 0, 0, 0.02);
+  --border-main: rgba(0, 0, 0, 0.08);
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --brand: #9333ea;
+  --brand-glow: rgba(147, 51, 234, 0.2);
+  --cyan: #0891b2;
+  --cyan-glow: rgba(8, 145, 178, 0.15);
+  --glass: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  
+  background: var(--bg-obsidian);
+  color: var(--text-primary);
+}
+
 
 
 html {
