@@ -47,6 +47,7 @@ export function RoadmapWorkspace() {
   const user = useAppStore((state) => state.user);
   const [activePhaseId, setActivePhaseId] = useState<string | null>(null);
   const [isExpansionOpen, setIsExpansionOpen] = useState(false);
+  const [isInternalLoading, setIsInternalLoading] = useState(true);
   const { roadmaps, setCurrentRoadmap, injectSkill } = useRoadmapsStore();
 
   useEffect(() => {
@@ -69,7 +70,7 @@ export function RoadmapWorkspace() {
 
   const handleGenerate = () => generateRoadmap(12);
 
-  if (loading && !currentRoadmap) return <LoadingState />;
+  if (isInternalLoading && !currentRoadmap) return <LoadingState />;
   if (error && !currentRoadmap) return <ErrorState error={error} onRetry={fetchRoadmaps} onClear={clearError} />;
   if (!currentRoadmap && !generating) return <EmptyState onGenerate={handleGenerate} isGenerating={generating} onboardingComplete={user?.onboardingCompleted} />;
   if (generating) return <GeneratingState />;
@@ -378,9 +379,7 @@ export function RoadmapWorkspace() {
              </div>
           </div>
         </aside>
-      </div>
-
-
+      <ExpansionFlow isOpen={isExpansionOpen} onClose={() => setIsExpansionOpen(false)} />
     </div>
   );
 }
@@ -593,7 +592,6 @@ function GeneratingState() {
         />
       </div>
 
-      <ExpansionFlow isOpen={isExpansionOpen} onClose={() => setIsExpansionOpen(false)} />
     </div>
   );
 }

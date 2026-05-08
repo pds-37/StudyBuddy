@@ -6,6 +6,11 @@ export type ProfilePayload = {
   targetRoles: string[];
   currentSkills: string[];
   experienceLevel: AuthUser["experienceLevel"];
+  dailyStudyHours?: number;
+  targetTimeline?: string;
+  learningStyle?: string;
+  primaryStruggle?: string;
+  careerInterests?: string[];
 };
 
 /** Loads the current user's career profile. */

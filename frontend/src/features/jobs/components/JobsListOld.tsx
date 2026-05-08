@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getJobs } from "../../lib/api/jobs";
+import { getRecommendations } from "../../lib/api/jobs";
 import type { JobListing } from "@personal-notes-ai/shared";
 
 type JobsListProps = {
@@ -15,7 +15,8 @@ export function JobsList({ refreshTrigger }: JobsListProps) {
   const loadJobs = async () => {
     try {
       setLoading(true);
-      const jobListings = await getJobs(50);
+      const recommendations = await getRecommendations();
+      const jobListings = recommendations.map(r => r.job);
       setJobs(jobListings);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load jobs");

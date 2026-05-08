@@ -100,7 +100,7 @@ export function OnboardingPage() {
         learningStyle: data.learningStyle,
         primaryStruggle: data.primaryStruggle,
         careerInterests: data.careerInterests,
-      });
+      } as any);
       setUser(profile);
       
       // Automatically trigger roadmap generation after onboarding

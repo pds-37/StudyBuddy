@@ -80,7 +80,7 @@ export function JobMatchAnalysis({ isOpen, onClose, job, matchScore }: JobMatchA
                   <CheckCircle2 className="w-4 h-4" /> Strength Areas
                 </h5>
                 <div className="space-y-2">
-                  {job.requiredSkills.slice(0, 3).map(skill => (
+                  {job.requiredSkills.slice(0, 3).map((skill: string) => (
                     <div key={skill} className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 font-medium">
                       <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> {skill}
                     </div>
