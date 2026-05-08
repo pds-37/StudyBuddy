@@ -379,6 +379,7 @@ export function RoadmapWorkspace() {
              </div>
           </div>
         </aside>
+      </div>
       <ExpansionFlow isOpen={isExpansionOpen} onClose={() => setIsExpansionOpen(false)} />
     </div>
   );
