@@ -4,7 +4,6 @@ import { Command, Menu, Search, Sparkles, X, Bell } from "lucide-react";
 import { cn } from "../../lib/utils/cn";
 import { useAppStore } from "../../store/app-store";
 import { NotificationsPopover } from "../NotificationsPopover";
-import { ThemeToggle } from "../common/ThemeToggle";
 
 const landingSections = [
   { label: "Home", href: "#home" },
@@ -95,8 +94,6 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
 
         {/* Right Side: Actions/Profile */}
         <div className="flex items-center gap-6 flex-1 justify-end">
-          <ThemeToggle />
-          
           {isAppShell ? (
             <div className="flex items-center gap-5">
               <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand/10 border border-brand/20 text-brand text-[10px] font-black uppercase tracking-widest">

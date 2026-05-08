@@ -15,7 +15,6 @@ import {
   LogOut,
   Network
 } from "lucide-react";
-import { ThemeToggle } from "../common/ThemeToggle";
 import { useAppStore } from "../../store/app-store";
 
 import { useCopilotStore } from "../../store/copilot-store";
@@ -161,16 +160,15 @@ export function SidebarNav({ isCollapsed = false, onToggleCollapsed }: SidebarNa
             <div className="flex items-center gap-2">
               <Link 
                 to="/settings"
-                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/5 text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-all text-xs font-bold"
+                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-all text-xs font-bold"
               >
                 <Settings size={14} />
                 Settings
               </Link>
-              <ThemeToggle />
 
               <button 
                 onClick={() => clearSession?.()}
-                className="p-3 rounded-xl bg-white/[0.03] hover:bg-red-500/10 border border-white/5 text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-red-400 transition-all"
+                className="p-3 rounded-xl bg-white/[0.03] hover:bg-red-500/10 border border-white/5 text-slate-500 dark:text-slate-400 hover:text-red-400 transition-all"
               >
                 <LogOut size={16} />
               </button>
@@ -179,18 +177,17 @@ export function SidebarNav({ isCollapsed = false, onToggleCollapsed }: SidebarNa
         ) : (
           <div className="flex flex-col items-center gap-4">
              <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-brand to-cyan p-[1px] cursor-pointer hover:scale-110 transition-transform">
-                <div className="w-full h-full rounded-full bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
+                <div className="w-full h-full rounded-full bg-white dark:bg-obsidian flex items-center justify-center text-slate-900 dark:text-white text-xs font-bold">
                   {userInitials}
                 </div>
              </div>
              <Link 
                 to="/settings"
-                className="p-3 rounded-xl hover:bg-slate-50 dark:bg-slate-50 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-colors"
+                className="p-3 rounded-xl hover:bg-slate-50 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:text-white transition-colors"
               >
                <Settings size={20} />
              </Link>
 
-             <ThemeToggle />
              <button 
                 onClick={() => clearSession?.()}
                 className="p-3 rounded-xl hover:bg-red-500/10 text-slate-500 hover:text-red-400 transition-colors"

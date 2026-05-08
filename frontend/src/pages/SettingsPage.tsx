@@ -1,9 +1,6 @@
 import { useAppStore } from "../store/app-store";
-import { useThemeStore } from "../store/theme-store";
 import { 
   User, 
-  Moon, 
-  Sun, 
   Bell, 
   Shield, 
   ChevronRight,
@@ -11,12 +8,9 @@ import {
   Cloud,
   Zap
 } from "lucide-react";
-import { cn } from "../lib/utils/cn";
-import { NebulaBackground } from "../components/common/NebulaBackground";
 
 export function SettingsPage() {
   const { user } = useAppStore();
-  const { theme, toggleTheme } = useThemeStore();
 
   return (
     <div className="flex flex-col min-h-full relative pb-20">
@@ -67,24 +61,6 @@ export function SettingsPage() {
             </div>
             
             <div className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 space-y-6">
-              <div className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.02] border border-white/5">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-xl bg-brand/10 text-brand border border-brand/20">
-                    {theme === 'dark' ? <Moon size={20} /> : <Sun size={20} />}
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-slate-900 dark:text-slate-900 dark:text-white">Appearance</p>
-                    <p className="text-xs text-slate-500">Toggle between Dark Nebula and Light Stellar modes.</p>
-                  </div>
-                </div>
-                <button 
-                  onClick={toggleTheme}
-                  className="px-6 py-2 rounded-xl bg-brand text-slate-900 dark:text-slate-900 dark:text-white text-xs font-black uppercase tracking-widest shadow-glow"
-                >
-                  {theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}
-                </button>
-              </div>
-
               <SettingToggle 
                 label="Reduced Motion" 
                 description="Minimize animations for better performance."
