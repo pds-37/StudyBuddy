@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import { jobsService } from "./jobs.service.js";
 
-/** Gets personalized job recommendations. */
+/** Gets personalized job recommendations. AI Engine. */
 export const getRecommendations: RequestHandler = async (req, res, next) => {
   try {
     const recommendations = await jobsService.getRecommendations(req.userId!);
