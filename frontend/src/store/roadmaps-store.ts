@@ -1,5 +1,12 @@
 import { create } from "zustand";
-import { getRoadmap, generateRoadmapFromGaps, rateRoadmap as apiRateRoadmap } from "../lib/api/roadmaps";
+import { 
+  getRoadmap, 
+  getUserRoadmaps,
+  generateRoadmapFromGaps, 
+  expandRoadmap as apiExpandRoadmap,
+  injectSkill as apiInjectSkill,
+  rateRoadmap as apiRateRoadmap 
+} from "../lib/api/roadmaps";
 import { getApiErrorMessage } from "../lib/api/error";
 import type { Roadmap } from "@studybuddy/shared";
 
@@ -19,6 +26,8 @@ type RoadmapsState = {
   refreshRoadmaps: () => Promise<void>;
   rateRoadmap: (roadmapId: string, rating: number, feedback?: string) => Promise<void>;
   updateTaskStatus: (taskId: string, status: "pending" | "completed" | "skipped") => Promise<void>;
+  addTrack: (data: any) => Promise<Roadmap | null>;
+  injectSkill: (skill: string) => Promise<void>;
 };
 
 /** Zustand store for roadmaps state management. */
@@ -41,8 +50,7 @@ export const useRoadmapsStore = create<RoadmapsState>((set, get) => ({
     set({ loading: true, error: null });
 
     try {
-      const roadmap = await getRoadmap();
-      const roadmaps = roadmap ? [roadmap] : [];
+      const roadmaps = await getUserRoadmaps();
       const nextRoadmap =
         roadmaps.find((item) => item.id === state.currentRoadmap?.id) ??
         roadmaps[0] ??
@@ -119,6 +127,44 @@ export const useRoadmapsStore = create<RoadmapsState>((set, get) => ({
     } catch (error) {
       set({
         error: getApiErrorMessage(error, "Failed to update task status")
+      });
+    }
+  },
+
+  addTrack: async (data) => {
+    set({ generating: true, error: null });
+    try {
+      const roadmap = await apiExpandRoadmap(data);
+      set(state => ({
+        roadmaps: [roadmap, ...state.roadmaps],
+        currentRoadmap: roadmap,
+        generating: false,
+        error: null
+      }));
+      return roadmap;
+    } catch (error) {
+      set({
+        generating: false,
+        error: getApiErrorMessage(error, "Failed to expand career direction")
+      });
+      return null;
+    }
+  },
+
+  injectSkill: async (skill) => {
+    set({ loading: true, error: null });
+    try {
+      const updatedRoadmap = await apiInjectSkill({ skill });
+      set((state) => ({
+        roadmaps: state.roadmaps.map((r) => (r.id === updatedRoadmap.id ? updatedRoadmap : r)),
+        currentRoadmap: updatedRoadmap,
+        loading: false,
+        error: null
+      }));
+    } catch (error) {
+      set({
+        loading: false,
+        error: getApiErrorMessage(error, "Failed to inject skill")
       });
     }
   }

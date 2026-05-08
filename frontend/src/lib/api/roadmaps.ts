@@ -9,6 +9,9 @@ type GenerateRoadmapRequest = {
   targetRole: string;
   timelineWeeks: number;
   skillGaps: Array<{ skill: string; gapScore: number }>;
+  trackId?: string;
+  category?: string;
+  priorityWeight?: number;
 };
 
 /** Generates a roadmap from the user's current skill gaps. */
@@ -37,6 +40,23 @@ export async function getRoadmap(): Promise<Roadmap | null> {
   }
 }
 
+/** Retrieves all active roadmaps for the user. */
+export async function getUserRoadmaps(): Promise<Roadmap[]> {
+  const response = await apiClient.get<{ roadmaps: Roadmap[] }>("/roadmaps/all");
+  return response.data.roadmaps;
+}
+
+/** Expands the user's learning journey with a new career track. */
+export async function expandRoadmap(data: {
+  newInterest: string;
+  expansionReason: string;
+  priorityWeight: number;
+  initialTrackLevel: string;
+}): Promise<Roadmap> {
+  const response = await apiClient.post<RoadmapResponse>("/roadmaps/expand", data);
+  return response.data.roadmap;
+}
+
 /** Updates a task's status. */
 export async function updateTaskStatus(taskId: string, status: RoadmapTaskStatus): Promise<Roadmap> {
   const response = await apiClient.patch<RoadmapResponse>(`/roadmaps/tasks/${taskId}`, { status });
@@ -50,4 +70,10 @@ export async function rateRoadmap(roadmapId: string, rating: number, feedback?: 
     feedback
   });
   return data.roadmap;
+}
+
+/** Injects an externally learned skill. */
+export async function injectSkill(data: { skill: string }): Promise<Roadmap> {
+  const response = await apiClient.post<RoadmapResponse>("/roadmaps/inject-skill", data);
+  return response.data.roadmap;
 }

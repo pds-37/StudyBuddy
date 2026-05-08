@@ -18,6 +18,21 @@ export type AuthUser = {
     usageMonth: string;
   };
   onboardingCompleted: boolean;
+  behaviorProfile?: {
+    consistencyScore: number;
+    skipRate: number;
+    lastActivityAt: string;
+  };
+  psychologicalProfile?: {
+    identityNarrative: string;
+    motivationState: string;
+    confidence: {
+      skill: number;
+      execution: number;
+      interview: number;
+      learning: number;
+    };
+  };
 };
 
 export type AuthResponse = {

@@ -91,7 +91,7 @@ async function generateRoadmap(
   skillGaps: Array<{ skill: string; gapScore: number }>,
   userNotes?: string,
   behaviorProfile?: any,
-  learningStyle?: string
+  intelligenceProfile?: any
 ): Promise<{
   title: string;
   readinessScore: number;
@@ -112,20 +112,38 @@ async function generateRoadmap(
   const prompt = `You are Veda, an advanced AI Mentor. Your task is to generate a highly adaptive "Career Learning Mission" for a student targeting the role of "${targetRole}".
 
 CONTEXT:
-- Target Role: ${targetRole}
-- Timeline: ${timelineWeeks} weeks
+- Target Role/Interest: ${targetRole}
+- Timeline: ${timelineWeeks} weeks (User's goal: ${intelligenceProfile?.targetTimeline || "Adaptive"})
+- Available Study Time: ${intelligenceProfile?.availableHours || 2} hours/day
+- Expansion Intent: ${intelligenceProfile?.expansionReason || "Primary Career Path"}
+- Initial Level: ${intelligenceProfile?.initialTrackLevel || "Beginner"}
 - Skill Gaps:
-${skillGapsText}${notesContext}
+${skillGapsText || "No specific gaps provided. Estimate baseline based on Initial Level."}${notesContext}
 ${behaviorProfile ? `- Consistency Score: ${behaviorProfile.consistencyScore}%
-- Skip Rate: ${behaviorProfile.skipRate}%
-- Learning Style: ${learningStyle || "Adaptive"}` : ""}
+- Skip Rate: ${behaviorProfile.skipRate}%` : ""}
+- Learning Style: ${intelligenceProfile?.learningStyle || "Adaptive"}
+- Primary Learning Struggle: ${intelligenceProfile?.primaryStruggle || "None specified"}
+- Career Interests: ${intelligenceProfile?.careerInterests?.join(", ") || "General development"}
+
+PSYCHOLOGICAL PROFILE:
+- Motivation State: ${intelligenceProfile?.motivationState || "Steady"}
+- Confidence (Skill/Execution): ${intelligenceProfile?.confidence?.skill || 50}% / ${intelligenceProfile?.confidence?.execution || 50}%
+- Identity Narrative: ${intelligenceProfile?.identityNarrative || "Evolving Student"}
+- Inferred Emotional State: ${intelligenceProfile?.emotionalState || "Steady"}
 
 PHILOSOPHY:
 Do NOT generate a static roadmap. Generate a living execution engine.
 - Divide the journey into 4-6 Strategic Phases.
 - Each phase must contain Weekly Missions.
 - Each mission must contain Daily Execution Tasks (highly actionable).
-- Integrate "Memory + Recall" tasks automatically.
+- Adjust intensity based on "Inferred Emotional State".
+- MENTOR PERSONALITY ADAPTATION: 
+  * If OVERWHELMED: Use a calm, simplified, and focused tone. Minimize visible tasks.
+  * If ANXIOUS: Provide reassurance and explain the 'Why' behind every milestone.
+  * If DISCOURAGED: Use identity reinforcement (e.g., "As a Software Engineer...") and highlight historical growth.
+  * If HIGH MOMENTUM: Increase challenge depth and project complexity.
+- IDENTITY EVOLUTION: Reinforce the transformation from student to ${intelligenceProfile?.identityNarrative || "Engineer"}.
+- DECISION FATIGUE: Provide direct guidance; don't ask open-ended preference questions.
 
 RESPONSE STRUCTURE (JSON):
 {

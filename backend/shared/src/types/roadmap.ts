@@ -36,7 +36,7 @@ export type RoadmapPhase = {
 };
 
 export type RoadmapInsight = {
-  type: "behavior" | "performance" | "recommendation";
+  type: "performance" | "behavior" | "market" | "recommendation";
   message: string;
   actionLabel?: string;
   actionUrl?: string;
@@ -45,8 +45,12 @@ export type RoadmapInsight = {
 export type Roadmap = {
   id: string;
   userId: string;
+  trackId: string;
   title: string;
+  category: string;
+  priorityWeight: number;
   targetRole: string;
+  status: "active" | "paused" | "completed" | "archived";
   readinessScore: number;
   consistencyScore: number;
   currentPhaseId?: string;

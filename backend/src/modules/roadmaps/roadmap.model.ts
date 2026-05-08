@@ -48,13 +48,32 @@ const roadmapSchema = new Schema(
       required: true,
       index: true
     },
+    trackId: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true
+    },
     title: {
       type: String,
       required: true
     },
+    category: {
+      type: String,
+      default: "Career"
+    },
+    priorityWeight: {
+      type: Number,
+      default: 1.0 // 0.0 to 1.0
+    },
     targetRole: {
       type: String,
       required: true
+    },
+    status: {
+      type: String,
+      enum: ["active", "paused", "completed", "archived"],
+      default: "active"
     },
     readinessScore: {
       type: Number,

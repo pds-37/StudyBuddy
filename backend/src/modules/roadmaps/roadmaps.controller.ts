@@ -67,9 +67,42 @@ const rate: RequestHandler = async (request, response, next) => {
   }
 };
 
+/** Returns all roadmaps for the user. */
+const getAll: RequestHandler = async (request, response, next) => {
+  try {
+    const roadmaps = await roadmapsService.getUserRoadmaps(request.userId ?? "");
+    response.json({ roadmaps });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/** Expands learning journey with a new track. */
+const expand: RequestHandler = async (request, response, next) => {
+  try {
+    const roadmap = await roadmapsService.expandRoadmap(request.userId ?? "", request.body);
+    response.json({ roadmap });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/** Injects an externally learned skill into the roadmap. */
+const injectSkill: RequestHandler = async (request, response, next) => {
+  try {
+    const roadmap = await roadmapsService.injectExternalSkill(request.userId ?? "", request.body.skill);
+    response.json({ roadmap });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const roadmapsController = {
   generate,
   generateFromGaps,
+  getAll,
+  expand,
+  injectSkill,
   get,
   updateTaskStatus,
   generateQuiz,

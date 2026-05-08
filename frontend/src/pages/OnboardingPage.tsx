@@ -12,14 +12,17 @@ import {
   isStepComplete,
   STEP_TITLES,
   STEP_AI_MESSAGES,
-  Step1Career,
-  Step2Academic,
-  Step3Behavior,
-  Step4Learning,
-  Step5Mentor,
+  Step1Role,
+  Step2Experience,
+  Step3Skills,
+  Step4Hours,
+  Step5Timeline,
+  Step6Style,
+  Step7Struggle,
+  Step8Interests,
 } from "./onboarding/OnboardingSteps";
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 8;
 
 function getProfileErrorMessage(error: unknown) {
   if (isAxiosError<{ message?: string; errors?: any }>(error)) {
@@ -91,6 +94,12 @@ export function OnboardingPage() {
         targetRoles: data.targetRoles,
         currentSkills: data.currentSkills,
         experienceLevel: data.experienceLevel,
+        // Additional intelligence OS fields
+        dailyStudyHours: data.dailyStudyHours,
+        targetTimeline: data.targetTimeline,
+        learningStyle: data.learningStyle,
+        primaryStruggle: data.primaryStruggle,
+        careerInterests: data.careerInterests,
       });
       setUser(profile);
       
@@ -111,11 +120,14 @@ export function OnboardingPage() {
 
   /* Step components */
   const stepComponents = [
-    <Step1Career key="s1" data={data} update={update} />,
-    <Step2Academic key="s2" data={data} update={update} />,
-    <Step3Behavior key="s3" data={data} update={update} />,
-    <Step4Learning key="s4" data={data} update={update} />,
-    <Step5Mentor key="s5" data={data} update={update} />,
+    <Step1Role key="s1" data={data} update={update} />,
+    <Step2Experience key="s2" data={data} update={update} />,
+    <Step3Skills key="s3" data={data} update={update} />,
+    <Step4Hours key="s4" data={data} update={update} />,
+    <Step5Timeline key="s5" data={data} update={update} />,
+    <Step6Style key="s6" data={data} update={update} />,
+    <Step7Struggle key="s7" data={data} update={update} />,
+    <Step8Interests key="s8" data={data} update={update} />,
   ];
 
   return (
@@ -162,7 +174,7 @@ export function OnboardingPage() {
         {!showProfile && (
           <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/[0.04]">
             <button type="button" onClick={handleBack} disabled={step === 0}
-              className="px-5 py-2.5 text-sm text-slate-500 hover:text-slate-900 dark:text-slate-900 dark:text-white transition disabled:opacity-30 disabled:cursor-not-allowed">
+              className="px-5 py-2.5 text-sm text-slate-500 hover:text-slate-900 dark:text-white transition disabled:opacity-30 disabled:cursor-not-allowed">
               ← Back
             </button>
             <button type="button" onClick={handleNext} disabled={!canAdvance}

@@ -18,7 +18,7 @@ export function NebulaBackground({
 }: NebulaBackgroundProps) {
   return (
     <div 
-      className={cn("pointer-events-none absolute inset-0 -z-10 bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4", className)}
+      className={cn("pointer-events-none absolute inset-0 -z-10 bg-obsidian", className)}
       style={{ opacity }}
     >
       {showGrid && <div className="absolute inset-0 bg-grid opacity-20" />}

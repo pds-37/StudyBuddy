@@ -8,6 +8,7 @@ import {
   Loader2, 
   MessageSquare, 
   Play, 
+  Pause,
   Square, 
   Timer, 
   Zap,
@@ -33,7 +34,7 @@ export function StudyPage() {
   const [showConfidence, setShowConfidence] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  const { isActive, timeLeft, duration, startSprint, stopSprint, tick } = useFocusStore();
+  const { isActive, isPaused, timeLeft, duration, startSprint, stopSprint, pauseSprint, resumeSprint, tick } = useFocusStore();
   const { sendMessage, currentConversation, createNewConversation } = useCopilotStore();
 
   useEffect(() => {
@@ -228,13 +229,27 @@ export function StudyPage() {
                   Start 45m Sprint
                 </button>
               ) : (
-                <button
-                  onClick={stopSprint}
-                  className="flex items-center gap-2 rounded-2xl border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-50 dark:bg-white/5 px-8 py-4 text-lg font-bold text-slate-900 dark:text-slate-900 dark:text-white transition hover:bg-slate-100 dark:bg-slate-100 dark:bg-white/10"
-                >
-                  <Square className="h-5 w-5 fill-current" />
-                  Stop Session
-                </button>
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={isPaused ? resumeSprint : pauseSprint}
+                    className={cn(
+                      "flex items-center gap-2 rounded-2xl px-8 py-4 text-lg font-bold transition-all hover:scale-105",
+                      isPaused 
+                        ? "bg-brand text-slate-900 dark:text-slate-900 dark:text-white shadow-glow" 
+                        : "bg-amber-500/10 border border-amber-500/20 text-amber-500 hover:bg-amber-500/20"
+                    )}
+                  >
+                    {isPaused ? <Play className="h-5 w-5 fill-current" /> : <Pause className="h-5 w-5 fill-current" />}
+                    {isPaused ? "Resume Sprint" : "Pause"}
+                  </button>
+                  <button
+                    onClick={stopSprint}
+                    className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-8 py-4 text-lg font-bold text-slate-300 transition hover:bg-white/10 hover:text-white"
+                  >
+                    <Square className="h-5 w-5 fill-current" />
+                    Stop
+                  </button>
+                </div>
               )}
             </div>
           </div>

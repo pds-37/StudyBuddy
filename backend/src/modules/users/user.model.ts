@@ -16,6 +16,43 @@ export interface IUser {
     skipRate: number;
     avgSessionTime: number;
     preferredStudyTime: string;
+    lastActivityAt: Date;
+    burnoutRisk: number; // 0-100
+    cognitiveLoad: number; // 0-100
+  };
+  psychologicalProfile: {
+    confidence: {
+      skill: number;
+      execution: number;
+      interview: number;
+      learning: number;
+    };
+    motivationState: "overexcited" | "momentum_driven" | "steady" | "discouraged" | "burned_out";
+    anxietyLevel: number; // 0-100
+    energyPatterns: {
+      peakFocusWindow: string; // "morning", "afternoon", "evening", "night"
+      fatigueTriggers: string[];
+    };
+    identityNarrative: string; // e.g. "Aspiring Engineer", "System Architect"
+  };
+  careerProfile: {
+    readiness: {
+      frontend: number;
+      backend: number;
+      ai: number;
+      interview: number;
+    };
+    projectDepth: number; // 0-100
+    executionStrength: "beginner" | "medium" | "advanced";
+    communicationConfidence: number; // 0-100
+    retentionHealth: number; // 0-100
+    targetRoles: string[];
+    applicationHistory: {
+      totalApplied: number;
+      responses: number;
+      interviews: number;
+      offers: number;
+    };
   };
   subscription: {
     plan: "free" | "pro" | "team";
@@ -88,7 +125,44 @@ const userSchema = new Schema<IUser>(
       consistencyScore: { type: Number, default: 0 },
       skipRate: { type: Number, default: 0 },
       avgSessionTime: { type: Number, default: 0 },
-      preferredStudyTime: { type: String, default: "evening" }
+      preferredStudyTime: { type: String, default: "evening" },
+      lastActivityAt: { type: Date, default: Date.now },
+      burnoutRisk: { type: Number, default: 0 },
+      cognitiveLoad: { type: Number, default: 0 }
+    },
+    psychologicalProfile: {
+      confidence: {
+        skill: { type: Number, default: 50 },
+        execution: { type: Number, default: 50 },
+        interview: { type: Number, default: 50 },
+        learning: { type: Number, default: 50 }
+      },
+      motivationState: { type: String, default: "steady" },
+      anxietyLevel: { type: Number, default: 10 },
+      energyPatterns: {
+        peakFocusWindow: { type: String, default: "evening" },
+        fatigueTriggers: { type: [String], default: [] }
+      },
+      identityNarrative: { type: String, default: "Student" }
+    },
+    careerProfile: {
+      readiness: {
+        frontend: { type: Number, default: 0 },
+        backend: { type: Number, default: 0 },
+        ai: { type: Number, default: 0 },
+        interview: { type: Number, default: 0 }
+      },
+      projectDepth: { type: Number, default: 0 },
+      executionStrength: { type: String, default: "beginner" },
+      communicationConfidence: { type: Number, default: 10 },
+      retentionHealth: { type: Number, default: 0 },
+      targetRoles: { type: [String], default: [] },
+      applicationHistory: {
+        totalApplied: { type: Number, default: 0 },
+        responses: { type: Number, default: 0 },
+        interviews: { type: Number, default: 0 },
+        offers: { type: Number, default: 0 }
+      }
     },
     subscription: {
       plan: {

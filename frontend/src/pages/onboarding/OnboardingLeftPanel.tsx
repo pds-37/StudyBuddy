@@ -101,15 +101,33 @@ export function OnboardingLeftPanel({ step, totalSteps, messages }: Props) {
 
         <AnimatePresence mode="wait">
           <Motion.div key={step}>
-            <Motion.h2 className="text-3xl font-bold text-slate-900 dark:text-slate-900 dark:text-white leading-tight mb-3"
+            <Motion.h2 className="text-3xl font-bold text-slate-900 dark:text-white leading-tight mb-3"
               initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}>
-              {["Where do you want to go?", "Where are you now?", "How do you work?", "How do you learn?", "How should I guide you?"][step]}
+              {[
+                "What do you want to become?",
+                "Where are you starting?",
+                "What's your current stack?",
+                "What's your daily bandwidth?",
+                "What's your target timeline?",
+                "How do you learn best?",
+                "What holds you back?",
+                "What excites you most?"
+              ][step]}
             </Motion.h2>
-            <Motion.p className="text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400 leading-relaxed max-w-sm mb-6"
+            <Motion.p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-sm mb-6"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }}
               transition={{ delay: 0.15, duration: 0.5 }}>
-              {["I'll map your career direction and motivation.", "Let me understand your academic profile and skills.", "Understanding your behavior helps me adapt.", "Your learning style shapes how I'll teach you.", "Choose how your AI mentor should interact with you."][step]}
+              {[
+                "I'll map your career direction and skill dependency graph.",
+                "This helps me calibrate the roadmap complexity and pacing.",
+                "Let's identify your existing mastery to skip redundant tasks.",
+                "Knowing your capacity helps me schedule realistic milestones.",
+                "Your timeline defines how aggressive your trajectory will be.",
+                "I'll adapt resource recommendations to your cognitive style.",
+                "I'll design specific interventions to address your friction zones.",
+                "This influences project selection and career recommendations."
+              ][step]}
             </Motion.p>
           </Motion.div>
         </AnimatePresence>

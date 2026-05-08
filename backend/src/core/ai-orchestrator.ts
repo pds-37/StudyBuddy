@@ -26,10 +26,10 @@ export class AIOrchestrator {
     skillGaps: Array<{ skill: string; gapScore: number }>,
     userNotes?: string,
     behaviorProfile?: any,
-    learningStyle?: string
+    intelligenceProfile?: any
   ) {
     // Logic to switch between models based on context size or user tier
-    return groqService.generateRoadmap(targetRole, timelineWeeks, skillGaps, userNotes, behaviorProfile, learningStyle);
+    return groqService.generateRoadmap(targetRole, timelineWeeks, skillGaps, userNotes, behaviorProfile, intelligenceProfile);
   }
 
 

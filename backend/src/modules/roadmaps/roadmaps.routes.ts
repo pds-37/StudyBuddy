@@ -8,6 +8,9 @@ roadmapsRouter.use(authenticate);
 
 roadmapsRouter.post("/generate", roadmapsController.generate);
 roadmapsRouter.get("/generate-from-gaps", roadmapsController.generateFromGaps);
+roadmapsRouter.get("/all", roadmapsController.getAll);
+roadmapsRouter.post("/expand", roadmapsController.expand);
+roadmapsRouter.post("/inject-skill", roadmapsController.injectSkill);
 roadmapsRouter.get("/", roadmapsController.get);
 roadmapsRouter.patch("/tasks/:taskId", roadmapsController.updateTaskStatus);
 roadmapsRouter.get("/tasks/:taskId/quiz", roadmapsController.generateQuiz);

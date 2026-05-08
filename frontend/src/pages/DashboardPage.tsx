@@ -371,12 +371,14 @@ export function DashboardPage() {
 
 function Metric({ label, value, icon: Icon }: { label: string; value: string; icon: typeof Brain }) {
   return (
-    <div className="rounded-lg border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
-      <div className="flex items-center justify-between">
-        <p className="text-xs uppercase tracking-[0.2em] text-slate-500">{label}</p>
-        <Icon size={16} className="text-cyan" />
+    <div className="rounded-3xl border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4 p-8 flex flex-col items-center justify-center text-center relative group hover:border-brand/30 transition-all">
+      <div className="absolute top-4 right-4 text-cyan opacity-40 group-hover:scale-110 transition-transform">
+        <Icon size={18} />
       </div>
-      <p className="mt-3 text-2xl font-semibold text-slate-900 dark:text-slate-900 dark:text-white">{value}</p>
+      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-3">{label}</p>
+      <p className="text-4xl font-bold text-slate-900 dark:text-slate-900 dark:text-white tracking-tight">
+        {value}
+      </p>
     </div>
   );
 }

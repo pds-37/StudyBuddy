@@ -13,7 +13,12 @@ function toProfile(user: UserDocument) {
     experienceLevel: user.experienceLevel,
     subscription: user.subscription,
     usage: user.usage,
-    onboardingCompleted: user.onboardingCompleted
+    onboardingCompleted: user.onboardingCompleted,
+    dailyStudyHours: user.availableHours,
+    targetTimeline: user.preferences?.targetTimeline,
+    learningStyle: user.preferences?.learningStyle,
+    primaryStruggle: user.preferences?.primaryStruggle,
+    careerInterests: user.preferences?.careerInterests
   };
 }
 
@@ -49,6 +54,13 @@ async function updateProfile(userId: string, payload: UpdateProfileBody) {
       targetRoles: payload.targetRoles,
       currentSkills: normalizedSkills,
       experienceLevel: payload.experienceLevel,
+      availableHours: payload.dailyStudyHours,
+      preferences: {
+        targetTimeline: payload.targetTimeline,
+        learningStyle: payload.learningStyle,
+        primaryStruggle: payload.primaryStruggle,
+        careerInterests: payload.careerInterests
+      },
       onboardingCompleted: true
     },
     { new: true, runValidators: true }

@@ -7,24 +7,13 @@ type Props = { data: OnboardingData; onComplete: () => void; isSubmitting: boole
 type ProfileCard = { label: string; value: string; color: string };
 
 function deriveProfile(d: OnboardingData): ProfileCard[] {
-  const clarity = d.careerConfidence === "confident" ? "High" : d.careerConfidence === "clear" ? "Medium" : "Low";
-  const cColor = clarity === "High" ? "text-emerald-400" : clarity === "Medium" ? "text-amber-400" : "text-red-400";
-
-  const consistency = d.abandonFrequency === "I finish most" ? "Low"
-    : d.abandonFrequency === "After a month" ? "Moderate" : "High";
-  const conColor = consistency === "Low" ? "text-emerald-400" : consistency === "Moderate" ? "text-amber-400" : "text-red-400";
-
-  const burnout = d.consistencyBreaker === "Burnout" ? "High"
-    : ["Fear of failure", "Overplanning"].includes(d.consistencyBreaker) ? "Moderate" : "Low";
-  const bColor = burnout === "High" ? "text-red-400" : burnout === "Moderate" ? "text-amber-400" : "text-emerald-400";
-
   return [
-    { label: "Career Clarity", value: clarity, color: cColor },
-    { label: "Best Learning Style", value: d.learningMethod || "—", color: "text-cyan-400" },
-    { label: "Study Window", value: (d.productiveTime?.charAt(0).toUpperCase() + d.productiveTime?.slice(1)) || "—", color: "text-blue-400" },
-    { label: "Consistency Risk", value: consistency, color: conColor },
-    { label: "Burnout Risk", value: burnout, color: bColor },
-    { label: "Mentor Style", value: d.mentorStyle ? d.mentorStyle.charAt(0).toUpperCase() + d.mentorStyle.slice(1) : "—", color: "text-purple-400" },
+    { label: "Target Path", value: d.targetRoles[0] || "Generalist", color: "text-cyan-400" },
+    { label: "Experience", value: d.experienceLevel.charAt(0).toUpperCase() + d.experienceLevel.slice(1), color: "text-emerald-400" },
+    { label: "Study Capacity", value: `${d.dailyStudyHours}h / day`, color: "text-blue-400" },
+    { label: "Timeline", value: d.targetTimeline || "Flexible", color: "text-purple-400" },
+    { label: "Learning Style", value: d.learningStyle ? d.learningStyle.charAt(0).toUpperCase() + d.learningStyle.slice(1) : "—", color: "text-amber-400" },
+    { label: "Core Struggle", value: d.primaryStruggle || "—", color: "text-rose-400" },
   ];
 }
 
@@ -45,7 +34,7 @@ export function OnboardingProfile({ data, onComplete, isSubmitting }: Props) {
           <div className="absolute inset-0 rounded-full border-2 border-t-cyan-400 border-r-purple-500/30 border-b-transparent border-l-transparent" />
           <div className="absolute inset-2 rounded-full border border-t-transparent border-r-transparent border-b-cyan-400/30 border-l-purple-400/20" />
         </Motion.div>
-        <Motion.p className="text-lg font-semibold text-slate-900 dark:text-slate-900 dark:text-white mb-2"
+        <Motion.p className="text-lg font-semibold text-slate-900 dark:text-white mb-2"
           animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 2, repeat: Infinity }}>
           Building your learning profile...
         </Motion.p>
@@ -62,7 +51,7 @@ export function OnboardingProfile({ data, onComplete, isSubmitting }: Props) {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
           Profile Ready
         </Motion.p>
-        <Motion.h2 className="text-2xl font-bold text-slate-900 dark:text-slate-900 dark:text-white"
+        <Motion.h2 className="text-2xl font-bold text-slate-900 dark:text-white"
           initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           Your Learning DNA
         </Motion.h2>
@@ -82,7 +71,7 @@ export function OnboardingProfile({ data, onComplete, isSubmitting }: Props) {
 
       <Motion.div className="pt-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
         <button type="button" onClick={onComplete} disabled={isSubmitting}
-          className="w-full rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 px-6 py-4 text-sm font-bold text-slate-950 transition-all hover:scale-[1.01] hover:shadow-[0_0_30px_rgba(34,211,238,0.15)] disabled:opacity-50 disabled:cursor-not-allowed">
+          className="w-full rounded-2xl bg-gradient-to-r from-cyan to-blue-600 px-6 py-4 text-sm font-bold text-slate-950 transition-all hover:scale-[1.01] hover:shadow-[0_0_30px_rgba(40,176,243,0.3)] disabled:opacity-50 disabled:cursor-not-allowed">
           {isSubmitting ? (
             <span className="flex items-center justify-center gap-2">
               <Motion.span className="w-4 h-4 border-2 border-slate-950/30 border-t-slate-950 rounded-full inline-block"

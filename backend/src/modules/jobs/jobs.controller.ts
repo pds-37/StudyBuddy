@@ -1,42 +1,70 @@
-import { type RequestHandler } from "express";
+import { RequestHandler } from "express";
 import { jobsService } from "./jobs.service.js";
-import { createJobSchema, jobsQuerySchema } from "./jobs.validation.js";
 
-/** Retrieves jobs with optional user-specific matching. */
-const getJobs: RequestHandler = async (request, response, next) => {
+/** Gets personalized job recommendations. */
+export const getRecommendations: RequestHandler = async (req, res, next) => {
   try {
-    const query = jobsQuerySchema.parse(request.query);
-    const jobs = await jobsService.getJobs(request.userId, query.limit);
-    response.json({ jobs });
+    const recommendations = await jobsService.getRecommendations(req.userId!);
+    res.json({ recommendations });
   } catch (error) {
     next(error);
   }
 };
 
-/** Retrieves a single job by ID. */
-const getJob: RequestHandler = async (request, response, next) => {
+/** Gets the student's career readiness profile. */
+export const getReadiness: RequestHandler = async (req, res, next) => {
   try {
-    const jobId = String(request.params.id ?? "");
-    const job = await jobsService.getJob(jobId);
-    response.json({ job });
+    const readiness = await jobsService.getReadiness(req.userId!);
+    res.json({ readiness });
   } catch (error) {
     next(error);
   }
 };
 
-/** Creates a new job listing. */
-const createJob: RequestHandler = async (request, response, next) => {
+/** Matches a specific job to the student. */
+export const matchJob: RequestHandler = async (req, res, next) => {
   try {
-    const body = createJobSchema.parse(request.body);
-    const job = await jobsService.createJob(body);
-    response.status(201).json({ job });
+    const match = await jobsService.matchJob(req.userId!, req.params.jobId);
+    res.json({ match });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/** Gets all user applications. */
+export const getApplications: RequestHandler = async (req, res, next) => {
+  try {
+    res.json({ applications: [] });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/** Gets raw job listings. */
+export const getJobs: RequestHandler = async (req, res, next) => {
+  try {
+    const jobs = await jobsService.getJobs(req.userId!);
+    res.json({ jobs });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/** Gets a single job listing. */
+export const getJob: RequestHandler = async (req, res, next) => {
+  try {
+    const job = await jobsService.getJob(req.params.id);
+    res.json({ job });
   } catch (error) {
     next(error);
   }
 };
 
 export const jobsController = {
+  getRecommendations,
+  getReadiness,
+  matchJob,
+  getApplications,
   getJobs,
-  getJob,
-  createJob
+  getJob
 };

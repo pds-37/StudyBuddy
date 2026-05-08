@@ -16,12 +16,16 @@ import {
   TrendingUp,
   Flame,
   LayoutDashboard,
-  BookOpen
+  BookOpen,
+  Compass,
+  Plus
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useRoadmapsStore } from "../../../store/roadmaps-store";
 import { useAppStore } from "../../../store/app-store";
 import { cn } from "../../../lib/utils/cn";
+import { ExpansionFlow } from "./ExpansionFlow";
+import { BehavioralIntervention } from "./BehavioralIntervention";
 import type { Roadmap, RoadmapPhase, RoadmapMission, RoadmapTask } from "@studybuddy/shared";
 
 /** 
@@ -42,6 +46,8 @@ export function RoadmapWorkspace() {
   
   const user = useAppStore((state) => state.user);
   const [activePhaseId, setActivePhaseId] = useState<string | null>(null);
+  const [isExpansionOpen, setIsExpansionOpen] = useState(false);
+  const { roadmaps, setCurrentRoadmap, injectSkill } = useRoadmapsStore();
 
   useEffect(() => {
     fetchRoadmaps();
@@ -74,6 +80,16 @@ export function RoadmapWorkspace() {
         {/* ─── MAIN COLUMN ─── */}
         <div className="space-y-6">
           
+          {/* BEHAVIORAL INTERVENTIONS */}
+          {currentRoadmap?.insights?.filter(i => i.type === "behavior").map((insight, idx) => (
+            <BehavioralIntervention 
+              key={idx}
+              type={insight.message.toLowerCase().includes("welcome back") ? "recovery" : insight.message.toLowerCase().includes("consistency") ? "burnout" : "overload"}
+              message={insight.message}
+              onAction={() => console.log("Intervention triggered")}
+            />
+          ))}
+
           {/* TOP BANNER */}
           <div className="relative rounded-3xl border border-white/[0.06] bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
             <div className="absolute top-0 right-0 w-[600px] h-full opacity-60 pointer-events-none">
@@ -83,13 +99,49 @@ export function RoadmapWorkspace() {
                <div className="absolute bottom-[-20%] right-[10%] w-64 h-64 bg-cyan-500/20 blur-[80px] rounded-full" />
             </div>
 
-            <div className="relative z-10">
-               <div className="flex items-center gap-2 mb-4">
-                  <Route className="w-4 h-4 text-brand" />
-                  <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand">Roadmap</span>
+            <div className="relative z-10 p-8">
+               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                 <div>
+                    <div className="flex items-center gap-2 mb-2">
+                       <Route className="w-4 h-4 text-brand" />
+                       <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand">Learning OS</span>
+                    </div>
+                    <h1 className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
+                       Intelligence Roadmap
+                       {user?.psychologicalProfile?.identityNarrative && (
+                         <span className="px-3 py-1 rounded-full bg-brand/10 border border-brand/30 text-[10px] font-bold text-brand uppercase tracking-[0.2em] animate-pulse">
+                           {user.psychologicalProfile.identityNarrative}
+                         </span>
+                       )}
+                    </h1>
+                 </div>
+                 
+                 <div className="flex items-center gap-3">
+                    {roadmaps.length > 1 && (
+                      <div className="flex items-center gap-1 p-1 bg-white/5 border border-white/10 rounded-2xl">
+                        {roadmaps.map(r => (
+                          <button 
+                            key={r.id}
+                            onClick={() => setCurrentRoadmap(r)}
+                            className={cn(
+                              "px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all",
+                              currentRoadmap?.id === r.id ? "bg-brand text-slate-900 dark:text-slate-900 dark:text-white" : "text-slate-500 hover:text-slate-300"
+                            )}
+                          >
+                            {r.category === "Career" ? r.targetRole.split(" ")[0] : r.title.split(" ")[0]}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    <button 
+                      onClick={() => setIsExpansionOpen(true)}
+                      className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-bold text-slate-900 dark:text-slate-900 dark:text-white flex items-center gap-2 transition-all group"
+                    >
+                      <Plus className="w-4 h-4 text-brand group-hover:rotate-90 transition-transform duration-300" />
+                      <span>Explore New Direction</span>
+                    </button>
+                 </div>
                </div>
-               <h1 className="text-3xl font-semibold text-slate-900 dark:text-slate-900 dark:text-white mb-2">Career Roadmap</h1>
-               <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 text-sm mb-10">Your personalized learning path to achieve your career goals.</p>
 
                <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                   <TopMetric label="Readiness Score" value={`${currentRoadmap?.readinessScore || 0}%`} sub="↑ 12% this week" color="text-cyan-400" border="border-cyan-400" />
@@ -179,12 +231,16 @@ export function RoadmapWorkspace() {
                 <div className="flex items-center justify-between mb-6">
                    <div className="flex items-center gap-2">
                       <LayoutDashboard className="w-4 h-4 text-cyan-400" />
-                      <h3 className="text-xs font-bold uppercase tracking-widest text-slate-700 dark:text-slate-700 dark:text-slate-300">Execution Tasks</h3>
+                      <h3 className="text-xs font-bold uppercase tracking-widest text-slate-700 dark:text-slate-700 dark:text-slate-300">
+                        {currentRoadmap?.insights?.some(i => i.message.toLowerCase().includes("overwhelmed")) ? "Momentum Focus" : "Execution Tasks"}
+                      </h3>
                    </div>
-                   <button className="text-[10px] text-slate-500 hover:text-slate-900 dark:text-slate-900 dark:text-white uppercase tracking-widest font-bold">View All</button>
+                   {!currentRoadmap?.insights?.some(i => i.message.toLowerCase().includes("overwhelmed")) && (
+                     <button className="text-[10px] text-slate-500 hover:text-slate-900 dark:text-slate-900 dark:text-white uppercase tracking-widest font-bold">View All</button>
+                   )}
                 </div>
                 <div className="space-y-3">
-                  {currentMission?.tasks.map((task, idx) => (
+                  {currentMission?.tasks.slice(0, currentRoadmap?.insights?.some(i => i.message.toLowerCase().includes("overwhelmed")) ? 2 : 10).map((task, idx) => (
                     <TaskCard 
                       key={task.id} 
                       task={task} 
@@ -192,9 +248,17 @@ export function RoadmapWorkspace() {
                       delay={idx * 0.05}
                     />
                   ))}
-                  <button className="w-full py-3 rounded-xl border border-dashed border-slate-200 dark:border-slate-200 dark:border-white/10 text-[10px] font-bold text-slate-500 uppercase tracking-widest hover:text-slate-900 dark:text-slate-900 dark:text-white hover:border-white/30 transition mt-2">
-                     + Add New Task
-                  </button>
+                  {currentRoadmap?.insights?.some(i => i.message.toLowerCase().includes("overwhelmed")) && (
+                    <div className="p-4 rounded-2xl bg-brand/5 border border-dashed border-brand/20 text-center">
+                       <p className="text-[11px] text-brand font-bold uppercase tracking-widest">Focus Mode Activated</p>
+                       <p className="text-[10px] text-slate-500 mt-1">Completing these 2 tasks will restore your momentum.</p>
+                    </div>
+                  )}
+                  {!currentRoadmap?.insights?.some(i => i.message.toLowerCase().includes("overwhelmed")) && (
+                    <button className="w-full py-3 rounded-xl border border-dashed border-slate-200 dark:border-slate-200 dark:border-white/10 text-[10px] font-bold text-slate-500 uppercase tracking-widest hover:text-slate-900 dark:text-slate-900 dark:text-white hover:border-white/30 transition mt-2">
+                       + Add New Task
+                    </button>
+                  )}
                 </div>
              </div>
           </div>
@@ -284,8 +348,20 @@ export function RoadmapWorkspace() {
                    { icon: RefreshCw, label: "Recall" },
                    { icon: Target, label: "Quiz" },
                    { icon: BookOpen, label: "Note" },
+                   { icon: Plus, label: "Inject" },
                 ].map((action, i) => (
-                   <button key={i} className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition group">
+                   <button 
+                     key={i} 
+                     onClick={() => {
+                       if (action.label === "Inject") {
+                         const skill = prompt("What skill did you learn externally?");
+                         if (skill) {
+                            injectSkill(skill);
+                         }
+                       }
+                     }}
+                     className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition group"
+                   >
                       <action.icon className="w-4 h-4 text-slate-500 dark:text-slate-500 dark:text-slate-400 group-hover:text-brand transition-colors" />
                       <span className="text-[8px] font-bold text-slate-500 uppercase">{action.label}</span>
                    </button>
@@ -516,6 +592,8 @@ function GeneratingState() {
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         />
       </div>
+
+      <ExpansionFlow isOpen={isExpansionOpen} onClose={() => setIsExpansionOpen(false)} />
     </div>
   );
 }

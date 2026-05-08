@@ -5,10 +5,10 @@ export interface IJob extends mongoose.Document {
   company: string;
   location: string;
   type: "full-time" | "internship" | "remote";
-  requiredSkills: string[];
-  description?: string;
-  source?: string;
-  applyUrl?: string;
+  requirements: string[];
+  description: string;
+  source: string;
+  externalUrl: string;
   category: "frontend" | "backend" | "ai" | "fullstack" | "devops";
   postedAt: Date;
 }
@@ -18,15 +18,14 @@ const jobSchema = new mongoose.Schema({
   company: { type: String, required: true },
   location: { type: String, required: true },
   type: { type: String, enum: ["full-time", "internship", "remote"], default: "internship" },
-  requiredSkills: [{ type: String }],
+  requirements: [{ type: String }],
   description: { type: String },
   source: { type: String },
-  applyUrl: { type: String },
+  externalUrl: { type: String },
   category: { type: String, enum: ["frontend", "backend", "ai", "fullstack", "devops"], required: true },
   postedAt: { type: Date, default: Date.now }
 }, { timestamps: true });
 
-export type JobDocument = IJob;
 export const JobModel = mongoose.model<IJob>("Job", jobSchema);
 
 export interface IApplication extends mongoose.Document {
@@ -37,9 +36,9 @@ export interface IApplication extends mongoose.Document {
   aiReadinessAnalysis: {
     strengthAreas: string[];
     weakAreas: string[];
-    prepRoadmapId?: mongoose.Types.ObjectId;
+    prepRoadmapId?: string;
   };
-  notes?: string;
+  notes: string;
 }
 
 const applicationSchema = new mongoose.Schema({

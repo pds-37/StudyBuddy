@@ -137,7 +137,7 @@ export function AuthPage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="auth-input"
-                    placeholder="John Doe"
+                    placeholder="mr pds"
                     required
                   />
                 </div>
