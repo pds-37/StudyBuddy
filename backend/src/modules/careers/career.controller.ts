@@ -24,7 +24,7 @@ const getReadiness: RequestHandler = async (req, res, next) => {
 /** Matches a specific job to the student. */
 const matchJob: RequestHandler = async (req, res, next) => {
   try {
-    const match = await CareerService.matchJob(req.userId!, req.params.jobId);
+    const match = await CareerService.matchJob(req.userId!, req.params.jobId as string);
     res.json({ match });
   } catch (error) {
     next(error);

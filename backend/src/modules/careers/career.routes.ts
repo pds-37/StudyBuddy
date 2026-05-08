@@ -1,10 +1,10 @@
 import { Router } from "express";
 import { careerController } from "./career.controller.js";
-import { authMiddleware } from "../../middlewares/auth.js";
+import { authenticate } from "../../middlewares/authenticate.js";
 
 const careerRouter = Router();
 
-careerRouter.use(authMiddleware);
+careerRouter.use(authenticate);
 
 careerRouter.get("/recommendations", careerController.getRecommendations);
 careerRouter.get("/readiness", careerController.getReadiness);

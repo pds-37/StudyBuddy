@@ -18,7 +18,7 @@ type GenerateRoadmapRequest = {
 
 /** Converts a roadmap document to the public API shape. */
 function toRoadmap(roadmap: RoadmapDocument): Roadmap {
-  return {
+  return ({
     id: String(roadmap._id),
     userId: roadmap.userId,
     trackId: roadmap.trackId,
@@ -67,7 +67,7 @@ function toRoadmap(roadmap: RoadmapDocument): Roadmap {
       actionUrl: insight.actionUrl
     })),
     updatedAt: (roadmap as any).updatedAt.toISOString()
-  };
+  }) as Roadmap;
 }
 
 /** Generates a personalized roadmap using AI and user data. */

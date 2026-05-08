@@ -129,7 +129,7 @@ async function buildUserContext(userId: string, currentQuery?: string, knownNote
       skillsService.analyzeSkillGap(userId).catch(() => null),
       notesService.listNotes(userId, { limit: 5, offset: 0 }).catch(() => ({ notes: [], total: 0 })),
       roadmapsService.getRoadmap(userId).catch(() => null),
-      jobsService.getJobs(userId, 5).catch(() => []),
+      jobsService.getJobs(userId).catch(() => []),
       mentorService.getTodayPlan(userId).catch(() => null),
       RecommendationEngine.getNextBestAction(userId).catch(() => null)
     ]);
@@ -202,7 +202,7 @@ async function buildUserContext(userId: string, currentQuery?: string, knownNote
     if (jobs && jobs.length > 0) {
       const topJobs = jobs
         .slice(0, 3)
-        .map((job: JobListing) => `${job.title} at ${job.company}${job.matchScore ? ` (${job.matchScore}% match)` : ""}`)
+        .map((job: any) => `${job.title} at ${job.company}${job.matchScore ? ` (${job.matchScore}% match)` : ""}`)
         .join(", ");
       context.push(`Recommended Jobs: ${topJobs}`);
     }

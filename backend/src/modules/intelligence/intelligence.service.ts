@@ -47,7 +47,7 @@ export class IntelligenceEngine {
     }
 
     // EDGE CASE: Rapid Learning Acceleration (Part 5)
-    if (user.behaviorProfile.consistencyScore > 90 && user.readinessScore > 50) {
+    if (user.behaviorProfile.consistencyScore > 90 && (user.careerProfile?.readiness?.frontend > 50 || user.careerProfile?.readiness?.backend > 50)) {
       intervention = await this.handleAcceleration(userId);
     }
 

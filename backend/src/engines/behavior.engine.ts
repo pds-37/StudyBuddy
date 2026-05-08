@@ -38,7 +38,10 @@ export class BehaviorEngine {
       consistencyScore: Math.round(newConsistency),
       skipRate: Math.round(skipRate),
       avgSessionTime: user.behaviorProfile?.avgSessionTime || 0,
-      preferredStudyTime: user.behaviorProfile?.preferredStudyTime || "evening"
+      preferredStudyTime: user.behaviorProfile?.preferredStudyTime || "evening",
+      lastActivityAt: new Date(),
+      burnoutRisk: Math.round(skipRate) > 40 ? Math.min(100, skipRate * 1.5) : 0,
+      cognitiveLoad: Math.min(100, (100 - Math.round(newConsistency)) + Math.round(skipRate))
     };
 
     await user.save();
