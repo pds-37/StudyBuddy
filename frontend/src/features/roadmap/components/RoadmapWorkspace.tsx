@@ -210,27 +210,26 @@ export function RoadmapWorkspace() {
             </div>
 
             <div className="p-4 rounded-2xl bg-brand/10 border border-brand/20">
-               <p className="text-xs text-white font-medium mb-1">Excellent progress, Priyanka! ✨</p>
+               <p className="text-xs text-white font-medium mb-1">Excellent progress, {user?.name || 'there'}! ✨</p>
                <p className="text-[10px] text-slate-400">Your consistency and recall are improving.</p>
             </div>
 
             <div>
                <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-4">Key Insights</h4>
                <div className="space-y-4">
-                  <div className="flex gap-3">
-                     <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                     <div>
-                        <p className="text-[11px] text-slate-300 font-medium">Your DSA retention dropped 15%</p>
-                        <p className="text-[10px] text-slate-500 mt-1">Review Linked List concepts.</p>
-                     </div>
-                  </div>
-                  <div className="flex gap-3">
-                     <Clock className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-                     <div>
-                        <p className="text-[11px] text-slate-300 font-medium">You perform best between 9 PM - 11 PM</p>
-                        <p className="text-[10px] text-slate-500 mt-1">Optimize your study schedule.</p>
-                     </div>
-                  </div>
+                  {currentRoadmap?.insights && currentRoadmap.insights.length > 0 ? (
+                    currentRoadmap.insights.map((insight, idx) => (
+                      <InsightCard key={idx} insight={insight} />
+                    ))
+                  ) : (
+                    <div className="flex gap-3">
+                       <Clock className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+                       <div>
+                          <p className="text-[11px] text-slate-300 font-medium">No insights available yet</p>
+                          <p className="text-[10px] text-slate-500 mt-1">Check back later as you progress.</p>
+                       </div>
+                    </div>
+                  )}
                </div>
             </div>
           </div>

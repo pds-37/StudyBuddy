@@ -277,7 +277,16 @@ RULES:
     groqMessages.unshift({ role: "system", content: systemPrompt });
   }
 
-  const response = await requestGroq(groqMessages, 2500, model);
+  let response: string;
+  try {
+    response = await requestGroq(groqMessages, 2500, model);
+  } catch (error) {
+    console.error("Groq API request failed during copilot chat:", error);
+    return {
+      content: "I'm currently experiencing a high load or connection issue. Please try again in a few moments.",
+      metadata: {}
+    };
+  }
 
   try {
     const parsed = JSON.parse(extractJsonPayload(response));
