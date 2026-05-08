@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FolderGit2, Check, Clock, Target, Sparkles, Code2, Layers, Cpu, Server, Plus, ArrowRight, Brain, Zap, Send, Play, BarChart2, Briefcase, Award, Flame, Monitor, HardDrive, Smartphone, ChevronRight, MoreHorizontal } from "lucide-react";
+import { FolderGit2, Check, Clock, Target, Sparkles, Code2, Layers, Cpu, Server, Plus, ArrowRight, Brain, Zap, Send, Play, BarChart2, Briefcase, Award, Flame, Monitor, HardDrive, Smartphone, ChevronRight, MoreHorizontal, LayoutDashboard } from "lucide-react";
 import { useProjectsStore } from "../../../store/projects-store";
 import { useAppStore } from "../../../store/app-store";
 import { logBehavior } from "../../../lib/api/behavior";
