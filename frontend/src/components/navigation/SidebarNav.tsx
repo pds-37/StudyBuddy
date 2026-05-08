@@ -23,19 +23,27 @@ import { useJobsStore } from "../../store/jobs-store";
 import { useRoadmapsStore } from "../../store/roadmaps-store";
 import { cn } from "../../lib/utils/cn";
 
-const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Ask Veda", href: "/copilot", icon: MessageSquare },
-  { name: "Notes", href: "/notes", icon: FileText },
-  { name: "Recall", href: "/recall", icon: Brain },
-  { name: "Roadmap", href: "/roadmap", icon: Route },
-  { name: "Jobs", href: "/jobs", icon: Briefcase },
-  { name: "Mentors", href: "/mentorship", icon: Users },
-  { name: "Projects", href: "/projects", icon: FolderKanban },
-  { name: "Resume", href: "/resume", icon: FilePenLine },
-  { name: "Skill Gap", href: "/skill-gap", icon: Target },
-  { name: "Knowledge", href: "/knowledge", icon: Network },
-] as const;
+const navGroups = [
+  [
+    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Ask Veda", href: "/copilot", icon: MessageSquare },
+  ],
+  [
+    { name: "Notes", href: "/notes", icon: FileText },
+    { name: "Recall", href: "/recall", icon: Brain },
+    { name: "Roadmap", href: "/roadmap", icon: Route },
+  ],
+  [
+    { name: "Jobs", href: "/jobs", icon: Briefcase },
+    { name: "Mentors", href: "/mentorship", icon: Users },
+    { name: "Projects", href: "/projects", icon: FolderKanban },
+    { name: "Resume", href: "/resume", icon: FilePenLine },
+    { name: "Skill Gap", href: "/skill-gap", icon: Target },
+  ],
+  [
+    { name: "Knowledge", href: "/knowledge", icon: Network },
+  ]
+];
 
 type SidebarNavProps = {
   isCollapsed?: boolean;
@@ -85,44 +93,51 @@ export function SidebarNav({ isCollapsed = false, onToggleCollapsed }: SidebarNa
 
       {/* Navigation */}
       <nav className="flex-1 space-y-2 overflow-y-auto overflow-x-hidden custom-scrollbar pr-2 -mr-2 min-h-0">
-        {navigation.map((item) => {
-          const isActive = location.pathname === item.href;
-          return (
-            <Link
-              key={item.name}
-              to={item.href}
-              className={cn(
-                "group flex items-center gap-4 px-3 py-3 rounded-2xl transition-all duration-300 relative",
-                isActive 
-                  ? "bg-white/[0.05] text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]" 
-                  : "text-slate-500 hover:text-white hover:bg-white/[0.02]",
-                isCollapsed ? "justify-center px-0" : "px-3"
-              )}
-            >
-              {isActive && (
-                <div className={cn(
-                  "absolute left-0 w-1 bg-brand rounded-r-full shadow-[0_0_15px_var(--brand)]",
-                  isCollapsed ? "h-8 top-1/2 -translate-y-1/2" : "h-6"
-                )} />
-              )}
-              <item.icon 
-                size={22} 
-                className={cn(
-                  "transition-all duration-300",
-                  isActive ? "text-brand scale-110" : "group-hover:text-white group-hover:scale-110"
-                )} 
-              />
-              {!isCollapsed && (
-                <span className={cn(
-                  "flex-1 font-semibold text-sm transition-all duration-300",
-                  isActive ? "translate-x-1" : "group-hover:translate-x-1"
-                )}>
-                  {item.name}
-                </span>
-              )}
-            </Link>
-          );
-        })}
+        {navGroups.map((group, groupIndex) => (
+          <div key={groupIndex} className={cn(
+            "space-y-1",
+            groupIndex > 0 && "pt-2 mt-2 border-t border-white/[0.05]"
+          )}>
+            {group.map((item) => {
+              const isActive = location.pathname === item.href;
+              return (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={cn(
+                    "group flex items-center gap-4 px-3 py-2.5 rounded-2xl transition-all duration-300 relative",
+                    isActive 
+                      ? "bg-white/[0.05] text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]" 
+                      : "text-slate-500 hover:text-white hover:bg-white/[0.02]",
+                    isCollapsed ? "justify-center px-0" : "px-3"
+                  )}
+                >
+                  {isActive && (
+                    <div className={cn(
+                      "absolute left-0 w-1 bg-brand rounded-r-full shadow-[0_0_15px_var(--brand)]",
+                      isCollapsed ? "h-8 top-1/2 -translate-y-1/2" : "h-6"
+                    )} />
+                  )}
+                  <item.icon 
+                    size={20} 
+                    className={cn(
+                      "transition-all duration-300",
+                      isActive ? "text-brand scale-110" : "group-hover:text-white group-hover:scale-110"
+                    )} 
+                  />
+                  {!isCollapsed && (
+                    <span className={cn(
+                      "flex-1 font-semibold text-sm transition-all duration-300",
+                      isActive ? "translate-x-1" : "group-hover:translate-x-1"
+                    )}>
+                      {item.name}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </nav>
 
       {/* Bottom Profile Section */}

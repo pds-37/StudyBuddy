@@ -4,13 +4,13 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        obsidian: "#030507",
-        ink: "#0a0c10",
-        panel: "#09090b",
-        card: "#09090b",
-        line: "#18181b",
-        brand: "#ca8af7",
-        cyan: "#28b0f3",
+        obsidian: "var(--bg-obsidian)",
+        ink: "var(--bg-ink)",
+        panel: "var(--bg-panel)",
+        card: "var(--bg-card)",
+        line: "var(--border-main)",
+        brand: "var(--brand)",
+        cyan: "var(--cyan)",
         sun: "#f6c453"
       },
       fontFamily: {

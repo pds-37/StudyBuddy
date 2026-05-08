@@ -70,185 +70,236 @@ export function RoadmapWorkspace() {
 
   return (
     <div className="relative min-h-screen pb-20">
-      {/* ─── TOP SECTION: MISSION METRICS ─── */}
-      <Motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
-      >
-        <MetricCard 
-          label="Target Path" 
-          value={currentRoadmap?.targetRole || "Career Path"} 
-          icon={Target} 
-          color="text-cyan-400"
-          glow="shadow-[0_0_20px_rgba(34,211,238,0.15)]"
-        />
-        <MetricCard 
-          label="Readiness" 
-          value={`${currentRoadmap?.readinessScore || 0}%`} 
-          icon={Brain} 
-          color="text-purple-400"
-          progress={currentRoadmap?.readinessScore}
-        />
-        <MetricCard 
-          label="Consistency" 
-          value={(currentRoadmap?.consistencyScore ?? 0) > 70 ? "High" : (currentRoadmap?.consistencyScore ?? 0) > 40 ? "Medium" : "Developing"} 
-          icon={Flame} 
-          color="text-orange-400"
-        />
-        <MetricCard 
-          label="Next Milestone" 
-          value={currentRoadmap?.nextMilestone || "Initialization"} 
-          icon={Sparkles} 
-          color="text-emerald-400"
-        />
-      </Motion.div>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
+        {/* ─── MAIN COLUMN ─── */}
+        <div className="space-y-6">
+          
+          {/* TOP BANNER */}
+          <div className="relative rounded-3xl border border-white/[0.06] bg-obsidian overflow-hidden p-8">
+            <div className="absolute top-0 right-0 w-[600px] h-full opacity-60 pointer-events-none">
+               {/* Decorative Nebula Placeholder */}
+               <div className="absolute inset-0 bg-gradient-to-r from-obsidian via-transparent to-transparent z-10" />
+               <div className="absolute top-[-50%] right-[-10%] w-96 h-96 bg-brand/30 blur-[100px] rounded-full" />
+               <div className="absolute bottom-[-20%] right-[10%] w-64 h-64 bg-cyan-500/20 blur-[80px] rounded-full" />
+            </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr_320px] gap-8">
-        {/* ─── LEFT PANEL: PHASES ─── */}
-        <aside className="space-y-6">
-          <div className="flex items-center gap-2 mb-4 px-2">
-            <Route className="w-4 h-4 text-cyan-400" />
-            <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Journey Phases</h3>
+            <div className="relative z-10">
+               <div className="flex items-center gap-2 mb-4">
+                  <Route className="w-4 h-4 text-brand" />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand">Roadmap</span>
+               </div>
+               <h1 className="text-3xl font-semibold text-white mb-2">Career Roadmap</h1>
+               <p className="text-slate-400 text-sm mb-10">Your personalized learning path to achieve your career goals.</p>
+
+               <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                  <TopMetric label="Readiness Score" value={`${currentRoadmap?.readinessScore || 0}%`} sub="↑ 12% this week" color="text-cyan-400" border="border-cyan-400" />
+                  <TopMetric label="Skill Consistency" value={(currentRoadmap?.consistencyScore ?? 0) > 70 ? "85%" : "60%"} sub="Strong consistency" color="text-purple-400" border="border-purple-400" />
+                  <TopMetric label="Recall Health" value="68%" sub="Needs improvement" color="text-emerald-400" border="border-emerald-400" />
+                  <TopMetric label="Market Alignment" value="+12%" sub="Keep it up!" color="text-blue-400" border="border-blue-400" />
+               </div>
+            </div>
           </div>
-          <div className="relative pl-4 space-y-2">
-            <div className="absolute left-[21px] top-4 bottom-4 w-[2px] bg-white/[0.04]" />
-            {currentRoadmap?.phases.map((phase, idx) => (
-              <PhaseNode 
-                key={phase.id} 
-                phase={phase} 
-                active={activePhaseId === phase.id}
-                onClick={() => setActivePhaseId(phase.id)}
-                isLast={idx === currentRoadmap.phases.length - 1}
-              />
-            ))}
+
+          {/* CURRENT JOURNEY */}
+          <div className="rounded-3xl border border-white/[0.06] bg-obsidian p-8">
+             <div className="flex items-center gap-2 mb-8">
+                <Target className="w-4 h-4 text-slate-400" />
+                <h3 className="text-xs font-bold uppercase tracking-widest text-slate-300">Current Journey</h3>
+             </div>
+
+             <div className="flex flex-col md:flex-row items-center gap-8 mb-10">
+                <div className="shrink-0 relative w-24 h-24 rounded-full border border-white/10 flex items-center justify-center">
+                   <svg className="absolute inset-0 w-full h-full -rotate-90">
+                      <circle cx="48" cy="48" r="46" fill="transparent" stroke="rgba(255,255,255,0.05)" strokeWidth="4" />
+                      <circle cx="48" cy="48" r="46" fill="transparent" stroke="var(--brand)" strokeWidth="4" strokeDasharray="289" strokeDashoffset={289 * (1 - (currentRoadmap?.readinessScore || 0) / 100)} className="transition-all duration-1000" />
+                   </svg>
+                   <div className="text-center">
+                      <p className="text-xl font-bold text-white">{currentRoadmap?.readinessScore || 0}%</p>
+                      <p className="text-[8px] text-slate-500 uppercase tracking-widest mt-1">Progress</p>
+                   </div>
+                </div>
+                <div className="flex-1">
+                   <div className="flex items-center gap-3 mb-2">
+                      <h2 className="text-xl font-bold text-white">{currentRoadmap?.targetRole || "Software Developer"}</h2>
+                      <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest bg-brand/10 text-brand border border-brand/20">Target Role</span>
+                   </div>
+                   <p className="text-sm text-slate-400">Master full stack development and problem solving to become a job-ready software engineer.</p>
+                </div>
+                <button className="px-4 py-2 rounded-xl border border-white/10 text-xs font-bold text-slate-300 hover:bg-white/5 transition flex items-center gap-2">
+                   View Path <ArrowRight className="w-3 h-3" />
+                </button>
+             </div>
+
+             <div className="relative">
+                <div className="absolute top-4 left-0 w-full h-[2px] bg-white/5" />
+                <div className="relative flex justify-between">
+                   {currentRoadmap?.phases.slice(0, 5).map((phase, idx) => {
+                      const isCompleted = phase.status === "completed";
+                      const isLocked = phase.status === "locked";
+                      const isActive = activePhaseId === phase.id;
+                      return (
+                        <div key={phase.id} className="flex flex-col items-center w-24 text-center cursor-pointer" onClick={() => setActivePhaseId(phase.id)}>
+                           <div className={cn("w-8 h-8 rounded-full border-[3px] flex items-center justify-center z-10 transition-colors bg-obsidian", isCompleted ? "border-brand" : isActive ? "border-brand" : "border-white/10")}>
+                              {isCompleted ? <CheckCircle2 className="w-4 h-4 text-brand" /> : isLocked ? <Lock className="w-3 h-3 text-slate-600" /> : <div className="w-2 h-2 rounded-full bg-brand" />}
+                           </div>
+                           <p className={cn("text-[10px] font-bold mt-3 mb-1 line-clamp-1 transition-colors", isActive || isCompleted ? "text-white" : "text-slate-500")}>{phase.title}</p>
+                           <p className="text-[9px] text-slate-500 font-medium uppercase">{isCompleted ? "Completed" : isLocked ? "Locked" : "In Progress"}</p>
+                        </div>
+                      )
+                   })}
+                </div>
+             </div>
           </div>
-        </aside>
 
-        {/* ─── CENTER PANEL: MISSION WORKSPACE ─── */}
-        <main className="space-y-8">
-          <AnimatePresence mode="wait">
-            <Motion.section 
-              key={activePhaseId}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="space-y-8"
-            >
-              {/* Current Weekly Mission */}
-              {currentMission && (
-                <div className="rounded-[2rem] border border-white/[0.06] bg-white/[0.02] p-8 backdrop-blur-md relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 blur-[80px] -mr-32 -mt-32 rounded-full transition-all group-hover:bg-cyan-500/10" />
-                  
-                  <div className="relative z-10">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="px-3 py-1 rounded-full bg-cyan-400/10 border border-cyan-400/20 text-[10px] font-bold text-cyan-400 uppercase tracking-widest">
-                        Week {currentMission.weekNumber} Mission
-                      </div>
-                      <div className={cn(
-                        "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest",
-                        currentMission.status === "completed" ? "bg-emerald-400/10 text-emerald-400 border border-emerald-400/20" : "bg-blue-400/10 text-blue-400 border border-blue-400/20"
-                      )}>
-                        {currentMission.status.replace('_', ' ')}
-                      </div>
-                    </div>
-
-                    <h2 className="text-3xl font-bold text-white mb-4">{currentMission.title}</h2>
-                    <p className="text-slate-400 leading-relaxed mb-6 max-w-2xl">{currentMission.description}</p>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm mb-6">
-                      <div className="space-y-2">
-                        <p className="text-slate-500 uppercase tracking-wider text-[10px] font-bold">Why this matters</p>
-                        <p className="text-slate-300 italic">"{currentMission.whyItMatters}"</p>
-                      </div>
-                      <div className="space-y-2">
-                        <p className="text-slate-500 uppercase tracking-wider text-[10px] font-bold">Success Outcome</p>
-                        <p className="text-slate-300 flex items-center gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                          {currentMission.outcome}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-4 pt-6 border-t border-white/[0.04]">
-                       <div className="flex -space-x-2">
-                          {currentMission.commonMistakes.slice(0, 3).map((_, i) => (
-                            <div key={i} className="w-6 h-6 rounded-full bg-red-400/10 border border-red-400/20 flex items-center justify-center text-[10px] text-red-400 font-bold" title="Avoid common pitfalls">!</div>
-                          ))}
-                       </div>
-                       <p className="text-xs text-slate-500 font-medium">AI detected {currentMission.commonMistakes.length} common pitfalls to avoid this week.</p>
-                    </div>
-                  </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+             {/* JOURNEY PHASES */}
+             <div className="rounded-3xl border border-white/[0.06] bg-obsidian p-6">
+                <div className="flex items-center justify-between mb-6">
+                   <div className="flex items-center gap-2">
+                      <Route className="w-4 h-4 text-purple-400" />
+                      <h3 className="text-xs font-bold uppercase tracking-widest text-slate-300">Journey Phases</h3>
+                   </div>
                 </div>
-              )}
-
-              {/* Daily Execution Tasks */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between px-2">
-                  <div className="flex items-center gap-2">
-                    <LayoutDashboard className="w-4 h-4 text-purple-400" />
-                    <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Execution Tasks</h3>
-                  </div>
-                  <span className="text-[10px] text-slate-600 font-bold uppercase tracking-widest">
-                    {currentMission?.tasks.filter(t => t.status === "completed").length} / {currentMission?.tasks.length} Completed
-                  </span>
+                <div className="relative pl-4 space-y-4">
+                  <div className="absolute left-[21px] top-4 bottom-4 w-[2px] bg-white/[0.04]" />
+                  {currentRoadmap?.phases.map((phase, idx) => (
+                    <PhaseNode 
+                      key={phase.id} 
+                      phase={phase} 
+                      active={activePhaseId === phase.id}
+                      onClick={() => setActivePhaseId(phase.id)}
+                      isLast={idx === currentRoadmap.phases.length - 1}
+                    />
+                  ))}
                 </div>
+             </div>
 
-                <div className="grid gap-3">
+             {/* EXECUTION TASKS */}
+             <div className="rounded-3xl border border-white/[0.06] bg-obsidian p-6">
+                <div className="flex items-center justify-between mb-6">
+                   <div className="flex items-center gap-2">
+                      <LayoutDashboard className="w-4 h-4 text-cyan-400" />
+                      <h3 className="text-xs font-bold uppercase tracking-widest text-slate-300">Execution Tasks</h3>
+                   </div>
+                   <button className="text-[10px] text-slate-500 hover:text-white uppercase tracking-widest font-bold">View All</button>
+                </div>
+                <div className="space-y-3">
                   {currentMission?.tasks.map((task, idx) => (
                     <TaskCard 
                       key={task.id} 
                       task={task} 
-                      onToggle={() => {
-                        const nextStatus = task.status === "completed" ? "pending" : "completed";
-                        updateTaskStatus(task.id, nextStatus);
-                      }}
+                      onToggle={() => updateTaskStatus(task.id, task.status === "completed" ? "pending" : "completed")}
                       delay={idx * 0.05}
                     />
                   ))}
+                  <button className="w-full py-3 rounded-xl border border-dashed border-white/10 text-[10px] font-bold text-slate-500 uppercase tracking-widest hover:text-white hover:border-white/30 transition mt-2">
+                     + Add New Task
+                  </button>
                 </div>
-              </div>
-            </Motion.section>
-          </AnimatePresence>
-        </main>
+             </div>
+          </div>
+        </div>
 
         {/* ─── RIGHT PANEL: AI INSIGHTS ─── */}
         <aside className="space-y-6">
-          <div className="rounded-3xl border border-white/[0.06] bg-white/[0.01] p-6 space-y-6">
+          {/* MENTOR INSIGHTS */}
+          <div className="rounded-3xl border border-white/[0.06] bg-obsidian p-6 space-y-6">
             <div className="flex items-center gap-2 mb-2">
-              <Zap className="w-4 h-4 text-amber-400" />
-              <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Veda AI Mentor</h3>
+              <Sparkles className="w-4 h-4 text-brand" />
+              <h3 className="text-xs font-bold uppercase tracking-widest text-slate-300">AI Mentor Insights</h3>
             </div>
 
-            <div className="space-y-4">
-              {currentRoadmap?.insights?.map((insight, i) => (
-                <InsightCard key={i} insight={insight} />
-              ))}
+            <div className="p-4 rounded-2xl bg-brand/10 border border-brand/20">
+               <p className="text-xs text-white font-medium mb-1">Excellent progress, Priyanka! ✨</p>
+               <p className="text-[10px] text-slate-400">Your consistency and recall are improving.</p>
             </div>
 
-            <div className="pt-6 border-t border-white/[0.04] space-y-4">
-              <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-600">Dynamic Nudges</h4>
-              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
-                 <div className="flex items-center gap-3 mb-2">
-                    <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-xs font-bold text-white tracking-wide">Next Best Action</span>
-                 </div>
-                 <p className="text-[11px] text-slate-400 leading-relaxed mb-4">
-                    Based on your night-owl behavior and recent DP struggles, you should focus on BFS traversal tonight for 45 mins.
-                 </p>
-                 <button className="w-full py-2.5 rounded-xl bg-cyan-400 text-slate-950 text-[11px] font-bold uppercase tracking-widest hover:scale-[1.02] transition">
-                    Start Learning Mission
-                 </button>
-              </div>
+            <div>
+               <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-4">Key Insights</h4>
+               <div className="space-y-4">
+                  <div className="flex gap-3">
+                     <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                     <div>
+                        <p className="text-[11px] text-slate-300 font-medium">Your DSA retention dropped 15%</p>
+                        <p className="text-[10px] text-slate-500 mt-1">Review Linked List concepts.</p>
+                     </div>
+                  </div>
+                  <div className="flex gap-3">
+                     <Clock className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+                     <div>
+                        <p className="text-[11px] text-slate-300 font-medium">You perform best between 9 PM - 11 PM</p>
+                        <p className="text-[10px] text-slate-500 mt-1">Optimize your study schedule.</p>
+                     </div>
+                  </div>
+               </div>
             </div>
           </div>
 
-          <div className="rounded-3xl border border-white/[0.06] bg-white/[0.01] p-6 text-center">
-             <TrendingUp className="w-6 h-6 text-slate-700 mx-auto mb-3" />
-             <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1">Weekly Momentum</p>
-             <p className="text-2xl font-bold text-white mb-2">+12%</p>
-             <div className="h-1.5 w-full bg-white/[0.06] rounded-full overflow-hidden">
-                <Motion.div className="h-full bg-emerald-400" initial={{ width: 0 }} animate={{ width: "65%" }} />
+          {/* NEXT BEST ACTION */}
+          <div className="rounded-3xl border border-white/[0.06] bg-obsidian p-6">
+             <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                   <Target className="w-4 h-4 text-emerald-400" />
+                   <h3 className="text-xs font-bold uppercase tracking-widest text-slate-300">Next Best Action</h3>
+                </div>
+                <span className="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Recommended</span>
+             </div>
+             <p className="text-[11px] text-slate-400 leading-relaxed mb-6">
+                Based on your progress and recent performance, start a focus on Graph Traversal sprint.
+             </p>
+             <button className="w-full py-3 rounded-xl bg-brand text-white text-[11px] font-bold flex items-center justify-center gap-2 hover:bg-brand/90 transition shadow-glow">
+                <Zap className="w-4 h-4" /> Start 45-min Sprint
+             </button>
+          </div>
+
+          {/* WEEKLY PROGRESS */}
+          <div className="rounded-3xl border border-white/[0.06] bg-obsidian p-6">
+             <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                   <TrendingUp className="w-4 h-4 text-blue-400" />
+                   <h3 className="text-xs font-bold uppercase tracking-widest text-slate-300">Weekly Progress</h3>
+                </div>
+             </div>
+             <p className="text-[10px] text-slate-500 mb-6">You're ahead of 65% of learners</p>
+             <div className="h-24 w-full flex items-end justify-between gap-1 pb-4 border-b border-white/5">
+                {[40, 60, 30, 80, 50, 90, 70].map((h, i) => (
+                   <div key={i} className="w-full bg-white/5 rounded-t-sm hover:bg-brand/50 transition-colors relative group" style={{ height: `${h}%` }}>
+                      <div className="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 text-[9px] text-white bg-black px-1 rounded transition-opacity">{h}%</div>
+                   </div>
+                ))}
+             </div>
+             <div className="flex justify-between mt-2 text-[9px] font-bold text-slate-600 uppercase">
+                <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+             </div>
+          </div>
+
+          {/* QUICK ACTIONS */}
+          <div className="rounded-3xl border border-white/[0.06] bg-obsidian p-6">
+             <div className="flex items-center gap-2 mb-4">
+                <Zap className="w-4 h-4 text-amber-400" />
+                <h3 className="text-xs font-bold uppercase tracking-widest text-slate-300">Quick Actions</h3>
+             </div>
+             <div className="grid grid-cols-4 gap-2">
+                {[
+                   { icon: Brain, label: "Ask Veda" },
+                   { icon: RefreshCw, label: "Recall" },
+                   { icon: Target, label: "Quiz" },
+                   { icon: BookOpen, label: "Note" },
+                ].map((action, i) => (
+                   <button key={i} className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition group">
+                      <action.icon className="w-4 h-4 text-slate-400 group-hover:text-brand transition-colors" />
+                      <span className="text-[8px] font-bold text-slate-500 uppercase">{action.label}</span>
+                   </button>
+                ))}
+             </div>
+             <div className="mt-4 p-3 rounded-xl bg-gradient-to-r from-brand/20 to-transparent border border-brand/20 flex items-center gap-3 cursor-pointer">
+                <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center shrink-0">
+                   <Sparkles className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                   <p className="text-[10px] font-bold text-white uppercase tracking-widest">Veda Assistant</p>
+                   <p className="text-[9px] text-slate-400">How can I help you today?</p>
+                </div>
              </div>
           </div>
         </aside>
@@ -261,31 +312,18 @@ export function RoadmapWorkspace() {
 
 /* ─── SUB-COMPONENTS ─── */
 
-function MetricCard({ label, value, icon: Icon, color, glow, progress }: any) {
+function TopMetric({ label, value, sub, color, border }: any) {
   return (
-    <div className={cn(
-      "rounded-3xl border border-white/[0.06] bg-white/[0.02] p-5 backdrop-blur-sm relative overflow-hidden group",
-      glow
-    )}>
-      <div className="flex items-start justify-between relative z-10">
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-2">{label}</p>
-          <p className={cn("text-2xl font-bold transition-all group-hover:scale-105 origin-left", color)}>{value}</p>
-        </div>
-        <div className={cn("p-2.5 rounded-2xl bg-white/[0.04] border border-white/[0.06]", color)}>
-          <Icon className="w-5 h-5" />
-        </div>
-      </div>
-      {progress !== undefined && (
-        <div className="mt-4 h-1 w-full bg-white/[0.04] rounded-full overflow-hidden">
-          <Motion.div 
-            className={cn("h-full", color.replace('text-', 'bg-'))}
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 1, delay: 0.5 }}
-          />
-        </div>
-      )}
+    <div className="flex flex-col gap-2">
+       <div className="w-10 h-10 rounded-full bg-transparent flex items-center justify-center mb-2 relative">
+          <svg className="absolute inset-0 w-full h-full -rotate-90">
+             <circle cx="20" cy="20" r="18" fill="transparent" stroke="rgba(255,255,255,0.1)" strokeWidth="3" />
+             <circle cx="20" cy="20" r="18" fill="transparent" stroke="currentColor" strokeWidth="3" strokeDasharray="113" strokeDashoffset="40" className={color} />
+          </svg>
+          <span className="text-[10px] font-bold text-white">{value}</span>
+       </div>
+       <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{label}</p>
+       <p className={cn("text-[10px] font-medium", color)}>{sub}</p>
     </div>
   );
 }
@@ -314,15 +352,18 @@ function PhaseNode({ phase, active, onClick, isLast }: { phase: RoadmapPhase; ac
           {isLocked && <Lock className="w-2.5 h-2.5 text-slate-500" />}
         </div>
       </div>
-      <div className="text-left overflow-hidden">
+      <div className="text-left overflow-hidden flex-1">
         <p className={cn(
-          "text-xs font-bold truncate transition-all",
-          active ? "text-white" : "text-slate-500"
+          "text-[11px] font-bold truncate transition-all",
+          active ? "text-white" : isCompleted ? "text-white" : "text-slate-400"
         )}>
           {phase.title}
         </p>
-        <p className="text-[10px] text-slate-600 font-medium truncate uppercase tracking-widest">{phase.difficulty}</p>
+        <p className="text-[9px] text-slate-500 font-medium truncate uppercase tracking-widest">{phase.description || "Foundational concepts"}</p>
       </div>
+      {isCompleted && <span className="text-[9px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded uppercase">Completed</span>}
+      {!isCompleted && isActive && <span className="text-[9px] font-bold text-brand bg-brand/10 px-2 py-0.5 rounded uppercase">In Progress</span>}
+      {!isCompleted && !isActive && <span className="text-[9px] font-bold text-slate-600 bg-white/5 px-2 py-0.5 rounded uppercase">Locked</span>}
       {active && (
         <Motion.div layoutId="phase-glow" className="absolute inset-0 rounded-2xl bg-cyan-400/5 blur-md" />
       )}
@@ -373,10 +414,7 @@ function TaskCard({ task, onToggle, delay }: { task: RoadmapTask; onToggle: () =
           <span className={cn("px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest border", typeColors[task.type])}>
             {task.type}
           </span>
-          <span className="text-[10px] text-slate-600 font-bold uppercase tracking-tighter flex items-center gap-1">
-            <Clock className="w-3 h-3" /> {task.durationMinutes}m
-          </span>
-          <span className="text-[10px] text-slate-600 font-bold uppercase tracking-tighter">• {task.difficulty}</span>
+          <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{task.durationMinutes}m • {task.difficulty}</span>
         </div>
         <h4 className={cn("text-sm font-semibold transition-all", isDone ? "text-slate-500 line-through" : "text-white")}>
           {task.title}

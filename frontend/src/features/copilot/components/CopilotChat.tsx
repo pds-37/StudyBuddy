@@ -119,42 +119,36 @@ export function CopilotChat() {
       <NebulaBackground opacity={0.3} showGrid={false} />
 
       {/* ─── TOP STATUS BAR: MENTOR METRICS ─── */}
-      <header className="h-20 shrink-0 px-8 border-b border-white/[0.06] bg-obsidian/40 backdrop-blur-2xl flex items-center justify-between z-20">
-        <div className="flex items-center gap-10">
-          <div className="flex items-center gap-3">
-             <div className="w-10 h-10 rounded-2xl bg-brand/10 border border-brand/20 flex items-center justify-center text-brand shadow-glow">
-                <Bot size={22} />
-             </div>
-             <div>
-                <h2 className="text-sm font-black text-white tracking-tight uppercase">Veda AI Mentor</h2>
-                <div className="flex items-center gap-2">
-                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Active Intelligence</span>
-                </div>
-             </div>
-          </div>
+      <header className="shrink-0 px-8 py-8 border-b border-white/[0.06] bg-obsidian/40 backdrop-blur-3xl z-20">
+         <div className="max-w-[1600px] mx-auto space-y-8">
+            <div className="flex items-center justify-between">
+               <div>
+                  <h1 className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
+                     Veda AI <span className="text-brand font-normal text-sm border border-brand/20 px-2 py-0.5 rounded-lg bg-brand/5">Command Center</span>
+                  </h1>
+                  <p className="text-slate-400 text-sm mt-1 font-medium italic">Deeply contextual career guidance and adaptive study missions.</p>
+               </div>
+               <div className="flex items-center gap-4">
+                  <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                     <History size={14} className="text-brand" />
+                     Mission: Graph Mastery
+                  </div>
+                  <button 
+                    onClick={() => setIsInsightsVisible(!isInsightsVisible)}
+                    className={cn("p-3 rounded-xl transition-colors", isInsightsVisible ? "bg-brand/10 text-brand shadow-glow" : "bg-white/[0.03] border border-white/5 text-slate-400 hover:text-white")}
+                  >
+                     <LayoutDashboard size={18} />
+                  </button>
+               </div>
+            </div>
 
-          <div className="hidden lg:flex items-center gap-8">
-             <TopMetric label="Focus Score" value={`${(user as any)?.behaviorProfile?.consistencyScore || 0}%`} icon={Zap} color="text-blue-400" />
-             <TopMetric label="Recall Health" value={(user as any)?.behaviorProfile?.recallMomentum > 0 ? "Good" : "Learning"} icon={Brain} color="text-purple-400" />
-             <TopMetric label="Consistency" value={(user as any)?.behaviorProfile?.consistencyScore > 70 ? "High" : "Medium"} icon={Flame} color="text-orange-400" />
-             <TopMetric label="Burnout Risk" value={(user as any)?.behaviorProfile?.skipRate > 30 ? "High" : "Low"} icon={ShieldAlert} color="text-emerald-400" />
-          </div>
-
-        </div>
-
-        <div className="flex items-center gap-4">
-           <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-              <History size={14} className="text-brand" />
-              Mission: Graph Mastery
-           </div>
-           <button 
-             onClick={() => setIsInsightsVisible(!isInsightsVisible)}
-             className={cn("p-2 rounded-lg transition-colors", isInsightsVisible ? "bg-brand/10 text-brand" : "text-slate-500 hover:text-white")}
-           >
-              <LayoutDashboard size={20} />
-           </button>
-        </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+               <TopMetric label="Focus Score" value={`${(user as any)?.behaviorProfile?.consistencyScore || 0}%`} icon={Zap} color="text-blue-400" />
+               <TopMetric label="Recall Health" value={(user as any)?.behaviorProfile?.recallMomentum > 0 ? "Good" : "Learning"} icon={Brain} color="text-purple-400" />
+               <TopMetric label="Consistency" value={(user as any)?.behaviorProfile?.consistencyScore > 70 ? "High" : "Medium"} icon={Flame} color="text-orange-400" />
+               <TopMetric label="Burnout Risk" value={(user as any)?.behaviorProfile?.skipRate > 30 ? "High" : "Low"} icon={ShieldAlert} color="text-emerald-400" />
+            </div>
+         </div>
       </header>
 
       <div className="flex-1 flex overflow-hidden">
@@ -174,44 +168,47 @@ export function CopilotChat() {
 
              <div className="space-y-4">
                 <h3 className="px-2 text-[10px] font-black text-slate-600 uppercase tracking-[0.3em]">Categories</h3>
-                <div className="grid grid-cols-1 gap-2">
-                   {categories.map(cat => (
-                     <button 
-                        key={cat.id} 
-                        onClick={() => handleSendMessage(`Analyze my ${cat.label} progress and suggest next steps.`)}
-                        className="w-full p-3 rounded-xl hover:bg-white/[0.03] flex items-center gap-3 transition-colors group"
-                     >
-                        <cat.icon size={16} className={cn(cat.color, "group-hover:scale-110 transition-transform")} />
-                        <span className="text-[11px] font-bold text-slate-400 group-hover:text-white transition-colors">{cat.label}</span>
-                     </button>
-                   ))}
-                </div>
+                <div className="space-y-2">
+                    {categories.map(cat => (
+                      <button 
+                         key={cat.id} 
+                         onClick={() => handleSendMessage(`Analyze my ${cat.label} progress and suggest next steps.`)}
+                         className="w-full p-4 rounded-2xl flex items-center justify-between transition-all group hover:bg-white/[0.05] text-slate-500 hover:text-white"
+                      >
+                         <div className="flex items-center gap-4">
+                            <cat.icon size={18} className={cn("transition-transform group-hover:scale-110", cat.color)} />
+                            <span className="text-sm font-bold">{cat.label}</span>
+                         </div>
+                         <ChevronRight size={14} className="text-brand opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </button>
+                    ))}
+                 </div>
              </div>
 
              <div className="space-y-4 flex-1">
                 <h3 className="px-2 text-[10px] font-black text-slate-600 uppercase tracking-[0.3em]">Recent Missions</h3>
                 <div className="space-y-2 max-h-[400px] overflow-y-auto custom-scrollbar">
-                   {conversations.map(conv => {
-                     const active = currentConversation?._id === conv._id;
-                     return (
-                       <button 
-                         key={conv._id}
-                         onClick={() => selectConversation(conv._id)}
-                         className={cn(
-                           "w-full p-4 rounded-2xl text-left transition-all border",
-                           active ? "bg-white/[0.05] border-white/10" : "border-transparent hover:bg-white/[0.02]"
-                         )}
-                       >
-                          <p className={cn("text-[11px] font-bold truncate mb-1", active ? "text-white" : "text-slate-500")}>
-                            {conv.messages.find(m => m.role === "user")?.content || "New Session"}
-                          </p>
-                          <div className="flex items-center gap-2 text-[9px] font-bold text-slate-600 uppercase">
-                             <Clock3 size={10} /> {formatDate(conv.updatedAt)}
-                          </div>
-                       </button>
-                     );
-                   })}
-                </div>
+                    {conversations.map(conv => {
+                      const active = currentConversation?._id === conv._id;
+                      return (
+                        <button 
+                          key={conv._id}
+                          onClick={() => selectConversation(conv._id)}
+                          className={cn(
+                            "w-full p-4 rounded-2xl text-left transition-all group",
+                            active ? "bg-white/[0.05] text-white" : "text-slate-500 hover:text-white hover:bg-white/[0.02]"
+                          )}
+                        >
+                           <p className={cn("text-sm font-bold truncate mb-1", active ? "text-white" : "group-hover:text-white")}>
+                             {conv.messages.find(m => m.role === "user")?.content || "New Session"}
+                           </p>
+                           <div className="flex items-center gap-2 text-[10px] font-black text-slate-600 uppercase">
+                              <Clock3 size={12} /> {formatDate(conv.updatedAt)}
+                           </div>
+                        </button>
+                      );
+                    })}
+                 </div>
              </div>
           </div>
         </Motion.aside>
@@ -291,37 +288,33 @@ export function CopilotChat() {
 
                 <div className="relative group">
                    <div className="absolute -inset-1 bg-gradient-to-r from-brand to-purple-600 rounded-[2.5rem] blur opacity-10 group-focus-within:opacity-30 transition-opacity" />
-                   <div className="relative glass bg-ink/80 border-white/10 rounded-[2.5rem] p-2 shadow-2xl overflow-hidden">
-                      <div className="flex items-end gap-3 px-4">
-                         <button className="mb-3 p-3 rounded-2xl hover:bg-white/5 text-slate-500 transition-colors">
-                            <Plus size={20} />
-                         </button>
-                         <textarea
-                            ref={messageRef}
-                            value={draft}
-                            onChange={(e) => setDraft(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                            placeholder="Type a command or ask Veda anything..."
-                            className="flex-1 bg-transparent py-5 text-sm text-white outline-none resize-none max-h-40 min-h-[60px] custom-scrollbar placeholder-slate-600 font-medium"
-                            rows={1}
-                         />
-                         <div className="flex items-center gap-2 mb-3">
-                            <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-[9px] font-black text-slate-500 uppercase tracking-widest">
-                               <Command size={10} /> Enter to send
-                            </div>
-                            <button
-                               onClick={() => void handleSendMessage()}
-                               disabled={!draft.trim() || sending}
-                               className={cn(
-                                 "p-4 rounded-[1.5rem] transition-all disabled:opacity-30 active:scale-95",
-                                 draft.trim() ? "bg-brand text-white shadow-glow" : "bg-white/5 text-slate-600"
-                               )}
-                            >
-                               {sending ? <Loader2 size={20} className="animate-spin" /> : <Send size={20} />}
-                            </button>
-                         </div>
-                      </div>
-                   </div>
+                    <div className="relative glass bg-ink/80 border-white/10 rounded-2xl p-2 shadow-2xl overflow-hidden flex items-center pr-4">
+                       <MessageSquare size={18} className="text-slate-500 ml-4 hidden md:block" />
+                       <textarea
+                          ref={messageRef}
+                          value={draft}
+                          onChange={(e) => setDraft(e.target.value)}
+                          onKeyDown={handleKeyDown}
+                          placeholder="Command Veda or ask anything..."
+                          className="flex-1 bg-transparent py-4 px-4 text-sm text-white outline-none resize-none max-h-40 min-h-[50px] custom-scrollbar placeholder-slate-600 font-medium"
+                          rows={1}
+                       />
+                       <div className="flex items-center gap-3">
+                          <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-[9px] font-black text-slate-500 uppercase tracking-widest">
+                             <Command size={10} /> Enter
+                          </div>
+                          <button
+                             onClick={() => void handleSendMessage()}
+                             disabled={!draft.trim() || sending}
+                             className={cn(
+                               "p-3 rounded-xl transition-all disabled:opacity-30 active:scale-95",
+                               draft.trim() ? "bg-brand text-white shadow-glow" : "bg-white/5 text-slate-600"
+                             )}
+                          >
+                             {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                          </button>
+                       </div>
+                    </div>
                 </div>
              </div>
           </div>
@@ -343,18 +336,18 @@ export function CopilotChat() {
                  </div>
 
                  <div className="space-y-6">
-                    <LiveInsight 
+                    <InsightRow 
                       label="Burnout Indicator" 
-                      value={(user as any)?.behaviorProfile?.skipRate > 30 ? "High Risk" : "Stable"} 
+                      message="Your skip rate increased by 12% this week. Consider a rest session." 
                       color={(user as any)?.behaviorProfile?.skipRate > 30 ? "text-red-400" : "text-emerald-400"}
-                      description="Your skip rate increased by 12% this week. Consider a rest session."
+                      icon={ShieldAlert}
                     />
                     
-                    <LiveInsight 
+                    <InsightRow 
                       label="Learning Velocity" 
-                      value="Accelerating" 
+                      message="Topic mastery is 15% faster than last month. Ready for advanced modules." 
                       color="text-cyan-400"
-                      description="Topic mastery is 15% faster than last month. Ready for advanced modules."
+                      icon={TrendingUp}
                     />
 
                     <div className="p-6 rounded-[2rem] bg-white/[0.02] border border-white/[0.06] space-y-4">
@@ -404,15 +397,20 @@ export function CopilotChat() {
 
 function TopMetric({ label, value, icon: Icon, color }: any) {
   return (
-    <div className="flex items-center gap-3">
-      <div className={cn("p-2 rounded-xl bg-white/[0.04] border border-white/[0.06]", color)}>
-        <Icon size={16} />
+    <Motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="p-6 rounded-[2.5rem] glass border-white/5 bg-white/[0.02] relative overflow-hidden"
+    >
+      <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 blur-3xl -mr-12 -mt-12 rounded-full" />
+      <div className="relative z-10">
+        <div className={cn("p-2 rounded-xl bg-white/[0.04] w-fit mb-4", color)}>
+          <Icon size={20} />
+        </div>
+        <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">{label}</p>
+        <p className="text-2xl font-black text-white">{value}</p>
       </div>
-      <div>
-        <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{label}</p>
-        <p className="text-xs font-black text-white">{value}</p>
-      </div>
-    </div>
+    </Motion.div>
   );
 }
 
@@ -428,14 +426,14 @@ function SuggestionChip({ icon: Icon, label, onClick }: any) {
   );
 }
 
-function LiveInsight({ label, value, color, description }: any) {
+function InsightRow({ label, message, color, icon: Icon }: any) {
   return (
     <div className="space-y-2">
-       <div className="flex items-center justify-between">
-          <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{label}</span>
-          <span className={cn("text-[10px] font-black uppercase tracking-widest", color)}>{value}</span>
-       </div>
-       <p className="text-[11px] text-slate-400 leading-relaxed font-medium">{description}</p>
+      <div className="flex items-center gap-2">
+        <Icon size={14} className={color} />
+        <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{label}</span>
+      </div>
+      <p className="text-[11px] text-slate-300 font-medium leading-relaxed">{message}</p>
     </div>
   );
 }
