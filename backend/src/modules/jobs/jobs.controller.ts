@@ -24,7 +24,7 @@ export const getReadiness: RequestHandler = async (req, res, next) => {
 /** Matches a specific job to the student. */
 export const matchJob: RequestHandler = async (req, res, next) => {
   try {
-    const match = await jobsService.matchJob(req.userId!, req.params.jobId);
+    const match = await jobsService.matchJob(req.userId!, req.params.jobId as string);
     res.json({ match });
   } catch (error) {
     next(error);
@@ -53,7 +53,7 @@ export const getJobs: RequestHandler = async (req, res, next) => {
 /** Gets a single job listing. */
 export const getJob: RequestHandler = async (req, res, next) => {
   try {
-    const job = await jobsService.getJob(req.params.id);
+    const job = await jobsService.getJob(req.params.id as string);
     res.json({ job });
   } catch (error) {
     next(error);
