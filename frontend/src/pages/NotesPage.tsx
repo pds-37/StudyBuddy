@@ -21,7 +21,6 @@ import {
 } from "lucide-react";
 import { cn } from "../lib/utils/cn";
 import { useNotesStore } from "../store/notes-store";
-import { useNotesStore } from "../store/notes-store";
 import { 
   KnowledgeMetrics, 
   IntelligentNoteCard, 

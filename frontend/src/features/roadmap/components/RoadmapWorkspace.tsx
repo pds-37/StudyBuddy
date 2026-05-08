@@ -362,8 +362,8 @@ function PhaseNode({ phase, active, onClick, isLast }: { phase: RoadmapPhase; ac
         <p className="text-[9px] text-slate-500 font-medium truncate uppercase tracking-widest">{phase.description || "Foundational concepts"}</p>
       </div>
       {isCompleted && <span className="text-[9px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded uppercase">Completed</span>}
-      {!isCompleted && isActive && <span className="text-[9px] font-bold text-brand bg-brand/10 px-2 py-0.5 rounded uppercase">In Progress</span>}
-      {!isCompleted && !isActive && <span className="text-[9px] font-bold text-slate-600 bg-white/5 px-2 py-0.5 rounded uppercase">Locked</span>}
+      {!isCompleted && active && <span className="text-[9px] font-bold text-brand bg-brand/10 px-2 py-0.5 rounded uppercase">In Progress</span>}
+      {!isCompleted && !active && <span className="text-[9px] font-bold text-slate-600 bg-white/5 px-2 py-0.5 rounded uppercase">Locked</span>}
       {active && (
         <Motion.div layoutId="phase-glow" className="absolute inset-0 rounded-2xl bg-cyan-400/5 blur-md" />
       )}
