@@ -8,6 +8,8 @@ import {
   Cloud,
   Zap
 } from "lucide-react";
+import { cn } from "../lib/utils/cn";
+import { NebulaBackground } from "../components/common/NebulaBackground";
 
 export function SettingsPage() {
   const { user } = useAppStore();
