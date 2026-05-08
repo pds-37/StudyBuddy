@@ -80,7 +80,7 @@ export function GlobalCopilotWidget() {
       {/* AI Chat Drawer / Popover */}
       <div
         className={cn(
-          "fixed bottom-6 right-6 z-50 flex w-[min(calc(100vw-48px),400px)] flex-col overflow-hidden rounded-[2rem] border border-white/[0.08] bg-panel/95 shadow-[0_20px_80px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-2xl transition-all duration-500",
+          "fixed bottom-6 right-6 z-50 flex w-[min(calc(100vw-48px),400px)] flex-col overflow-hidden rounded-[2rem] border border-white/[0.08] bg-slate-50 dark:bg-panel bg-slate-50 dark:bg-panel/95 shadow-[0_20px_80px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-2xl transition-all duration-500",
           isOpen ? "h-[600px] max-h-[calc(100vh-96px)] translate-y-0 opacity-100" : "pointer-events-none h-[600px] translate-y-12 opacity-0"
         )}
       >
@@ -91,16 +91,16 @@ export function GlobalCopilotWidget() {
               <Bot className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-white">Veda AI</h3>
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-900 dark:text-white">Veda AI</h3>
               <div className="flex items-center gap-1.5">
-                <p className="text-[11px] text-slate-400">{isAuthenticated ? `Mentor for ${user?.name || "you"}` : "Guest Mode"}</p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-500 dark:text-slate-400">{isAuthenticated ? `Mentor for ${user?.name || "you"}` : "Guest Mode"}</p>
                 <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-brand/10 border border-brand/20 text-brand font-bold uppercase tracking-tighter">Llama 3.1</span>
               </div>
             </div>
           </div>
           <button
             onClick={() => setIsOpen(false)}
-            className="grid h-8 w-8 place-items-center rounded-full text-slate-400 transition hover:bg-white/[0.06] hover:text-white"
+            className="grid h-8 w-8 place-items-center rounded-full text-slate-500 dark:text-slate-500 dark:text-slate-400 transition hover:bg-white/[0.06] hover:text-slate-900 dark:text-slate-900 dark:text-white"
           >
             <X className="h-4 w-4" />
           </button>
@@ -113,7 +113,7 @@ export function GlobalCopilotWidget() {
               <div className="mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-white/[0.02] border border-white/[0.04]">
                 <MessageSquare className="h-6 w-6 text-slate-500" />
               </div>
-              <p className="text-sm font-medium text-white">How can I help you today?</p>
+              <p className="text-sm font-medium text-slate-900 dark:text-slate-900 dark:text-white">How can I help you today?</p>
               <p className="mt-1 text-xs text-slate-500 max-w-[240px]">Ask me anything about your career roadmap, interview prep, or daily tasks.</p>
             </div>
           ) : (
@@ -123,7 +123,7 @@ export function GlobalCopilotWidget() {
                   className={cn(
                     "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-sm",
                     msg.role === "user"
-                      ? "rounded-tr-sm bg-gradient-to-br from-brand to-cyan text-white"
+                      ? "rounded-tr-sm bg-gradient-to-br from-brand to-cyan text-slate-900 dark:text-slate-900 dark:text-white"
                       : "rounded-tl-sm border border-white/[0.04] bg-white/[0.02] text-slate-200"
                   )}
                 >
@@ -145,7 +145,7 @@ export function GlobalCopilotWidget() {
           )}
           {sending && (
             <div className="flex justify-start">
-              <div className="inline-flex items-center gap-2 rounded-2xl border border-white/[0.04] bg-white/[0.02] px-4 py-2 text-xs text-slate-400">
+              <div className="inline-flex items-center gap-2 rounded-2xl border border-white/[0.04] bg-white/[0.02] px-4 py-2 text-xs text-slate-500 dark:text-slate-500 dark:text-slate-400">
                 <Loader2 className="h-3.5 w-3.5 animate-spin text-cyan" />
                 Thinking...
               </div>
@@ -162,7 +162,7 @@ export function GlobalCopilotWidget() {
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Ask Veda..."
-              className="max-h-32 min-h-[40px] w-full resize-none bg-transparent px-3 py-2 text-sm text-white placeholder-slate-500 outline-none"
+              className="max-h-32 min-h-[40px] w-full resize-none bg-transparent px-3 py-2 text-sm text-slate-900 dark:text-slate-900 dark:text-white placeholder-slate-500 outline-none"
               rows={1}
             />
             <button

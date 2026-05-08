@@ -119,23 +119,23 @@ export function CopilotChat() {
       <NebulaBackground opacity={0.3} showGrid={false} />
 
       {/* ─── TOP STATUS BAR: MENTOR METRICS ─── */}
-      <header className="shrink-0 px-8 py-8 border-b border-white/[0.06] bg-obsidian/40 backdrop-blur-3xl z-20">
+      <header className="shrink-0 px-8 py-8 border-b border-white/[0.06] bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
          <div className="max-w-[1600px] mx-auto space-y-8">
             <div className="flex items-center justify-between">
                <div>
-                  <h1 className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
+                  <h1 className="text-3xl font-black text-slate-900 dark:text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
                      Veda AI <span className="text-brand font-normal text-sm border border-brand/20 px-2 py-0.5 rounded-lg bg-brand/5">Command Center</span>
                   </h1>
-                  <p className="text-slate-400 text-sm mt-1 font-medium italic">Deeply contextual career guidance and adaptive study missions.</p>
+                  <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 text-sm mt-1 font-medium italic">Deeply contextual career guidance and adaptive study missions.</p>
                </div>
                <div className="flex items-center gap-4">
-                  <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                  <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-[11px] font-bold text-slate-500 dark:text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                      <History size={14} className="text-brand" />
                      Mission: Graph Mastery
                   </div>
                   <button 
                     onClick={() => setIsInsightsVisible(!isInsightsVisible)}
-                    className={cn("p-3 rounded-xl transition-colors", isInsightsVisible ? "bg-brand/10 text-brand shadow-glow" : "bg-white/[0.03] border border-white/5 text-slate-400 hover:text-white")}
+                    className={cn("p-3 rounded-xl transition-colors", isInsightsVisible ? "bg-brand/10 text-brand shadow-glow" : "bg-white/[0.03] border border-white/5 text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white")}
                   >
                      <LayoutDashboard size={18} />
                   </button>
@@ -156,7 +156,7 @@ export function CopilotChat() {
         <Motion.aside 
           initial={false}
           animate={{ width: isSidebarCollapsed ? 0 : 320, opacity: isSidebarCollapsed ? 0 : 1 }}
-          className="shrink-0 border-r border-white/[0.06] bg-ink/20 backdrop-blur-3xl overflow-hidden flex flex-col z-10"
+          className="shrink-0 border-r border-white/[0.06] bg-ink bg-white dark:bg-ink$4"
         >
           <div className="p-6 space-y-6 min-w-[320px]">
              <button 
@@ -173,7 +173,7 @@ export function CopilotChat() {
                       <button 
                          key={cat.id} 
                          onClick={() => handleSendMessage(`Analyze my ${cat.label} progress and suggest next steps.`)}
-                         className="w-full p-4 rounded-2xl flex items-center justify-between transition-all group hover:bg-white/[0.05] text-slate-500 hover:text-white"
+                         className="w-full p-4 rounded-2xl flex items-center justify-between transition-all group hover:bg-white/[0.05] text-slate-500 hover:text-slate-900 dark:text-slate-900 dark:text-white"
                       >
                          <div className="flex items-center gap-4">
                             <cat.icon size={18} className={cn("transition-transform group-hover:scale-110", cat.color)} />
@@ -196,10 +196,10 @@ export function CopilotChat() {
                           onClick={() => selectConversation(conv._id)}
                           className={cn(
                             "w-full p-4 rounded-2xl text-left transition-all group",
-                            active ? "bg-white/[0.05] text-white" : "text-slate-500 hover:text-white hover:bg-white/[0.02]"
+                            active ? "bg-white/[0.05] text-slate-900 dark:text-slate-900 dark:text-white" : "text-slate-500 hover:text-slate-900 dark:text-slate-900 dark:text-white hover:bg-white/[0.02]"
                           )}
                         >
-                           <p className={cn("text-sm font-bold truncate mb-1", active ? "text-white" : "group-hover:text-white")}>
+                           <p className={cn("text-sm font-bold truncate mb-1", active ? "text-slate-900 dark:text-slate-900 dark:text-white" : "group-hover:text-slate-900 dark:text-slate-900 dark:text-white")}>
                              {conv.messages.find(m => m.role === "user")?.content || "New Session"}
                            </p>
                            <div className="flex items-center gap-2 text-[10px] font-black text-slate-600 uppercase">
@@ -223,11 +223,11 @@ export function CopilotChat() {
                     animate={{ opacity: 1, y: 0 }}
                     className="py-20 text-center"
                   >
-                     <div className="w-24 h-24 rounded-[3rem] bg-gradient-to-br from-brand to-purple-600 flex items-center justify-center text-white mx-auto mb-10 shadow-[0_20px_50px_rgba(124,92,255,0.3)]">
+                     <div className="w-24 h-24 rounded-[3rem] bg-gradient-to-br from-brand to-purple-600 flex items-center justify-center text-slate-900 dark:text-slate-900 dark:text-white mx-auto mb-10 shadow-[0_20px_50px_rgba(124,92,255,0.3)]">
                         <Sparkles size={44} />
                      </div>
-                     <h1 className="text-4xl font-black text-white mb-4 leading-tight tracking-tight">Your AI Mentor Command Center.</h1>
-                     <p className="text-slate-400 max-w-md mx-auto leading-relaxed mb-12 text-base font-medium">
+                     <h1 className="text-4xl font-black text-slate-900 dark:text-slate-900 dark:text-white mb-4 leading-tight tracking-tight">Your AI Mentor Command Center.</h1>
+                     <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 max-w-md mx-auto leading-relaxed mb-12 text-base font-medium">
                         Deeply contextual career guidance, behavior-aware execution, and adaptive study missions.
                      </p>
                      
@@ -288,7 +288,7 @@ export function CopilotChat() {
 
                 <div className="relative group">
                    <div className="absolute -inset-1 bg-gradient-to-r from-brand to-purple-600 rounded-[2.5rem] blur opacity-10 group-focus-within:opacity-30 transition-opacity" />
-                    <div className="relative glass bg-ink/80 border-white/10 rounded-2xl p-2 shadow-2xl overflow-hidden flex items-center pr-4">
+                    <div className="relative glass bg-ink bg-white dark:bg-ink$4">
                        <MessageSquare size={18} className="text-slate-500 ml-4 hidden md:block" />
                        <textarea
                           ref={messageRef}
@@ -296,11 +296,11 @@ export function CopilotChat() {
                           onChange={(e) => setDraft(e.target.value)}
                           onKeyDown={handleKeyDown}
                           placeholder="Command Veda or ask anything..."
-                          className="flex-1 bg-transparent py-4 px-4 text-sm text-white outline-none resize-none max-h-40 min-h-[50px] custom-scrollbar placeholder-slate-600 font-medium"
+                          className="flex-1 bg-transparent py-4 px-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none resize-none max-h-40 min-h-[50px] custom-scrollbar placeholder-slate-600 font-medium"
                           rows={1}
                        />
                        <div className="flex items-center gap-3">
-                          <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-[9px] font-black text-slate-500 uppercase tracking-widest">
+                          <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] border border-slate-200 dark:border-slate-200 dark:border-white/10 text-[9px] font-black text-slate-500 uppercase tracking-widest">
                              <Command size={10} /> Enter
                           </div>
                           <button
@@ -308,7 +308,7 @@ export function CopilotChat() {
                              disabled={!draft.trim() || sending}
                              className={cn(
                                "p-3 rounded-xl transition-all disabled:opacity-30 active:scale-95",
-                               draft.trim() ? "bg-brand text-white shadow-glow" : "bg-white/5 text-slate-600"
+                               draft.trim() ? "bg-brand text-slate-900 dark:text-slate-900 dark:text-white shadow-glow" : "bg-slate-50 dark:bg-slate-50 dark:bg-white/5 text-slate-600"
                              )}
                           >
                              {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
@@ -327,7 +327,7 @@ export function CopilotChat() {
               initial={{ width: 0, opacity: 0 }}
               animate={{ width: 360, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
-              className="shrink-0 border-l border-white/[0.06] bg-ink/20 backdrop-blur-3xl overflow-hidden hidden xl:flex flex-col z-10"
+              className="shrink-0 border-l border-white/[0.06] bg-ink bg-white dark:bg-ink$4"
             >
               <div className="p-8 space-y-8 min-w-[360px]">
                  <div className="flex items-center justify-between">
@@ -361,14 +361,14 @@ export function CopilotChat() {
 
                     <div className="p-6 rounded-[2.5rem] bg-gradient-to-br from-brand/10 to-purple-600/10 border border-brand/20 relative overflow-hidden group">
                        <div className="relative z-10">
-                          <h4 className="text-xs font-black text-white uppercase tracking-widest mb-3 flex items-center gap-2">
+                          <h4 className="text-xs font-black text-slate-900 dark:text-slate-900 dark:text-white uppercase tracking-widest mb-3 flex items-center gap-2">
                              <Sparkles size={14} className="text-brand" /> 
                              Veda Proactive Recommendation
                           </h4>
-                          <p className="text-xs text-slate-300 leading-relaxed mb-4">
+                          <p className="text-xs text-slate-700 dark:text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
                              You perform best between 9 PM and 11 PM. I've scheduled your heavy "Mission Execution" for that window.
                           </p>
-                          <button className="text-[10px] font-black uppercase tracking-widest text-brand hover:text-white transition-colors">
+                          <button className="text-[10px] font-black uppercase tracking-widest text-brand hover:text-slate-900 dark:text-slate-900 dark:text-white transition-colors">
                              Optimize Schedule →
                           </button>
                        </div>
@@ -380,7 +380,7 @@ export function CopilotChat() {
                        <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Recall Momentum</span>
                        <span className="text-[10px] font-black text-emerald-400">+8%</span>
                     </div>
-                    <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                    <div className="h-1 w-full bg-slate-50 dark:bg-slate-50 dark:bg-white/5 rounded-full overflow-hidden">
                        <Motion.div className="h-full bg-emerald-400" initial={{ width: 0 }} animate={{ width: "72%" }} />
                     </div>
                  </div>
@@ -402,13 +402,13 @@ function TopMetric({ label, value, icon: Icon, color }: any) {
       animate={{ opacity: 1, y: 0 }}
       className="p-6 rounded-[2.5rem] glass border-white/5 bg-white/[0.02] relative overflow-hidden"
     >
-      <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 blur-3xl -mr-12 -mt-12 rounded-full" />
+      <div className="absolute top-0 right-0 w-24 h-24 bg-slate-50 dark:bg-slate-50 dark:bg-white/5 blur-3xl -mr-12 -mt-12 rounded-full" />
       <div className="relative z-10">
         <div className={cn("p-2 rounded-xl bg-white/[0.04] w-fit mb-4", color)}>
           <Icon size={20} />
         </div>
         <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">{label}</p>
-        <p className="text-2xl font-black text-white">{value}</p>
+        <p className="text-2xl font-black text-slate-900 dark:text-slate-900 dark:text-white">{value}</p>
       </div>
     </Motion.div>
   );
@@ -418,7 +418,7 @@ function SuggestionChip({ icon: Icon, label, onClick }: any) {
   return (
     <button 
       onClick={onClick}
-      className="flex items-center gap-2 px-4 py-2 rounded-full glass border-white/5 bg-white/[0.02] hover:bg-white/[0.05] hover:border-brand/30 transition-all text-[10px] font-black text-slate-400 hover:text-white uppercase tracking-widest"
+      className="flex items-center gap-2 px-4 py-2 rounded-full glass border-white/5 bg-white/[0.02] hover:bg-white/[0.05] hover:border-brand/30 transition-all text-[10px] font-black text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white uppercase tracking-widest"
     >
       <Icon size={12} className="text-brand" />
       {label}
@@ -433,7 +433,7 @@ function InsightRow({ label, message, color, icon: Icon }: any) {
         <Icon size={14} className={color} />
         <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{label}</span>
       </div>
-      <p className="text-[11px] text-slate-300 font-medium leading-relaxed">{message}</p>
+      <p className="text-[11px] text-slate-700 dark:text-slate-700 dark:text-slate-300 font-medium leading-relaxed">{message}</p>
     </div>
   );
 }
@@ -468,8 +468,8 @@ function MentorMessage({ message, index }: { message: any; index: number }) {
         <div className={cn(
           "px-8 py-5 rounded-[2.2rem] text-sm leading-relaxed shadow-2xl backdrop-blur-3xl transition-all border group/msg relative",
           isUser 
-            ? "bg-gradient-to-br from-brand to-purple-600 border-white/20 text-white rounded-tr-none" 
-            : "glass border-white/10 bg-white/[0.03] text-slate-100 rounded-tl-none"
+            ? "bg-gradient-to-br from-brand to-purple-600 border-white/20 text-slate-900 dark:text-slate-900 dark:text-white rounded-tr-none" 
+            : "glass border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white/[0.03] text-slate-100 rounded-tl-none"
         )}>
           <div className="whitespace-pre-wrap font-medium">{message.content}</div>
           
@@ -521,7 +521,7 @@ function MentorMessage({ message, index }: { message: any; index: number }) {
                       <Sparkles size={14} className="text-emerald-400" />
                       <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Veda's Recommended Action</span>
                    </div>
-                   <h4 className="text-sm font-black text-white mb-1">{metadata.nextBestAction.label}</h4>
+                   <h4 className="text-sm font-black text-slate-900 dark:text-slate-900 dark:text-white mb-1">{metadata.nextBestAction.label}</h4>
                    <p className="text-[11px] text-slate-500 mb-4">{metadata.nextBestAction.description}</p>
                    <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-400 group-hover:text-emerald-300 transition-colors">
                       Execute Now <ArrowRight size={12} />

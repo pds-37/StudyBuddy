@@ -8,7 +8,7 @@ export function MarketingLayout() {
   const isAuthPage = location.pathname === "/auth";
 
   return (
-    <div className="min-h-screen bg-ink text-slate-100">
+    <div className="min-h-screen bg-ink bg-white dark:bg-ink$4">
       <TopNav />
       <main>
         <Outlet />

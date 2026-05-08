@@ -137,7 +137,7 @@ export function StudyPage() {
   return (
     <div className="max-w-6xl mx-auto space-y-8 animate-fade-in">
       <header className="flex items-center justify-between">
-        <Link to="/dashboard" className="group flex items-center gap-2 text-slate-400 hover:text-white transition">
+        <Link to="/dashboard" className="group flex items-center gap-2 text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white transition">
           <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
           <span>Back to Mission Control</span>
         </Link>
@@ -150,7 +150,7 @@ export function StudyPage() {
       <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
         <div className="space-y-8">
           {/* Main Task Card */}
-          <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-8 lg:p-10 relative overflow-hidden">
+          <div className="rounded-3xl border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white/[0.03] p-8 lg:p-10 relative overflow-hidden">
             <div className="absolute top-0 right-0 p-8 opacity-10">
               <Target size={120} className="text-brand" />
             </div>
@@ -162,11 +162,11 @@ export function StudyPage() {
                 </div>
                 <div>
                   <p className="text-xs font-bold uppercase tracking-widest text-cyan">{task.type}</p>
-                  <h1 className="mt-1 text-3xl font-bold text-white">{task.title}</h1>
+                  <h1 className="mt-1 text-3xl font-bold text-slate-900 dark:text-slate-900 dark:text-white">{task.title}</h1>
                 </div>
               </div>
 
-              <div className="mt-8 flex flex-wrap gap-6 text-sm text-slate-400">
+              <div className="mt-8 flex flex-wrap gap-6 text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400">
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-brand" />
                   <span>{task.estimatedMinutes} Minutes</span>
@@ -178,8 +178,8 @@ export function StudyPage() {
               </div>
 
               <div className="mt-8 space-y-4">
-                <h3 className="text-sm font-semibold text-white uppercase tracking-wider">Mission Objective</h3>
-                <p className="text-lg leading-relaxed text-slate-300">
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-900 dark:text-white uppercase tracking-wider">Mission Objective</h3>
+                <p className="text-lg leading-relaxed text-slate-700 dark:text-slate-700 dark:text-slate-300">
                   {task.description}
                 </p>
               </div>
@@ -187,12 +187,12 @@ export function StudyPage() {
               <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-white/[0.02] border border-white/5 p-5">
                 <div>
                   <p className="text-xs font-semibold text-cyan uppercase tracking-tighter mb-2">Veda AI Context</p>
-                  <p className="text-sm italic text-slate-400">"{task.reason}"</p>
+                  <p className="text-sm italic text-slate-500 dark:text-slate-500 dark:text-slate-400">"{task.reason}"</p>
                 </div>
                 {task.href && task.href !== location.pathname && (
                   <Link
                     to={task.href}
-                    className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-2.5 text-xs font-bold text-white transition-all hover:bg-white/10 hover:border-white/20"
+                    className="inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-50 dark:bg-white/5 px-5 py-2.5 text-xs font-bold text-slate-900 dark:text-slate-900 dark:text-white transition-all hover:bg-slate-100 dark:bg-slate-100 dark:bg-white/10 hover:border-white/20"
                   >
                     Open in Tool
                     <ArrowUpRight size={14} />
@@ -209,11 +209,11 @@ export function StudyPage() {
               style={{ width: `${progress}%` }}
             />
             
-            <h2 className="text-xl font-bold text-white">Focus Engine</h2>
-            <p className="mt-2 text-sm text-slate-400">Deep work session for maximum retention</p>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-900 dark:text-white">Focus Engine</h2>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400">Deep work session for maximum retention</p>
             
             <div className="mt-10 mb-8">
-              <span className="text-7xl font-mono font-bold tracking-tighter text-white">
+              <span className="text-7xl font-mono font-bold tracking-tighter text-slate-900 dark:text-slate-900 dark:text-white">
                 {formatTime(timeLeft)}
               </span>
             </div>
@@ -222,7 +222,7 @@ export function StudyPage() {
               {!isActive ? (
                 <button
                   onClick={() => startSprint(45)}
-                  className="flex items-center gap-2 rounded-2xl bg-brand px-8 py-4 text-lg font-bold text-white shadow-[0_0_30px_rgba(124,92,255,0.3)] transition hover:scale-105 hover:bg-brand/90"
+                  className="flex items-center gap-2 rounded-2xl bg-brand px-8 py-4 text-lg font-bold text-slate-900 dark:text-slate-900 dark:text-white shadow-[0_0_30px_rgba(124,92,255,0.3)] transition hover:scale-105 hover:bg-brand/90"
                 >
                   <Play className="h-5 w-5 fill-current" />
                   Start 45m Sprint
@@ -230,7 +230,7 @@ export function StudyPage() {
               ) : (
                 <button
                   onClick={stopSprint}
-                  className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-8 py-4 text-lg font-bold text-white transition hover:bg-white/10"
+                  className="flex items-center gap-2 rounded-2xl border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-50 dark:bg-white/5 px-8 py-4 text-lg font-bold text-slate-900 dark:text-slate-900 dark:text-white transition hover:bg-slate-100 dark:bg-slate-100 dark:bg-white/10"
                 >
                   <Square className="h-5 w-5 fill-current" />
                   Stop Session
@@ -241,16 +241,16 @@ export function StudyPage() {
         </div>
 
         <aside className="space-y-6">
-          <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 flex flex-col h-[600px]">
+          <div className="rounded-3xl border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white/[0.03] p-6 flex flex-col h-[600px]">
             <div className="flex items-center gap-3 mb-6">
               <div className="rounded-lg bg-cyan/10 p-2 text-cyan">
                 <MessageSquare size={20} />
               </div>
-              <h2 className="font-bold text-white">Task Assistant</h2>
+              <h2 className="font-bold text-slate-900 dark:text-slate-900 dark:text-white">Task Assistant</h2>
             </div>
             
             <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
-              <div className="rounded-2xl bg-white/[0.02] border border-white/5 p-4 text-sm text-slate-300 leading-relaxed">
+              <div className="rounded-2xl bg-white/[0.02] border border-white/5 p-4 text-sm text-slate-700 dark:text-slate-700 dark:text-slate-300 leading-relaxed">
                 Hello! I'm here to help you with <strong>{task.title}</strong>. 
                 <br /><br />
                 Whether you need a concept explained, a code snippet reviewed, or a quick quiz to test your understanding, just ask!
@@ -260,8 +260,8 @@ export function StudyPage() {
                 <div key={i} className={cn(
                   "max-w-[90%] rounded-2xl px-4 py-3 text-sm",
                   msg.role === 'user' 
-                    ? "ml-auto bg-brand/20 text-white border border-brand/20" 
-                    : "bg-white/[0.02] text-slate-300 border border-white/5"
+                    ? "ml-auto bg-brand/20 text-slate-900 dark:text-slate-900 dark:text-white border border-brand/20" 
+                    : "bg-white/[0.02] text-slate-700 dark:text-slate-700 dark:text-slate-300 border border-white/5"
                 )}>
                   {msg.content}
                 </div>
@@ -273,7 +273,7 @@ export function StudyPage() {
                 <input 
                   type="text"
                   placeholder="Ask Veda about this task..."
-                  className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand/50 transition-all"
+                  className="w-full bg-white/[0.05] border border-slate-200 dark:border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:border-brand/50 transition-all"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && e.currentTarget.value.trim()) {
                       void sendMessage(e.currentTarget.value);
@@ -314,20 +314,20 @@ export function StudyPage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowConfidence(false)}
-              className="absolute inset-0 bg-obsidian/80 backdrop-blur-sm"
+              className="absolute inset-0 bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4"
             />
             <motion.div 
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="relative w-full max-w-lg rounded-[2.5rem] border border-white/10 bg-panel p-8 shadow-2xl"
+              className="relative w-full max-w-lg rounded-[2.5rem] border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-panel bg-slate-50 dark:bg-panel p-8 shadow-2xl"
             >
               <div className="text-center">
                 <div className="mx-auto w-16 h-16 rounded-2xl bg-brand/10 flex items-center justify-center text-brand mb-6">
                   <Brain size={32} />
                 </div>
-                <h2 className="text-2xl font-bold text-white">How confident do you feel?</h2>
-                <p className="mt-2 text-slate-400 text-sm">Be honest—this tunes Veda's memory engine to optimize your next review session.</p>
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-900 dark:text-white">How confident do you feel?</h2>
+                <p className="mt-2 text-slate-500 dark:text-slate-500 dark:text-slate-400 text-sm">Be honest—this tunes Veda's memory engine to optimize your next review session.</p>
               </div>
 
               <div className="mt-8 grid grid-cols-5 gap-3">
@@ -337,7 +337,7 @@ export function StudyPage() {
                     onClick={() => void submitConfidence(score)}
                     className="group flex flex-col items-center gap-2"
                   >
-                    <div className="w-full aspect-square rounded-2xl border border-white/10 bg-white/5 flex items-center justify-center text-xl font-bold text-slate-400 transition-all group-hover:bg-brand group-hover:text-white group-hover:border-brand group-hover:scale-110">
+                    <div className="w-full aspect-square rounded-2xl border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-50 dark:bg-white/5 flex items-center justify-center text-xl font-bold text-slate-500 dark:text-slate-500 dark:text-slate-400 transition-all group-hover:bg-brand group-hover:text-slate-900 dark:text-slate-900 dark:text-white group-hover:border-brand group-hover:scale-110">
                       {score}
                     </div>
                     <span className="text-[10px] uppercase tracking-tighter text-slate-500 font-bold opacity-0 group-hover:opacity-100 transition-opacity">
@@ -349,7 +349,7 @@ export function StudyPage() {
 
               <button 
                 onClick={() => setShowConfidence(false)}
-                className="mt-8 w-full py-3 text-sm font-medium text-slate-500 hover:text-white transition"
+                className="mt-8 w-full py-3 text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-slate-900 dark:text-white transition"
               >
                 Skip Assessment
               </button>

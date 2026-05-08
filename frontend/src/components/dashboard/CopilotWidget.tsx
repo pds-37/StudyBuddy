@@ -18,13 +18,13 @@ export function CopilotWidget() {
             <Sparkles className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-white">AI copilot</h3>
-            <p className="text-sm text-slate-400">Context-aware career guidance</p>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-900 dark:text-white">AI copilot</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400">Context-aware career guidance</p>
           </div>
         </div>
         <Link
           to="/copilot"
-          className="rounded-full border border-white/10 px-3 py-1.5 text-xs uppercase tracking-[0.22em] text-slate-300 transition hover:border-white/20 hover:text-white"
+          className="rounded-full border border-slate-200 dark:border-slate-200 dark:border-white/10 px-3 py-1.5 text-xs uppercase tracking-[0.22em] text-slate-700 dark:text-slate-700 dark:text-slate-300 transition hover:border-white/20 hover:text-slate-900 dark:text-slate-900 dark:text-white"
         >
           Open
         </Link>
@@ -32,18 +32,18 @@ export function CopilotWidget() {
 
       {loading ? (
         <div className="mt-6 animate-pulse">
-          <div className="h-24 rounded-[1.5rem] bg-white/5" />
+          <div className="h-24 rounded-[1.5rem] bg-slate-50 dark:bg-slate-50 dark:bg-white/5" />
         </div>
       ) : conversations.length === 0 ? (
         <div className="mt-6 rounded-[1.5rem] border border-white/8 bg-black/20 p-5 text-center">
           <MessageCircle className="mx-auto h-9 w-9 text-slate-500" />
-          <p className="mt-4 text-base font-semibold text-white">Start your first copilot thread</p>
-          <p className="mt-2 text-sm leading-7 text-slate-400">
+          <p className="mt-4 text-base font-semibold text-slate-900 dark:text-slate-900 dark:text-white">Start your first copilot thread</p>
+          <p className="mt-2 text-sm leading-7 text-slate-500 dark:text-slate-500 dark:text-slate-400">
             Ask about role readiness, learning plans, job prep, or how to sequence your next week.
           </p>
           <Link
             to="/copilot"
-            className="mt-5 inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:border-white/20 hover:text-white"
+            className="mt-5 inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-slate-200 dark:border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:border-white/20 hover:text-slate-900 dark:text-slate-900 dark:text-white"
           >
             Start chatting
             <Plus className="h-3.5 w-3.5" />
@@ -55,10 +55,10 @@ export function CopilotWidget() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[11px] uppercase tracking-[0.28em] text-slate-500">Conversation memory</p>
-                <p className="mt-3 font-display text-4xl tracking-tight text-white">{conversations.length}</p>
+                <p className="mt-3 font-display text-4xl tracking-tight text-slate-900 dark:text-slate-900 dark:text-white">{conversations.length}</p>
               </div>
               <div className="text-right">
-                <p className="text-sm text-slate-400">{totalMessages} total messages</p>
+                <p className="text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400">{totalMessages} total messages</p>
                 <p className="mt-1 text-xs text-slate-500">Powered by your notes and roadmap context</p>
               </div>
             </div>
@@ -71,7 +71,7 @@ export function CopilotWidget() {
 
           <div className="rounded-[1.35rem] border border-white/8 bg-white/[0.03] p-4">
             <p className="text-[11px] uppercase tracking-[0.28em] text-slate-500">Latest thread</p>
-            <p className="mt-3 text-sm leading-7 text-slate-300">
+            <p className="mt-3 text-sm leading-7 text-slate-700 dark:text-slate-700 dark:text-slate-300">
               {recentConversation?.messages.length && recentConversation.messages.length > 1
                 ? recentConversation.messages[1].content.substring(0, 120) + "..."
                 : "Open the copilot to continue the latest conversation or start a fresh one."}
@@ -80,7 +80,7 @@ export function CopilotWidget() {
 
           <Link
             to="/copilot"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-cyan transition hover:text-white"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-cyan transition hover:text-slate-900 dark:text-slate-900 dark:text-white"
           >
             Continue chatting
             <MessageSquare className="h-3.5 w-3.5" />

@@ -41,11 +41,11 @@ export function SkillGapPage() {
          <div className="w-24 h-24 rounded-full bg-brand/10 border border-brand/20 flex items-center justify-center text-brand mb-8 shadow-[0_0_50px_rgba(124,92,255,0.2)]">
             <Target size={40} />
          </div>
-         <h1 className="text-4xl font-black text-white mb-4 tracking-tight">Set Your Trajectory</h1>
-         <p className="text-slate-400 font-medium max-w-md mx-auto mb-8 leading-relaxed">
+         <h1 className="text-4xl font-black text-slate-900 dark:text-slate-900 dark:text-white mb-4 tracking-tight">Set Your Trajectory</h1>
+         <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 font-medium max-w-md mx-auto mb-8 leading-relaxed">
             Complete onboarding to define your target role. Veda will track your readiness and build an adaptive learning path tailored to your goals.
          </p>
-         <Link to="/onboarding" className="px-10 py-5 rounded-2xl bg-brand text-white font-black text-xs uppercase tracking-widest shadow-[0_20px_40px_rgba(124,92,255,0.3)] hover:scale-105 transition-all">
+         <Link to="/onboarding" className="px-10 py-5 rounded-2xl bg-brand text-slate-900 dark:text-slate-900 dark:text-white font-black text-xs uppercase tracking-widest shadow-[0_20px_40px_rgba(124,92,255,0.3)] hover:scale-105 transition-all">
             Configure Career Profile
          </Link>
       </div>
@@ -72,17 +72,17 @@ export function SkillGapPage() {
                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand/10 border border-brand/20 text-[10px] font-black text-brand uppercase tracking-[0.2em] mb-6">
                     <Activity size={14} className="animate-pulse" /> AI Career Intelligence
                  </div>
-                 <h1 className="text-5xl lg:text-6xl font-black text-white tracking-tighter mb-4 leading-none">
+                 <h1 className="text-5xl lg:text-6xl font-black text-slate-900 dark:text-slate-900 dark:text-white tracking-tighter mb-4 leading-none">
                    {data.targetRole}
                  </h1>
-                 <p className="text-slate-400 text-lg font-medium max-w-2xl">
+                 <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 text-lg font-medium max-w-2xl">
                     {data.careerTrajectory || "Veda is currently analyzing your behavior and learning patterns to predict your career trajectory."}
                  </p>
               </div>
               
               <div className="flex flex-col sm:flex-row items-center gap-8 bg-black/40 border border-white/5 p-8 rounded-[2.5rem] backdrop-blur-md">
                  <ReadinessRing score={data.overallScore || 0} label="Readiness" />
-                 <div className="hidden sm:block w-px h-24 bg-white/10" />
+                 <div className="hidden sm:block w-px h-24 bg-slate-100 dark:bg-slate-100 dark:bg-white/10" />
                  <div className="grid grid-cols-1 gap-5 min-w-[220px]">
                     <MiniMetric label="Learning Foundation" value={data.readiness?.learningFoundation || "Medium"} />
                     <MiniMetric label="Problem Solving" value={data.readiness?.problemSolving || "Medium"} />
@@ -104,7 +104,7 @@ export function SkillGapPage() {
                     <Briefcase size={18} />
                  </div>
                  <div>
-                    <h2 className="text-lg font-black text-white tracking-tight">Market Alignment Analysis</h2>
+                    <h2 className="text-lg font-black text-slate-900 dark:text-slate-900 dark:text-white tracking-tight">Market Alignment Analysis</h2>
                     <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">How you stack up against real-world roles</p>
                  </div>
               </div>
@@ -119,7 +119,7 @@ export function SkillGapPage() {
                      className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 hover:border-brand/30 transition-all group shadow-xl"
                    >
                       <div className="flex items-center justify-between mb-4">
-                         <span className="text-xl font-black text-white group-hover:text-brand transition-colors">{match.role}</span>
+                         <span className="text-xl font-black text-slate-900 dark:text-slate-900 dark:text-white group-hover:text-brand transition-colors">{match.role}</span>
                          <div className="px-3 py-1 rounded-full bg-brand/10 border border-brand/20 text-xs font-black text-brand">
                             {match.matchPercentage}%
                          </div>
@@ -147,7 +147,7 @@ export function SkillGapPage() {
                     <Brain size={18} />
                  </div>
                  <div>
-                    <h2 className="text-lg font-black text-white tracking-tight">Technical Mastery Matrix</h2>
+                    <h2 className="text-lg font-black text-slate-900 dark:text-slate-900 dark:text-white tracking-tight">Technical Mastery Matrix</h2>
                     <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Multi-dimensional skill intelligence</p>
                  </div>
               </div>
@@ -167,14 +167,14 @@ export function SkillGapPage() {
            {/* Recovery Plan - High Priority */}
            {data.recommendations?.recoveryPlan && (
              <section className="p-8 rounded-[3rem] bg-gradient-to-br from-brand/20 to-brand/5 border border-brand/30 relative overflow-hidden group shadow-[0_20px_50px_rgba(124,92,255,0.1)]">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-3xl -mr-16 -mt-16 rounded-full" />
-                <h3 className="text-sm font-black text-white uppercase tracking-[0.2em] mb-4 flex items-center gap-2 relative z-10">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-slate-100 dark:bg-slate-100 dark:bg-white/10 blur-3xl -mr-16 -mt-16 rounded-full" />
+                <h3 className="text-sm font-black text-slate-900 dark:text-slate-900 dark:text-white uppercase tracking-[0.2em] mb-4 flex items-center gap-2 relative z-10">
                    <Zap size={18} className="text-brand fill-brand" /> Recovery Strategy
                 </h3>
-                <p className="text-xs text-slate-300 leading-relaxed mb-8 relative z-10 font-medium">
+                <p className="text-xs text-slate-700 dark:text-slate-700 dark:text-slate-300 leading-relaxed mb-8 relative z-10 font-medium">
                    {data.recommendations.recoveryPlan}
                 </p>
-                <button className="w-full py-4 rounded-2xl bg-brand text-white text-[10px] font-black uppercase tracking-widest shadow-[0_15px_30px_rgba(124,92,255,0.4)] relative z-10 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all">
+                <button className="w-full py-4 rounded-2xl bg-brand text-slate-900 dark:text-slate-900 dark:text-white text-[10px] font-black uppercase tracking-widest shadow-[0_15px_30px_rgba(124,92,255,0.4)] relative z-10 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all">
                    Adopt Strategy <ArrowRight size={14} />
                 </button>
              </section>
@@ -228,7 +228,7 @@ function MiniMetric({ label, value }: { label: string, value: string }) {
   return (
     <div className="flex items-center justify-between gap-4">
        <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{label}</span>
-       <span className={cn("px-2 py-0.5 rounded-md text-[9px] font-black uppercase", colorMap[value] || "text-slate-400 bg-white/5")}>
+       <span className={cn("px-2 py-0.5 rounded-md text-[9px] font-black uppercase", colorMap[value] || "text-slate-500 dark:text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-50 dark:bg-white/5")}>
           {value}
        </span>
     </div>

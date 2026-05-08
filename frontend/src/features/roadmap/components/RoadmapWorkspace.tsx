@@ -75,7 +75,7 @@ export function RoadmapWorkspace() {
         <div className="space-y-6">
           
           {/* TOP BANNER */}
-          <div className="relative rounded-3xl border border-white/[0.06] bg-obsidian overflow-hidden p-8">
+          <div className="relative rounded-3xl border border-white/[0.06] bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
             <div className="absolute top-0 right-0 w-[600px] h-full opacity-60 pointer-events-none">
                {/* Decorative Nebula Placeholder */}
                <div className="absolute inset-0 bg-gradient-to-r from-obsidian via-transparent to-transparent z-10" />
@@ -88,8 +88,8 @@ export function RoadmapWorkspace() {
                   <Route className="w-4 h-4 text-brand" />
                   <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand">Roadmap</span>
                </div>
-               <h1 className="text-3xl font-semibold text-white mb-2">Career Roadmap</h1>
-               <p className="text-slate-400 text-sm mb-10">Your personalized learning path to achieve your career goals.</p>
+               <h1 className="text-3xl font-semibold text-slate-900 dark:text-slate-900 dark:text-white mb-2">Career Roadmap</h1>
+               <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 text-sm mb-10">Your personalized learning path to achieve your career goals.</p>
 
                <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                   <TopMetric label="Readiness Score" value={`${currentRoadmap?.readinessScore || 0}%`} sub="↑ 12% this week" color="text-cyan-400" border="border-cyan-400" />
@@ -101,37 +101,37 @@ export function RoadmapWorkspace() {
           </div>
 
           {/* CURRENT JOURNEY */}
-          <div className="rounded-3xl border border-white/[0.06] bg-obsidian p-8">
+          <div className="rounded-3xl border border-white/[0.06] bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
              <div className="flex items-center gap-2 mb-8">
-                <Target className="w-4 h-4 text-slate-400" />
-                <h3 className="text-xs font-bold uppercase tracking-widest text-slate-300">Current Journey</h3>
+                <Target className="w-4 h-4 text-slate-500 dark:text-slate-500 dark:text-slate-400" />
+                <h3 className="text-xs font-bold uppercase tracking-widest text-slate-700 dark:text-slate-700 dark:text-slate-300">Current Journey</h3>
              </div>
 
              <div className="flex flex-col md:flex-row items-center gap-8 mb-10">
-                <div className="shrink-0 relative w-24 h-24 rounded-full border border-white/10 flex items-center justify-center">
+                <div className="shrink-0 relative w-24 h-24 rounded-full border border-slate-200 dark:border-slate-200 dark:border-white/10 flex items-center justify-center">
                    <svg className="absolute inset-0 w-full h-full -rotate-90">
                       <circle cx="48" cy="48" r="46" fill="transparent" stroke="rgba(255,255,255,0.05)" strokeWidth="4" />
                       <circle cx="48" cy="48" r="46" fill="transparent" stroke="var(--brand)" strokeWidth="4" strokeDasharray="289" strokeDashoffset={289 * (1 - (currentRoadmap?.readinessScore || 0) / 100)} className="transition-all duration-1000" />
                    </svg>
                    <div className="text-center">
-                      <p className="text-xl font-bold text-white">{currentRoadmap?.readinessScore || 0}%</p>
+                      <p className="text-xl font-bold text-slate-900 dark:text-slate-900 dark:text-white">{currentRoadmap?.readinessScore || 0}%</p>
                       <p className="text-[8px] text-slate-500 uppercase tracking-widest mt-1">Progress</p>
                    </div>
                 </div>
                 <div className="flex-1">
                    <div className="flex items-center gap-3 mb-2">
-                      <h2 className="text-xl font-bold text-white">{currentRoadmap?.targetRole || "Software Developer"}</h2>
+                      <h2 className="text-xl font-bold text-slate-900 dark:text-slate-900 dark:text-white">{currentRoadmap?.targetRole || "Software Developer"}</h2>
                       <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest bg-brand/10 text-brand border border-brand/20">Target Role</span>
                    </div>
-                   <p className="text-sm text-slate-400">Master full stack development and problem solving to become a job-ready software engineer.</p>
+                   <p className="text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400">Master full stack development and problem solving to become a job-ready software engineer.</p>
                 </div>
-                <button className="px-4 py-2 rounded-xl border border-white/10 text-xs font-bold text-slate-300 hover:bg-white/5 transition flex items-center gap-2">
+                <button className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-200 dark:border-white/10 text-xs font-bold text-slate-700 dark:text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:bg-slate-50 dark:bg-white/5 transition flex items-center gap-2">
                    View Path <ArrowRight className="w-3 h-3" />
                 </button>
              </div>
 
              <div className="relative">
-                <div className="absolute top-4 left-0 w-full h-[2px] bg-white/5" />
+                <div className="absolute top-4 left-0 w-full h-[2px] bg-slate-50 dark:bg-slate-50 dark:bg-white/5" />
                 <div className="relative flex justify-between">
                    {currentRoadmap?.phases.slice(0, 5).map((phase, idx) => {
                       const isCompleted = phase.status === "completed";
@@ -139,10 +139,10 @@ export function RoadmapWorkspace() {
                       const isActive = activePhaseId === phase.id;
                       return (
                         <div key={phase.id} className="flex flex-col items-center w-24 text-center cursor-pointer" onClick={() => setActivePhaseId(phase.id)}>
-                           <div className={cn("w-8 h-8 rounded-full border-[3px] flex items-center justify-center z-10 transition-colors bg-obsidian", isCompleted ? "border-brand" : isActive ? "border-brand" : "border-white/10")}>
+                           <div className={cn("w-8 h-8 rounded-full border-[3px] flex items-center justify-center z-10 transition-colors bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4", isCompleted ? "border-brand" : isActive ? "border-brand" : "border-slate-200 dark:border-slate-200 dark:border-white/10")}>
                               {isCompleted ? <CheckCircle2 className="w-4 h-4 text-brand" /> : isLocked ? <Lock className="w-3 h-3 text-slate-600" /> : <div className="w-2 h-2 rounded-full bg-brand" />}
                            </div>
-                           <p className={cn("text-[10px] font-bold mt-3 mb-1 line-clamp-1 transition-colors", isActive || isCompleted ? "text-white" : "text-slate-500")}>{phase.title}</p>
+                           <p className={cn("text-[10px] font-bold mt-3 mb-1 line-clamp-1 transition-colors", isActive || isCompleted ? "text-slate-900 dark:text-slate-900 dark:text-white" : "text-slate-500")}>{phase.title}</p>
                            <p className="text-[9px] text-slate-500 font-medium uppercase">{isCompleted ? "Completed" : isLocked ? "Locked" : "In Progress"}</p>
                         </div>
                       )
@@ -153,11 +153,11 @@ export function RoadmapWorkspace() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
              {/* JOURNEY PHASES */}
-             <div className="rounded-3xl border border-white/[0.06] bg-obsidian p-6">
+             <div className="rounded-3xl border border-white/[0.06] bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
                 <div className="flex items-center justify-between mb-6">
                    <div className="flex items-center gap-2">
                       <Route className="w-4 h-4 text-purple-400" />
-                      <h3 className="text-xs font-bold uppercase tracking-widest text-slate-300">Journey Phases</h3>
+                      <h3 className="text-xs font-bold uppercase tracking-widest text-slate-700 dark:text-slate-700 dark:text-slate-300">Journey Phases</h3>
                    </div>
                 </div>
                 <div className="relative pl-4 space-y-4">
@@ -175,13 +175,13 @@ export function RoadmapWorkspace() {
              </div>
 
              {/* EXECUTION TASKS */}
-             <div className="rounded-3xl border border-white/[0.06] bg-obsidian p-6">
+             <div className="rounded-3xl border border-white/[0.06] bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
                 <div className="flex items-center justify-between mb-6">
                    <div className="flex items-center gap-2">
                       <LayoutDashboard className="w-4 h-4 text-cyan-400" />
-                      <h3 className="text-xs font-bold uppercase tracking-widest text-slate-300">Execution Tasks</h3>
+                      <h3 className="text-xs font-bold uppercase tracking-widest text-slate-700 dark:text-slate-700 dark:text-slate-300">Execution Tasks</h3>
                    </div>
-                   <button className="text-[10px] text-slate-500 hover:text-white uppercase tracking-widest font-bold">View All</button>
+                   <button className="text-[10px] text-slate-500 hover:text-slate-900 dark:text-slate-900 dark:text-white uppercase tracking-widest font-bold">View All</button>
                 </div>
                 <div className="space-y-3">
                   {currentMission?.tasks.map((task, idx) => (
@@ -192,7 +192,7 @@ export function RoadmapWorkspace() {
                       delay={idx * 0.05}
                     />
                   ))}
-                  <button className="w-full py-3 rounded-xl border border-dashed border-white/10 text-[10px] font-bold text-slate-500 uppercase tracking-widest hover:text-white hover:border-white/30 transition mt-2">
+                  <button className="w-full py-3 rounded-xl border border-dashed border-slate-200 dark:border-slate-200 dark:border-white/10 text-[10px] font-bold text-slate-500 uppercase tracking-widest hover:text-slate-900 dark:text-slate-900 dark:text-white hover:border-white/30 transition mt-2">
                      + Add New Task
                   </button>
                 </div>
@@ -203,15 +203,15 @@ export function RoadmapWorkspace() {
         {/* ─── RIGHT PANEL: AI INSIGHTS ─── */}
         <aside className="space-y-6">
           {/* MENTOR INSIGHTS */}
-          <div className="rounded-3xl border border-white/[0.06] bg-obsidian p-6 space-y-6">
+          <div className="rounded-3xl border border-white/[0.06] bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
             <div className="flex items-center gap-2 mb-2">
               <Sparkles className="w-4 h-4 text-brand" />
-              <h3 className="text-xs font-bold uppercase tracking-widest text-slate-300">AI Mentor Insights</h3>
+              <h3 className="text-xs font-bold uppercase tracking-widest text-slate-700 dark:text-slate-700 dark:text-slate-300">AI Mentor Insights</h3>
             </div>
 
             <div className="p-4 rounded-2xl bg-brand/10 border border-brand/20">
-               <p className="text-xs text-white font-medium mb-1">Excellent progress, {user?.name || 'there'}! ✨</p>
-               <p className="text-[10px] text-slate-400">Your consistency and recall are improving.</p>
+               <p className="text-xs text-slate-900 dark:text-slate-900 dark:text-white font-medium mb-1">Excellent progress, {user?.name || 'there'}! ✨</p>
+               <p className="text-[10px] text-slate-500 dark:text-slate-500 dark:text-slate-400">Your consistency and recall are improving.</p>
             </div>
 
             <div>
@@ -225,7 +225,7 @@ export function RoadmapWorkspace() {
                     <div className="flex gap-3">
                        <Clock className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
                        <div>
-                          <p className="text-[11px] text-slate-300 font-medium">No insights available yet</p>
+                          <p className="text-[11px] text-slate-700 dark:text-slate-700 dark:text-slate-300 font-medium">No insights available yet</p>
                           <p className="text-[10px] text-slate-500 mt-1">Check back later as you progress.</p>
                        </div>
                     </div>
@@ -235,35 +235,35 @@ export function RoadmapWorkspace() {
           </div>
 
           {/* NEXT BEST ACTION */}
-          <div className="rounded-3xl border border-white/[0.06] bg-obsidian p-6">
+          <div className="rounded-3xl border border-white/[0.06] bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
              <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                    <Target className="w-4 h-4 text-emerald-400" />
-                   <h3 className="text-xs font-bold uppercase tracking-widest text-slate-300">Next Best Action</h3>
+                   <h3 className="text-xs font-bold uppercase tracking-widest text-slate-700 dark:text-slate-700 dark:text-slate-300">Next Best Action</h3>
                 </div>
                 <span className="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Recommended</span>
              </div>
-             <p className="text-[11px] text-slate-400 leading-relaxed mb-6">
+             <p className="text-[11px] text-slate-500 dark:text-slate-500 dark:text-slate-400 leading-relaxed mb-6">
                 Based on your progress and recent performance, start a focus on Graph Traversal sprint.
              </p>
-             <button className="w-full py-3 rounded-xl bg-brand text-white text-[11px] font-bold flex items-center justify-center gap-2 hover:bg-brand/90 transition shadow-glow">
+             <button className="w-full py-3 rounded-xl bg-brand text-slate-900 dark:text-slate-900 dark:text-white text-[11px] font-bold flex items-center justify-center gap-2 hover:bg-brand/90 transition shadow-glow">
                 <Zap className="w-4 h-4" /> Start 45-min Sprint
              </button>
           </div>
 
           {/* WEEKLY PROGRESS */}
-          <div className="rounded-3xl border border-white/[0.06] bg-obsidian p-6">
+          <div className="rounded-3xl border border-white/[0.06] bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
              <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                    <TrendingUp className="w-4 h-4 text-blue-400" />
-                   <h3 className="text-xs font-bold uppercase tracking-widest text-slate-300">Weekly Progress</h3>
+                   <h3 className="text-xs font-bold uppercase tracking-widest text-slate-700 dark:text-slate-700 dark:text-slate-300">Weekly Progress</h3>
                 </div>
              </div>
              <p className="text-[10px] text-slate-500 mb-6">You're ahead of 65% of learners</p>
              <div className="h-24 w-full flex items-end justify-between gap-1 pb-4 border-b border-white/5">
                 {[40, 60, 30, 80, 50, 90, 70].map((h, i) => (
-                   <div key={i} className="w-full bg-white/5 rounded-t-sm hover:bg-brand/50 transition-colors relative group" style={{ height: `${h}%` }}>
-                      <div className="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 text-[9px] text-white bg-black px-1 rounded transition-opacity">{h}%</div>
+                   <div key={i} className="w-full bg-slate-50 dark:bg-slate-50 dark:bg-white/5 rounded-t-sm hover:bg-brand/50 transition-colors relative group" style={{ height: `${h}%` }}>
+                      <div className="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 text-[9px] text-slate-900 dark:text-slate-900 dark:text-white bg-black px-1 rounded transition-opacity">{h}%</div>
                    </div>
                 ))}
              </div>
@@ -273,10 +273,10 @@ export function RoadmapWorkspace() {
           </div>
 
           {/* QUICK ACTIONS */}
-          <div className="rounded-3xl border border-white/[0.06] bg-obsidian p-6">
+          <div className="rounded-3xl border border-white/[0.06] bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
              <div className="flex items-center gap-2 mb-4">
                 <Zap className="w-4 h-4 text-amber-400" />
-                <h3 className="text-xs font-bold uppercase tracking-widest text-slate-300">Quick Actions</h3>
+                <h3 className="text-xs font-bold uppercase tracking-widest text-slate-700 dark:text-slate-700 dark:text-slate-300">Quick Actions</h3>
              </div>
              <div className="grid grid-cols-4 gap-2">
                 {[
@@ -286,18 +286,18 @@ export function RoadmapWorkspace() {
                    { icon: BookOpen, label: "Note" },
                 ].map((action, i) => (
                    <button key={i} className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition group">
-                      <action.icon className="w-4 h-4 text-slate-400 group-hover:text-brand transition-colors" />
+                      <action.icon className="w-4 h-4 text-slate-500 dark:text-slate-500 dark:text-slate-400 group-hover:text-brand transition-colors" />
                       <span className="text-[8px] font-bold text-slate-500 uppercase">{action.label}</span>
                    </button>
                 ))}
              </div>
              <div className="mt-4 p-3 rounded-xl bg-gradient-to-r from-brand/20 to-transparent border border-brand/20 flex items-center gap-3 cursor-pointer">
                 <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center shrink-0">
-                   <Sparkles className="w-4 h-4 text-white" />
+                   <Sparkles className="w-4 h-4 text-slate-900 dark:text-slate-900 dark:text-white" />
                 </div>
                 <div>
-                   <p className="text-[10px] font-bold text-white uppercase tracking-widest">Veda Assistant</p>
-                   <p className="text-[9px] text-slate-400">How can I help you today?</p>
+                   <p className="text-[10px] font-bold text-slate-900 dark:text-slate-900 dark:text-white uppercase tracking-widest">Veda Assistant</p>
+                   <p className="text-[9px] text-slate-500 dark:text-slate-500 dark:text-slate-400">How can I help you today?</p>
                 </div>
              </div>
           </div>
@@ -319,9 +319,9 @@ function TopMetric({ label, value, sub, color, border }: any) {
              <circle cx="20" cy="20" r="18" fill="transparent" stroke="rgba(255,255,255,0.1)" strokeWidth="3" />
              <circle cx="20" cy="20" r="18" fill="transparent" stroke="currentColor" strokeWidth="3" strokeDasharray="113" strokeDashoffset="40" className={color} />
           </svg>
-          <span className="text-[10px] font-bold text-white">{value}</span>
+          <span className="text-[10px] font-bold text-slate-900 dark:text-slate-900 dark:text-white">{value}</span>
        </div>
-       <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{label}</p>
+       <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-500 dark:text-slate-400">{label}</p>
        <p className={cn("text-[10px] font-medium", color)}>{sub}</p>
     </div>
   );
@@ -344,17 +344,17 @@ function PhaseNode({ phase, active, onClick, isLast }: { phase: RoadmapPhase; ac
       <div className="relative z-10">
         <div className={cn(
           "w-4 h-4 rounded-full border-2 transition-all flex items-center justify-center",
-          active ? "bg-cyan-400 border-cyan-400 scale-125" : isCompleted ? "bg-emerald-500 border-emerald-500" : "bg-obsidian border-white/20",
+          active ? "bg-cyan-400 border-cyan-400 scale-125" : isCompleted ? "bg-emerald-500 border-emerald-500" : "bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4",
           active && "shadow-[0_0_15px_rgba(34,211,238,0.5)]"
         )}>
-          {isCompleted && <CheckCircle2 className="w-3 h-3 text-white" />}
+          {isCompleted && <CheckCircle2 className="w-3 h-3 text-slate-900 dark:text-slate-900 dark:text-white" />}
           {isLocked && <Lock className="w-2.5 h-2.5 text-slate-500" />}
         </div>
       </div>
       <div className="text-left overflow-hidden flex-1">
         <p className={cn(
           "text-[11px] font-bold truncate transition-all",
-          active ? "text-white" : isCompleted ? "text-white" : "text-slate-400"
+          active ? "text-slate-900 dark:text-slate-900 dark:text-white" : isCompleted ? "text-slate-900 dark:text-slate-900 dark:text-white" : "text-slate-500 dark:text-slate-500 dark:text-slate-400"
         )}>
           {phase.title}
         </p>
@@ -362,7 +362,7 @@ function PhaseNode({ phase, active, onClick, isLast }: { phase: RoadmapPhase; ac
       </div>
       {isCompleted && <span className="text-[9px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded uppercase">Completed</span>}
       {!isCompleted && active && <span className="text-[9px] font-bold text-brand bg-brand/10 px-2 py-0.5 rounded uppercase">In Progress</span>}
-      {!isCompleted && !active && <span className="text-[9px] font-bold text-slate-600 bg-white/5 px-2 py-0.5 rounded uppercase">Locked</span>}
+      {!isCompleted && !active && <span className="text-[9px] font-bold text-slate-600 bg-slate-50 dark:bg-slate-50 dark:bg-white/5 px-2 py-0.5 rounded uppercase">Locked</span>}
       {active && (
         <Motion.div layoutId="phase-glow" className="absolute inset-0 rounded-2xl bg-cyan-400/5 blur-md" />
       )}
@@ -402,10 +402,10 @@ function TaskCard({ task, onToggle, delay }: { task: RoadmapTask; onToggle: () =
         onClick={onToggle}
         className={cn(
           "shrink-0 w-6 h-6 rounded-lg border-2 transition-all flex items-center justify-center",
-          isDone ? "bg-emerald-500 border-emerald-500" : "border-white/10 group-hover:border-white/30"
+          isDone ? "bg-emerald-500 border-emerald-500" : "border-slate-200 dark:border-slate-200 dark:border-white/10 group-hover:border-white/30"
         )}
       >
-        {isDone && <CheckCircle2 className="w-4 h-4 text-white" />}
+        {isDone && <CheckCircle2 className="w-4 h-4 text-slate-900 dark:text-slate-900 dark:text-white" />}
       </button>
 
       <div className="flex-1 min-w-0">
@@ -415,7 +415,7 @@ function TaskCard({ task, onToggle, delay }: { task: RoadmapTask; onToggle: () =
           </span>
           <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{task.durationMinutes}m • {task.difficulty}</span>
         </div>
-        <h4 className={cn("text-sm font-semibold transition-all", isDone ? "text-slate-500 line-through" : "text-white")}>
+        <h4 className={cn("text-sm font-semibold transition-all", isDone ? "text-slate-500 line-through" : "text-slate-900 dark:text-slate-900 dark:text-white")}>
           {task.title}
         </h4>
         {task.aiHint && !isDone && (
@@ -427,7 +427,7 @@ function TaskCard({ task, onToggle, delay }: { task: RoadmapTask; onToggle: () =
 
       <Link 
         to={`/study/${task.id}`}
-        className="opacity-0 group-hover:opacity-100 p-2 text-slate-500 hover:text-white transition"
+        className="opacity-0 group-hover:opacity-100 p-2 text-slate-500 hover:text-slate-900 dark:text-slate-900 dark:text-white transition"
       >
         <ArrowRight className="w-4 h-4" />
       </Link>
@@ -447,11 +447,11 @@ function InsightCard({ insight }: { insight: any }) {
   return (
     <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04] group hover:bg-white/[0.04] transition-all">
       <div className="flex items-start gap-3">
-        <div className="p-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-slate-400 group-hover:text-white transition-colors">
+        <div className="p-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-slate-500 dark:text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:text-slate-900 dark:text-white transition-colors">
           <Icon className="w-4 h-4" />
         </div>
         <div>
-          <p className="text-[11px] text-slate-300 leading-relaxed font-medium">
+          <p className="text-[11px] text-slate-700 dark:text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
             {insight.message}
           </p>
           {insight.actionLabel && (
@@ -504,8 +504,8 @@ function GeneratingState() {
         ))}
       </div>
       <div className="space-y-3">
-        <h2 className="text-2xl font-bold text-white">Synthesizing Mission...</h2>
-        <p className="text-slate-400 text-sm leading-relaxed">
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-900 dark:text-white">Synthesizing Mission...</h2>
+        <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
           Analyzing skill gaps, behavior patterns, and memory state to generate your optimized execution engine.
         </p>
       </div>
@@ -527,8 +527,8 @@ function EmptyState({ onGenerate, isGenerating, onboardingComplete }: any) {
         <Route className="w-10 h-10" />
       </div>
       <div className="space-y-3">
-        <h2 className="text-3xl font-bold text-white">Initialize Your Mission</h2>
-        <p className="text-slate-400 leading-relaxed">
+        <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-900 dark:text-white">Initialize Your Mission</h2>
+        <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 leading-relaxed">
           You don't have an active learning mission. Let Veda analyze your profile and build an adaptive execution engine to reach your career goals.
         </p>
       </div>
@@ -559,11 +559,11 @@ function ErrorState({ error, onRetry, onClear }: any) {
         <AlertCircle className="w-8 h-8" />
       </div>
       <div className="space-y-2">
-        <h2 className="text-xl font-bold text-white">Transmission Interrupted</h2>
-        <p className="text-slate-400 text-sm leading-relaxed">{error}</p>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-900 dark:text-white">Transmission Interrupted</h2>
+        <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{error}</p>
       </div>
       <div className="flex gap-4">
-        <button onClick={onClear} className="px-6 py-2.5 rounded-xl bg-white/[0.04] text-slate-400 font-bold uppercase tracking-widest text-[10px] hover:text-white transition">Dismiss</button>
+        <button onClick={onClear} className="px-6 py-2.5 rounded-xl bg-white/[0.04] text-slate-500 dark:text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-[10px] hover:text-slate-900 dark:text-slate-900 dark:text-white transition">Dismiss</button>
         <button onClick={onRetry} className="px-6 py-2.5 rounded-xl bg-red-400 text-slate-950 font-bold uppercase tracking-widest text-[10px] hover:bg-red-300 transition">Retry Sync</button>
       </div>
     </div>

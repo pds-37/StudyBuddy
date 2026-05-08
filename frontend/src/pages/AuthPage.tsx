@@ -175,7 +175,7 @@ export function AuthPage() {
                 <button 
                   type="button" 
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 text-slate-500 hover:text-white transition-colors"
+                  className="absolute right-4 text-slate-500 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-colors"
                 >
                   {showPassword ? <Shield size={16} /> : <Lock size={16} />}
                 </button>

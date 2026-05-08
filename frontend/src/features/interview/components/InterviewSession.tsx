@@ -24,11 +24,11 @@ export function InterviewSession({ session }: Props) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5">
+      <div className="rounded-xl border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white/[0.03] p-5">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-white">Mock Interview: {session.targetRole}</h2>
-            <p className="text-sm text-slate-400 mt-1">
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-900 dark:text-white">Mock Interview: {session.targetRole}</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400 mt-1">
               {isCompleted ? "Session completed. Review your feedback below." : `Question ${activeQuestionIndex + 1} of ${session.questions.length}`}
             </p>
           </div>
@@ -62,7 +62,7 @@ export function InterviewSession({ session }: Props) {
               key={q.id} 
               className={`rounded-xl border p-5 transition-all ${
                 isActive ? "border-brand bg-brand/5 shadow-[0_0_15px_rgba(124,92,255,0.1)]" : 
-                isAnswered ? "border-white/10 bg-white/[0.02]" : "border-white/5 bg-transparent opacity-60"
+                isAnswered ? "border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white/[0.02]" : "border-white/5 bg-transparent opacity-60"
               }`}
             >
               <div className="flex items-start justify-between gap-4">
@@ -72,19 +72,19 @@ export function InterviewSession({ session }: Props) {
                     <span className={`text-[10px] uppercase px-2 py-0.5 rounded-full ${
                       q.category === "behavioral" ? "bg-amber-500/20 text-amber-300" :
                       q.category === "technical" ? "bg-cyan-500/20 text-cyan-300" :
-                      "bg-slate-500/20 text-slate-300"
+                      "bg-slate-500/20 text-slate-700 dark:text-slate-700 dark:text-slate-300"
                     }`}>
                       {q.category}
                     </span>
                     {isAnswered && <CheckCircle className="w-4 h-4 text-green-400 ml-auto" />}
                   </div>
-                  <p className={`text-base ${isActive ? "text-white font-medium" : "text-slate-300"}`}>{q.question}</p>
+                  <p className={`text-base ${isActive ? "text-slate-900 dark:text-slate-900 dark:text-white font-medium" : "text-slate-700 dark:text-slate-700 dark:text-slate-300"}`}>{q.question}</p>
                   
                   {isAnswered && (
                     <div className="mt-4 pt-4 border-t border-white/5 space-y-4">
                       <div>
                         <p className="text-xs text-slate-500 mb-1">Your Answer:</p>
-                        <p className="text-sm text-slate-300 whitespace-pre-wrap">{q.userAnswer}</p>
+                        <p className="text-sm text-slate-700 dark:text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{q.userAnswer}</p>
                       </div>
                       
                       {q.score && (
@@ -102,7 +102,7 @@ export function InterviewSession({ session }: Props) {
                               { label: "STAR", score: q.score.starMethod }
                             ].map(s => (
                               <div key={s.label} className="text-center">
-                                <div className="text-lg font-semibold text-white">{s.score}/10</div>
+                                <div className="text-lg font-semibold text-slate-900 dark:text-slate-900 dark:text-white">{s.score}/10</div>
                                 <div className="text-[10px] text-slate-500 uppercase">{s.label}</div>
                               </div>
                             ))}
@@ -113,20 +113,20 @@ export function InterviewSession({ session }: Props) {
                   )}
 
                   {isActive && (
-                    <div className="mt-4 pt-4 border-t border-white/10 space-y-3">
+                    <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-200 dark:border-white/10 space-y-3">
                       <div className="bg-slate-900/50 rounded-lg p-1">
                         <textarea
                           value={answerInput}
                           onChange={(e) => setAnswerInput(e.target.value)}
                           placeholder="Type your answer here... (Use the STAR method for behavioral questions)"
-                          className="w-full bg-transparent border-0 text-sm text-white placeholder-slate-600 focus:ring-0 p-3 min-h-[120px] resize-y"
+                          className="w-full bg-transparent border-0 text-sm text-slate-900 dark:text-slate-900 dark:text-white placeholder-slate-600 focus:ring-0 p-3 min-h-[120px] resize-y"
                         />
                       </div>
                       <div className="flex justify-end">
                         <button
                           onClick={handleSubmit}
                           disabled={submitting || !answerInput.trim()}
-                          className="flex items-center gap-2 bg-brand text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-brand/90 transition disabled:opacity-50"
+                          className="flex items-center gap-2 bg-brand text-slate-900 dark:text-slate-900 dark:text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-brand/90 transition disabled:opacity-50"
                         >
                           {submitting ? "Submitting..." : (
                             <>

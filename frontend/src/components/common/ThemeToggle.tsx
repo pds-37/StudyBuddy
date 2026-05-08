@@ -17,7 +17,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.08] text-slate-400 hover:text-white transition-all group relative overflow-hidden"
+      className="p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.08] text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-all group relative overflow-hidden"
       aria-label="Toggle theme"
     >
       <div className="relative z-10 flex items-center justify-center">
@@ -27,7 +27,7 @@ export function ThemeToggle() {
           <Moon size={18} className="text-blue-500" />
         )}
       </div>
-      <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute inset-0 bg-slate-50 dark:bg-slate-50 dark:bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
     </button>
   );
 }

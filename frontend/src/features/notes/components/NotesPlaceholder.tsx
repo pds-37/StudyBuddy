@@ -34,7 +34,7 @@ export function NotesPlaceholder() {
     return (
       <div className="space-y-6">
         <div>
-          <h2 className="text-xl font-semibold text-white">Create New Note</h2>
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-900 dark:text-white">Create New Note</h2>
         </div>
         <NoteForm onSuccess={handleSuccess} onCancel={handleCancel} />
       </div>
@@ -45,7 +45,7 @@ export function NotesPlaceholder() {
     return (
       <div className="space-y-6">
         <div>
-          <h2 className="text-xl font-semibold text-white">Edit Note</h2>
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-900 dark:text-white">Edit Note</h2>
         </div>
         <NoteForm note={editingNote} onSuccess={handleSuccess} onCancel={handleCancel} />
       </div>
@@ -56,12 +56,12 @@ export function NotesPlaceholder() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-white">Your Notes</h2>
-          <p className="text-slate-400">Capture and organize your learning resources.</p>
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-900 dark:text-white">Your Notes</h2>
+          <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400">Capture and organize your learning resources.</p>
         </div>
         <button
           onClick={handleCreate}
-          className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand/90"
+          className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-slate-900 dark:text-slate-900 dark:text-white hover:bg-brand/90"
           type="button"
         >
           New Note

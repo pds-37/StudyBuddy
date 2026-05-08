@@ -24,13 +24,13 @@ export function JobsWidget() {
             <Briefcase className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-white">Job opportunities</h3>
-            <p className="text-sm text-slate-400">Live market roles matched to your profile</p>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-900 dark:text-white">Job opportunities</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400">Live market roles matched to your profile</p>
           </div>
         </div>
         <Link
           to="/jobs"
-          className="rounded-full border border-white/10 px-3 py-1.5 text-xs uppercase tracking-[0.22em] text-slate-300 transition hover:border-white/20 hover:text-white"
+          className="rounded-full border border-slate-200 dark:border-slate-200 dark:border-white/10 px-3 py-1.5 text-xs uppercase tracking-[0.22em] text-slate-700 dark:text-slate-700 dark:text-slate-300 transition hover:border-white/20 hover:text-slate-900 dark:text-slate-900 dark:text-white"
         >
           Open
         </Link>
@@ -38,7 +38,7 @@ export function JobsWidget() {
 
       {loading ? (
         <div className="mt-6 animate-pulse">
-          <div className="h-24 rounded-[1.5rem] bg-white/5" />
+          <div className="h-24 rounded-[1.5rem] bg-slate-50 dark:bg-slate-50 dark:bg-white/5" />
         </div>
       ) : (
         <div className="mt-6 space-y-5">
@@ -46,10 +46,10 @@ export function JobsWidget() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[11px] uppercase tracking-[0.28em] text-slate-500">Opportunities</p>
-                <p className="mt-3 font-display text-4xl tracking-tight text-white">{jobs.length}</p>
+                <p className="mt-3 font-display text-4xl tracking-tight text-slate-900 dark:text-slate-900 dark:text-white">{jobs.length}</p>
               </div>
               <div className="text-right">
-                <p className="text-sm text-slate-400">{totalMatches} with a match score</p>
+                <p className="text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400">{totalMatches} with a match score</p>
                 <p className="mt-1 text-xs text-slate-500">{liveSources} live sources tracked</p>
               </div>
             </div>
@@ -66,15 +66,15 @@ export function JobsWidget() {
             <p className="text-[11px] uppercase tracking-[0.28em] text-slate-500">Top current match</p>
             {topJob ? (
               <>
-                <p className="mt-3 text-base font-semibold text-white">
+                <p className="mt-3 text-base font-semibold text-slate-900 dark:text-slate-900 dark:text-white">
                   {topJob.title} at {topJob.company}
                 </p>
-                <p className="mt-2 text-sm text-slate-400">
+                <p className="mt-2 text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400">
                   {topJob.location} · {topJob.matchScore}% match{topJob.source ? ` · ${topJob.source}` : ""}
                 </p>
               </>
             ) : (
-              <p className="mt-3 text-sm leading-7 text-slate-400">
+              <p className="mt-3 text-sm leading-7 text-slate-500 dark:text-slate-500 dark:text-slate-400">
                 Load the jobs page to see the strongest live role matches for your current direction.
               </p>
             )}
@@ -82,7 +82,7 @@ export function JobsWidget() {
 
           <Link
             to="/jobs"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-cyan transition hover:text-white"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-cyan transition hover:text-slate-900 dark:text-slate-900 dark:text-white"
           >
             Review all matches
             <ExternalLink className="h-3.5 w-3.5" />

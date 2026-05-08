@@ -28,7 +28,7 @@ const SettingsPage = lazy(() => import("../pages/SettingsPage").then(m => ({ def
 
 function PageLoader() {
   return (
-    <div className="flex h-screen w-full items-center justify-center bg-obsidian">
+    <div className="flex h-screen w-full items-center justify-center bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
       <Loader2 className="h-8 w-8 animate-spin text-brand" />
     </div>
   );

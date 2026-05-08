@@ -42,9 +42,9 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
       className={cn(
         "sticky top-0 z-40 w-full transition-all duration-300 h-20 flex items-center shrink-0",
         isAppShell 
-          ? "bg-obsidian backdrop-blur-xl border-b border-white/[0.08]" 
+          ? "bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4" 
           : isScrolled 
-            ? "bg-obsidian/90 backdrop-blur-xl border-b border-white/5 shadow-2xl"
+            ? "bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4"
             : "bg-transparent"
       )}
     >
@@ -64,11 +64,11 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
             <div className="flex-1 max-w-xl">
               <button
                 onClick={onOpenCommand}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/[0.06] border border-white/[0.15] hover:bg-white/[0.1] hover:border-white/[0.25] transition-all group text-white shadow-lg"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/[0.06] border border-white/[0.15] hover:bg-white/[0.1] hover:border-white/[0.25] transition-all group text-slate-900 dark:text-slate-900 dark:text-white shadow-lg"
               >
                 <Search size={20} className="text-brand shrink-0" />
-                <span className="text-sm font-semibold text-slate-300">Search actions, notes, or roadmaps...</span>
-                <div className="ml-auto flex items-center gap-1.5 px-2 py-1 rounded-lg border border-white/20 bg-white/10 text-[10px] font-black text-white">
+                <span className="text-sm font-semibold text-slate-700 dark:text-slate-700 dark:text-slate-300">Search actions, notes, or roadmaps...</span>
+                <div className="ml-auto flex items-center gap-1.5 px-2 py-1 rounded-lg border border-white/20 bg-slate-100 dark:bg-slate-100 dark:bg-white/10 text-[10px] font-black text-slate-900 dark:text-slate-900 dark:text-white">
                   <Command size={10} />
                   <span>K</span>
                 </div>
@@ -84,7 +84,7 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
               <a
                 key={item.label}
                 href={item.href}
-                className="text-sm font-bold text-slate-400 hover:text-white transition-all hover:translate-y-[-1px]"
+                className="text-sm font-bold text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-all hover:translate-y-[-1px]"
               >
                 {item.label}
               </a>
@@ -105,11 +105,11 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
 
               <div className="flex items-center gap-4 pl-4 border-l border-white/5 group cursor-pointer">
                 <div className="text-right hidden sm:block">
-                  <p className="text-sm font-bold text-white group-hover:text-brand transition-colors">{user?.name || "User"}</p>
+                  <p className="text-sm font-bold text-slate-900 dark:text-slate-900 dark:text-white group-hover:text-brand transition-colors">{user?.name || "User"}</p>
                   <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Free Tier</p>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-brand to-cyan p-[1px] transition-transform group-hover:scale-105">
-                  <div className="w-full h-full rounded-full bg-obsidian flex items-center justify-center text-white text-xs font-black">
+                  <div className="w-full h-full rounded-full bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
                     {userInitials}
                   </div>
                 </div>
@@ -117,7 +117,7 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
             </div>
           ) : (
             <div className="flex items-center gap-4">
-              <Link to="/auth" className="px-5 py-2.5 text-sm font-bold text-slate-400 hover:text-white transition-colors">
+              <Link to="/auth" className="px-5 py-2.5 text-sm font-bold text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-colors">
                 Log in
               </Link>
               <Link 
@@ -132,7 +132,7 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMenuOpen(!isMenuOpen)}
-            className="p-2.5 rounded-xl lg:hidden text-slate-400 hover:text-white hover:bg-white/5 transition-all"
+            className="p-2.5 rounded-xl lg:hidden text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white hover:bg-slate-50 dark:bg-slate-50 dark:bg-white/5 transition-all"
           >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -141,12 +141,12 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="lg:hidden bg-obsidian border-b border-white/5 px-6 py-6 space-y-4 animate-slide-up">
+        <div className="lg:hidden bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
            {isLandingPage && landingSections.map((item) => (
              <a
                key={item.label}
                href={item.href}
-               className="block text-lg font-medium text-slate-400 hover:text-white"
+               className="block text-lg font-medium text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white"
                onClick={() => setMenuOpen(false)}
              >
                {item.label}
@@ -154,7 +154,7 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
            ))}
            {!isAuthenticated && (
              <div className="pt-4 space-y-4">
-               <Link to="/auth" className="block w-full py-3 text-center rounded-xl border border-white/10 text-white font-medium">
+               <Link to="/auth" className="block w-full py-3 text-center rounded-xl border border-slate-200 dark:border-slate-200 dark:border-white/10 text-slate-900 dark:text-slate-900 dark:text-white font-medium">
                  Sign in
                </Link>
                <Link to="/auth" className="block w-full py-3 text-center rounded-xl bg-white text-obsidian font-bold">

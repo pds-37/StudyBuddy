@@ -142,12 +142,12 @@ export function ResumeTailorWorkspace() {
     <div className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
       <form
         onSubmit={handleSubmit}
-        className="rounded-[2rem] border border-white/10 bg-white/[0.045] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl"
+        className="rounded-[2rem] border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white/[0.045] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl"
       >
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-cyan">Input</p>
-            <h2 className="mt-2 text-xl font-semibold tracking-tight text-white">Role and resume context</h2>
+            <h2 className="mt-2 text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-900 dark:text-white">Role and resume context</h2>
           </div>
           <div className="grid h-11 w-11 place-items-center rounded-2xl border border-cyan/20 bg-cyan/10 text-cyan">
             <FileText className="h-5 w-5" />
@@ -160,7 +160,7 @@ export function ResumeTailorWorkspace() {
             value={targetRole}
             onChange={(event) => setTargetRole(event.target.value)}
             placeholder="Frontend Developer, Data Analyst, Product Manager..."
-            className="mt-2 w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-cyan/35 focus:bg-black/35"
+            className="mt-2 w-full rounded-2xl border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-black/25 px-4 py-3 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none transition placeholder:text-slate-600 focus:border-cyan/35 focus:bg-black/35"
           />
         </label>
 
@@ -171,13 +171,13 @@ export function ResumeTailorWorkspace() {
             onChange={(event) => setJobDescription(event.target.value)}
             placeholder="Paste the role description, required skills, responsibilities, or job link notes..."
             rows={5}
-            className="mt-2 w-full resize-none rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-slate-600 focus:border-cyan/35 focus:bg-black/35"
+            className="mt-2 w-full resize-none rounded-2xl border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-black/25 px-4 py-3 text-sm leading-6 text-slate-900 dark:text-slate-900 dark:text-white outline-none transition placeholder:text-slate-600 focus:border-cyan/35 focus:bg-black/35"
           />
         </label>
 
         <label className="mt-5 block">
           <span className="text-sm font-medium text-slate-200">Resume Upload</span>
-          <div className="relative mt-2 flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/10 bg-black/25 px-4 py-8 transition hover:border-cyan/35 hover:bg-black/35">
+          <div className="relative mt-2 flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-200 dark:border-white/10 bg-black/25 px-4 py-8 transition hover:border-cyan/35 hover:bg-black/35">
             <input 
               type="file" 
               accept=".pdf,.txt" 
@@ -188,7 +188,7 @@ export function ResumeTailorWorkspace() {
             {isParsing ? (
               <div className="flex flex-col items-center gap-2">
                 <Loader2 className="h-6 w-6 animate-spin text-cyan" />
-                <span className="text-sm text-slate-400">Extracting text...</span>
+                <span className="text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400">Extracting text...</span>
               </div>
             ) : currentResume ? (
               <div className="flex flex-col items-center gap-2 text-center">
@@ -198,7 +198,7 @@ export function ResumeTailorWorkspace() {
               </div>
             ) : (
               <div className="flex flex-col items-center gap-2 text-center">
-                <FileText className="h-6 w-6 text-slate-400" />
+                <FileText className="h-6 w-6 text-slate-500 dark:text-slate-500 dark:text-slate-400" />
                 <span className="text-sm text-slate-200">Click or drag PDF/TXT here</span>
                 <span className="text-xs text-slate-500">Max size: 5MB</span>
               </div>
@@ -218,10 +218,10 @@ export function ResumeTailorWorkspace() {
                   "rounded-2xl border p-3 text-left transition",
                   tone === option.value
                     ? "border-cyan/35 bg-cyan/10"
-                    : "border-white/10 bg-black/20 hover:border-white/20 hover:bg-white/[0.04]"
+                    : "border-slate-200 dark:border-slate-200 dark:border-white/10 bg-black/20 hover:border-white/20 hover:bg-white/[0.04]"
                 )}
               >
-                <span className="block text-sm font-semibold text-white">{option.label}</span>
+                <span className="block text-sm font-semibold text-slate-900 dark:text-slate-900 dark:text-white">{option.label}</span>
                 <span className="mt-1 block text-xs text-slate-500">{option.description}</span>
               </button>
             ))}
@@ -238,24 +238,24 @@ export function ResumeTailorWorkspace() {
         <button
           type="submit"
           disabled={!canSubmit}
-          className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan to-blue-500 px-5 py-3 text-sm font-semibold text-white shadow-[0_16px_44px_rgba(34,211,238,0.18)] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
+          className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan to-blue-500 px-5 py-3 text-sm font-semibold text-slate-900 dark:text-slate-900 dark:text-white shadow-[0_16px_44px_rgba(34,211,238,0.18)] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
           {isLoading ? "Tailoring resume..." : "Generate tailored edits"}
         </button>
       </form>
 
-      <div className="rounded-[1.5rem] border border-white/[0.04] bg-ink p-6">
+      <div className="rounded-[1.5rem] border border-white/[0.04] bg-ink bg-white dark:bg-ink$4">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-cyan">Output</p>
-            <h2 className="mt-2 text-xl font-semibold tracking-tight text-white">Tailored resume changes</h2>
+            <h2 className="mt-2 text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-900 dark:text-white">Tailored resume changes</h2>
           </div>
           <button
             type="button"
             onClick={() => void copyResult()}
             disabled={!result}
-            className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm text-slate-300 transition hover:border-cyan/25 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm text-slate-700 dark:text-slate-700 dark:text-slate-300 transition hover:border-cyan/25 hover:text-slate-900 dark:text-slate-900 dark:text-white disabled:cursor-not-allowed disabled:opacity-40"
           >
             <Copy className="h-4 w-4" />
             Copy
@@ -265,12 +265,12 @@ export function ResumeTailorWorkspace() {
         {result ? (
           <div className="mt-6 space-y-4">
             <ResultCard title="Fit summary" icon={<Sparkles className="h-4 w-4" />}>
-              <p className="text-sm leading-7 text-slate-300">{result.roleFitSummary}</p>
+              <p className="text-sm leading-7 text-slate-700 dark:text-slate-700 dark:text-slate-300">{result.roleFitSummary}</p>
             </ResultCard>
 
             <ResultCard title="Headline and summary" icon={<FileText className="h-4 w-4" />}>
-              <p className="text-base font-semibold text-white">{result.targetHeadline}</p>
-              <p className="mt-3 text-sm leading-7 text-slate-300">{result.tailoredSummary}</p>
+              <p className="text-base font-semibold text-slate-900 dark:text-slate-900 dark:text-white">{result.targetHeadline}</p>
+              <p className="mt-3 text-sm leading-7 text-slate-700 dark:text-slate-700 dark:text-slate-300">{result.tailoredSummary}</p>
             </ResultCard>
 
             <ResultCard title="Bullet rewrites" icon={<Wand2 className="h-4 w-4" />}>
@@ -280,7 +280,7 @@ export function ResumeTailorWorkspace() {
                     <p className="text-xs uppercase tracking-[0.2em] text-slate-600">Before</p>
                     <p className="mt-2 text-sm leading-6 text-slate-500">{rewrite.before}</p>
                     <p className="mt-4 text-xs uppercase tracking-[0.2em] text-cyan">After</p>
-                    <p className="mt-2 text-sm leading-7 text-white">{rewrite.after}</p>
+                    <p className="mt-2 text-sm leading-7 text-slate-900 dark:text-slate-900 dark:text-white">{rewrite.after}</p>
                     <p className="mt-3 text-xs leading-5 text-slate-500">{rewrite.reason}</p>
                   </div>
                 ))}
@@ -300,8 +300,8 @@ export function ResumeTailorWorkspace() {
               <div className="mx-auto grid h-16 w-16 place-items-center rounded-[1.4rem] border border-cyan/20 bg-cyan/10 text-cyan">
                 <Wand2 className="h-7 w-7" />
               </div>
-              <h3 className="mt-6 text-2xl font-bold tracking-tight text-white">Your tailored resume edits will appear here.</h3>
-              <p className="mt-3 text-sm leading-7 text-slate-400">
+              <h3 className="mt-6 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-900 dark:text-white">Your tailored resume edits will appear here.</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-500 dark:text-slate-500 dark:text-slate-400">
                 The AI will keep edits truthful, suggest stronger bullets, and show the keywords this role is likely scanning for.
               </p>
             </div>
@@ -321,7 +321,7 @@ type ResultCardProps = {
 function ResultCard({ title, icon, children }: ResultCardProps) {
   return (
     <div className="rounded-[1rem] border border-white/[0.04] bg-black/20 p-4">
-      <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-white">
+      <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-900 dark:text-white">
         <span className="grid h-8 w-8 place-items-center rounded-xl bg-cyan/10 text-cyan">{icon}</span>
         {title}
       </div>
@@ -339,11 +339,11 @@ type ChecklistProps = {
 function Checklist({ title, items, warning = false }: ChecklistProps) {
   return (
     <div className="rounded-[1rem] border border-white/[0.04] bg-black/20 p-4">
-      <p className="text-sm font-semibold text-white">{title}</p>
+      <p className="text-sm font-semibold text-slate-900 dark:text-slate-900 dark:text-white">{title}</p>
       <div className="mt-3 space-y-2">
         {items.length > 0 ? (
           items.map((item, index) => (
-            <div key={`${item}-${index}`} className="flex gap-2 text-sm leading-6 text-slate-300">
+            <div key={`${item}-${index}`} className="flex gap-2 text-sm leading-6 text-slate-700 dark:text-slate-700 dark:text-slate-300">
               {warning ? (
                 <AlertCircle className="mt-1 h-4 w-4 flex-shrink-0 text-amber-300" />
               ) : (

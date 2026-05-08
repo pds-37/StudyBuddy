@@ -77,13 +77,13 @@ export function RecallPage() {
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.38em] text-cyan">Recall</p>
-          <h1 className="mt-3 text-3xl font-semibold text-white">Memory Training</h1>
-          <p className="mt-2 text-slate-400">Review due notes, score recall, and strengthen weak topics.</p>
+          <h1 className="mt-3 text-3xl font-semibold text-slate-900 dark:text-slate-900 dark:text-white">Memory Training</h1>
+          <p className="mt-2 text-slate-500 dark:text-slate-500 dark:text-slate-400">Review due notes, score recall, and strengthen weak topics.</p>
         </div>
         <button
           type="button"
           onClick={() => void loadRecall()}
-          className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-white/5"
+          className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 dark:border-slate-200 dark:border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-50 dark:bg-slate-50 dark:bg-white/5"
         >
           <RotateCcw size={16} />
           Refresh
@@ -97,24 +97,24 @@ export function RecallPage() {
       )}
 
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-lg border border-white/10 bg-white/[0.04] p-5">
-          <p className="text-sm text-slate-400">Due now</p>
-          <p className="mt-2 text-3xl font-semibold text-white">{stats?.dueCount ?? 0}</p>
+        <div className="rounded-lg border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white/[0.04] p-5">
+          <p className="text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400">Due now</p>
+          <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-slate-900 dark:text-white">{stats?.dueCount ?? 0}</p>
         </div>
-        <div className="rounded-lg border border-white/10 bg-white/[0.04] p-5">
-          <p className="text-sm text-slate-400">Tracked notes</p>
-          <p className="mt-2 text-3xl font-semibold text-white">{stats?.totalNotes ?? 0}</p>
+        <div className="rounded-lg border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white/[0.04] p-5">
+          <p className="text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400">Tracked notes</p>
+          <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-slate-900 dark:text-white">{stats?.totalNotes ?? 0}</p>
         </div>
-        <div className="rounded-lg border border-white/10 bg-white/[0.04] p-5">
-          <p className="text-sm text-slate-400">Memory health</p>
-          <p className="mt-2 text-3xl font-semibold text-white">{strengthLabel}</p>
+        <div className="rounded-lg border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white/[0.04] p-5">
+          <p className="text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400">Memory health</p>
+          <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-slate-900 dark:text-white">{strengthLabel}</p>
         </div>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="rounded-lg border border-white/10 bg-white/[0.04] p-6">
+        <div className="rounded-lg border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white/[0.04] p-6">
           {loading ? (
-            <div className="flex items-center gap-3 text-slate-300">
+            <div className="flex items-center gap-3 text-slate-700 dark:text-slate-700 dark:text-slate-300">
               <Loader2 className="animate-spin" size={18} />
               Loading recall queue...
             </div>
@@ -126,8 +126,8 @@ export function RecallPage() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-cyan">{activePrompt.topic}</p>
-                  <h2 className="mt-1 text-2xl font-semibold text-white">{activePrompt.prompt}</h2>
-                  <p className="mt-2 text-sm text-slate-400">Current strength: {formatPercent(activePrompt.strength)}</p>
+                  <h2 className="mt-1 text-2xl font-semibold text-slate-900 dark:text-slate-900 dark:text-white">{activePrompt.prompt}</h2>
+                  <p className="mt-2 text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400">Current strength: {formatPercent(activePrompt.strength)}</p>
                 </div>
               </div>
 
@@ -135,7 +135,7 @@ export function RecallPage() {
                 value={answer}
                 onChange={(event) => setAnswer(event.target.value)}
                 rows={8}
-                className="w-full rounded-lg border border-white/10 bg-obsidian/60 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-brand"
+                className="w-full rounded-lg border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4"
                 placeholder="Type your explanation from memory..."
               />
 
@@ -144,7 +144,7 @@ export function RecallPage() {
                   type="button"
                   disabled={reviewing || !answer.trim()}
                   onClick={() => void submitReview()}
-                  className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                  className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-slate-900 dark:text-slate-900 dark:text-white disabled:opacity-50"
                 >
                   {reviewing ? <Loader2 className="animate-spin" size={16} /> : <CheckCircle2 size={16} />}
                   Auto score
@@ -157,34 +157,34 @@ export function RecallPage() {
           ) : (
             <div className="py-10 text-center">
               <CheckCircle2 className="mx-auto text-emerald-400" size={34} />
-              <h2 className="mt-4 text-xl font-semibold text-white">Nothing due right now</h2>
-              <p className="mt-2 text-slate-400">Add more notes or come back when the next review window opens.</p>
+              <h2 className="mt-4 text-xl font-semibold text-slate-900 dark:text-slate-900 dark:text-white">Nothing due right now</h2>
+              <p className="mt-2 text-slate-500 dark:text-slate-500 dark:text-slate-400">Add more notes or come back when the next review window opens.</p>
             </div>
           )}
         </div>
 
         <aside className="space-y-4">
           {result && (
-            <div className="rounded-lg border border-white/10 bg-white/[0.04] p-5">
+            <div className="rounded-lg border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white/[0.04] p-5">
               <div className="flex items-center gap-2">
                 {result.grade === "wrong" ? <XCircle className="text-red-300" size={18} /> : <CheckCircle2 className="text-emerald-300" size={18} />}
-                <p className="font-semibold text-white">Last result: {result.grade}</p>
+                <p className="font-semibold text-slate-900 dark:text-slate-900 dark:text-white">Last result: {result.grade}</p>
               </div>
-              <p className="mt-2 text-sm text-slate-300">{result.feedback}</p>
+              <p className="mt-2 text-sm text-slate-700 dark:text-slate-700 dark:text-slate-300">{result.feedback}</p>
               <p className="mt-3 text-xs text-slate-500">Match score: {formatPercent(result.score)}</p>
             </div>
           )}
 
-          <div className="rounded-lg border border-white/10 bg-white/[0.04] p-5">
-            <h2 className="font-semibold text-white">Weak Topics</h2>
+          <div className="rounded-lg border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white/[0.04] p-5">
+            <h2 className="font-semibold text-slate-900 dark:text-slate-900 dark:text-white">Weak Topics</h2>
             <div className="mt-4 space-y-3">
               {(stats?.weakTopics ?? []).length === 0 ? (
-                <p className="text-sm text-slate-400">No weak topics yet.</p>
+                <p className="text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400">No weak topics yet.</p>
               ) : (
                 stats?.weakTopics.map((topic) => (
                   <div key={topic.topic} className="rounded-lg bg-white/[0.04] p-3">
                     <div className="flex items-center justify-between gap-3">
-                      <p className="text-sm font-semibold text-white">{topic.topic}</p>
+                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-900 dark:text-white">{topic.topic}</p>
                       <span className="text-xs text-cyan">{formatPercent(topic.averageStrength)}</span>
                     </div>
                     <p className="mt-1 text-xs text-slate-500">{topic.noteCount} notes, {topic.dueCount} due</p>

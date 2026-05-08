@@ -74,7 +74,7 @@ export function SidebarNav({ isCollapsed = false, onToggleCollapsed }: SidebarNa
             </Link>
             <button
               onClick={onToggleCollapsed}
-              className="p-2 rounded-lg hover:bg-white/5 text-slate-500 hover:text-white transition-colors"
+              className="p-2 rounded-lg hover:bg-slate-50 dark:bg-slate-50 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-colors"
             >
               <PanelLeftClose size={18} />
             </button>
@@ -107,8 +107,8 @@ export function SidebarNav({ isCollapsed = false, onToggleCollapsed }: SidebarNa
                   className={cn(
                     "group flex items-center gap-4 px-3 py-2.5 rounded-2xl transition-all duration-300 relative",
                     isActive 
-                      ? "bg-white/[0.05] text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]" 
-                      : "text-slate-500 hover:text-white hover:bg-white/[0.02]",
+                      ? "bg-white/[0.05] text-slate-900 dark:text-slate-900 dark:text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]" 
+                      : "text-slate-500 hover:text-slate-900 dark:text-slate-900 dark:text-white hover:bg-white/[0.02]",
                     isCollapsed ? "justify-center px-0" : "px-3"
                   )}
                 >
@@ -122,7 +122,7 @@ export function SidebarNav({ isCollapsed = false, onToggleCollapsed }: SidebarNa
                     size={20} 
                     className={cn(
                       "transition-all duration-300",
-                      isActive ? "text-brand scale-110" : "group-hover:text-white group-hover:scale-110"
+                      isActive ? "text-brand scale-110" : "group-hover:text-slate-900 dark:text-slate-900 dark:text-white group-hover:scale-110"
                     )} 
                   />
                   {!isCollapsed && (
@@ -147,12 +147,12 @@ export function SidebarNav({ isCollapsed = false, onToggleCollapsed }: SidebarNa
             <div className="p-4 rounded-[2rem] glass border-white/5 bg-white/[0.01]">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-brand to-cyan p-[1px]">
-                  <div className="w-full h-full rounded-full bg-obsidian flex items-center justify-center text-white text-xs font-bold">
+                  <div className="w-full h-full rounded-full bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
                     {userInitials}
                   </div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-white truncate">{user?.name || "User"}</p>
+                  <p className="text-sm font-bold text-slate-900 dark:text-slate-900 dark:text-white truncate">{user?.name || "User"}</p>
                   <p className="text-[10px] text-slate-500 truncate uppercase tracking-widest">{user?.email}</p>
                 </div>
               </div>
@@ -161,7 +161,7 @@ export function SidebarNav({ isCollapsed = false, onToggleCollapsed }: SidebarNa
             <div className="flex items-center gap-2">
               <Link 
                 to="/settings"
-                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/5 text-slate-400 hover:text-white transition-all text-xs font-bold"
+                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/5 text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-all text-xs font-bold"
               >
                 <Settings size={14} />
                 Settings
@@ -170,7 +170,7 @@ export function SidebarNav({ isCollapsed = false, onToggleCollapsed }: SidebarNa
 
               <button 
                 onClick={() => clearSession?.()}
-                className="p-3 rounded-xl bg-white/[0.03] hover:bg-red-500/10 border border-white/5 text-slate-400 hover:text-red-400 transition-all"
+                className="p-3 rounded-xl bg-white/[0.03] hover:bg-red-500/10 border border-white/5 text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-red-400 transition-all"
               >
                 <LogOut size={16} />
               </button>
@@ -179,13 +179,13 @@ export function SidebarNav({ isCollapsed = false, onToggleCollapsed }: SidebarNa
         ) : (
           <div className="flex flex-col items-center gap-4">
              <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-brand to-cyan p-[1px] cursor-pointer hover:scale-110 transition-transform">
-                <div className="w-full h-full rounded-full bg-obsidian flex items-center justify-center text-white text-xs font-bold">
+                <div className="w-full h-full rounded-full bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
                   {userInitials}
                 </div>
              </div>
              <Link 
                 to="/settings"
-                className="p-3 rounded-xl hover:bg-white/5 text-slate-500 hover:text-white transition-colors"
+                className="p-3 rounded-xl hover:bg-slate-50 dark:bg-slate-50 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-colors"
               >
                <Settings size={20} />
              </Link>

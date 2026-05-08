@@ -43,12 +43,12 @@ export function IntelligentNoteCard({ note, onAction }: { note: CareerNote; onAc
     <Motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="group p-6 border border-white/10 bg-transparent hover:border-white/20 transition-all flex flex-col h-full rounded-none"
+      className="group p-6 border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-transparent hover:border-white/20 transition-all flex flex-col h-full rounded-none"
     >
       <div className="flex items-center justify-between mb-4">
          <div className="flex flex-wrap gap-2">
             {(metadata?.concepts || note.tags || []).slice(0, 2).map((concept: string, i: number) => (
-               <span key={i} className="px-2 py-0.5 rounded-full bg-white/5 text-[10px] font-medium text-slate-300">
+               <span key={i} className="px-2 py-0.5 rounded-full bg-slate-50 dark:bg-slate-50 dark:bg-white/5 text-[10px] font-medium text-slate-700 dark:text-slate-700 dark:text-slate-300">
                   {concept}
                </span>
             ))}
@@ -56,8 +56,8 @@ export function IntelligentNoteCard({ note, onAction }: { note: CareerNote; onAc
          <div className={cn("w-1.5 h-1.5 rounded-full", note.strength > 0.7 ? "bg-emerald-500" : note.strength > 0.3 ? "bg-amber-500" : "bg-red-500")} />
       </div>
 
-      <h3 className="text-base font-medium text-white mb-2">{note.title}</h3>
-      <p className="text-[11px] text-slate-400 line-clamp-2 mb-6 flex-1 font-medium leading-relaxed">
+      <h3 className="text-base font-medium text-slate-900 dark:text-slate-900 dark:text-white mb-2">{note.title}</h3>
+      <p className="text-[11px] text-slate-500 dark:text-slate-500 dark:text-slate-400 line-clamp-2 mb-6 flex-1 font-medium leading-relaxed">
          {metadata?.summary || note.content.substring(0, 120)}...
       </p>
 
@@ -72,10 +72,10 @@ export function IntelligentNoteCard({ note, onAction }: { note: CareerNote; onAc
       </div>
 
       <div className="grid grid-cols-2 gap-3 mt-auto">
-         <button onClick={() => onAction('recall')} className="py-2.5 bg-brand/10 text-brand text-[10px] font-semibold hover:bg-brand hover:text-white transition-colors flex items-center justify-center gap-2">
+         <button onClick={() => onAction('recall')} className="py-2.5 bg-brand/10 text-brand text-[10px] font-semibold hover:bg-brand hover:text-slate-900 dark:text-slate-900 dark:text-white transition-colors flex items-center justify-center gap-2">
             Practice recall ↗
          </button>
-         <button onClick={() => onAction('mastery')} className="py-2.5 bg-emerald-500/10 text-emerald-500 text-[10px] font-semibold hover:bg-emerald-500 hover:text-white transition-colors flex items-center justify-center gap-2">
+         <button onClick={() => onAction('mastery')} className="py-2.5 bg-emerald-500/10 text-emerald-500 text-[10px] font-semibold hover:bg-emerald-500 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-colors flex items-center justify-center gap-2">
             AI mastery ↗
          </button>
       </div>
@@ -107,11 +107,11 @@ export function KnowledgeInsightsPanel({ insights }: any) {
       </div>
 
       <div className="p-6 border border-brand/20 bg-brand/5 mt-10">
-         <h4 className="text-[11px] font-medium text-slate-300 mb-2">Turn into mastery</h4>
-         <p className="text-[10px] text-slate-400 leading-relaxed mb-6">
+         <h4 className="text-[11px] font-medium text-slate-700 dark:text-slate-700 dark:text-slate-300 mb-2">Turn into mastery</h4>
+         <p className="text-[10px] text-slate-500 dark:text-slate-500 dark:text-slate-400 leading-relaxed mb-6">
             Upload any lecture, PDF, or video link and Veda will transform it into a mastery plan.
          </p>
-         <button className="w-full py-2.5 bg-brand text-white text-[10px] font-semibold hover:bg-brand/90 transition-colors flex items-center justify-center">
+         <button className="w-full py-2.5 bg-brand text-slate-900 dark:text-slate-900 dark:text-white text-[10px] font-semibold hover:bg-brand/90 transition-colors flex items-center justify-center">
             Start processing →
          </button>
       </div>
@@ -122,8 +122,8 @@ export function KnowledgeInsightsPanel({ insights }: any) {
 function InsightRow({ label, message }: any) {
   return (
     <div className="space-y-1 mb-6">
-      <h4 className="text-xs font-semibold text-white">{label}</h4>
-      <p className="text-[11px] text-slate-400 font-medium leading-relaxed">{message}</p>
+      <h4 className="text-xs font-semibold text-slate-900 dark:text-slate-900 dark:text-white">{label}</h4>
+      <p className="text-[11px] text-slate-500 dark:text-slate-500 dark:text-slate-400 font-medium leading-relaxed">{message}</p>
     </div>
   );
 }

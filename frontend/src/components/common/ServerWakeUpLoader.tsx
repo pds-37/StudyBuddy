@@ -7,7 +7,7 @@ import { Loader2, Sparkles, Zap } from "lucide-react";
  */
 export function ServerWakeUpLoader() {
   return (
-    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-obsidian overflow-hidden">
+    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
       {/* Background Nebula Decor */}
       <motion.div 
         animate={{ 
@@ -41,12 +41,12 @@ export function ServerWakeUpLoader() {
           />
         </motion.div>
 
-        <h1 className="text-4xl font-black text-white mb-4 tracking-tight">Waking Up Veda AI</h1>
-        <p className="text-slate-400 text-lg leading-relaxed mb-12">
+        <h1 className="text-4xl font-black text-slate-900 dark:text-slate-900 dark:text-white mb-4 tracking-tight">Waking Up Veda AI</h1>
+        <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 text-lg leading-relaxed mb-12">
           Your AI mentor is initializing its knowledge engine. This usually takes 30-40 seconds on cold starts.
         </p>
 
-        <div className="w-64 h-1.5 bg-white/5 rounded-full overflow-hidden relative mb-8">
+        <div className="w-64 h-1.5 bg-slate-50 dark:bg-slate-50 dark:bg-white/5 rounded-full overflow-hidden relative mb-8">
            <motion.div 
              initial={{ x: "-100%" }}
              animate={{ x: "100%" }}

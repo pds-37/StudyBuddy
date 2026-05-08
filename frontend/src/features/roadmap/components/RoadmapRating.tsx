@@ -36,8 +36,8 @@ export function RoadmapRating({ roadmapId, initialRating, initialFeedback }: Roa
         <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-green-500/20 text-green-400">
           <CheckCircle2 size={24} />
         </div>
-        <h4 className="text-sm font-semibold text-white">Feedback Received!</h4>
-        <p className="mt-1 text-xs text-slate-400">Thank you for helping us improve your learning path.</p>
+        <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-900 dark:text-white">Feedback Received!</h4>
+        <p className="mt-1 text-xs text-slate-500 dark:text-slate-500 dark:text-slate-400">Thank you for helping us improve your learning path.</p>
         <div className="mt-4 flex justify-center gap-1">
           {[1, 2, 3, 4, 5].map((star) => (
             <Star
@@ -54,8 +54,8 @@ export function RoadmapRating({ roadmapId, initialRating, initialFeedback }: Roa
   return (
     <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-8 backdrop-blur-sm">
       <div className="mb-6 text-center">
-        <h3 className="text-lg font-semibold text-white">How is this roadmap?</h3>
-        <p className="mt-1 text-sm text-slate-400">Your feedback helps the AI create better paths for everyone.</p>
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-900 dark:text-white">How is this roadmap?</h3>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400">Your feedback helps the AI create better paths for everyone.</p>
       </div>
 
       <div className="mb-8 flex justify-center gap-3">
@@ -85,13 +85,13 @@ export function RoadmapRating({ roadmapId, initialRating, initialFeedback }: Roa
           value={feedback}
           onChange={(e) => setFeedback(e.target.value)}
           placeholder="Any specific thoughts? (e.g., too fast, missing key topics, great resources...)"
-          className="w-full min-h-[100px] rounded-xl border border-white/[0.06] bg-black/20 p-4 text-sm text-white placeholder-slate-600 focus:border-cyan/50 focus:outline-none focus:ring-1 focus:ring-cyan/50 transition-all"
+          className="w-full min-h-[100px] rounded-xl border border-white/[0.06] bg-black/20 p-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white placeholder-slate-600 focus:border-cyan/50 focus:outline-none focus:ring-1 focus:ring-cyan/50 transition-all"
         />
 
         <button
           onClick={handleSubmit}
           disabled={rating === 0 || isSubmitting}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-bold text-slate-950 transition-all hover:bg-cyan hover:text-white disabled:opacity-50 disabled:hover:bg-white disabled:hover:text-slate-950"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-bold text-slate-950 transition-all hover:bg-cyan hover:text-slate-900 dark:text-slate-900 dark:text-white disabled:opacity-50 disabled:hover:bg-white disabled:hover:text-slate-950"
         >
           {isSubmitting ? (
             <Loader2 size={18} className="animate-spin" />

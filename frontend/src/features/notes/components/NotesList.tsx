@@ -42,7 +42,7 @@ export function NotesList({ refreshTrigger, onEdit }: NotesListProps) {
   };
 
   if (loading) {
-    return <div className="text-slate-400">Loading notes...</div>;
+    return <div className="text-slate-500 dark:text-slate-500 dark:text-slate-400">Loading notes...</div>;
   }
 
   if (error) {
@@ -50,17 +50,17 @@ export function NotesList({ refreshTrigger, onEdit }: NotesListProps) {
   }
 
   if (notes.length === 0) {
-    return <div className="text-slate-400">No notes yet. Create your first note above.</div>;
+    return <div className="text-slate-500 dark:text-slate-500 dark:text-slate-400">No notes yet. Create your first note above.</div>;
   }
 
   return (
     <div className="space-y-4">
       {notes.map((note) => (
-        <div key={note.id} className="rounded-lg border border-white/10 bg-white/5 p-4">
+        <div key={note.id} className="rounded-lg border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-50 dark:bg-white/5 p-4">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <h3 className="font-semibold text-white">{note.title}</h3>
-              <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-400">
+              <h3 className="font-semibold text-slate-900 dark:text-slate-900 dark:text-white">{note.title}</h3>
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-500 dark:text-slate-400">
                 <span>{note.topic || note.tags[0] || "General"}</span>
                 <span className="h-1 w-1 rounded-full bg-slate-600" />
                 <span>{Math.round(note.strength * 100)}% strength</span>
@@ -71,7 +71,7 @@ export function NotesList({ refreshTrigger, onEdit }: NotesListProps) {
                   </>
                 )}
               </div>
-              <p className="mt-2 text-sm text-slate-300 line-clamp-3">{note.content}</p>
+              <p className="mt-2 text-sm text-slate-700 dark:text-slate-700 dark:text-slate-300 line-clamp-3">{note.content}</p>
               {note.tags.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-1">
                   {note.tags.map((tag) => (
@@ -95,7 +95,7 @@ export function NotesList({ refreshTrigger, onEdit }: NotesListProps) {
             <div className="ml-4 flex gap-2">
               <button
                 onClick={() => onEdit?.(note)}
-                className="text-slate-400 hover:text-white"
+                className="text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white"
                 type="button"
               >
                 Edit

@@ -17,7 +17,7 @@ export function JobsList({ refreshTrigger }: JobsListProps) {
   }, [fetchJobs, refreshTrigger]);
 
   const getMatchScoreColor = (score?: number) => {
-    if (!score) return "text-slate-400";
+    if (!score) return "text-slate-500 dark:text-slate-500 dark:text-slate-400";
     if (score >= 80) return "text-green-400";
     if (score >= 60) return "text-yellow-400";
     return "text-red-400";
@@ -120,7 +120,7 @@ export function JobsList({ refreshTrigger }: JobsListProps) {
           <div className="absolute inset-0 bg-brand/20 blur-3xl rounded-full" />
           <RefreshCw className="relative h-12 w-12 animate-spin text-brand" />
         </div>
-        <p className="mt-6 text-slate-400 font-medium">Scanning live market opportunities...</p>
+        <p className="mt-6 text-slate-500 dark:text-slate-500 dark:text-slate-400 font-medium">Scanning live market opportunities...</p>
       </div>
     );
   }
@@ -130,19 +130,19 @@ export function JobsList({ refreshTrigger }: JobsListProps) {
       <div className="rounded-[2rem] glass border-red-500/20 bg-red-500/5 p-10 animate-slide-up">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex-1 text-center md:text-left">
-            <h3 className="text-2xl font-bold text-white mb-3">Market Sync Interrupted</h3>
-            <p className="text-slate-400 max-w-md leading-relaxed">{error}</p>
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-900 dark:text-white mb-3">Market Sync Interrupted</h3>
+            <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 max-w-md leading-relaxed">{error}</p>
           </div>
           <div className="flex items-center gap-4">
             <button
               onClick={handleClearError}
-              className="px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 transition-all"
+              className="px-6 py-3 rounded-xl bg-slate-50 dark:bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-slate-200 dark:border-white/10 text-slate-900 dark:text-slate-900 dark:text-white font-bold hover:bg-slate-100 dark:bg-slate-100 dark:bg-white/10 transition-all"
             >
               Dismiss
             </button>
             <button
               onClick={handleRefresh}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-brand text-white font-bold hover:scale-105 transition-all shadow-[0_0_20px_rgba(124,92,255,0.4)]"
+              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-brand text-slate-900 dark:text-slate-900 dark:text-white font-bold hover:scale-105 transition-all shadow-[0_0_20px_rgba(124,92,255,0.4)]"
             >
               <RefreshCw className="h-4 w-4" />
               Retry Sync
@@ -156,11 +156,11 @@ export function JobsList({ refreshTrigger }: JobsListProps) {
   if (jobs.length === 0) {
     return (
       <div className="py-24 text-center glass rounded-[3rem] border-white/5 bg-white/[0.01] animate-slide-up">
-        <div className="w-20 h-20 rounded-3xl bg-white/5 flex items-center justify-center text-slate-600 mx-auto mb-8">
+        <div className="w-20 h-20 rounded-3xl bg-slate-50 dark:bg-slate-50 dark:bg-white/5 flex items-center justify-center text-slate-600 mx-auto mb-8">
           <Building size={40} />
         </div>
-        <h3 className="text-2xl font-bold text-white mb-3">No live matches found</h3>
-        <p className="text-slate-400 mb-10 max-w-sm mx-auto leading-relaxed">
+        <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-900 dark:text-white mb-3">No live matches found</h3>
+        <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 mb-10 max-w-sm mx-auto leading-relaxed">
           We couldn't find active openings matching your current profile. Try adjusting your target role or location.
         </p>
         <button
@@ -180,22 +180,22 @@ export function JobsList({ refreshTrigger }: JobsListProps) {
         <div className="p-6 rounded-2xl glass border-white/5 bg-white/[0.02] relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-24 h-24 bg-brand/5 blur-2xl -z-10 group-hover:bg-brand/10 transition-colors" />
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4">Live Roles</p>
-          <p className="text-4xl font-black text-white">{jobs.length}</p>
+          <p className="text-4xl font-black text-slate-900 dark:text-slate-900 dark:text-white">{jobs.length}</p>
         </div>
         <div className="p-6 rounded-2xl glass border-white/5 bg-white/[0.02] relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-24 h-24 bg-cyan/5 blur-2xl -z-10 group-hover:bg-cyan/10 transition-colors" />
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4">New Today</p>
-          <p className="text-4xl font-black text-white">{freshJobs}</p>
+          <p className="text-4xl font-black text-slate-900 dark:text-slate-900 dark:text-white">{freshJobs}</p>
         </div>
         <div className="p-6 rounded-2xl glass border-white/5 bg-white/[0.02] relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 blur-2xl -z-10 group-hover:bg-emerald-500/10 transition-colors" />
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4">Verified Sources</p>
-          <p className="text-4xl font-black text-white">{Object.keys(sourceCounts).length}</p>
+          <p className="text-4xl font-black text-slate-900 dark:text-slate-900 dark:text-white">{Object.keys(sourceCounts).length}</p>
         </div>
         <div className="p-6 rounded-2xl glass border-white/5 bg-white/[0.02] relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 blur-2xl -z-10 group-hover:bg-purple-500/10 transition-colors" />
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4">Remote Ready</p>
-          <p className="text-4xl font-black text-white">{remoteJobs}</p>
+          <p className="text-4xl font-black text-slate-900 dark:text-slate-900 dark:text-white">{remoteJobs}</p>
         </div>
       </div>
 
@@ -204,21 +204,21 @@ export function JobsList({ refreshTrigger }: JobsListProps) {
           const salary = formatSalary(job);
 
           return (
-            <div key={job.id} className="group p-8 rounded-[2.5rem] glass border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all hover:border-white/10 hover:translate-y-[-2px]">
+            <div key={job.id} className="group p-8 rounded-[2.5rem] glass border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all hover:border-slate-200 dark:border-slate-200 dark:border-white/10 hover:translate-y-[-2px]">
               <div className="flex flex-col lg:flex-row gap-8">
                 <div className="flex-1">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                     <div>
                       <div className="flex items-center gap-3 mb-2">
-                         <h3 className="text-2xl font-bold text-white group-hover:text-brand transition-colors">{job.title}</h3>
+                         <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-900 dark:text-white group-hover:text-brand transition-colors">{job.title}</h3>
                          {job.isRemote && (
                            <span className="px-2 py-0.5 rounded-md bg-cyan/10 border border-cyan/20 text-[10px] font-bold text-cyan uppercase tracking-wider">Remote</span>
                          )}
                       </div>
-                      <div className="flex flex-wrap items-center gap-6 text-sm text-slate-400">
+                      <div className="flex flex-wrap items-center gap-6 text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400">
                         <div className="flex items-center gap-2">
                           <Building size={16} className="text-slate-600" />
-                          <span className="font-semibold text-slate-300">{job.company}</span>
+                          <span className="font-semibold text-slate-700 dark:text-slate-700 dark:text-slate-300">{job.company}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <MapPin size={16} className="text-slate-600" />
@@ -244,7 +244,7 @@ export function JobsList({ refreshTrigger }: JobsListProps) {
                     )}
                   </div>
 
-                  <p className="text-slate-400 text-sm leading-relaxed mb-8 max-w-4xl line-clamp-2 group-hover:line-clamp-none transition-all">
+                  <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-8 max-w-4xl line-clamp-2 group-hover:line-clamp-none transition-all">
                     {job.description || "No description provided."}
                   </p>
 
@@ -253,13 +253,13 @@ export function JobsList({ refreshTrigger }: JobsListProps) {
                       {job.requiredSkills.slice(0, 5).map((skill) => (
                         <span
                           key={skill}
-                          className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/5 text-xs font-medium text-slate-300"
+                          className="px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-50 dark:bg-white/5 border border-white/5 text-xs font-medium text-slate-700 dark:text-slate-700 dark:text-slate-300"
                         >
                           {skill}
                         </span>
                       ))}
                       {job.requiredSkills.length > 5 && (
-                        <span className="px-3 py-1.5 rounded-xl bg-white/5 text-xs font-medium text-slate-500">
+                        <span className="px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-50 dark:bg-white/5 text-xs font-medium text-slate-500">
                           +{job.requiredSkills.length - 5} more
                         </span>
                       )}

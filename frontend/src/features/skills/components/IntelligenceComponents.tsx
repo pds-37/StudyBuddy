@@ -33,11 +33,11 @@ export function SkillMatrixCard({ gap }: { gap: SkillGapItem }) {
            )}>
               {gap.status} Match
            </div>
-           <h3 className="text-2xl font-black text-white tracking-tight group-hover:text-brand transition-colors">{gap.skill}</h3>
+           <h3 className="text-2xl font-black text-slate-900 dark:text-slate-900 dark:text-white tracking-tight group-hover:text-brand transition-colors">{gap.skill}</h3>
            <p className="text-[10px] font-bold text-slate-500 mt-2 uppercase tracking-[0.2em]">{gap.category}</p>
         </div>
         <div className="w-16 h-16 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center shadow-inner">
-           <span className="text-xl font-black text-white">{gap.userScore}<span className="text-[10px] text-brand ml-0.5">%</span></span>
+           <span className="text-xl font-black text-slate-900 dark:text-slate-900 dark:text-white">{gap.userScore}<span className="text-[10px] text-brand ml-0.5">%</span></span>
         </div>
       </div>
 
@@ -64,8 +64,8 @@ function DimensionBar({ label, value, icon: Icon, color }: any) {
   return (
     <div className="space-y-3">
        <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-widest text-slate-500">
-          <span className="flex items-center gap-2"><Icon size={12} className="text-slate-400" /> {label}</span>
-          <span className="text-white">{value}%</span>
+          <span className="flex items-center gap-2"><Icon size={12} className="text-slate-500 dark:text-slate-500 dark:text-slate-400" /> {label}</span>
+          <span className="text-slate-900 dark:text-slate-900 dark:text-white">{value}%</span>
        </div>
        <div className="h-1.5 rounded-full bg-white/[0.03] overflow-hidden p-[1px] border border-white/[0.05]">
           <Motion.div 
@@ -86,7 +86,7 @@ export function ReadinessRing({ score, label }: { score: number, label: string }
   return (
     <div className="relative w-32 h-32 flex items-center justify-center">
       <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-         <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="8" className="text-white/5" />
+         <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="8" className="text-slate-900 dark:text-slate-900 dark:text-white/5" />
          <Motion.circle 
            cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="8" 
            strokeLinecap="round"
@@ -98,8 +98,8 @@ export function ReadinessRing({ score, label }: { score: number, label: string }
          />
       </svg>
       <div className="absolute flex flex-col items-center justify-center">
-         <span className="text-3xl font-black text-white">{score}</span>
-         <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">{label}</span>
+         <span className="text-3xl font-black text-slate-900 dark:text-slate-900 dark:text-white">{score}</span>
+         <span className="text-[8px] font-black text-slate-500 dark:text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1">{label}</span>
       </div>
     </div>
   );

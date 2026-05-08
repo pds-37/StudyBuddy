@@ -44,13 +44,13 @@ export function InterviewWorkspace() {
         </div>
       )}
 
-      <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.05] to-transparent p-8 text-center">
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-gradient-to-br from-white/[0.05] to-transparent p-8 text-center">
         <div className="mx-auto w-16 h-16 rounded-2xl bg-brand/10 text-brand flex items-center justify-center mb-6">
           <Mic className="w-8 h-8" />
         </div>
-        <h2 className="text-2xl font-bold text-white mb-3">AI Interview Simulator</h2>
-        <p className="text-slate-400 max-w-lg mx-auto mb-8 leading-relaxed">
-          Practice interviewing for your target role: <strong className="text-white">{user.targetRoles[0]}</strong>. 
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-900 dark:text-white mb-3">AI Interview Simulator</h2>
+        <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 max-w-lg mx-auto mb-8 leading-relaxed">
+          Practice interviewing for your target role: <strong className="text-slate-900 dark:text-slate-900 dark:text-white">{user.targetRoles[0]}</strong>. 
           The AI will ask behavioral and technical questions and score your answers using the STAR method.
         </p>
         <button
@@ -71,10 +71,10 @@ export function InterviewWorkspace() {
 
       {sessions.length > 0 && (
         <div>
-          <h3 className="text-lg font-medium text-white mb-4">Past Sessions</h3>
+          <h3 className="text-lg font-medium text-slate-900 dark:text-slate-900 dark:text-white mb-4">Past Sessions</h3>
           <div className="grid gap-3 sm:grid-cols-2">
             {sessions.map(s => (
-              <div key={s.id} className="rounded-xl border border-white/10 bg-black/20 p-5 flex flex-col gap-3">
+              <div key={s.id} className="rounded-xl border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-black/20 p-5 flex flex-col gap-3">
                 <div className="flex justify-between items-start">
                   <div>
                     <div className="font-medium text-slate-200">{s.targetRole}</div>
@@ -89,7 +89,7 @@ export function InterviewWorkspace() {
                 </div>
                 {s.status === "completed" && s.overallScore !== undefined && (
                   <div className="mt-auto pt-3 border-t border-white/5 flex items-end justify-between">
-                    <span className="text-xs text-slate-400">Overall Score</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-500 dark:text-slate-400">Overall Score</span>
                     <span className="font-bold text-cyan">{s.overallScore}/10</span>
                   </div>
                 )}

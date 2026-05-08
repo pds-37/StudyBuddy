@@ -129,13 +129,13 @@ export function CopilotChat() {
                 currentConversation?._id === conv._id ? "bg-slate-800 border-r-2 border-brand" : ""
               }`}
             >
-              <div className="text-sm text-white truncate">
+              <div className="text-sm text-slate-900 dark:text-slate-900 dark:text-white truncate">
                 {conv.messages.length > 1
                   ? conv.messages[1].content.substring(0, 50) + "..."
                   : "New conversation"
                 }
               </div>
-              <div className="text-xs text-slate-400 mt-1">
+              <div className="text-xs text-slate-500 dark:text-slate-500 dark:text-slate-400 mt-1">
                 {new Date(conv.updatedAt).toLocaleDateString()}
               </div>
             </button>
@@ -159,13 +159,13 @@ export function CopilotChat() {
                   <div
                     className={`max-w-[70%] rounded-lg px-4 py-2 ${
                       msg.role === 'user'
-                        ? 'bg-brand text-white'
+                        ? 'bg-brand text-slate-900 dark:text-slate-900 dark:text-white'
                         : 'bg-slate-700 text-slate-100'
                     }`}
                   >
                     <div className="whitespace-pre-wrap">{msg.content}</div>
                     <div className={`text-xs mt-1 ${
-                      msg.role === 'user' ? 'text-blue-200' : 'text-slate-400'
+                      msg.role === 'user' ? 'text-blue-200' : 'text-slate-500 dark:text-slate-500 dark:text-slate-400'
                     }`}>
                       {formatTime(msg.createdAt)}
                     </div>
@@ -194,7 +194,7 @@ export function CopilotChat() {
                   onChange={(e) => setMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Ask me anything about your career..."
-                  className="flex-1 bg-slate-800 border border-slate-600 text-white placeholder-slate-400 rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
+                  className="flex-1 bg-slate-800 border border-slate-600 text-slate-900 dark:text-slate-900 dark:text-white placeholder-slate-400 rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
                   rows={2}
                   disabled={isLoading}
                 />
@@ -213,8 +213,8 @@ export function CopilotChat() {
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <MessageCircle className="w-12 h-12 text-slate-500 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-white mb-2">Start a conversation</h3>
-              <p className="text-slate-400 mb-4">
+              <h3 className="text-lg font-medium text-slate-900 dark:text-slate-900 dark:text-white mb-2">Start a conversation</h3>
+              <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 mb-4">
                 Get personalized career guidance from your AI copilot
               </p>
               <Button onClick={handleNewConversation} className="bg-brand hover:bg-brand/90">

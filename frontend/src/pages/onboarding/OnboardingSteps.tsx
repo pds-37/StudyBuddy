@@ -58,8 +58,8 @@ function Chip({ label, selected, onClick, delay = 0 }: { label: string; selected
       onClick={onClick}
       className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 ${
         selected
-          ? "border-cyan-400/40 bg-cyan-400/10 text-white shadow-[0_0_20px_rgba(34,211,238,0.08)]"
-          : "border-white/[0.06] bg-white/[0.02] text-slate-400 hover:border-white/[0.12] hover:text-white"
+          ? "border-cyan-400/40 bg-cyan-400/10 text-slate-900 dark:text-slate-900 dark:text-white shadow-[0_0_20px_rgba(34,211,238,0.08)]"
+          : "border-white/[0.06] bg-white/[0.02] text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:border-white/[0.12] hover:text-slate-900 dark:text-slate-900 dark:text-white"
       }`}
       initial={{ opacity: 0, scale: 0.92 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -87,7 +87,7 @@ function SectionLabel({ children, delay = 0 }: { children: React.ReactNode; dela
 function Prompt({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   return (
     <Motion.h3
-      className="text-xl font-semibold text-white mb-6 leading-relaxed"
+      className="text-xl font-semibold text-slate-900 dark:text-slate-900 dark:text-white mb-6 leading-relaxed"
       initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
       transition={{ delay: delay * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
@@ -124,8 +124,8 @@ export function Step1Career({ data, update }: StepProps) {
         <div className="mt-3 flex gap-2">
           <input value={roleInput} onChange={e => setRoleInput(e.target.value)}
             onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addCustom(); } }}
-            placeholder="Or type your own..." className="flex-1 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-2.5 text-sm text-white placeholder-slate-600 outline-none focus:border-cyan-400/30 transition" />
-          <button type="button" onClick={addCustom} className="rounded-xl bg-white/[0.04] px-4 py-2 text-xs font-bold uppercase text-slate-500 hover:text-white transition">Add</button>
+            placeholder="Or type your own..." className="flex-1 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-2.5 text-sm text-slate-900 dark:text-slate-900 dark:text-white placeholder-slate-600 outline-none focus:border-cyan-400/30 transition" />
+          <button type="button" onClick={addCustom} className="rounded-xl bg-white/[0.04] px-4 py-2 text-xs font-bold uppercase text-slate-500 hover:text-slate-900 dark:text-slate-900 dark:text-white transition">Add</button>
         </div>
       </div>
 
@@ -147,7 +147,7 @@ export function Step1Career({ data, update }: StepProps) {
             {confidenceLevels.map((c, i) => (
               <Motion.button key={c.value} type="button" onClick={() => update({ careerConfidence: c.value })}
                 className={`rounded-2xl border p-4 text-center transition-all ${
-                  data.careerConfidence === c.value ? "border-cyan-400/30 bg-cyan-400/5 text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-400 hover:text-white"
+                  data.careerConfidence === c.value ? "border-cyan-400/30 bg-cyan-400/5 text-slate-900 dark:text-slate-900 dark:text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white"
                 }`}
                 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.08 * i, duration: 0.4 }}
@@ -228,22 +228,22 @@ export function Step2Academic({ data, update }: StepProps) {
               <div className="flex flex-wrap gap-2 mb-3">
                 {data.currentSkills.map(s => (
                   <button key={s} type="button" onClick={() => update({ currentSkills: data.currentSkills.filter(x => x !== s) })}
-                    className="rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-white hover:bg-red-500/15 hover:border-red-400/25 transition">{s} ×</button>
+                    className="rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-slate-900 dark:text-slate-900 dark:text-white hover:bg-red-500/15 hover:border-red-400/25 transition">{s} ×</button>
                 ))}
               </div>
             )}
             <div className="flex gap-2">
               <input value={skillInput} onChange={e => setSkillInput(e.target.value)}
                 onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addSkill(skillInput); } }}
-                placeholder="Search or type a skill..." className="flex-1 bg-transparent px-2 py-2 text-sm text-white outline-none placeholder-slate-600" />
-              <button type="button" onClick={() => addSkill(skillInput)} className="text-xs font-bold uppercase text-slate-500 hover:text-white px-3 transition">Add</button>
+                placeholder="Search or type a skill..." className="flex-1 bg-transparent px-2 py-2 text-sm text-slate-900 dark:text-slate-900 dark:text-white outline-none placeholder-slate-600" />
+              <button type="button" onClick={() => addSkill(skillInput)} className="text-xs font-bold uppercase text-slate-500 hover:text-slate-900 dark:text-slate-900 dark:text-white px-3 transition">Add</button>
             </div>
           </div>
           {suggestions.length > 0 && (
             <div className="mt-2 rounded-xl border border-white/[0.06] bg-black/40 p-1 max-h-40 overflow-y-auto">
               {suggestions.map(s => (
                 <button key={s.id} type="button" onClick={() => addSkill(s.name)}
-                  className="w-full flex justify-between rounded-lg px-3 py-2 text-left text-sm text-slate-300 hover:bg-white/[0.06] hover:text-white transition">
+                  className="w-full flex justify-between rounded-lg px-3 py-2 text-left text-sm text-slate-700 dark:text-slate-700 dark:text-slate-300 hover:bg-white/[0.06] hover:text-slate-900 dark:text-slate-900 dark:text-white transition">
                   <span>{s.name}</span><span className="text-xs text-slate-600">{s.category}</span>
                 </button>
               ))}
@@ -273,7 +273,7 @@ export function Step3Behavior({ data, update }: StepProps) {
         <div className="flex items-center gap-6">
           <input type="range" min={1} max={10} value={data.dailyHours} onChange={e => update({ dailyHours: Number(e.target.value) })}
             className="flex-1 h-1.5 rounded-full appearance-none bg-white/[0.06] accent-cyan-400 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-cyan-400 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:shadow-[0_0_12px_rgba(34,211,238,0.4)]" />
-          <Motion.span key={data.dailyHours} className="text-2xl font-bold text-white min-w-[3rem] text-center"
+          <Motion.span key={data.dailyHours} className="text-2xl font-bold text-slate-900 dark:text-slate-900 dark:text-white min-w-[3rem] text-center"
             initial={{ scale: 1.3, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 300, damping: 20 }}>
             {data.dailyHours}h
           </Motion.span>
@@ -286,7 +286,7 @@ export function Step3Behavior({ data, update }: StepProps) {
         <div className="grid grid-cols-3 gap-3">
           {productiveTimes.map((t, i) => (
             <Motion.button key={t.value} type="button" onClick={() => update({ productiveTime: t.value })}
-              className={`rounded-2xl border p-5 text-center transition-all ${data.productiveTime === t.value ? "border-cyan-400/30 bg-cyan-400/5 text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-400 hover:text-white"}`}
+              className={`rounded-2xl border p-5 text-center transition-all ${data.productiveTime === t.value ? "border-cyan-400/30 bg-cyan-400/5 text-slate-900 dark:text-slate-900 dark:text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white"}`}
               initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 * i }}
               whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               <span className="text-2xl block mb-2">{t.icon}</span>
@@ -350,7 +350,7 @@ export function Step4Learning({ data, update }: StepProps) {
           <div className="grid grid-cols-3 gap-3">
             {revisionLevels.map((r, i) => (
               <Motion.button key={r.value} type="button" onClick={() => update({ revisionConsistency: r.value })}
-                className={`rounded-2xl border p-4 text-center transition-all ${data.revisionConsistency === r.value ? "border-cyan-400/30 bg-cyan-400/5 text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-400 hover:text-white"}`}
+                className={`rounded-2xl border p-4 text-center transition-all ${data.revisionConsistency === r.value ? "border-cyan-400/30 bg-cyan-400/5 text-slate-900 dark:text-slate-900 dark:text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white"}`}
                 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 * i }}
                 whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
                 <span className="text-sm font-semibold block">{r.label}</span>
@@ -368,7 +368,7 @@ export function Step4Learning({ data, update }: StepProps) {
           <div className="grid grid-cols-3 gap-3">
             {retentionLevels.map((r, i) => (
               <Motion.button key={r.value} type="button" onClick={() => update({ memoryRetention: r.value })}
-                className={`rounded-2xl border p-5 text-center transition-all ${data.memoryRetention === r.value ? "border-cyan-400/30 bg-cyan-400/5 text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-400 hover:text-white"}`}
+                className={`rounded-2xl border p-5 text-center transition-all ${data.memoryRetention === r.value ? "border-cyan-400/30 bg-cyan-400/5 text-slate-900 dark:text-slate-900 dark:text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white"}`}
                 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 * i }}
                 whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
                 <span className="text-2xl block mb-2">{r.emoji}</span>
@@ -401,14 +401,14 @@ export function Step5Mentor({ data, update }: StepProps) {
           {mentorStyles.map((m, i) => (
             <Motion.button key={m.value} type="button" onClick={() => update({ mentorStyle: m.value })}
               className={`rounded-2xl border p-5 flex items-center gap-5 text-left transition-all ${
-                data.mentorStyle === m.value ? "border-cyan-400/30 bg-cyan-400/5 text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-400 hover:border-white/[0.12] hover:text-white"
+                data.mentorStyle === m.value ? "border-cyan-400/30 bg-cyan-400/5 text-slate-900 dark:text-slate-900 dark:text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:border-white/[0.12] hover:text-slate-900 dark:text-slate-900 dark:text-white"
               }`}
               initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.08 * i, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
               whileHover={{ scale: 1.02, x: 4 }} whileTap={{ scale: 0.98 }}>
               <span className="text-3xl">{m.icon}</span>
               <div>
-                <span className="text-sm font-semibold block text-white">{m.label}</span>
+                <span className="text-sm font-semibold block text-slate-900 dark:text-slate-900 dark:text-white">{m.label}</span>
                 <span className="text-xs text-slate-500">{m.desc}</span>
               </div>
               {data.mentorStyle === m.value && (

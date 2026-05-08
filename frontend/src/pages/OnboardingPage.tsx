@@ -162,7 +162,7 @@ export function OnboardingPage() {
         {!showProfile && (
           <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/[0.04]">
             <button type="button" onClick={handleBack} disabled={step === 0}
-              className="px-5 py-2.5 text-sm text-slate-500 hover:text-white transition disabled:opacity-30 disabled:cursor-not-allowed">
+              className="px-5 py-2.5 text-sm text-slate-500 hover:text-slate-900 dark:text-slate-900 dark:text-white transition disabled:opacity-30 disabled:cursor-not-allowed">
               ← Back
             </button>
             <button type="button" onClick={handleNext} disabled={!canAdvance}
