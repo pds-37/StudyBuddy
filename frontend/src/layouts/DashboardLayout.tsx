@@ -41,12 +41,12 @@ export function DashboardLayout() {
   }, [isSidebarCollapsed]);
 
   return (
-    <div className="relative flex h-screen w-full bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
+    <div className="relative flex h-screen w-full bg-white dark:bg-obsidian">
       <NebulaBackground />
 
       <aside 
         className={cn(
-          "relative hidden h-full shrink-0 border-r border-white/[0.06] bg-ink bg-white dark:bg-ink$4",
+          "relative hidden h-full shrink-0 border-r border-slate-200 dark:border-white/[0.06] bg-white dark:bg-ink",
           isSidebarCollapsed ? "w-[84px]" : "w-[280px]"
         )}
       >

@@ -4,6 +4,7 @@ import { Command, Menu, Search, Sparkles, X, Bell } from "lucide-react";
 import { cn } from "../../lib/utils/cn";
 import { useAppStore } from "../../store/app-store";
 import { NotificationsPopover } from "../NotificationsPopover";
+import { ThemeToggle } from "../common/ThemeToggle";
 
 const landingSections = [
   { label: "Home", href: "#home" },
@@ -44,7 +45,7 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
         isAppShell 
           ? "bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4" 
           : isScrolled 
-            ? "bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4"
+            ? "bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4 shadow-sm"
             : "bg-transparent"
       )}
     >
@@ -64,11 +65,11 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
             <div className="flex-1 max-w-xl">
               <button
                 onClick={onOpenCommand}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/[0.06] border border-white/[0.15] hover:bg-white/[0.1] hover:border-white/[0.25] transition-all group text-slate-900 dark:text-slate-900 dark:text-white shadow-lg"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-slate-100 dark:bg-white/[0.06] border border-slate-200 dark:border-white/[0.15] hover:bg-slate-200 dark:hover:bg-white/[0.1] hover:border-slate-300 dark:hover:border-white/[0.25] transition-all group text-slate-900 dark:text-slate-900 dark:text-white shadow-lg"
               >
                 <Search size={20} className="text-brand shrink-0" />
                 <span className="text-sm font-semibold text-slate-700 dark:text-slate-700 dark:text-slate-300">Search actions, notes, or roadmaps...</span>
-                <div className="ml-auto flex items-center gap-1.5 px-2 py-1 rounded-lg border border-white/20 bg-slate-100 dark:bg-slate-100 dark:bg-white/10 text-[10px] font-black text-slate-900 dark:text-slate-900 dark:text-white">
+                <div className="ml-auto flex items-center gap-1.5 px-2 py-1 rounded-lg border border-slate-200 dark:border-white/20 bg-slate-200 dark:bg-slate-200 dark:bg-white/10 text-[10px] font-black text-slate-900 dark:text-slate-900 dark:text-white">
                   <Command size={10} />
                   <span>K</span>
                 </div>
@@ -94,6 +95,8 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
 
         {/* Right Side: Actions/Profile */}
         <div className="flex items-center gap-6 flex-1 justify-end">
+          <ThemeToggle />
+          
           {isAppShell ? (
             <div className="flex items-center gap-5">
               <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand/10 border border-brand/20 text-brand text-[10px] font-black uppercase tracking-widest">
@@ -103,13 +106,13 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
               
               <NotificationsPopover />
 
-              <div className="flex items-center gap-4 pl-4 border-l border-white/5 group cursor-pointer">
+              <div className="flex items-center gap-4 pl-4 border-l border-slate-200 dark:border-white/5 group cursor-pointer">
                 <div className="text-right hidden sm:block">
                   <p className="text-sm font-bold text-slate-900 dark:text-slate-900 dark:text-white group-hover:text-brand transition-colors">{user?.name || "User"}</p>
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Free Tier</p>
+                  <p className="text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest">Free Tier</p>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-brand to-cyan p-[1px] transition-transform group-hover:scale-105">
-                  <div className="w-full h-full rounded-full bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
+                  <div className="w-full h-full rounded-full bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4 flex items-center justify-center text-slate-900 dark:text-white text-xs font-bold">
                     {userInitials}
                   </div>
                 </div>
@@ -122,7 +125,7 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
               </Link>
               <Link 
                 to="/auth" 
-                className="px-6 py-3 rounded-full bg-white text-obsidian text-sm font-black hover:bg-slate-200 transition-all hover:scale-105 shadow-[0_10px_30px_rgba(255,255,255,0.15)]"
+                className="px-6 py-3 rounded-full bg-slate-900 dark:bg-white text-white dark:text-obsidian text-sm font-black hover:bg-slate-800 dark:hover:bg-slate-200 transition-all hover:scale-105 shadow-xl"
               >
                 Get Started
               </Link>
