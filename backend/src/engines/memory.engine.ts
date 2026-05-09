@@ -1,5 +1,17 @@
 import { MemoryItemModel } from "../modules/memory/memory.model.js";
 
+type MemoryHealth = {
+  totalItems: number;
+  dueItems: number;
+  averageStrength: number;
+  averageEaseFactor: number;
+  itemsByStrength: {
+    strong: number;   // > 0.7
+    moderate: number;  // 0.3 - 0.7
+    weak: number;      // < 0.3
+  };
+};
+
 export class MemoryEngine {
   /**
    * Applies the SM-2 algorithm to calculate the next review date and updated strength.
@@ -115,5 +127,46 @@ export class MemoryEngine {
       userId,
       nextReview: { $lte: today }
     }).sort({ nextReview: 1 }).limit(20); // Give them up to 20 items to review
+  }
+
+  /**
+   * Aggregates memory health statistics for a user.
+   */
+  static async getMemoryHealth(userId: string): Promise<MemoryHealth> {
+    const now = new Date();
+    const items = await MemoryItemModel.find({ userId });
+
+    const totalItems = items.length;
+    const dueItems = items.filter(item => item.nextReview <= now).length;
+    const totalStrength = items.reduce((sum, item) => sum + (item.strength ?? 0), 0);
+    const totalEaseFactor = items.reduce((sum, item) => sum + (item.easeFactor ?? 2.5), 0);
+
+    let strong = 0, moderate = 0, weak = 0;
+    for (const item of items) {
+      const s = item.strength ?? 0;
+      if (s > 0.7) strong++;
+      else if (s >= 0.3) moderate++;
+      else weak++;
+    }
+
+    return {
+      totalItems,
+      dueItems,
+      averageStrength: totalItems > 0 ? totalStrength / totalItems : 0,
+      averageEaseFactor: totalItems > 0 ? totalEaseFactor / totalItems : 2.5,
+      itemsByStrength: { strong, moderate, weak }
+    };
+  }
+
+  /**
+   * Gets the most decayed memory items (lowest strength, most overdue).
+   */
+  static async getDecayingItems(userId: string, limit = 10) {
+    return MemoryItemModel.find({
+      userId,
+      strength: { $lt: 0.4 }
+    })
+      .sort({ strength: 1, nextReview: 1 })
+      .limit(limit);
   }
 }

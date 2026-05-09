@@ -6,6 +6,9 @@ export type RecallStats = {
   dueCount: number;
   averageStrength: number;
   weakTopics: WeakTopic[];
+  reviewedToday: number;
+  streakDays: number;
+  retentionScore: number;
 };
 
 export async function getDueRecallPrompts(limit = 10): Promise<RecallPrompt[]> {

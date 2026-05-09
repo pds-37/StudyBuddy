@@ -1,146 +1,202 @@
-import { UserModel } from "../users/user.model.js";
-import { RoadmapModel } from "../roadmaps/roadmap.model.js";
-import { AIOrchestrator } from "../../core/ai-orchestrator.js";
-import { ApiError } from "../../utils/api-error.js";
-import { PsychologyEngine } from "./psychology.service.js";
+import { NoteModel } from "../notes/note.model.js";
+import { ConceptNodeModel } from "../knowledge/concept.model.js";
+import { MemoryItemModel } from "../memory/memory.model.js";
+import { DecayEngine } from "../../engines/decay.engine.js";
+import { PriorityEngine } from "../../engines/priority.engine.js";
+import type {
+  KnowledgeHealthMetrics,
+  RevisionPriority,
+  ConceptNode,
+  MemoryDecayState
+} from "@studybuddy/shared";
 
 /**
- * Edge Case Intelligence Engine
- * Monitors student behavior and dynamically adapts the learning OS.
+ * Intelligence service — aggregates knowledge health, revision priorities,
+ * concept analytics, and learning momentum for the Knowledge Intelligence Dashboard.
  */
-export class IntelligenceEngine {
-  /**
-   * Analyzes user behavior and returns adaptive interventions.
-   * This should be called on major events (login, task completion, adding tracks).
-   */
-  static async analyzeBehavior(userId: string) {
-    const user = await UserModel.findById(userId);
-    if (!user) throw new ApiError(404, "User not found");
 
-    const roadmaps = await RoadmapModel.find({ userId, status: "active" });
-    const lastActivity = user.updatedAt;
-    const now = new Date();
-    
-    const daySinceLastActivity = Math.floor((now.getTime() - lastActivity.getTime()) / (1000 * 60 * 60 * 24));
-    
-    let intervention: any = null;
+/** Computes the full Knowledge Health Dashboard metrics. */
+async function getKnowledgeHealth(userId: string): Promise<KnowledgeHealthMetrics> {
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    // PSYCHOLOGICAL ANALYSIS (Emotional State Engine)
-    const psychState = await PsychologyEngine.inferEmotionalState(userId);
-    if (psychState && psychState.state !== "steady") {
-      intervention = psychState;
+  const [notes, concepts, todayReviewed] = await Promise.all([
+    NoteModel.find({ userId, deleted: { $ne: true } }),
+    ConceptNodeModel.find({ userId }),
+    NoteModel.countDocuments({
+      userId,
+      deleted: { $ne: true },
+      lastReviewed: { $gte: todayStart }
+    })
+  ]);
+
+  // Count concept retention states
+  let strongConcepts = 0;
+  let stableConcepts = 0;
+  let weakeningConcepts = 0;
+  let criticalConcepts = 0;
+
+  for (const concept of concepts) {
+    switch (concept.retentionState) {
+      case "strong": strongConcepts++; break;
+      case "stable": stableConcepts++; break;
+      case "weakening": weakeningConcepts++; break;
+      case "critical": criticalConcepts++; break;
     }
+  }
 
-    // EDGE CASE: Long Inactivity Recovery (Part 3)
-    if (daySinceLastActivity > 7) {
-      intervention = await this.handleRecoveryMode(userId, daySinceLastActivity);
+  // Calculate overall retention from notes
+  const totalRetention = notes.reduce((sum, note) => {
+    return sum + DecayEngine.calculateRetention(note.lastReviewed, note.strength ?? 0.25);
+  }, 0);
+  const overallRetention = notes.length > 0 ? Math.round(totalRetention / notes.length) : 0;
+
+  // Recall health = average strength * 100
+  const totalStrength = notes.reduce((sum, note) => sum + (note.strength ?? 0), 0);
+  const recallHealth = notes.length > 0 ? Math.round((totalStrength / notes.length) * 100) : 0;
+
+  // Interview readiness = average of interview importance weighted by retention
+  const interviewNotes = notes.filter(n => (n.interviewImportance ?? 0) > 30);
+  let interviewReadiness = 0;
+  if (interviewNotes.length > 0) {
+    const weightedSum = interviewNotes.reduce((sum, n) => {
+      const retention = DecayEngine.calculateRetention(n.lastReviewed, n.strength ?? 0.25);
+      return sum + (retention * (n.interviewImportance ?? 0)) / 100;
+    }, 0);
+    interviewReadiness = Math.round(weightedSum / interviewNotes.length);
+  }
+
+  // Execution readiness = % of notes with reviewCount > 2 and strength > 0.5
+  const executionReady = notes.filter(n => (n.reviewCount ?? 0) > 2 && (n.strength ?? 0) > 0.5);
+  const executionReadiness = notes.length > 0 ? Math.round((executionReady.length / notes.length) * 100) : 0;
+
+  // Knowledge momentum from 7-day review trend
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+
+  const recentReviews = notes.filter(n =>
+    n.lastReviewed && n.lastReviewed >= sevenDaysAgo
+  ).length;
+  const olderReviews = notes.filter(n =>
+    n.lastReviewed && n.lastReviewed >= fourteenDaysAgo && n.lastReviewed < sevenDaysAgo
+  ).length;
+
+  let knowledgeMomentum: "accelerating" | "steady" | "declining" | "stalled";
+  if (recentReviews === 0 && olderReviews === 0) knowledgeMomentum = "stalled";
+  else if (recentReviews > olderReviews * 1.3) knowledgeMomentum = "accelerating";
+  else if (recentReviews < olderReviews * 0.7) knowledgeMomentum = "declining";
+  else knowledgeMomentum = "steady";
+
+  // Due count
+  const dueCount = notes.filter(n =>
+    !n.nextReviewAt || n.nextReviewAt <= now
+  ).length;
+
+  // Streak calculation (consecutive days with at least 1 review)
+  let streakDays = 0;
+  const checkDate = new Date(todayStart);
+  for (let i = 0; i < 30; i++) {
+    const dayStart = new Date(checkDate);
+    const dayEnd = new Date(checkDate);
+    dayEnd.setDate(dayEnd.getDate() + 1);
+
+    const hasReview = notes.some(n =>
+      n.lastReviewed && n.lastReviewed >= dayStart && n.lastReviewed < dayEnd
+    );
+
+    if (hasReview || i === 0) {
+      streakDays++;
+    } else {
+      break;
     }
-
-    // EDGE CASE: Overcommitment Detection (Part 2)
-    if (roadmaps.length > 3) {
-      intervention = await this.handleOvercommitment(userId, roadmaps);
-    }
-
-    // EDGE CASE: Cognitive Overload Detection (Part 7)
-    if (user.behaviorProfile.skipRate > 0.4 || user.behaviorProfile.consistencyScore < 30) {
-      intervention = await this.handleCognitiveOverload(userId, user);
-    }
-
-    // EDGE CASE: Rapid Learning Acceleration (Part 5)
-    if (user.behaviorProfile.consistencyScore > 90 && (user.careerProfile?.readiness?.frontend > 50 || user.careerProfile?.readiness?.backend > 50)) {
-      intervention = await this.handleAcceleration(userId);
-    }
-
-    // EDGE CASE: AI Overdependence Detection (Part 19)
-    // Hypothetical: If user requests hints for every task (we'd need to track this)
-    if (user.behaviorProfile.avgSessionTime < 5 && user.behaviorProfile.consistencyScore > 80) {
-      intervention = await this.handleOverdependence(userId);
-    }
-
-    return intervention;
+    checkDate.setDate(checkDate.getDate() - 1);
   }
 
-  /**
-   * Acceleration: Unlocks harder tasks and faster pacing for high-velocity learners.
-   */
-  private static async handleAcceleration(userId: string) {
-    return {
-      type: "acceleration",
-      message: "Your learning velocity is significantly above baseline. I've unlocked an advanced optimization track for your current mission.",
-      actions: ["INCREASE_CHALLENGE", "UNLOCK_ADVANCED"]
-    };
-  }
+  // Target: aim for reviewing 5-15 items per day based on total note count
+  const todayRevisionTarget = Math.min(15, Math.max(5, Math.ceil(notes.length * 0.15)));
 
-  /**
-   * Overdependence: Encourages independent thinking when AI hints are over-used.
-   */
-  private static async handleOverdependence(userId: string) {
-    return {
-      type: "guidance",
-      message: "You've relied heavily on guided hints recently. I've activated Independent Challenge mode to help you master self-reasoning.",
-      actions: ["REDUCE_HINTS", "INDEPENDENT_MODE"]
-    };
-  }
-
-  /**
-   * Market Trend Panic (Part 16)
-   * Provides realistic context to prevent fear-based roadmap switching.
-   */
-  static async handleMarketPanic(userId: string, context: string) {
-    return {
-      message: "I detect some concern about market shifts. Remember: your foundational skills remain the base for any evolution. Let's look at hybridization instead of a full reset.",
-      type: "supportive"
-    };
-  }
-
-  /**
-   * Recovery Mode: Estimates memory decay and generates a recovery sprint.
-   */
-  private static async handleRecoveryMode(userId: string, daysInactive: number) {
-    // 1. Identify critical concepts to revise
-    // 2. Reduce roadmap intensity temporarily
-    // 3. Update mentor message
-    return {
-      type: "recovery",
-      mode: "RECOVERY_MODE",
-      message: `Welcome back. It's been ${daysInactive} days. Your retention may have weakened, so I've activated a 2-day momentum recovery sprint.`,
-      actions: ["REDUCE_PACING", "PRIORITIZE_REVISION"]
-    };
-  }
-
-  /**
-   * Overcommitment: Detects unrealistic workload and suggests prioritization.
-   */
-  private static async handleOvercommitment(userId: string, roadmaps: any[]) {
-    return {
-      type: "warning",
-      message: `You have ${roadmaps.length} active learning tracks. Your cognitive load exceeds sustainable limits. I recommend focusing on 2 tracks maximum for optimal retention.`,
-      actions: ["SUGGEST_PAUSE_SECONDARY"]
-    };
-  }
-
-  /**
-   * Cognitive Overload: Detects high skip rates or burnout signals.
-   */
-  private static async handleCognitiveOverload(userId: string, user: any) {
-    return {
-      type: "burnout_alert",
-      message: "Your consistency has dropped recently. I'm simplifying your milestones this week to help you rebuild momentum without burnout.",
-      actions: ["SIMPLIFY_TASKS", "REDUCE_DAILY_HOURS"]
-    };
-  }
-
-  /**
-   * Career Transition Layer (Part 1)
-   * Intelligently archives current roadmap and bridges to a new one.
-   */
-  static async transitionCareer(userId: string, fromRole: string, toRole: string) {
-    // 1. Find overlapping skills using AI
-    // 2. Mark overlapping missions as 'pre-completed' or 'transferable'
-    // 3. Archive old roadmap
-    // 4. Generate transition pathway
-    return {
-      message: `Transitioning from ${fromRole} to ${toRole}. Your previous experience in ${fromRole} still benefits your new path. Overlapping concepts have been identified.`,
-    };
-  }
+  return {
+    totalConcepts: concepts.length,
+    strongConcepts,
+    stableConcepts,
+    weakeningConcepts,
+    criticalConcepts,
+    overallRetention,
+    recallHealth,
+    interviewReadiness,
+    executionReadiness,
+    knowledgeMomentum,
+    todayRevisionCount: todayReviewed,
+    todayRevisionTarget,
+    streakDays: Math.max(0, streakDays - 1),
+    totalNotes: notes.length,
+    dueCount
+  };
 }
+
+/** Gets today's prioritized revision list. */
+async function getRevisionPriorities(userId: string, limit: number = 8): Promise<RevisionPriority[]> {
+  return PriorityEngine.generateRevisionPriorities(userId, limit);
+}
+
+/** Gets all concept nodes for the user with their retention states. */
+async function getConcepts(userId: string): Promise<ConceptNode[]> {
+  await DecayEngine.updateConceptRetention(userId).catch(() => {});
+
+  const concepts = await ConceptNodeModel.find({ userId }).sort({ retentionScore: 1 });
+
+  return concepts.map(c => ({
+    id: c._id.toString(),
+    userId: c.userId,
+    name: c.name,
+    category: c.category as any,
+    difficulty: c.difficulty as any,
+    noteIds: c.noteIds,
+    relatedConceptIds: c.relatedConceptIds,
+    interviewFrequency: c.interviewFrequency as any,
+    retentionState: c.retentionState as any,
+    retentionScore: c.retentionScore ?? 0,
+    masteryValidated: c.masteryValidated ?? false,
+    lastReviewed: c.lastReviewed ? c.lastReviewed.toISOString() : undefined,
+    projectLinks: c.projectLinks,
+    roadmapPhaseIds: c.roadmapPhaseIds,
+    executionEvidence: c.executionEvidence ?? 0,
+    createdAt: c.createdAt.toISOString(),
+    updatedAt: c.updatedAt.toISOString()
+  }));
+}
+
+/** Gets memory decay states for all user notes. */
+async function getDecayStates(userId: string): Promise<MemoryDecayState[]> {
+  return DecayEngine.processUserDecay(userId);
+}
+
+/** Gets learning momentum / today's focus recommendation. */
+async function getMomentum(userId: string): Promise<{
+  state: string;
+  streakDays: number;
+  reviewedToday: number;
+  dailyTarget: number;
+  focusConcepts: string[];
+  estimatedMinutes: number;
+}> {
+  const health = await getKnowledgeHealth(userId);
+  const priorities = await getRevisionPriorities(userId, 3);
+
+  return {
+    state: health.knowledgeMomentum,
+    streakDays: health.streakDays,
+    reviewedToday: health.todayRevisionCount,
+    dailyTarget: health.todayRevisionTarget,
+    focusConcepts: priorities.map(p => p.title),
+    estimatedMinutes: priorities.reduce((sum, p) => sum + p.estimatedMinutes, 0)
+  };
+}
+
+export const intelligenceService = {
+  getKnowledgeHealth,
+  getRevisionPriorities,
+  getConcepts,
+  getDecayStates,
+  getMomentum
+};

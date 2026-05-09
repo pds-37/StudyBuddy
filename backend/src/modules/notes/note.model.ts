@@ -93,12 +93,62 @@ const noteSchema = new Schema(
     lapseCount: {
       type: Number,
       default: 0
+    },
+
+    // ─── Knowledge Intelligence Fields ───
+    concepts: {
+      type: [String],
+      default: [],
+      index: true
+    },
+    difficulty: {
+      type: String,
+      enum: ["beginner", "intermediate", "advanced"],
+      default: "beginner"
+    },
+    knowledgeLayer: {
+      type: String,
+      enum: ["surface", "understanding", "application", "mastery"],
+      default: "surface"
+    },
+    interviewImportance: {
+      type: Number,
+      min: 0,
+      max: 100,
+      default: 0
+    },
+    confusionCount: {
+      type: Number,
+      default: 0
+    },
+    evolutionHistory: {
+      type: [Schema.Types.Mixed],
+      default: []
+    },
+    relatedNoteIds: {
+      type: [String],
+      default: []
+    },
+    projectLinks: {
+      type: [String],
+      default: []
+    },
+    revisionStrategy: {
+      type: String,
+      enum: ["implementation", "conceptual", "practical_repetition", "visual"],
+      default: "conceptual"
     }
   },
   {
     timestamps: true
   }
 );
+
+// Compound indexes for knowledge intelligence queries
+noteSchema.index({ userId: 1, concepts: 1 });
+noteSchema.index({ userId: 1, difficulty: 1 });
+noteSchema.index({ userId: 1, interviewImportance: -1 });
+noteSchema.index({ userId: 1, strength: 1, nextReviewAt: 1 });
 
 export type NoteDocument = HydratedDocument<InferSchemaType<typeof noteSchema>>;
 export const NoteModel = model("Note", noteSchema);

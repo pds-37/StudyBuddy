@@ -332,18 +332,41 @@ function normalizeResumeTailorResult(value: unknown): ResumeTailorResult {
     tailoredSummary: String(payload.tailoredSummary ?? ""),
     keywordAdditions: Array.isArray(payload.keywordAdditions) ? payload.keywordAdditions.map(String).slice(0, 16) : [],
     bulletRewrites: Array.isArray(payload.bulletRewrites)
-      ? payload.bulletRewrites.slice(0, 6).map((item) => {
-          const rewrite = item as Partial<ResumeTailorResult["bulletRewrites"][number]>;
-
+      ? payload.bulletRewrites.slice(0, 8).map((item) => {
+          const rewrite = item as any;
           return {
             before: String(rewrite.before ?? ""),
             after: String(rewrite.after ?? ""),
-            reason: String(rewrite.reason ?? "")
+            reason: String(rewrite.reason ?? ""),
+            impactScore: Number(rewrite.impactScore ?? 50),
+            technicalDepthScore: Number(rewrite.technicalDepthScore ?? 50)
           };
         })
       : [],
+    projectAnalysis: Array.isArray(payload.projectAnalysis)
+      ? payload.projectAnalysis.map((proj: any) => ({
+          projectName: String(proj.projectName ?? ""),
+          originalDescription: String(proj.originalDescription ?? ""),
+          strategicFraming: String(proj.strategicFraming ?? ""),
+          impactMetricsSuggested: Array.isArray(proj.impactMetricsSuggested) ? proj.impactMetricsSuggested.map(String) : [],
+          engineeringStorytelling: String(proj.engineeringStorytelling ?? "")
+        }))
+      : [],
+    atsIntelligence: {
+      score: Number(payload.atsIntelligence?.score ?? 0),
+      missingKeywords: Array.isArray(payload.atsIntelligence?.missingKeywords) ? payload.atsIntelligence.missingKeywords.map(String) : [],
+      formattingSafety: {
+        status: (payload.atsIntelligence?.formattingSafety?.status as any) || "safe",
+        issues: Array.isArray(payload.atsIntelligence?.formattingSafety?.issues) ? payload.atsIntelligence.formattingSafety.issues.map(String) : []
+      },
+      recruiterScanOptimization: String(payload.atsIntelligence?.recruiterScanOptimization ?? "")
+    },
+    interviewAlignment: {
+      likelyQuestions: Array.isArray(payload.interviewAlignment?.likelyQuestions) ? payload.interviewAlignment.likelyQuestions.map(String) : [],
+      weakDiscussionAreas: Array.isArray(payload.interviewAlignment?.weakDiscussionAreas) ? payload.interviewAlignment.weakDiscussionAreas.map(String) : [],
+      projectExplanationGaps: Array.isArray(payload.interviewAlignment?.projectExplanationGaps) ? payload.interviewAlignment.projectExplanationGaps.map(String) : []
+    },
     missingProofPoints: Array.isArray(payload.missingProofPoints) ? payload.missingProofPoints.map(String).slice(0, 8) : [],
-    atsWarnings: Array.isArray(payload.atsWarnings) ? payload.atsWarnings.map(String).slice(0, 8) : [],
     nextActions: Array.isArray(payload.nextActions) ? payload.nextActions.map(String).slice(0, 6) : []
   };
 }
@@ -353,46 +376,75 @@ async function generateResumeTailoring(
   request: ResumeTailorRequest,
   userContext: string
 ): Promise<ResumeTailorResult> {
-  const prompt = `You are an expert technical recruiter and resume editor. Tailor the user's resume for the target role while staying truthful. Do not invent experience, employers, dates, metrics, degrees, certifications, or tools that are not supported by the resume/user context.
+  const prompt = `You are Veda, an expert Technical Recruiter and Career Positioning AI. Your goal is to strategically reposition the user's resume for the role of "${request.targetRole}" while maintaining absolute integrity.
 
-Target role:
-${request.targetRole}
+RESUME MODE: ${request.mode || "technical"} (Adapt tone and emphasis accordingly)
+TONE: ${request.tone ?? "impact"}
 
-Job description or role notes:
-${request.jobDescription || "No job description provided. Use common expectations for this role."}
-
-User profile context:
-${userContext}
-
-Current resume:
+CONTEXT:
+- Target Role: ${request.targetRole}
+- Job Description: ${request.jobDescription || "Standard industry expectations for this role."}
+- User Profile: ${userContext}
+- Current Resume Content:
 ${request.currentResume}
 
-Preferred writing tone: ${request.tone ?? "impact"}
+CRITICAL RULES (IDENTITY INTEGRITY):
+1. NEVER fabricate experience, employers, or dates.
+2. NEVER create fake degrees or certifications.
+3. NEVER invent specific metrics or numbers (e.g., "Increased sales by 40%").
+4. ONLY improve framing, clarity, and relevance based on existing evidence.
+5. If a metric is missing but needed, use "[Quantifiable Impact]" as a placeholder.
 
-Return ONLY valid JSON with this exact shape:
+OBJECTIVES:
+1. ROLE FIT: Analyze how the user's existing background maps to the specific JD.
+2. STRATEGIC POSITIONING: Rewrite bullets to highlight the skills the recruiter is actually looking for.
+3. PROJECT STORYTELLING: Enhance project descriptions to show engineering depth and architecture, not just "I built X".
+4. ATS INTELLIGENCE: Score the resume based on keyword density and formatting safety.
+5. INTERVIEW PREDICTION: Identify what an interviewer will likely ask based on the current resume's strengths/weaknesses.
+
+RESPONSE STRUCTURE (JSON):
 {
-  "roleFitSummary": "2-3 sentence fit analysis",
-  "targetHeadline": "short resume headline for this role",
-  "tailoredSummary": "3-4 line resume summary tailored to the role",
-  "keywordAdditions": ["keyword or phrase"],
+  "roleFitSummary": "A high-level strategic analysis of why this user fits (or what they lack).",
+  "targetHeadline": "A powerful, role-aligned headline.",
+  "tailoredSummary": "A 3-4 sentence professional summary that creates a cohesive narrative.",
+  "keywordAdditions": ["Essential ATS keywords missing from the current text"],
   "bulletRewrites": [
     {
-      "before": "original or summarized weak bullet",
-      "after": "stronger truthful bullet with action, scope, tools, and outcome",
-      "reason": "why this improves relevance"
+      "before": "Original bullet",
+      "after": "Repositioned bullet (Truthful but higher impact)",
+      "reason": "Recruiter-centric logic",
+      "impactScore": 85, // 0-100
+      "technicalDepthScore": 70 // 0-100
     }
   ],
-  "missingProofPoints": ["specific proof point user should add if true"],
-  "atsWarnings": ["ATS or recruiter risk to fix"],
-  "nextActions": ["concrete edit step"]
+  "projectAnalysis": [
+    {
+      "projectName": "Name from resume",
+      "originalDescription": "Original text",
+      "strategicFraming": "How to talk about this project for THIS role",
+      "impactMetricsSuggested": ["Specific metrics they should add if true"],
+      "engineeringStorytelling": "A narrative rewrite emphasizing architectural decisions."
+    }
+  ],
+  "atsIntelligence": {
+    "score": 75,
+    "missingKeywords": ["keyword1"],
+    "formattingSafety": {
+      "status": "safe" | "warning" | "risk",
+      "issues": ["Issue description if any"]
+    },
+    "recruiterScanOptimization": "How to improve the 6-second scanability."
+  },
+  "interviewAlignment": {
+    "likelyQuestions": ["Technical or behavioral questions specific to this resume/role"],
+    "weakDiscussionAreas": ["Where the resume is thin and will be poked"],
+    "projectExplanationGaps": ["What architectural details are missing from the project descriptions"]
+  },
+  "missingProofPoints": ["Specific evidence the user should find in their history"],
+  "nextActions": ["Step-by-step editing priorities"]
 }
 
-Rules:
-- Prefer concise, measurable bullets, but use placeholders like "[add metric]" only when the metric is not present.
-- If the resume lacks evidence for the target role, say what proof point to add instead of fabricating it.
-- Include 8-14 keyword additions relevant to the role.
-- Include 3-6 bullet rewrites.
-- Keep all output suitable to paste into a resume.`;
+Return ONLY valid JSON. No commentary.`;
 
   const response = await requestGroq(
     [
@@ -460,16 +512,24 @@ async function analyzeNote(
   topic: string;
   summary: string;
   concepts: string[];
+  difficulty: "beginner" | "intermediate" | "advanced";
+  knowledgeLayer: "surface" | "understanding" | "application" | "mastery";
+  conceptGraph: Array<{ from: string; to: string; relationship: string }>;
+  executionTasks: Array<{ title: string; type: "code" | "debug" | "build" | "explain"; difficulty: string }>;
+  confusionSignals: string[];
   flashcards: Array<{ question: string; answer: string }>;
   interviewRelevance: {
     frequency: "low" | "medium" | "high";
     importance: number;
     usageContext: string;
+    commonQuestions: string[];
+    realWorldUsage: string[];
   };
+  revisionStrategy: "implementation" | "conceptual" | "practical_repetition" | "visual";
   tags: string[];
 }> {
-  const prompt = `You are Veda, an AI Knowledge Engineer. Your task is to transform a raw learning note into structured knowledge for a student's "Second Brain".
-  
+  const prompt = `You are Veda, an AI Knowledge Intelligence Engine. Transform this raw note into deep structured knowledge for a cognitive learning system.
+
 NOTE TITLE: ${title}
 NOTE CONTENT:
 ${content}
@@ -480,29 +540,69 @@ ${userContext}
 RESPONSE STRUCTURE (JSON):
 {
   "topic": "Main high-level topic (e.g., 'Data Structures', 'React Hooks')",
-  "summary": "A concise, high-impact summary of the key concepts.",
-  "concepts": ["Concept 1", "Concept 2"],
+  "summary": "A concise, high-impact summary for quick review.",
+  "concepts": ["Concept 1", "Concept 2", "Concept 3"],
+  "difficulty": "beginner" | "intermediate" | "advanced",
+  "knowledgeLayer": "surface" | "understanding" | "application" | "mastery",
+  "conceptGraph": [
+    { "from": "Concept A", "to": "Concept B", "relationship": "depends_on" | "part_of" | "similar_to" | "prerequisite" | "leads_to" }
+  ],
+  "executionTasks": [
+    { "title": "Build a counter using useState", "type": "code" | "debug" | "build" | "explain", "difficulty": "easy" | "medium" | "hard" }
+  ],
+  "confusionSignals": ["Potential confusion: X vs Y", "Common mistake: ..."],
   "flashcards": [
     { "question": "Active recall question", "answer": "Concise answer" }
   ],
   "interviewRelevance": {
     "frequency": "low" | "medium" | "high",
-    "importance": 85, // 0-100 score
-    "usageContext": "How this is usually asked in technical interviews"
+    "importance": 85,
+    "usageContext": "How this is usually asked in technical interviews",
+    "commonQuestions": ["What is X?", "Explain the difference between X and Y"],
+    "realWorldUsage": ["Used in React hooks for state management", "Critical for async operations"]
   },
+  "revisionStrategy": "implementation" | "conceptual" | "practical_repetition" | "visual",
   "tags": ["Tag1", "Tag2"]
 }
 
 RULES:
-1. Generate 3-5 high-quality flashcards for active recall.
-2. Ensure the summary is helpful for quick review.
-3. Tags should be consistent and professional.
-4. Provide ONLY valid JSON.`;
+1. Extract 3-8 distinct concepts from the note. Be specific (e.g., "useEffect dependency array" not just "React").
+2. Generate 3-5 high-quality flashcards testing active recall, not recognition.
+3. ConceptGraph should show relationships BETWEEN extracted concepts (2-5 edges).
+4. Generate 2-3 execution tasks that convert this knowledge into practice.
+5. Identify 1-3 potential confusion signals (common mistakes or misconceptions).
+6. Generate 2-4 common interview questions related to these concepts.
+7. List 2-3 real-world usage contexts.
+8. Assess difficulty based on inherent complexity, not note length.
+9. KnowledgeLayer: "surface" = just definitions, "understanding" = can explain why, "application" = can use it, "mastery" = can teach it.
+10. RevisionStrategy: algorithms/DS → "implementation", theory → "conceptual", frameworks → "practical_repetition", complex/visual topics → "visual".
+11. Provide ONLY valid JSON. No markdown, no comments.`;
 
-  const response = await requestGroq([{ role: "user", content: prompt }], 2000, "llama-3.3-70b-versatile");
+  const response = await requestGroq([{ role: "user", content: prompt }], 2500, "llama-3.3-70b-versatile");
 
   try {
-    return JSON.parse(extractJsonPayload(response));
+    const parsed = JSON.parse(extractJsonPayload(response));
+    // Normalize with safe defaults for any missing fields
+    return {
+      topic: parsed.topic || title,
+      summary: parsed.summary || content.substring(0, 200),
+      concepts: Array.isArray(parsed.concepts) ? parsed.concepts : [],
+      difficulty: parsed.difficulty || "beginner",
+      knowledgeLayer: parsed.knowledgeLayer || "surface",
+      conceptGraph: Array.isArray(parsed.conceptGraph) ? parsed.conceptGraph : [],
+      executionTasks: Array.isArray(parsed.executionTasks) ? parsed.executionTasks : [],
+      confusionSignals: Array.isArray(parsed.confusionSignals) ? parsed.confusionSignals : [],
+      flashcards: Array.isArray(parsed.flashcards) ? parsed.flashcards : [],
+      interviewRelevance: {
+        frequency: parsed.interviewRelevance?.frequency || "medium",
+        importance: parsed.interviewRelevance?.importance ?? 50,
+        usageContext: parsed.interviewRelevance?.usageContext || "",
+        commonQuestions: Array.isArray(parsed.interviewRelevance?.commonQuestions) ? parsed.interviewRelevance.commonQuestions : [],
+        realWorldUsage: Array.isArray(parsed.interviewRelevance?.realWorldUsage) ? parsed.interviewRelevance.realWorldUsage : []
+      },
+      revisionStrategy: parsed.revisionStrategy || "conceptual",
+      tags: Array.isArray(parsed.tags) ? parsed.tags : []
+    };
   } catch (error) {
     console.error("Failed to parse note analysis response:", response);
     throw new Error("Invalid response format from AI note analysis");

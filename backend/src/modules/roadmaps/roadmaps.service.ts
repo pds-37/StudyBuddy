@@ -208,9 +208,10 @@ async function updateTaskStatus(
       }
       await user.save();
 
-      // Check for edge cases
-      const { IntelligenceEngine } = await import("../intelligence/intelligence.service.js");
-      const intervention = await IntelligenceEngine.analyzeBehavior(userId);
+      // Check for behavioral edge cases
+      const { BehaviorEngine } = await import("../../engines/behavior.engine.js");
+      const risk = await BehaviorEngine.evaluateRisk(userId).catch(() => "low" as const);
+      const intervention = risk === "high" ? { message: "Consistency is dropping. Consider simplifying your daily tasks.", type: "recovery" } : null;
       
       if (intervention) {
         // Create an insight on the roadmap based on the intervention

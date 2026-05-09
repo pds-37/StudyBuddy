@@ -7,4 +7,6 @@ export const resumeRouter = Router();
 resumeRouter.use(authenticate);
 
 resumeRouter.post("/tailor", resumeController.tailor);
-
+resumeRouter.get("/versions", resumeController.getVersions);
+resumeRouter.get("/versions/:id", resumeController.getVersion);
+resumeRouter.delete("/versions/:id", resumeController.deleteVersion);

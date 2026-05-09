@@ -70,10 +70,10 @@ export function MilestoneQuiz({ milestoneId, milestoneTitle }: MilestoneQuizProp
 
   if (!questions) {
     return (
-      <div className="rounded-xl border border-white/[0.04] bg-ink bg-white dark:bg-ink$4">
+      <div className="rounded-xl border border-white/[0.04] bg-white dark:bg-obsidian">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-medium text-slate-900 dark:text-slate-900 dark:text-white">Knowledge Check</h3>
+            <h3 className="text-sm font-medium text-slate-900 dark:text-white">Knowledge Check</h3>
             <p className="mt-1 text-xs text-[#666666]">{milestoneTitle}</p>
           </div>
           <button
@@ -91,12 +91,12 @@ export function MilestoneQuiz({ milestoneId, milestoneTitle }: MilestoneQuizProp
 
   if (finished) {
     return (
-      <div className="rounded-xl border border-white/[0.04] bg-ink bg-white dark:bg-ink$4">
-        <h3 className="text-xl font-medium text-slate-900 dark:text-slate-900 dark:text-white">Completed</h3>
+      <div className="rounded-xl border border-white/[0.04] bg-white dark:bg-obsidian">
+        <h3 className="text-xl font-medium text-slate-900 dark:text-white">Completed</h3>
         <p className="mt-2 text-sm text-[#888888]">Score: {score}/{questions.length}</p>
         <button
           onClick={() => setQuestions(null)}
-          className="mt-6 rounded-lg border border-white/[0.04] px-4 py-2 text-xs text-[#888888] hover:text-slate-900 dark:text-slate-900 dark:text-white transition-colors"
+          className="mt-6 rounded-lg border border-white/[0.04] px-4 py-2 text-xs text-[#888888] hover:text-slate-900 dark:text-white transition-colors"
         >
           Close
         </button>
@@ -108,13 +108,13 @@ export function MilestoneQuiz({ milestoneId, milestoneTitle }: MilestoneQuizProp
   const isAnswered = selectedOption !== null;
 
   return (
-    <div className="rounded-xl border border-white/[0.04] bg-ink bg-white dark:bg-ink$4">
+    <div className="rounded-xl border border-white/[0.04] bg-white dark:bg-obsidian">
       <div className="mb-6 flex items-center justify-between">
         <span className="text-[10px] uppercase tracking-widest text-[#666666]">Question {currentIndex + 1}/{questions.length}</span>
-        <span className="text-[10px] uppercase tracking-widest text-slate-900 dark:text-slate-900 dark:text-white">{score} Correct</span>
+        <span className="text-[10px] uppercase tracking-widest text-slate-900 dark:text-white">{score} Correct</span>
       </div>
 
-      <h4 className="mb-8 text-base font-medium leading-relaxed text-slate-900 dark:text-slate-900 dark:text-white">{currentQ.question}</h4>
+      <h4 className="mb-8 text-base font-medium leading-relaxed text-slate-900 dark:text-white">{currentQ.question}</h4>
 
       <div className="space-y-2">
         {currentQ.options.map((option, idx) => {
@@ -123,7 +123,7 @@ export function MilestoneQuiz({ milestoneId, milestoneTitle }: MilestoneQuizProp
           
           let optionClass = "border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.03]";
           if (isAnswered) {
-            if (isCorrect) optionClass = "border-white/[0.1] bg-white/[0.05] text-slate-900 dark:text-slate-900 dark:text-white";
+            if (isCorrect) optionClass = "border-white/[0.1] bg-white/[0.05] text-slate-900 dark:text-white";
             else if (isSelected) optionClass = "border-red-500/20 bg-red-500/5 text-red-200";
             else optionClass = "border-white/[0.02] opacity-30";
           }

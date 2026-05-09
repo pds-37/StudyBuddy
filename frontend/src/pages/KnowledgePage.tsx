@@ -1,248 +1,307 @@
-import { useEffect, useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Network, 
-  Brain, 
-  NotebookText, 
-  Route, 
-  Loader2, 
-  Search,
-  Maximize2,
-  Minimize2,
-  Info
+import { useEffect, useState, useRef, useCallback } from "react";
+import { motion as Motion, AnimatePresence } from "framer-motion";
+import {
+  Network, Brain, NotebookText, Route, Loader2, Maximize2, Minimize2,
+  Target, Shield, Activity, Zap, BookOpen, XCircle, ArrowRight, Code
 } from "lucide-react";
-import { getKnowledgeGraph, type KnowledgeGraphData, type KnowledgeNode } from "../lib/api/knowledge";
+import {
+  getKnowledgeGraph, getConceptDetail, getInterviewReadiness,
+  type KnowledgeGraphData, type KnowledgeNode, type ConceptDetail, type InterviewReadiness
+} from "../lib/api/knowledge";
 import { cn } from "../lib/utils/cn";
+
+const retentionColors: Record<string, string> = {
+  strong: "#10b981", stable: "#06b6d4", weakening: "#f59e0b", critical: "#ef4444"
+};
+const typeColors: Record<string, string> = {
+  concept: "#a78bfa", note: "#64748b", skill: "#06b6d4", milestone: "#f59e0b"
+};
 
 export function KnowledgePage() {
   const [data, setData] = useState<KnowledgeGraphData | null>(null);
+  const [interview, setInterview] = useState<InterviewReadiness | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedNode, setSelectedNode] = useState<KnowledgeNode | null>(null);
+  const [conceptDetail, setConceptDetail] = useState<ConceptDetail | null>(null);
   const [zoom, setZoom] = useState(1);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [activeTab, setActiveTab] = useState<"graph" | "interview">("graph");
 
   useEffect(() => {
-    const loadGraph = async () => {
+    const load = async () => {
       try {
-        const graph = await getKnowledgeGraph();
+        const [graph, readiness] = await Promise.all([
+          getKnowledgeGraph(), getInterviewReadiness()
+        ]);
         setData(graph);
-      } catch (err) {
-        console.error("Failed to load graph", err);
-      } finally {
-        setLoading(false);
-      }
+        setInterview(readiness);
+      } catch (err) { console.error("Failed to load graph", err); }
+      finally { setLoading(false); }
     };
-    void loadGraph();
+    void load();
+  }, []);
+
+  const handleNodeClick = useCallback(async (node: KnowledgeNode) => {
+    setSelectedNode(node);
+    if (node.type === "concept") {
+      const rawId = node.id.replace("concept-", "");
+      try {
+        const detail = await getConceptDetail(rawId);
+        setConceptDetail(detail);
+      } catch { setConceptDetail(null); }
+    } else { setConceptDetail(null); }
   }, []);
 
   if (loading) {
     return (
-      <div className="flex h-[60vh] flex-col items-center justify-center gap-4">
-        <Loader2 className="h-8 w-8 animate-spin text-brand" />
-        <p className="text-sm font-medium text-slate-500">Mapping your knowledge base...</p>
+      <div className="flex h-full flex-col items-center justify-center gap-4 bg-[#05070A]">
+        <div className="w-14 h-14 rounded-full border-4 border-brand/20 border-t-brand animate-spin" />
+        <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Mapping knowledge graph...</p>
       </div>
     );
   }
 
   if (!data || data.nodes.length === 0) {
     return (
-      <div className="flex h-[60vh] flex-col items-center justify-center text-center">
-        <div className="rounded-full bg-slate-50 dark:bg-slate-50 dark:bg-white/5 p-6 mb-6">
-          <Network className="h-12 w-12 text-slate-600" />
-        </div>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-900 dark:text-white">Your Knowledge Graph is empty</h2>
-        <p className="mt-2 text-slate-500 dark:text-slate-500 dark:text-slate-400 max-w-md">Start taking notes or generating roadmaps to see how your skills and knowledge interconnect.</p>
+      <div className="flex h-full flex-col items-center justify-center text-center bg-[#05070A] px-8">
+        <div className="w-16 h-16 bg-brand/10 flex items-center justify-center text-brand mb-6"><Network size={32} /></div>
+        <h2 className="text-xl font-semibold text-white mb-2">Knowledge Graph is empty</h2>
+        <p className="text-xs text-slate-500 max-w-sm">Start adding notes with concepts to see how your knowledge interconnects.</p>
       </div>
     );
   }
 
-  // Simple layout: circular
   const nodesWithPos = data.nodes.map((node, i) => {
     const angle = (i / data.nodes.length) * 2 * Math.PI;
-    const radius = node.type === "skill" ? 150 : node.type === "milestone" ? 250 : 350;
-    return {
-      ...node,
-      x: Math.cos(angle) * radius,
-      y: Math.sin(angle) * radius
-    };
+    const baseRadius = node.type === "concept" ? 180 : node.type === "skill" ? 280 : node.type === "milestone" ? 340 : 240;
+    const jitter = ((i * 7) % 40) - 20;
+    return { ...node, x: Math.cos(angle) * (baseRadius + jitter), y: Math.sin(angle) * (baseRadius + jitter) };
   });
-
   const nodeMap = new Map(nodesWithPos.map(n => [n.id, n]));
 
   return (
-    <div className="h-[calc(100vh-120px)] flex flex-col pt-4 space-y-8 animate-fade-in overflow-hidden relative">
-
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between relative z-10">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-900 dark:text-white flex items-center gap-3">
-            <Network className="text-brand" />
-            Knowledge Graph
-          </h1>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400">Visualize the neural map of your learning journey</p>
-        </div>
-
-        <div className="flex items-center gap-2 bg-white/[0.03] border border-slate-200 dark:border-slate-200 dark:border-white/10 rounded-2xl p-1">
-          <button onClick={() => setZoom(prev => Math.min(2, prev + 0.1))} className="p-2 text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white transition"><Maximize2 size={18} /></button>
-          <button onClick={() => setZoom(prev => Math.max(0.5, prev - 0.1))} className="p-2 text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white transition"><Minimize2 size={18} /></button>
+    <div className="flex flex-col h-full overflow-hidden bg-[#05070A]">
+      {/* Header */}
+      <header className="shrink-0 px-8 pt-8 pb-5 border-b border-white/[0.04]">
+        <div className="max-w-[1600px] mx-auto">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h1 className="text-base font-semibold text-slate-100 flex items-center gap-3">
+                Knowledge Graph
+                <span className="text-purple-400 text-[9px] border border-purple-500/20 px-2 py-0.5 bg-purple-500/5 font-bold tracking-wider uppercase">Neural Map</span>
+              </h1>
+              <p className="text-slate-600 text-[11px] mt-1.5 font-medium">Visualize concept retention, connections, and interview readiness.</p>
+            </div>
+            <div className="flex items-center gap-2">
+              {["graph", "interview"].map(tab => (
+                <button key={tab} onClick={() => setActiveTab(tab as any)}
+                  className={cn("px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-all",
+                    activeTab === tab ? "text-brand border-b-2 border-brand" : "text-slate-600 hover:text-slate-300"
+                  )}>{tab === "graph" ? "Graph" : "Interview"}</button>
+              ))}
+            </div>
+          </div>
+          {/* Stats */}
+          <div className="grid grid-cols-3 lg:grid-cols-6 gap-6">
+            <Stat label="Nodes" value={data.stats.totalNodes} color="text-slate-300" icon={<Network size={12} />} />
+            <Stat label="Edges" value={data.stats.totalEdges} color="text-purple-400" icon={<Activity size={12} />} />
+            <Stat label="Strong" value={data.stats.strongConcepts} color="text-emerald-400" icon={<Shield size={12} />} />
+            <Stat label="Critical" value={data.stats.criticalConcepts} color="text-red-400" icon={<Zap size={12} />} />
+            <Stat label="Isolated" value={data.stats.isolatedConcepts} color="text-amber-400" icon={<Target size={12} />} />
+            <Stat label="Retention" value={`${data.stats.avgRetention}%`} color="text-cyan-400" icon={<Brain size={12} />} />
+          </div>
         </div>
       </header>
 
-      <div 
-        ref={containerRef}
-        className="flex-1 rounded-[2.5rem] border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-black/40 overflow-hidden relative cursor-grab active:cursor-grabbing"
-      >
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(124,92,255,0.05)_0%,transparent_70%)]" />
-        
-        <motion.div 
-          className="absolute inset-0 flex items-center justify-center"
-          animate={{ scale: zoom }}
-          transition={{ type: "spring", stiffness: 100, damping: 20 }}
-        >
-          <svg className="w-full h-full overflow-visible">
-            {/* Links */}
-            {data.links.map((link, i) => {
-              const s = nodeMap.get(link.source);
-              const t = nodeMap.get(link.target);
-              if (!s || !t) return null;
-              return (
-                <line
-                  key={i}
-                  x1={s.x + 400}
-                  y1={s.y + 300}
-                  x2={t.x + 400}
-                  y2={t.y + 300}
-                  stroke="rgba(255,255,255,0.05)"
-                  strokeWidth="1"
-                />
-              );
-            })}
+      {/* Content */}
+      <div className="flex-1 flex overflow-hidden">
+        {activeTab === "graph" ? (
+          <>
+            {/* Graph Canvas */}
+            <div className="flex-1 relative overflow-hidden">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(124,92,255,0.04)_0%,transparent_70%)]" />
+              <div className="absolute top-4 right-4 z-10 flex gap-1">
+                <button onClick={() => setZoom(z => Math.min(2, z + 0.15))} className="p-2 border border-white/10 text-slate-500 hover:text-white transition-colors"><Maximize2 size={14} /></button>
+                <button onClick={() => setZoom(z => Math.max(0.4, z - 0.15))} className="p-2 border border-white/10 text-slate-500 hover:text-white transition-colors"><Minimize2 size={14} /></button>
+              </div>
 
-            {/* Nodes as foreign objects for rich HTML */}
-            {nodesWithPos.map((node) => (
-              <foreignObject
-                key={node.id}
-                x={node.x + 400 - 40}
-                y={node.y + 300 - 40}
-                width="80"
-                height="80"
-              >
-                <div className="flex items-center justify-center h-full">
-                  <motion.button
-                    whileHover={{ scale: 1.2 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => setSelectedNode(node)}
-                    className={cn(
-                      "w-12 h-12 rounded-2xl flex items-center justify-center border-2 transition-all shadow-2xl relative group",
-                      node.type === "skill" ? "bg-cyan/10 border-cyan/40 text-cyan" :
-                      node.type === "milestone" ? "bg-purple-500/10 border-purple-500/40 text-purple-400" :
-                      "bg-slate-50 dark:bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-slate-200 dark:border-white/10 text-slate-900 dark:text-slate-900 dark:text-white"
-                    )}
-                  >
-                    {node.type === "skill" ? <Brain size={20} /> :
-                     node.type === "milestone" ? <Route size={20} /> :
-                     <NotebookText size={20} />}
-                    
-                    <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20">
-                      <span className="bg-black/80 text-[10px] text-slate-900 dark:text-slate-900 dark:text-white px-2 py-1 rounded border border-slate-200 dark:border-slate-200 dark:border-white/10">
-                        {node.label}
-                      </span>
-                    </div>
+              <Motion.div className="absolute inset-0 flex items-center justify-center" animate={{ scale: zoom }} transition={{ type: "spring", stiffness: 100, damping: 20 }}>
+                <svg className="w-full h-full overflow-visible">
+                  {data.links.map((link, i) => {
+                    const s = nodeMap.get(link.source), t = nodeMap.get(link.target);
+                    if (!s || !t) return null;
+                    const color = link.relationship === "contains" ? "rgba(167,139,250,0.15)" : "rgba(255,255,255,0.04)";
+                    return <line key={i} x1={s.x + 450} y1={s.y + 350} x2={t.x + 450} y2={t.y + 350} stroke={color} strokeWidth={link.strength ? link.strength * 2 : 1} />;
+                  })}
+                  {nodesWithPos.map(node => {
+                    const color = node.retentionState ? retentionColors[node.retentionState] : typeColors[node.type] || "#64748b";
+                    const size = Math.max(6, Math.min(16, node.val / 2));
+                    return (
+                      <g key={node.id} onClick={() => handleNodeClick(node)} className="cursor-pointer">
+                        <circle cx={node.x + 450} cy={node.y + 350} r={size + 4} fill="transparent" />
+                        <circle cx={node.x + 450} cy={node.y + 350} r={size} fill={color} opacity={0.15} stroke={color} strokeWidth={selectedNode?.id === node.id ? 2.5 : 1} />
+                        <circle cx={node.x + 450} cy={node.y + 350} r={size * 0.4} fill={color} opacity={0.8} />
+                        {zoom > 0.7 && (
+                          <text x={node.x + 450} y={node.y + 350 + size + 12} textAnchor="middle" fill="#64748b" fontSize="8" fontFamily="Inter, sans-serif">{node.label.length > 16 ? node.label.slice(0, 14) + "…" : node.label}</text>
+                        )}
+                      </g>
+                    );
+                  })}
+                </svg>
+              </Motion.div>
 
-                    {selectedNode?.id === node.id && (
-                      <motion.div 
-                        layoutId="active-ring"
-                        className="absolute inset-[-6px] rounded-[1.5rem] border-2 border-brand/50"
-                      />
-                    )}
-                  </motion.button>
-                </div>
-              </foreignObject>
-            ))}
-          </svg>
-        </motion.div>
-
-        {/* Info Panel Overlay */}
-        <AnimatePresence>
-          {selectedNode && (
-            <motion.aside
-              initial={{ x: 400, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: 400, opacity: 0 }}
-              className="absolute top-6 right-6 bottom-6 w-80 bg-slate-50 dark:bg-panel bg-slate-50 dark:bg-panel/95 backdrop-blur-2xl border border-slate-200 dark:border-slate-200 dark:border-white/10 rounded-[2rem] p-6 shadow-2xl z-30"
-            >
-              <button 
-                onClick={() => setSelectedNode(null)}
-                className="absolute top-4 right-4 text-slate-500 hover:text-slate-900 dark:text-slate-900 dark:text-white"
-              >
-                ✕
-              </button>
-
-              <div className="flex flex-col h-full">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className={cn(
-                    "p-3 rounded-2xl",
-                    selectedNode.type === "skill" ? "bg-cyan/10 text-cyan" :
-                    selectedNode.type === "milestone" ? "bg-purple-500/10 text-purple-400" :
-                    "bg-slate-50 dark:bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-slate-900 dark:text-white"
-                  )}>
-                    {selectedNode.type === "skill" ? <Brain size={24} /> :
-                     selectedNode.type === "milestone" ? <Route size={24} /> :
-                     <NotebookText size={24} />}
+              {/* Legend */}
+              <div className="absolute bottom-4 left-4 flex flex-col gap-1.5 z-10 bg-black/60 backdrop-blur p-3 border border-white/5">
+                {[
+                  { label: "Strong", color: retentionColors.strong },
+                  { label: "Stable", color: retentionColors.stable },
+                  { label: "Weakening", color: retentionColors.weakening },
+                  { label: "Critical", color: retentionColors.critical }
+                ].map(l => (
+                  <div key={l.label} className="flex items-center gap-2 text-[9px] text-slate-500">
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: l.color }} />{l.label}
                   </div>
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{selectedNode.type}</p>
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-slate-900 dark:text-white leading-tight">{selectedNode.label}</h3>
-                  </div>
-                </div>
+                ))}
+              </div>
+            </div>
 
-                <div className="flex-1 space-y-6 overflow-y-auto pr-2 custom-scrollbar">
-                  <div className="space-y-2">
-                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Relationship Density</p>
-                    <div className="flex items-center gap-4">
-                      <div className="flex-1 h-2 bg-slate-50 dark:bg-slate-50 dark:bg-white/5 rounded-full overflow-hidden">
-                        <div className="h-full bg-brand" style={{ width: `${Math.min(100, selectedNode.val * 5)}%` }} />
+            {/* Detail Panel */}
+            <AnimatePresence>
+              {selectedNode && (
+                <Motion.aside initial={{ width: 0, opacity: 0 }} animate={{ width: 320, opacity: 1 }} exit={{ width: 0, opacity: 0 }}
+                  className="shrink-0 border-l border-white/[0.04] overflow-y-auto custom-scrollbar">
+                  <div className="p-6 min-w-[300px] space-y-6">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mb-1">{selectedNode.type}</p>
+                        <h3 className="text-sm font-semibold text-white">{selectedNode.label}</h3>
                       </div>
-                      <span className="text-xs font-mono text-slate-900 dark:text-slate-900 dark:text-white">{selectedNode.val}</span>
+                      <button onClick={() => { setSelectedNode(null); setConceptDetail(null); }} className="text-slate-600 hover:text-white"><XCircle size={16} /></button>
                     </div>
-                  </div>
+                    {selectedNode.retentionState && (
+                      <div className="flex items-center gap-3">
+                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: retentionColors[selectedNode.retentionState] }} />
+                        <span className="text-[10px] font-medium text-slate-400 capitalize">{selectedNode.retentionState}</span>
+                        <span className="text-[10px] text-slate-600">{selectedNode.retentionScore}%</span>
+                      </div>
+                    )}
+                    {selectedNode.category && <DetailRow label="Category" value={selectedNode.category} />}
+                    {selectedNode.difficulty && <DetailRow label="Difficulty" value={selectedNode.difficulty} />}
+                    {selectedNode.interviewFrequency && <DetailRow label="Interview Freq" value={selectedNode.interviewFrequency} />}
+                    <DetailRow label="Connections" value={String(data.links.filter(l => l.source === selectedNode.id || l.target === selectedNode.id).length)} />
 
-                  <div className="rounded-2xl bg-white/[0.02] border border-white/5 p-4">
-                    <div className="flex items-center gap-2 text-xs font-semibold text-slate-900 dark:text-slate-900 dark:text-white mb-3">
-                      <Info size={14} className="text-brand" />
-                      AI Insight
-                    </div>
-                    <p className="text-xs leading-5 text-slate-500 dark:text-slate-500 dark:text-slate-400">
-                      This {selectedNode.type} is a central node in your learning network. It has {data.links.filter(l => l.source === selectedNode.id || l.target === selectedNode.id).length} active connections.
+                    {conceptDetail && (
+                      <>
+                        {conceptDetail.linkedNotes.length > 0 && (
+                          <div className="pt-4 border-t border-white/5 space-y-2">
+                            <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">Linked Notes</p>
+                            {conceptDetail.linkedNotes.map(n => (
+                              <div key={n.id} className="flex items-center justify-between py-1.5 border-b border-white/5 last:border-0">
+                                <span className="text-[10px] text-slate-400 truncate flex-1 mr-2">{n.title}</span>
+                                <span className="text-[9px] text-slate-600">{Math.round(n.strength * 100)}%</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {conceptDetail.relatedConcepts.length > 0 && (
+                          <div className="pt-4 border-t border-white/5 space-y-2">
+                            <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">Related Concepts</p>
+                            {conceptDetail.relatedConcepts.map(c => (
+                              <div key={c.id} className="flex items-center gap-2 py-1">
+                                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: retentionColors[c.retentionState] || "#64748b" }} />
+                                <span className="text-[10px] text-slate-400">{c.name}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </Motion.aside>
+              )}
+            </AnimatePresence>
+          </>
+        ) : (
+          /* Interview Readiness Tab */
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
+            <div className="max-w-3xl mx-auto space-y-8">
+              {interview && (
+                <>
+                  <div className="text-center py-8">
+                    <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mb-3">Interview Readiness Score</p>
+                    <p className={cn("text-6xl font-light tracking-tight",
+                      interview.overallScore > 70 ? "text-emerald-400" : interview.overallScore > 40 ? "text-amber-400" : "text-red-400"
+                    )}>{interview.overallScore}%</p>
+                    <p className="text-xs text-slate-500 mt-2 max-w-sm mx-auto">
+                      Based on retention scores of high-frequency interview concepts.
                     </p>
                   </div>
-                </div>
 
-                <div className="mt-6 pt-6 border-t border-white/5">
-                  <button className="w-full py-3 rounded-xl bg-brand text-sm font-bold text-slate-900 dark:text-slate-900 dark:text-white hover:bg-brand/90 transition shadow-lg shadow-brand/20">
-                    Open Node Details
-                  </button>
-                </div>
-              </div>
-            </motion.aside>
-          )}
-        </AnimatePresence>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="border border-red-500/20 bg-red-500/5 p-5 space-y-3">
+                      <h3 className="text-[10px] font-bold text-red-400 uppercase tracking-widest">Critical Gaps</h3>
+                      {interview.criticalGaps.length === 0 ? (
+                        <p className="text-[10px] text-slate-500">No critical gaps detected!</p>
+                      ) : interview.criticalGaps.map(g => (
+                        <div key={g.name} className="flex items-center justify-between py-1.5 border-b border-red-500/10 last:border-0">
+                          <span className="text-[11px] text-slate-300">{g.name}</span>
+                          <span className="text-[9px] text-red-400">{g.retentionScore}%</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="border border-emerald-500/20 bg-emerald-500/5 p-5 space-y-3">
+                      <h3 className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Strong Areas</h3>
+                      {interview.strongAreas.length === 0 ? (
+                        <p className="text-[10px] text-slate-500">Keep reviewing to build strength.</p>
+                      ) : interview.strongAreas.map(s => (
+                        <div key={s.name} className="flex items-center justify-between py-1.5 border-b border-emerald-500/10 last:border-0">
+                          <span className="text-[11px] text-slate-300">{s.name}</span>
+                          <span className="text-[9px] text-emerald-400">{s.retentionScore}%</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
 
-        {/* Legend */}
-        <div className="absolute bottom-6 left-6 flex flex-col gap-3 z-10 bg-black/40 backdrop-blur-md p-4 rounded-2xl border border-white/5">
-          <div className="flex items-center gap-3 text-[11px] font-medium text-slate-500 dark:text-slate-500 dark:text-slate-400">
-            <div className="w-3 h-3 rounded bg-cyan/40 border border-cyan/60" />
-            Skills (Core Knowledge)
+                  {interview.topicBreakdown.length > 0 && (
+                    <div className="border border-white/[0.06] p-5 space-y-4">
+                      <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Topic Breakdown</h3>
+                      {interview.topicBreakdown.map(t => (
+                        <div key={t.category} className="space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] text-slate-300 capitalize">{t.category}</span>
+                            <span className="text-[9px] text-slate-500">{t.count} concepts · {t.avgRetention}%</span>
+                          </div>
+                          <div className="h-1 bg-white/5 overflow-hidden">
+                            <div className={cn("h-full", t.avgRetention > 60 ? "bg-emerald-500" : t.avgRetention > 30 ? "bg-amber-500" : "bg-red-500")}
+                              style={{ width: `${t.avgRetention}%` }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           </div>
-          <div className="flex items-center gap-3 text-[11px] font-medium text-slate-500 dark:text-slate-500 dark:text-slate-400">
-            <div className="w-3 h-3 rounded bg-purple-500/40 border border-purple-500/60" />
-            Roadmap Milestones
-          </div>
-          <div className="flex items-center gap-3 text-[11px] font-medium text-slate-500 dark:text-slate-500 dark:text-slate-400">
-            <div className="w-3 h-3 rounded bg-slate-100 dark:bg-slate-100 dark:bg-white/10 border border-white/20" />
-            Personal Notes
-          </div>
-        </div>
+        )}
       </div>
+    </div>
+  );
+}
+
+function Stat({ label, value, color, icon }: { label: string; value: string | number; color: string; icon: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <div className="flex items-center gap-1.5"><span className={cn("opacity-50", color)}>{icon}</span><p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">{label}</p></div>
+      <p className={cn("text-xl font-light tracking-tight", color)}>{value}</p>
+    </div>
+  );
+}
+
+function DetailRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">{label}</span>
+      <span className="text-[10px] text-slate-400 capitalize">{value}</span>
     </div>
   );
 }

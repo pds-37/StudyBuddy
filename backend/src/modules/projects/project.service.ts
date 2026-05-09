@@ -3,85 +3,13 @@ import { UserModel } from "../users/user.model.js";
 import { groqService } from "../../services/ai/groq.service.js";
 import { ApiError } from "../../utils/api-error.js";
 import type { ProjectMatch, CapstoneProject } from "@studybuddy/shared";
-
-// Mock database of capstone projects
-const MOCK_PROJECTS: CapstoneProject[] = [
-  { 
-    id: "p1", 
-    title: "Build a scalable e-commerce API", 
-    company: "Stripe", 
-    industry: "FinTech", 
-    description: "Design and implement a scalable microservices architecture for an e-commerce platform.", 
-    requiredSkills: ["Node.js", "System Design", "PostgreSQL"], 
-    difficulty: "advanced", 
-    estimatedHours: 40,
-    implementationPlan: [
-      "Define API contract using OpenAPI/Swagger.",
-      "Set up PostgreSQL with Prisma for data modeling.",
-      "Implement core services: Auth, Catalog, and Orders.",
-      "Integrate Redis for caching frequent product queries.",
-      "Add Docker support for containerized deployment."
-    ]
-  },
-  { 
-    id: "p2", 
-    title: "Design a real-time collaborative editor", 
-    company: "Figma", 
-    industry: "SaaS", 
-    description: "Create a React-based collaborative text editor using WebSockets and CRDTs.", 
-    requiredSkills: ["React", "TypeScript", "WebSockets"], 
-    difficulty: "intermediate", 
-    estimatedHours: 30,
-    implementationPlan: [
-      "Initialize React app with TypeScript and TipTap/Lexical.",
-      "Set up WebSocket server using Socket.io.",
-      "Implement Yjs (CRDT) for conflict-free merging.",
-      "Add user presence indicators (avatars/cursors).",
-      "Sync document state to local storage for offline support."
-    ]
-  },
-  { 
-    id: "p3", 
-    title: "Develop a churn prediction model", 
-    company: "Netflix", 
-    industry: "Entertainment", 
-    description: "Use machine learning to predict user churn based on viewing history.", 
-    requiredSkills: ["Python", "Machine Learning", "Pandas"], 
-    difficulty: "intermediate", 
-    estimatedHours: 35,
-    implementationPlan: [
-      "Preprocess the viewing history dataset using Pandas.",
-      "Perform exploratory data analysis (EDA) for trends.",
-      "Train a Random Forest or XGBoost classification model.",
-      "Evaluate using Precision-Recall curves and F1-score.",
-      "Create a simple Flask/FastAPI endpoint for predictions."
-    ]
-  },
-  { 
-    id: "p4", 
-    title: "Create a responsive portfolio website", 
-    company: "Open Source", 
-    industry: "Technology", 
-    description: "Build a fully responsive and accessible personal portfolio website.", 
-    requiredSkills: ["HTML", "CSS", "JavaScript"], 
-    difficulty: "beginner", 
-    estimatedHours: 15,
-    implementationPlan: [
-      "Wireframe the layout for Mobile and Desktop.",
-      "Write semantic HTML structure with ARIA roles.",
-      "Apply responsive CSS using Grid and Flexbox.",
-      "Add scroll-into-view animations with Intersection Observer.",
-      "Optimize assets and deploy via Vercel/GitHub Pages."
-    ]
-  }
-];
-
+import { randomUUID } from "crypto";
 
 function toMatch(doc: ProjectDocument): ProjectMatch {
   return doc.toJSON() as unknown as ProjectMatch;
 }
 
-/** Analyzes user profile to find the best projects. */
+/** Analyzes user profile to dynamically generate tailored capstone projects. */
 async function findMatches(userId: string): Promise<ProjectMatch[]> {
   const user = await UserModel.findById(userId);
   if (!user || user.targetRoles.length === 0) {
@@ -93,39 +21,67 @@ async function findMatches(userId: string): Promise<ProjectMatch[]> {
     return existingMatches.map(toMatch);
   }
 
-  const prompt = `You are an expert tech career advisor. 
+  const prompt = `You are an expert tech career advisor and senior engineering manager.
 Candidate Target Role: ${user.targetRoles[0]}
 Candidate Skills: ${user.currentSkills.join(", ")}
 
-Available Projects:
-${JSON.stringify(MOCK_PROJECTS, null, 2)}
+Generate 3 unique, realistic, and highly impactful capstone projects tailored specifically for this candidate to help them land a job in their target role. The projects should be impressive enough for a portfolio.
+Do not use generic tutorial projects. Make them sound like real industry features (e.g., "Build a scalable e-commerce API", "Design a real-time collaborative editor").
 
-Match the candidate with the 2 most relevant projects that will help build their portfolio for the target role. For each match, provide a matchScore (0-100) and 2 specific matchReasons why this project is a good fit.
 Return ONLY valid JSON in this exact structure:
 [
-  { "projectId": "p1", "matchScore": 90, "matchReasons": ["reason 1", "reason 2"] }
+  {
+    "project": {
+      "title": "Project Title",
+      "company": "Fictional Tech Company",
+      "industry": "Industry Name",
+      "description": "2-sentence compelling description of what the project is.",
+      "requiredSkills": ["Skill 1", "Skill 2", "Skill 3"],
+      "difficulty": "beginner" | "intermediate" | "advanced",
+      "estimatedHours": 30,
+      "implementationPlan": ["Step 1...", "Step 2...", "Step 3...", "Step 4...", "Step 5..."]
+    },
+    "matchScore": 95,
+    "matchReasons": ["Specific reason 1", "Specific reason 2"]
+  }
 ]`;
 
   const aiMatchJson = await groqService.generateStructuredResponse(prompt);
   
-  let matchResults;
+  let matchResults: Array<{ project: Omit<CapstoneProject, "id">; matchScore: number; matchReasons: string[] }>;
   try {
     matchResults = JSON.parse(aiMatchJson);
   } catch (e) {
+    // Fallback if AI parsing fails
     matchResults = [
-      { projectId: "p2", matchScore: 85, matchReasons: ["Helps build React portfolio", "Good for frontend roles"] }
+      {
+        project: {
+          title: "Build a scalable microservices architecture",
+          company: "Tech Startups",
+          industry: "Technology",
+          description: "Design and implement a scalable microservices architecture for an e-commerce platform.",
+          requiredSkills: user.currentSkills.slice(0, 3),
+          difficulty: "intermediate",
+          estimatedHours: 40,
+          implementationPlan: ["Define API", "Setup DB", "Implement Auth", "Add Caching", "Dockerize"]
+        },
+        matchScore: 85,
+        matchReasons: ["Matches your target role perfectly.", "Uses your current skills in a practical scenario."]
+      }
     ];
   }
 
   const createdMatches = [];
   for (const result of matchResults) {
-    const project = MOCK_PROJECTS.find(p => p.id === result.projectId);
-    if (!project) continue;
+    const projectWithId: CapstoneProject = {
+      id: randomUUID(),
+      ...result.project
+    };
 
     const match = await ProjectModel.create({
       userId,
-      projectId: project.id,
-      project,
+      projectId: projectWithId.id,
+      project: projectWithId,
       matchScore: result.matchScore,
       matchReasons: result.matchReasons,
       status: "recommended"
@@ -147,7 +103,121 @@ async function updateProjectStatus(userId: string, matchId: string, status: "in_
   return toMatch(match);
 }
 
+async function generateCustomProject(userId: string, ideaPrompt: string): Promise<ProjectMatch> {
+  const user = await UserModel.findById(userId);
+  if (!user) throw new ApiError(404, "User not found");
+
+  const prompt = `You are an expert technical product manager and engineering mentor.
+The user wants to build a custom project based on this idea: "${ideaPrompt}"
+User's Skills: ${user.currentSkills.join(", ")}
+Target Role: ${user.targetRoles[0] || "Software Engineer"}
+
+Generate a detailed, realistic capstone project specification that fulfills this idea while maximizing its value for the user's target role and skills.
+Return ONLY valid JSON in this exact structure:
+{
+  "project": {
+    "title": "Professional Project Title",
+    "company": "Personal Project",
+    "industry": "Relevant Industry",
+    "description": "2-sentence compelling description of the project.",
+    "requiredSkills": ["Skill 1", "Skill 2"],
+    "difficulty": "intermediate",
+    "estimatedHours": 20,
+    "implementationPlan": ["Step 1", "Step 2", "Step 3"]
+  },
+  "matchScore": 95,
+  "matchReasons": ["Why this is a great custom project", "How it helps their portfolio"]
+}`;
+
+  const aiMatchJson = await groqService.generateStructuredResponse(prompt);
+  
+  let result;
+  try {
+    result = JSON.parse(aiMatchJson);
+  } catch (e) {
+    throw new ApiError(500, "Failed to parse AI generated project");
+  }
+
+  const projectWithId: CapstoneProject = {
+    id: randomUUID(),
+    ...result.project
+  };
+
+  const match = await ProjectModel.create({
+    userId,
+    projectId: projectWithId.id,
+    project: projectWithId,
+    matchScore: result.matchScore,
+    matchReasons: result.matchReasons,
+    status: "recommended"
+  });
+
+  return toMatch(match);
+}
+
+export type ProjectMentorInsights = {
+  encouragement: string;
+  focusArea: { title: string; description: string; action: string };
+  stats: { total: number; completed: number; inProgress: number; planning: number; streak: number };
+};
+
+async function getMentorInsights(userId: string): Promise<ProjectMentorInsights> {
+  const user = await UserModel.findById(userId);
+  const matches = await ProjectModel.find({ userId });
+  
+  const completed = matches.filter(m => m.status === "completed").length;
+  const inProgress = matches.filter(m => m.status === "in_progress").length;
+  const recommended = matches.filter(m => m.status === "recommended").length;
+  
+  const prompt = `You are an AI Project Mentor for a software engineer.
+User Target Role: ${user?.targetRoles[0] || "Software Engineer"}
+User Skills: ${user?.currentSkills.join(", ")}
+Projects Completed: ${completed}
+Projects In Progress: ${inProgress}
+Projects Recommended: ${recommended}
+
+Analyze their progress and generate brief mentor insights.
+Return ONLY valid JSON in this exact structure:
+{
+  "encouragement": "Short 1 sentence motivational message. (e.g. You're doing great! 🔥)",
+  "focusArea": {
+    "title": "Short Focus Title",
+    "description": "2-sentence advice on what they should focus on next based on their project status and skills.",
+    "action": "Short action button label (e.g. Find Backend Projects)"
+  }
+}`;
+
+  let insights: Omit<ProjectMentorInsights, "stats"> = {
+    encouragement: "Keep up the great work! 🚀",
+    focusArea: {
+      title: "Build your portfolio",
+      description: "Start a recommended project to build your practical experience.",
+      action: "Start a Project"
+    }
+  };
+
+  try {
+    const aiJson = await groqService.generateStructuredResponse(prompt);
+    insights = JSON.parse(aiJson);
+  } catch (e) {
+    console.error("Failed to parse mentor insights", e);
+  }
+
+  return {
+    ...insights,
+    stats: {
+      total: matches.length,
+      completed,
+      inProgress,
+      planning: recommended,
+      streak: user?.behaviorProfile?.consistencyScore ? Math.floor(user.behaviorProfile.consistencyScore / 10) : 1
+    }
+  };
+}
+
 export const projectService = {
   findMatches,
-  updateProjectStatus
+  updateProjectStatus,
+  generateCustomProject,
+  getMentorInsights
 };

@@ -18,6 +18,7 @@ import { recommendationsRouter } from "../modules/recommendations/recommendation
 import { behaviorRouter } from "../modules/behavior/behavior.routes.js";
 import knowledgeRouter from "../modules/knowledge/knowledge.routes.js";
 import memoryRouter from "../modules/memory/memory.routes.js";
+import { intelligenceRouter } from "../modules/intelligence/intelligence.routes.js";
 
 export const apiRouter = Router();
 
@@ -40,3 +41,5 @@ apiRouter.use("/recommendations", recommendationsRouter);
 apiRouter.use("/behavior", behaviorRouter);
 apiRouter.use("/knowledge", knowledgeRouter);
 apiRouter.use("/memory", memoryRouter);
+apiRouter.use("/intelligence", intelligenceRouter);
+
