@@ -20,8 +20,9 @@ import {
   Compass,
   Plus
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useRoadmapsStore } from "../../../store/roadmaps-store";
+import { useCopilotStore } from "../../../store/copilot-store";
 import { useAppStore } from "../../../store/app-store";
 import { cn } from "../../../lib/utils/cn";
 import { ExpansionFlow } from "./ExpansionFlow";
@@ -49,6 +50,15 @@ export function RoadmapWorkspace() {
   const [isExpansionOpen, setIsExpansionOpen] = useState(false);
   const [isInternalLoading, setIsInternalLoading] = useState(true);
   const { roadmaps, setCurrentRoadmap, injectSkill } = useRoadmapsStore();
+  const navigate = useNavigate();
+  const { sendMessage, createNewConversation, currentConversation } = useCopilotStore();
+
+  const handleCopilotAction = async (prompt: string) => {
+    if (!currentConversation) {
+      await createNewConversation();
+    }
+    await sendMessage(prompt);
+  };
 
   useEffect(() => {
     fetchRoadmaps();
@@ -87,7 +97,7 @@ export function RoadmapWorkspace() {
               key={idx}
               type={insight.message.toLowerCase().includes("welcome back") ? "recovery" : insight.message.toLowerCase().includes("consistency") ? "burnout" : "overload"}
               message={insight.message}
-              onAction={() => console.log("Intervention triggered")}
+              onAction={() => handleCopilotAction("I need help adjusting my roadmap pacing. Can you assist me?")}
             />
           ))}
 
@@ -178,7 +188,10 @@ export function RoadmapWorkspace() {
                    </div>
                    <p className="text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400">Master full stack development and problem solving to become a job-ready software engineer.</p>
                 </div>
-                <button className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-200 dark:border-white/10 text-xs font-bold text-slate-700 dark:text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:bg-slate-50 dark:bg-white/5 transition flex items-center gap-2">
+                <button 
+                  onClick={() => document.getElementById('journey-phases')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-200 dark:border-white/10 text-xs font-bold text-slate-700 dark:text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:bg-slate-50 dark:bg-white/5 transition flex items-center gap-2"
+                >
                    View Path <ArrowRight className="w-3 h-3" />
                 </button>
              </div>
@@ -206,7 +219,7 @@ export function RoadmapWorkspace() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
              {/* JOURNEY PHASES */}
-             <div className="rounded-3xl border border-white/[0.06] bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
+             <div id="journey-phases" className="rounded-3xl border border-white/[0.06] bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
                 <div className="flex items-center justify-between mb-6">
                    <div className="flex items-center gap-2">
                       <Route className="w-4 h-4 text-purple-400" />
@@ -237,7 +250,12 @@ export function RoadmapWorkspace() {
                       </h3>
                    </div>
                    {!currentRoadmap?.insights?.some(i => i.message.toLowerCase().includes("overwhelmed")) && (
-                     <button className="text-[10px] text-slate-500 hover:text-slate-900 dark:text-slate-900 dark:text-white uppercase tracking-widest font-bold">View All</button>
+                     <button 
+                       onClick={() => handleCopilotAction("Can we review all my pending tasks in the current mission?")}
+                       className="text-[10px] text-slate-500 hover:text-slate-900 dark:text-slate-900 dark:text-white uppercase tracking-widest font-bold"
+                     >
+                       View All
+                     </button>
                    )}
                 </div>
                 <div className="space-y-3">
@@ -256,7 +274,10 @@ export function RoadmapWorkspace() {
                     </div>
                   )}
                   {!currentRoadmap?.insights?.some(i => i.message.toLowerCase().includes("overwhelmed")) && (
-                    <button className="w-full py-3 rounded-xl border border-dashed border-slate-200 dark:border-slate-200 dark:border-white/10 text-[10px] font-bold text-slate-500 uppercase tracking-widest hover:text-slate-900 dark:text-slate-900 dark:text-white hover:border-white/30 transition mt-2">
+                    <button 
+                      onClick={() => handleCopilotAction("I want to add a new custom task to my current roadmap. Help me define it.")}
+                      className="w-full py-3 rounded-xl border border-dashed border-slate-200 dark:border-slate-200 dark:border-white/10 text-[10px] font-bold text-slate-500 uppercase tracking-widest hover:text-slate-900 dark:text-slate-900 dark:text-white hover:border-white/30 transition mt-2"
+                    >
                        + Add New Task
                     </button>
                   )}
@@ -284,7 +305,11 @@ export function RoadmapWorkspace() {
                <div className="space-y-4">
                   {currentRoadmap?.insights && currentRoadmap.insights.length > 0 ? (
                     currentRoadmap.insights.map((insight, idx) => (
-                      <InsightCard key={idx} insight={insight} />
+                      <InsightCard 
+                        key={idx} 
+                        insight={insight} 
+                        onAction={() => handleCopilotAction(`Regarding your insight: "${insight.message}". Let's work on this action: ${insight.actionLabel}`)}
+                      />
                     ))
                   ) : (
                     <div className="flex gap-3">
@@ -311,7 +336,10 @@ export function RoadmapWorkspace() {
              <p className="text-[11px] text-slate-500 dark:text-slate-500 dark:text-slate-400 leading-relaxed mb-6">
                 Based on your progress and recent performance, start a focus on Graph Traversal sprint.
              </p>
-             <button className="w-full py-3 rounded-xl bg-brand text-slate-900 dark:text-slate-900 dark:text-white text-[11px] font-bold flex items-center justify-center gap-2 hover:bg-brand/90 transition shadow-glow">
+             <button 
+               onClick={() => navigate('/focus')}
+               className="w-full py-3 rounded-xl bg-brand text-slate-900 dark:text-slate-900 dark:text-white text-[11px] font-bold flex items-center justify-center gap-2 hover:bg-brand/90 transition shadow-glow"
+             >
                 <Zap className="w-4 h-4" /> Start 45-min Sprint
              </button>
           </div>
@@ -354,6 +382,10 @@ export function RoadmapWorkspace() {
                    <button 
                      key={i} 
                      onClick={() => {
+                       if (action.label === "Ask Veda") handleCopilotAction("Hello Veda! Can we review my roadmap?");
+                       if (action.label === "Recall") navigate('/recall');
+                       if (action.label === "Quiz") navigate('/roadmap'); // You are here
+                       if (action.label === "Note") navigate('/notes');
                        if (action.label === "Inject") {
                          const skill = prompt("What skill did you learn externally?");
                          if (skill) {
@@ -368,7 +400,10 @@ export function RoadmapWorkspace() {
                    </button>
                 ))}
              </div>
-             <div className="mt-4 p-3 rounded-xl bg-gradient-to-r from-brand/20 to-transparent border border-brand/20 flex items-center gap-3 cursor-pointer">
+              <div 
+                onClick={() => handleCopilotAction("Hello Veda! How can you help me today?")}
+                className="mt-4 p-3 rounded-xl bg-gradient-to-r from-brand/20 to-transparent border border-brand/20 flex items-center gap-3 cursor-pointer hover:bg-brand/10 transition-all"
+              >
                 <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center shrink-0">
                    <Sparkles className="w-4 h-4 text-slate-900 dark:text-slate-900 dark:text-white" />
                 </div>
@@ -512,7 +547,7 @@ function TaskCard({ task, onToggle, delay }: { task: RoadmapTask; onToggle: () =
   );
 }
 
-function InsightCard({ insight }: { insight: any }) {
+function InsightCard({ insight, onAction }: { insight: any; onAction?: () => void }) {
   const icons = {
     behavior: Flame,
     performance: TrendingUp,
@@ -531,7 +566,10 @@ function InsightCard({ insight }: { insight: any }) {
             {insight.message}
           </p>
           {insight.actionLabel && (
-            <button className="mt-3 text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400 hover:text-cyan-300 transition-colors">
+            <button 
+              onClick={onAction}
+              className="mt-3 text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400 hover:text-cyan-300 transition-colors"
+            >
               {insight.actionLabel} →
             </button>
           )}

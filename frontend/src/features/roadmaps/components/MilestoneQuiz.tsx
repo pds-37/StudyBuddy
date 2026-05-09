@@ -3,6 +3,7 @@ import { CheckCircle2, ChevronRight, Loader2, PlayCircle, XCircle } from "lucide
 import { Card } from "../../../components/ui/Card";
 import { cn } from "../../../lib/utils/cn";
 import { useCopilotStore } from "../../../store/copilot-store";
+import { useRoadmapsStore } from "../../../store/roadmaps-store";
 import { apiClient } from "../../../lib/api/client";
 
 type QuizQuestion = {
@@ -24,8 +25,10 @@ export function MilestoneQuiz({ milestoneId, milestoneTitle }: MilestoneQuizProp
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
+  const [markedDone, setMarkedDone] = useState(false);
   
   const { sendMessage, createNewConversation, currentConversation } = useCopilotStore();
+  const { updateTaskStatus } = useRoadmapsStore();
 
   const handleGenerate = async () => {
     setLoading(true);
@@ -35,12 +38,18 @@ export function MilestoneQuiz({ milestoneId, milestoneTitle }: MilestoneQuizProp
       setCurrentIndex(0);
       setScore(0);
       setFinished(false);
+      setMarkedDone(false);
       setSelectedOption(null);
     } catch (error) {
       console.error("Failed to generate quiz", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleMarkDone = () => {
+    updateTaskStatus(milestoneId, "completed");
+    setMarkedDone(true);
   };
 
   const handleAnswer = (optionIndex: number) => {
@@ -91,15 +100,32 @@ export function MilestoneQuiz({ milestoneId, milestoneTitle }: MilestoneQuizProp
 
   if (finished) {
     return (
-      <div className="rounded-xl border border-white/[0.04] bg-white dark:bg-obsidian">
-        <h3 className="text-xl font-medium text-slate-900 dark:text-white">Completed</h3>
-        <p className="mt-2 text-sm text-[#888888]">Score: {score}/{questions.length}</p>
-        <button
-          onClick={() => setQuestions(null)}
-          className="mt-6 rounded-lg border border-white/[0.04] px-4 py-2 text-xs text-[#888888] hover:text-slate-900 dark:text-white transition-colors"
-        >
-          Close
-        </button>
+      <div className="rounded-xl border border-white/[0.04] p-6 bg-white dark:bg-obsidian">
+        <h3 className="text-xl font-medium text-slate-900 dark:text-white mb-2">Quiz Completed</h3>
+        <p className="text-sm text-[#888888] mb-6">You scored {score}/{questions.length} on the {milestoneTitle} knowledge check.</p>
+        
+        <div className="flex items-center gap-4 border-t border-slate-100 dark:border-white/[0.04] pt-6">
+          <button
+            onClick={() => setQuestions(null)}
+            className="rounded-lg border border-slate-200 dark:border-white/[0.04] px-4 py-2 text-xs font-medium text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
+          >
+            Close Quiz
+          </button>
+          
+          <button
+            onClick={handleMarkDone}
+            disabled={markedDone}
+            className={cn(
+              "flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition-all",
+              markedDone 
+                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 border border-emerald-500/20"
+                : "bg-brand text-slate-900 dark:text-white hover:scale-105 shadow-lg shadow-brand/20 border border-brand/20"
+            )}
+          >
+            {markedDone ? <CheckCircle2 className="w-4 h-4" /> : <PlayCircle className="w-4 h-4" />}
+            {markedDone ? "Marked as Done" : "Mark Task Done"}
+          </button>
+        </div>
       </div>
     );
   }
