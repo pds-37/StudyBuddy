@@ -51,9 +51,10 @@ export function RoadmapWorkspace() {
   const [isInternalLoading, setIsInternalLoading] = useState(true);
   const { roadmaps, setCurrentRoadmap, injectSkill } = useRoadmapsStore();
   const navigate = useNavigate();
-  const { sendMessage, createNewConversation, currentConversation } = useCopilotStore();
+  const { sendMessage, createNewConversation, currentConversation, setIsWidgetOpen } = useCopilotStore();
 
   const handleCopilotAction = async (prompt: string) => {
+    setIsWidgetOpen(true);
     if (!currentConversation) {
       await createNewConversation();
     }
@@ -97,7 +98,13 @@ export function RoadmapWorkspace() {
               key={idx}
               type={insight.message.toLowerCase().includes("welcome back") ? "recovery" : insight.message.toLowerCase().includes("consistency") ? "burnout" : "overload"}
               message={insight.message}
-              onAction={() => handleCopilotAction("I need help adjusting my roadmap pacing. Can you assist me?")}
+              onAction={() => {
+                if (insight.message.toLowerCase().includes("consistency") || insight.message.toLowerCase().includes("struggle")) {
+                   handleCopilotAction("My current roadmap feels a bit overwhelming. Can we simplify the tasks or adjust the pacing for better consistency?");
+                } else {
+                   handleCopilotAction("I need help adjusting my roadmap pacing. Can you assist me?");
+                }
+              }}
             />
           ))}
 
@@ -241,7 +248,7 @@ export function RoadmapWorkspace() {
              </div>
 
              {/* EXECUTION TASKS */}
-             <div className="rounded-3xl border border-white/[0.06] bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
+             <div id="execution-tasks" className="rounded-3xl border border-white/[0.06] bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4 scroll-mt-20">
                 <div className="flex items-center justify-between mb-6">
                    <div className="flex items-center gap-2">
                       <LayoutDashboard className="w-4 h-4 text-cyan-400" />
@@ -264,11 +271,12 @@ export function RoadmapWorkspace() {
                       key={task.id} 
                       task={task} 
                       onToggle={() => updateTaskStatus(task.id, task.status === "completed" ? "pending" : "completed")}
+                      onStart={() => navigate(`/study/${task.id}`)}
                       delay={idx * 0.05}
                     />
                   ))}
                   {currentRoadmap?.insights?.some(i => i.message.toLowerCase().includes("overwhelmed")) && (
-                    <div className="p-4 rounded-2xl bg-brand/5 border border-dashed border-brand/20 text-center">
+                    <div className="p-4 rounded-2xl bg-brand/5 border border-dashed border-brand/20 text-center animate-pulse">
                        <p className="text-[11px] text-brand font-bold uppercase tracking-widest">Focus Mode Activated</p>
                        <p className="text-[10px] text-slate-500 mt-1">Completing these 2 tasks will restore your momentum.</p>
                     </div>
@@ -276,9 +284,10 @@ export function RoadmapWorkspace() {
                   {!currentRoadmap?.insights?.some(i => i.message.toLowerCase().includes("overwhelmed")) && (
                     <button 
                       onClick={() => handleCopilotAction("I want to add a new custom task to my current roadmap. Help me define it.")}
-                      className="w-full py-3 rounded-xl border border-dashed border-slate-200 dark:border-slate-200 dark:border-white/10 text-[10px] font-bold text-slate-500 uppercase tracking-widest hover:text-slate-900 dark:text-slate-900 dark:text-white hover:border-white/30 transition mt-2"
+                      className="w-full py-4 rounded-xl border border-dashed border-slate-200 dark:border-slate-200 dark:border-white/10 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] hover:text-brand hover:border-brand/50 transition-all mt-2 flex items-center justify-center gap-2 group"
                     >
-                       + Add New Task
+                       <Plus size={14} className="group-hover:rotate-90 transition-transform" />
+                       Add Custom Objective
                     </button>
                   )}
                 </div>
@@ -308,7 +317,18 @@ export function RoadmapWorkspace() {
                       <InsightCard 
                         key={idx} 
                         insight={insight} 
-                        onAction={() => handleCopilotAction(`Regarding your insight: "${insight.message}". Let's work on this action: ${insight.actionLabel}`)}
+                        onAction={() => {
+                           const label = insight.actionLabel?.toUpperCase();
+                           if (label === "TRACK READINESS SCORE") {
+                              navigate("/skill-gap");
+                           } else if (label === "VIEW DAILY SCHEDULE") {
+                              document.getElementById("execution-tasks")?.scrollIntoView({ behavior: "smooth" });
+                           } else if (label === "START REVISION") {
+                              navigate("/recall");
+                           } else {
+                              handleCopilotAction(`Regarding your insight: "${insight.message}". Let's work on this action: ${insight.actionLabel}`);
+                           }
+                        }}
                       />
                     ))
                   ) : (
@@ -384,7 +404,11 @@ export function RoadmapWorkspace() {
                      onClick={() => {
                        if (action.label === "Ask Veda") handleCopilotAction("Hello Veda! Can we review my roadmap?");
                        if (action.label === "Recall") navigate('/recall');
-                       if (action.label === "Quiz") navigate('/roadmap'); // You are here
+                       if (action.label === "Quiz") {
+                         const firstPending = currentMission?.tasks.find(t => t.status === 'pending');
+                         if (firstPending) navigate(`/study/${firstPending.id}`);
+                         else handleCopilotAction("I want to take a quiz on my recent learning progress.");
+                       }
                        if (action.label === "Note") navigate('/notes');
                        if (action.label === "Inject") {
                          const skill = prompt("What skill did you learn externally?");
@@ -393,10 +417,10 @@ export function RoadmapWorkspace() {
                          }
                        }
                      }}
-                     className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition group"
+                     className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] hover:border-brand/30 transition group"
                    >
                       <action.icon className="w-4 h-4 text-slate-500 dark:text-slate-500 dark:text-slate-400 group-hover:text-brand transition-colors" />
-                      <span className="text-[8px] font-bold text-slate-500 uppercase">{action.label}</span>
+                      <span className="text-[8px] font-bold text-slate-500 uppercase group-hover:text-slate-300 transition-colors">{action.label}</span>
                    </button>
                 ))}
              </div>
@@ -481,7 +505,7 @@ function PhaseNode({ phase, active, onClick, isLast }: { phase: RoadmapPhase; ac
   );
 }
 
-function TaskCard({ task, onToggle, delay }: { task: RoadmapTask; onToggle: () => void; delay: number }) {
+function TaskCard({ task, onToggle, onStart, delay }: { task: RoadmapTask; onToggle: () => void; onStart: () => void; delay: number }) {
   const isDone = task.status === "completed";
   
   const typeIcons = {
@@ -501,19 +525,19 @@ function TaskCard({ task, onToggle, delay }: { task: RoadmapTask; onToggle: () =
 
   return (
     <Motion.div 
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
       transition={{ delay }}
       className={cn(
-        "group p-4 rounded-2xl border transition-all flex items-center gap-4",
-        isDone ? "bg-emerald-500/[0.03] border-emerald-500/10" : "bg-white/[0.015] border-white/[0.06] hover:bg-white/[0.03] hover:border-white/[0.12]"
+        "group p-5 rounded-3xl border transition-all flex items-center gap-4",
+        isDone ? "bg-emerald-500/[0.03] border-emerald-500/10" : "bg-white/[0.015] border-white/[0.06] hover:bg-white/[0.03] hover:border-brand/30 shadow-lg"
       )}
     >
       <button 
         onClick={onToggle}
         className={cn(
           "shrink-0 w-6 h-6 rounded-lg border-2 transition-all flex items-center justify-center",
-          isDone ? "bg-emerald-500 border-emerald-500" : "border-slate-200 dark:border-slate-200 dark:border-white/10 group-hover:border-white/30"
+          isDone ? "bg-emerald-500 border-emerald-500" : "border-slate-200 dark:border-slate-200 dark:border-white/10 group-hover:border-brand/50"
         )}
       >
         {isDone && <CheckCircle2 className="w-4 h-4 text-slate-900 dark:text-slate-900 dark:text-white" />}
@@ -521,27 +545,35 @@ function TaskCard({ task, onToggle, delay }: { task: RoadmapTask; onToggle: () =
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <span className={cn("px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest border", typeColors[task.type])}>
+          <span className={cn("px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border", typeColors[task.type])}>
             {task.type}
           </span>
           <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{task.durationMinutes}m • {task.difficulty}</span>
         </div>
-        <h4 className={cn("text-sm font-semibold transition-all", isDone ? "text-slate-500 line-through" : "text-slate-900 dark:text-slate-900 dark:text-white")}>
+        <h4 className={cn("text-sm font-bold tracking-tight transition-all", isDone ? "text-slate-500 line-through" : "text-slate-900 dark:text-slate-900 dark:text-white")}>
           {task.title}
         </h4>
         {task.aiHint && !isDone && (
-          <p className="text-[11px] text-cyan-400/60 mt-1 italic font-medium leading-tight">
+          <p className="text-[11px] text-cyan-400/60 mt-1 italic font-medium leading-tight line-clamp-1 group-hover:line-clamp-none transition-all">
             Veda: "{task.aiHint}"
           </p>
         )}
       </div>
 
-      <Link 
-        to={`/study/${task.id}`}
-        className="opacity-0 group-hover:opacity-100 p-2 text-slate-500 hover:text-slate-900 dark:text-slate-900 dark:text-white transition"
-      >
-        <ArrowRight className="w-4 h-4" />
-      </Link>
+      {!isDone && (
+        <button 
+          onClick={onStart}
+          className="opacity-0 group-hover:opacity-100 px-4 py-2 rounded-xl bg-brand/10 border border-brand/20 text-brand text-[10px] font-black uppercase tracking-widest hover:bg-brand hover:text-black transition-all flex items-center gap-2"
+        >
+          Start <ArrowRight size={12} />
+        </button>
+      )}
+
+      {isDone && (
+        <div className="text-emerald-500">
+           <CheckCircle2 size={18} />
+        </div>
+      )}
 
     </Motion.div>
   );

@@ -24,6 +24,7 @@ const ProjectsPage = lazy(() => import("../pages/ProjectsPage").then(m => ({ def
 const StudyPage = lazy(() => import("../pages/StudyPage").then(m => ({ default: m.StudyPage })));
 const KnowledgePage = lazy(() => import("../pages/KnowledgePage").then(m => ({ default: m.KnowledgePage })));
 const SettingsPage = lazy(() => import("../pages/SettingsPage").then(m => ({ default: m.SettingsPage })));
+const FocusPage = lazy(() => import("../pages/FocusPage").then(m => ({ default: m.FocusPage })));
 
 
 function PageLoader() {
@@ -53,6 +54,7 @@ export function AppRouter() {
             <Route path="/jobs" element={<JobsPage />} />
             <Route path="/resume" element={<ResumePage />} />
             <Route path="/roadmap" element={<RoadmapPage />} />
+            <Route path="/focus" element={<FocusPage />} />
             <Route path="/copilot" element={<CopilotPage />} />
             <Route path="/interview" element={<InterviewPage />} />
             <Route path="/mentorship" element={<MentorshipPage />} />
