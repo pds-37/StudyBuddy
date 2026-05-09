@@ -218,7 +218,7 @@ RULES:
 async function generateCopilotResponse(
   messages: CopilotMessage[],
   userContext: string,
-  model: string = "llama-3.3-70b-versatile"
+  model: string = "llama-3.1-8b-instant"
 ): Promise<{
   content: string;
   metadata: any;
@@ -297,25 +297,34 @@ RULES:
 
   let response: string;
   try {
+    // Try the preferred model (usually 8b for speed/reliability in chat)
     response = await requestGroq(groqMessages, 2500, model);
   } catch (error) {
-    console.error("Groq API request failed during copilot chat:", error);
-    return {
-      content: "I'm currently experiencing a high load or connection issue. Please try again in a few moments.",
-      metadata: {}
-    };
+    console.error(`Groq API request failed with model ${model}, trying fallback:`, error);
+    try {
+      // Fallback to the most reliable instant model
+      response = await requestGroq(groqMessages, 2000, "llama-3.1-8b-instant");
+    } catch (fallbackError) {
+      console.error("Groq fallback also failed:", fallbackError);
+      return {
+        content: "I'm currently experiencing a high load or connection issue. Please try again in a few moments.",
+        metadata: {}
+      };
+    }
   }
 
   try {
-    const parsed = JSON.parse(extractJsonPayload(response));
+    const payload = extractJsonPayload(response);
+    const parsed = JSON.parse(payload);
     return {
       content: parsed.content || "I'm processing your request.",
       metadata: parsed.metadata || {}
     };
   } catch (error) {
     console.error("Failed to parse Veda Copilot response:", response);
+    // If it's not JSON, it might be a direct conversational response from a model failure
     return {
-      content: response, // Fallback to raw response if JSON fails
+      content: response.length > 500 ? response.substring(0, 500) + "..." : response,
       metadata: {}
     };
   }
@@ -578,7 +587,7 @@ RULES:
 10. RevisionStrategy: algorithms/DS → "implementation", theory → "conceptual", frameworks → "practical_repetition", complex/visual topics → "visual".
 11. Provide ONLY valid JSON. No markdown, no comments.`;
 
-  const response = await requestGroq([{ role: "user", content: prompt }], 2500, "llama-3.3-70b-versatile");
+  const response = await requestGroq([{ role: "user", content: prompt }], 2500, "llama-3.1-70b-versatile");
 
   try {
     const parsed = JSON.parse(extractJsonPayload(response));

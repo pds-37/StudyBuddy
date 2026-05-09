@@ -118,26 +118,27 @@ export function GlobalCopilotWidget() {
             </div>
           ) : (
             visibleMessages.map((msg, i) => (
-              <div key={msg.id || i} className={cn("flex flex-col gap-1", msg.role === "user" ? "items-end" : "items-start")}>
+              <div key={msg.id || i} className={cn("flex flex-col gap-1.5", msg.role === "user" ? "items-end" : "items-start")}>
                 <div
                   className={cn(
-                    "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-sm",
+                    "max-w-[90%] rounded-[1.5rem] px-5 py-3 text-[13px] leading-relaxed shadow-xl backdrop-blur-3xl border transition-all",
                     msg.role === "user"
-                      ? "rounded-tr-sm bg-gradient-to-br from-brand to-cyan text-slate-900 dark:text-slate-900 dark:text-white"
-                      : "rounded-tl-sm border border-white/[0.04] bg-white/[0.02] text-slate-200"
+                      ? "rounded-tr-none bg-gradient-to-br from-brand to-purple-600 border-white/20 text-slate-900 font-bold"
+                      : "rounded-tl-none border-white/10 bg-white/[0.03] text-slate-100"
                   )}
                 >
                   {msg.content}
                 </div>
                 {msg.role === "assistant" && supported && (
-                  <div className="flex items-center gap-2 px-1">
+                  <div className="flex items-center gap-3 px-2">
                     <button
                       onClick={() => isSpeaking ? stop() : speak(msg.content)}
-                      className="text-[10px] flex items-center gap-1 text-slate-500 hover:text-cyan transition-colors"
+                      className="text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 text-slate-500 hover:text-brand transition-colors"
                     >
-                      {isSpeaking ? <VolumeX className="h-3 w-3" /> : <Volume2 className="h-3 w-3" />}
+                      {isSpeaking ? <VolumeX size={10} /> : <Volume2 size={10} />}
                       {isSpeaking ? "Stop" : "Listen"}
                     </button>
+                    <span className="text-[9px] font-black text-slate-700 uppercase tracking-widest">{new Date(msg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                   </div>
                 )}
               </div>
@@ -155,23 +156,29 @@ export function GlobalCopilotWidget() {
         </div>
 
         {/* Input Area */}
-        <div className="border-t border-white/[0.04] bg-white/[0.01] p-3">
-          <div className="flex items-end gap-2 rounded-xl border border-white/[0.06] bg-black/40 p-1.5 focus-within:border-cyan/50 focus-within:ring-1 focus-within:ring-cyan/50 transition-all">
-            <textarea
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Ask Veda..."
-              className="max-h-32 min-h-[40px] w-full resize-none bg-transparent px-3 py-2 text-sm text-slate-900 dark:text-slate-900 dark:text-white placeholder-slate-500 outline-none"
-              rows={1}
-            />
-            <button
-              onClick={() => void handleSendMessage()}
-              disabled={!draft.trim() || sending}
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-cyan text-slate-950 transition hover:bg-cyan/90 disabled:opacity-50 disabled:hover:bg-cyan"
-            >
-              {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-            </button>
+        <div className="p-4 bg-obsidian/50 border-t border-white/[0.04]">
+          <div className="relative group">
+             <div className="absolute -inset-0.5 bg-gradient-to-r from-brand to-purple-600 rounded-2xl blur opacity-0 group-focus-within:opacity-20 transition-opacity" />
+             <div className="relative flex items-end gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-1.5 focus-within:border-brand/40 transition-all">
+                <textarea
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Ask Veda anything..."
+                  className="max-h-32 min-h-[44px] w-full resize-none bg-transparent px-4 py-2.5 text-[13px] text-white placeholder-slate-600 outline-none"
+                  rows={1}
+                />
+                <button
+                  onClick={() => void handleSendMessage()}
+                  disabled={!draft.trim() || sending}
+                  className={cn(
+                    "grid h-10 w-10 shrink-0 place-items-center rounded-xl transition-all",
+                    draft.trim() ? "bg-brand text-slate-900 shadow-glow" : "bg-white/5 text-slate-600"
+                  )}
+                >
+                  {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4 fill-current" />}
+                </button>
+             </div>
           </div>
         </div>
       </div>

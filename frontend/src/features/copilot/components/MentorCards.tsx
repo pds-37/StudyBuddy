@@ -14,8 +14,10 @@ import {
   RefreshCw
 } from "lucide-react";
 import { cn } from "../../../lib/utils/cn";
+import { useNavigate } from "react-router-dom";
 
 export function InsightCard({ title, description, actionLabel, actionUrl }: any) {
+  const navigate = useNavigate();
   return (
     <Motion.div 
       initial={{ opacity: 0, y: 10 }}
@@ -41,6 +43,7 @@ export function InsightCard({ title, description, actionLabel, actionUrl }: any)
 }
 
 export function MissionCard({ title, description, onClick }: any) {
+  const navigate = useNavigate();
   return (
     <Motion.div 
       initial={{ opacity: 0, scale: 0.95 }}
@@ -56,7 +59,7 @@ export function MissionCard({ title, description, onClick }: any) {
         <h4 className="text-xl font-black text-slate-900 dark:text-slate-900 dark:text-white mb-2">{title}</h4>
         <p className="text-sm text-slate-400 leading-relaxed mb-6">{description}</p>
         <button 
-          onClick={onClick || (() => window.location.href = '/roadmap')}
+          onClick={onClick || (() => navigate('/roadmap'))}
           className="w-full py-3 rounded-2xl bg-cyan text-slate-950 text-xs font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-glow relative z-30"
         >
            Execute Mission
@@ -67,6 +70,7 @@ export function MissionCard({ title, description, onClick }: any) {
 }
 
 export function FocusSprintCard({ title, data, onClick }: any) {
+  const navigate = useNavigate();
   return (
     <Motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -89,7 +93,7 @@ export function FocusSprintCard({ title, data, onClick }: any) {
          </div>
       </div>
       <button 
-        onClick={onClick || (() => window.location.href = '/focus')}
+        onClick={onClick || (() => navigate('/focus'))}
         className="w-full py-3 rounded-2xl bg-purple-500 text-slate-900 dark:text-slate-900 dark:text-white text-xs font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-[0_0_20px_rgba(168,85,247,0.3)] relative z-30"
       >
          Start Focus Session
@@ -147,6 +151,7 @@ export function WarningCard({ title, description }: any) {
 }
 
 export function RecoveryPlanCard({ title, description, onClick }: any) {
+  const navigate = useNavigate();
   return (
     <Motion.div 
       initial={{ opacity: 0, scale: 0.9 }}
@@ -160,7 +165,7 @@ export function RecoveryPlanCard({ title, description, onClick }: any) {
       <h4 className="text-xl font-black text-slate-900 dark:text-slate-900 dark:text-white mb-2">{title}</h4>
       <p className="text-sm text-slate-300 leading-relaxed mb-6">{description}</p>
       <button 
-        onClick={onClick || (() => window.location.href = '/dashboard')}
+        onClick={onClick || (() => navigate('/dashboard'))}
         className="w-full py-3 rounded-2xl bg-emerald-400 text-slate-950 text-xs font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all relative z-30"
       >
          Adopt Strategy

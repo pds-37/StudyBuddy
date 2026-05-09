@@ -120,33 +120,24 @@ export function CopilotChat() {
 
       {/* ─── TOP STATUS BAR: MENTOR METRICS ─── */}
       <header className="shrink-0 px-8 py-8 border-b border-white/[0.06] bg-obsidian">
-         <div className="max-w-[1600px] mx-auto space-y-8">
+         <div className="max-w-[1600px] mx-auto">
             <div className="flex items-center justify-between">
-               <div>
-                  <h1 className="text-3xl font-black text-slate-900 dark:text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
-                     Veda AI <span className="text-brand font-normal text-sm border border-brand/20 px-2 py-0.5 rounded-lg bg-brand/5">Command Center</span>
-                  </h1>
-                  <p className="text-slate-400 text-sm mt-1 font-medium italic">Deeply contextual career guidance and adaptive study missions.</p>
-               </div>
-               <div className="flex items-center gap-4">
-                  <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-panel border border-white/[0.08] text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                     <History size={14} className="text-brand" />
-                     Mission: Graph Mastery
-                  </div>
-                  <button 
+                <div className="flex items-center gap-2 text-slate-400 text-sm font-medium">
+                   <span className="opacity-50">Veda</span>
+                   <ChevronRight size={14} className="opacity-30" />
+                   <span className="text-white font-bold">Command Center</span>
+                </div>
+                <div className="flex items-center gap-4">
+                   <button className="p-2 rounded-lg hover:bg-white/5 text-slate-400 transition-colors">
+                      <Send size={18} />
+                   </button>
+                   <button 
                     onClick={() => setIsInsightsVisible(!isInsightsVisible)}
                     className={cn("p-3 rounded-xl transition-colors", isInsightsVisible ? "bg-brand/10 text-brand shadow-glow" : "bg-panel border border-white/5 text-slate-400 hover:text-white")}
                   >
                      <LayoutDashboard size={18} />
                   </button>
                </div>
-            </div>
-
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-               <TopMetric label="Focus Score" value={`${(user as any)?.behaviorProfile?.consistencyScore || 0}%`} icon={Zap} color="text-blue-400" />
-               <TopMetric label="Recall Health" value={(user as any)?.behaviorProfile?.recallMomentum > 0 ? "Good" : "Learning"} icon={Brain} color="text-purple-400" />
-               <TopMetric label="Consistency" value={(user as any)?.behaviorProfile?.consistencyScore > 70 ? "High" : "Medium"} icon={Flame} color="text-orange-400" />
-               <TopMetric label="Burnout Risk" value={(user as any)?.behaviorProfile?.skipRate > 30 ? "High" : "Low"} icon={ShieldAlert} color="text-emerald-400" />
             </div>
          </div>
       </header>
@@ -155,121 +146,127 @@ export function CopilotChat() {
         {/* ─── LEFT SIDEBAR: SESSIONS ─── */}
         <Motion.aside 
           initial={false}
-          animate={{ width: isSidebarCollapsed ? 0 : 320, opacity: isSidebarCollapsed ? 0 : 1 }}
-          className="shrink-0 border-r border-white/[0.06] bg-ink"
+          animate={{ width: isSidebarCollapsed ? 0 : 280, opacity: isSidebarCollapsed ? 0 : 1 }}
+          className="shrink-0 bg-[#0d0d0d] relative z-20 flex flex-col h-full"
         >
-          <div className="p-6 space-y-6 min-w-[320px]">
-              <button 
-                onClick={() => createNewConversation()}
-                className="w-full p-4 rounded-2xl bg-brand text-slate-900 flex items-center justify-center gap-3 font-black text-xs uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-xl"
-              >
-                <Plus size={18} /> New Thread
-             </button>
+          <div className="p-3 flex flex-col h-full">
+              {/* TOP NAVIGATION */}
+              <div className="space-y-1 mb-6">
+                <button 
+                  onClick={() => createNewConversation()}
+                  className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-white/5 text-slate-200 transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center">
+                       <Bot size={16} />
+                    </div>
+                    <span className="text-sm font-medium">New chat</span>
+                  </div>
+                  <MessageSquare size={16} className="text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
+                
+                <button className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 text-slate-400 transition-colors">
+                  <History size={18} />
+                  <span className="text-sm font-medium">Search chats</span>
+                </button>
 
-             <div className="space-y-4">
-                <h3 className="px-2 text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Categories</h3>
-                <div className="space-y-2">
-                    {categories.map(cat => (
+                <button className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 text-slate-400 transition-colors">
+                  <Command size={18} />
+                  <span className="text-sm font-medium">Codex</span>
+                </button>
+              </div>
+
+              {/* GPTS / TOOLS SECTION */}
+              <div className="space-y-1 mb-8">
+                 <h3 className="px-3 text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-2">Veda GPTs</h3>
+                 {categories.map(cat => (
+                    <button 
+                       key={cat.id} 
+                       className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 text-slate-400 transition-colors group"
+                    >
+                       <div className={cn("w-6 h-6 rounded-md flex items-center justify-center bg-white/5", cat.color)}>
+                          <cat.icon size={14} />
+                       </div>
+                       <span className="text-sm font-medium">{cat.label}</span>
+                    </button>
+                 ))}
+              </div>
+
+              {/* HISTORY SECTION */}
+              <div className="flex-1 overflow-y-auto space-y-1 min-h-0 custom-scrollbar pr-1">
+                 <h3 className="px-3 text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-2">History</h3>
+                 {conversations.map(conv => {
+                    const active = currentConversation?._id === conv._id;
+                    return (
                       <button 
-                         key={cat.id} 
-                         onClick={() => handleSendMessage(`Analyze my ${cat.label} progress and suggest next steps.`)}
-                         className="w-full p-4 rounded-2xl flex items-center justify-between transition-all group hover:bg-white/[0.04] text-slate-300 hover:text-white"
+                        key={conv._id}
+                        onClick={() => selectConversation(conv._id)}
+                        className={cn(
+                          "w-full p-3 rounded-lg text-left transition-all group flex items-center justify-between",
+                          active ? "bg-white/10 text-white" : "text-slate-400 hover:text-white hover:bg-white/5"
+                        )}
                       >
-                         <div className="flex items-center gap-4">
-                            <cat.icon size={18} className={cn("transition-transform group-hover:scale-110", cat.color)} />
-                            <span className="text-sm font-bold">{cat.label}</span>
-                         </div>
-                         <ChevronRight size={14} className="text-brand opacity-0 group-hover:opacity-100 transition-opacity" />
+                         <span className="text-sm truncate flex-1">
+                           {conv.messages.find(m => m.role === "user")?.content || "New Session"}
+                         </span>
+                         {active && <div className="w-1.5 h-1.5 rounded-full bg-brand ml-2" />}
                       </button>
-                    ))}
-                 </div>
-             </div>
+                    );
+                 })}
+              </div>
 
-             <div className="space-y-4 flex-1">
-                <h3 className="px-2 text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Recent Missions</h3>
-                <div className="space-y-2 max-h-[400px] overflow-y-auto custom-scrollbar">
-                    {conversations.map(conv => {
-                      const active = currentConversation?._id === conv._id;
-                      return (
-                        <button 
-                          key={conv._id}
-                          onClick={() => selectConversation(conv._id)}
-                          className={cn(
-                            "w-full p-4 rounded-2xl text-left transition-all group",
-                            active ? "bg-white/[0.08] text-white shadow-lg" : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
-                          )}
-                        >
-                           <p className={cn("text-sm font-bold truncate mb-1", active ? "text-white" : "group-hover:text-white")}>
-                             {conv.messages.find(m => m.role === "user")?.content || "New Session"}
-                           </p>
-                           <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase">
-                              <Clock3 size={12} /> {formatDate(conv.updatedAt)}
-                           </div>
-                        </button>
-                      );
-                    })}
-                 </div>
-             </div>
+              {/* USER PROFILE */}
+              <div className="mt-auto pt-4 border-t border-white/5">
+                 <button className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 text-slate-200 transition-colors">
+                    <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center text-slate-900 font-bold text-xs">
+                       {user?.name?.substring(0, 2).toUpperCase() || "US"}
+                    </div>
+                    <span className="text-sm font-medium">{user?.name || "Priyanshu Tiwari"}</span>
+                 </button>
+              </div>
           </div>
         </Motion.aside>
 
         {/* ─── CENTER PANEL: MENTOR COMMAND CENTER ─── */}
-        <main className="flex-1 flex flex-col min-w-0 relative">
+        <main className="flex-1 flex flex-col min-w-0 bg-[#171717] relative">
           <div className="flex-1 overflow-y-auto custom-scrollbar px-6 py-10 scroll-smooth">
-             <div className="max-w-4xl mx-auto space-y-12">
+             <div className="max-w-3xl mx-auto space-y-10">
                 {visibleMessages.length === 0 ? (
-                  <Motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="py-20 text-center"
-                  >
-                     <div className="w-24 h-24 rounded-[3rem] bg-gradient-to-br from-brand to-purple-600 flex items-center justify-center text-white mx-auto mb-10 shadow-[0_20px_50px_rgba(124,92,255,0.3)]">
-                        <Sparkles size={44} />
-                     </div>
-                     <h1 className="text-4xl font-black text-white mb-4 leading-tight tracking-tight">Your AI Mentor Command Center.</h1>
-                     <p className="text-slate-400 max-w-md mx-auto leading-relaxed mb-12 text-base font-medium">
-                        Deeply contextual career guidance, behavior-aware execution, and adaptive study missions.
-                     </p>
-                     
-                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
-                        {suggestedPrompts.map(prompt => (
-                          <button
-                            key={prompt}
-                            onClick={() => handleSendMessage(prompt)}
-                            className="group p-5 rounded-3xl glass border-white/5 bg-panel hover:bg-panel/50 hover:border-brand/30 transition-all text-left relative overflow-hidden"
-                          >
-                            <div className="absolute top-0 right-0 p-3 text-slate-800 opacity-0 group-hover:opacity-100 transition-opacity">
-                               <ArrowRight size={20} />
-                            </div>
-                            <p className="text-xs font-black uppercase tracking-widest text-slate-500 mb-2 group-hover:text-brand transition-colors">Veda Prompt</p>
-                            <p className="text-sm font-bold text-slate-200 leading-snug">{prompt}</p>
-                          </button>
-                        ))}
-                     </div>
-                  </Motion.div>
+                   <div className="flex h-full flex-col items-center justify-center text-center py-20">
+                      <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center text-white mb-6">
+                         <Bot size={32} />
+                      </div>
+                      <h1 className="text-2xl font-bold text-white mb-8">How can I help you today?</h1>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-xl">
+                         {suggestedPrompts.map(prompt => (
+                           <button
+                             key={prompt}
+                             onClick={() => handleSendMessage(prompt)}
+                             className="p-4 rounded-xl border border-white/10 hover:bg-white/5 text-left transition-all"
+                           >
+                             <p className="text-sm font-medium text-slate-300">{prompt}</p>
+                           </button>
+                         ))}
+                      </div>
+                   </div>
                 ) : (
                   <>
                     {visibleMessages.map((msg, i) => (
                       <MentorMessage key={msg.id} message={msg} index={i} />
                     ))}
                     {sending && (
-                      <Motion.div 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="flex items-start gap-6"
-                      >
-                         <div className="w-10 h-10 rounded-2xl bg-brand/10 flex items-center justify-center text-brand animate-pulse">
-                            <Bot size={20} />
+                      <div className="flex gap-4 p-4">
+                         <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-white shrink-0">
+                            <Bot size={16} className="animate-spin" />
                          </div>
-                         <div className="space-y-3 pt-2">
-                            <div className="flex gap-2">
-                               <div className="w-2 h-2 rounded-full bg-brand/40 animate-bounce" style={{ animationDelay: '0ms' }} />
-                               <div className="w-2 h-2 rounded-full bg-brand/40 animate-bounce" style={{ animationDelay: '150ms' }} />
-                               <div className="w-2 h-2 rounded-full bg-brand/40 animate-bounce" style={{ animationDelay: '300ms' }} />
+                         <div className="space-y-2 pt-1">
+                            <div className="flex gap-1.5">
+                               <div className="w-1.5 h-1.5 rounded-full bg-slate-600 animate-pulse" />
+                               <div className="w-1.5 h-1.5 rounded-full bg-slate-600 animate-pulse delay-75" />
+                               <div className="w-1.5 h-1.5 rounded-full bg-slate-600 animate-pulse delay-150" />
                             </div>
-                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Veda is analyzing context...</p>
                          </div>
-                      </Motion.div>
+                      </div>
                     )}
                   </>
                 )}
@@ -277,45 +274,43 @@ export function CopilotChat() {
              </div>
           </div>
 
-          {/* ─── SMART INPUT AREA ─── */}
-          <div className="px-8 pb-8 pt-4">
-             <div className="max-w-4xl mx-auto">
-                <div className="flex flex-wrap gap-2 mb-6">
-                   <SuggestionChip icon={Target} label="Next Best Action" onClick={() => handleSendMessage("What should I do right now?")} />
-                   <SuggestionChip icon={AlertCircle} label="Why am I stuck?" onClick={() => handleSendMessage("Analyze why I am stuck and suggest a recovery plan.")} />
-                   <SuggestionChip icon={Clock3} label="1-Hour Session" onClick={() => handleSendMessage("Create a 1-hour adaptive study session for my current goals.")} />
-                </div>
-
+          {/* ─── CHATGPT STYLE INPUT ─── */}
+          <div className="px-6 pb-12 pt-4">
+             <div className="max-w-3xl mx-auto">
                 <div className="relative group">
-                   <div className="absolute -inset-1 bg-gradient-to-r from-brand to-purple-600 rounded-[2.5rem] blur opacity-10 group-focus-within:opacity-30 transition-opacity" />
-                    <div className="relative glass bg-ink">
-                       <MessageSquare size={18} className="text-slate-500 ml-4 hidden md:block" />
+                   <div className="relative bg-[#2f2f2f] rounded-[1.5rem] flex items-end p-2 pr-4 shadow-2xl">
+                       <button className="p-3 text-slate-400 hover:text-white transition-colors">
+                          <Plus size={20} />
+                       </button>
                        <textarea
                           ref={messageRef}
                           value={draft}
                           onChange={(e) => setDraft(e.target.value)}
                           onKeyDown={handleKeyDown}
-                          placeholder="Command Veda or ask anything..."
-                          className="flex-1 bg-transparent py-4 px-4 text-sm text-white outline-none resize-none max-h-40 min-h-[50px] custom-scrollbar placeholder-slate-600 font-medium"
+                          placeholder="Ask anything"
+                          className="flex-1 bg-transparent py-3 px-2 text-[16px] text-white outline-none resize-none max-h-40 min-h-[48px] custom-scrollbar placeholder-slate-500 font-normal leading-relaxed"
                           rows={1}
                        />
-                       <div className="flex items-center gap-3">
-                          <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-panel border border-white/10 text-[9px] font-black text-slate-500 uppercase tracking-widest">
-                             <Command size={10} /> Enter
-                          </div>
+                       <div className="flex items-center gap-2 pb-1.5">
+                          <button className="p-2 text-slate-400 hover:text-white transition-colors">
+                             <Sparkles size={20} />
+                          </button>
                           <button
                              onClick={() => void handleSendMessage()}
                              disabled={!draft.trim() || sending}
                              className={cn(
-                               "p-3 rounded-xl transition-all disabled:opacity-30 active:scale-95",
-                               draft.trim() ? "bg-brand text-black shadow-glow" : "bg-panel text-slate-600"
+                               "w-8 h-8 rounded-full flex items-center justify-center transition-all",
+                               draft.trim() ? "bg-white text-black" : "bg-[#676767] text-[#2f2f2f]"
                              )}
                           >
-                             {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                             <Send size={16} className="fill-current" />
                           </button>
                        </div>
                     </div>
                 </div>
+                <p className="text-center text-[11px] text-slate-600 mt-3">
+                   Veda can make mistakes. Check important info.
+                </p>
              </div>
           </div>
         </main>
@@ -444,34 +439,34 @@ function MentorMessage({ message, index }: { message: any; index: number }) {
 
   return (
     <Motion.div 
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
       className={cn(
-        "flex gap-6",
+        "flex gap-4 w-full group/msg",
         isUser ? "flex-row-reverse" : "flex-row"
       )}
     >
       <div className={cn(
-        "w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-lg border transition-all",
+        "w-8 h-8 rounded-full flex items-center justify-center shrink-0 border",
         isUser 
-          ? "bg-brand text-black border-brand/20 shadow-xl" 
-          : "bg-brand/10 border-brand/20 text-brand"
+          ? "bg-brand text-slate-900 border-brand/20" 
+          : "bg-white/10 border-white/10 text-white"
       )}>
-        {isUser ? <UserRound size={20} /> : <Bot size={20} />}
+        {isUser ? <UserRound size={16} /> : <Bot size={16} />}
       </div>
 
       <div className={cn(
-        "flex flex-col gap-4 max-w-[85%]",
+        "flex flex-col gap-2 max-w-[85%]",
         isUser ? "items-end" : "items-start"
       )}>
         <div className={cn(
-          "px-8 py-5 rounded-[2.2rem] text-sm leading-relaxed shadow-2xl backdrop-blur-3xl transition-all border group/msg relative",
+          "px-4 py-2 rounded-2xl text-[15px] leading-relaxed relative",
           isUser 
-            ? "bg-gradient-to-br from-brand to-purple-600 border-white/20 text-slate-900 rounded-tr-none" 
-            : "glass border-white/10 bg-white/[0.03] text-slate-100 rounded-tl-none"
+            ? "bg-[#2f2f2f] text-white" 
+            : "text-slate-100"
         )}>
-          <div className="whitespace-pre-wrap font-medium">{message.content}</div>
+          <div className="whitespace-pre-wrap">{message.content}</div>
           
           {!isUser && metadata?.saveableNote && (
             <button
@@ -482,27 +477,18 @@ function MentorMessage({ message, index }: { message: any; index: number }) {
                   console.error("Failed to save note:", err);
                 });
               }}
-              className="absolute -bottom-3 -right-3 px-3 py-1.5 rounded-full bg-emerald-500 text-obsidian text-[9px] font-black uppercase tracking-widest opacity-0 group-hover/msg:opacity-100 transition-all hover:scale-105 shadow-lg flex items-center gap-1.5 z-20"
+              className="mt-4 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-bold text-slate-400 hover:text-white transition-all opacity-0 group-hover/msg:opacity-100"
             >
               <Plus size={10} /> Save to Note
             </button>
           )}
-
         </div>
 
-
         {/* RICH METADATA CARDS */}
-        {!isUser && metadata && (
+        {!isUser && metadata && metadata.cards && metadata.cards.length > 0 && (
           <div className="w-full space-y-4 max-w-lg mt-2">
-             {metadata.behaviorAnalysis && (
-                <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-brand/5 border border-brand/10 text-[10px] font-bold text-brand uppercase tracking-widest">
-                   <TrendingUp size={12} />
-                   Behavior Insight: {metadata.behaviorAnalysis}
-                </div>
-             )}
-
              <div className="grid grid-cols-1 gap-4">
-                {metadata.cards?.map((card: any, i: number) => {
+                {metadata.cards.map((card: any, i: number) => {
                    switch (card.type) {
                      case 'insight': return <InsightCard key={i} {...card} />;
                      case 'mission': return <MissionCard key={i} {...card} />;
@@ -514,31 +500,13 @@ function MentorMessage({ message, index }: { message: any; index: number }) {
                    }
                 })}
              </div>
-
-             {metadata.nextBestAction && (
-                <div className="p-6 rounded-[2.5rem] bg-emerald-500/5 border border-emerald-500/20 group">
-                   <div className="flex items-center gap-2 mb-2">
-                      <Sparkles size={14} className="text-emerald-400" />
-                      <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Veda's Recommended Action</span>
-                   </div>
-                   <h4 className="text-sm font-black text-white mb-1">{metadata.nextBestAction.label}</h4>
-                   <p className="text-[11px] text-slate-500 mb-4">{metadata.nextBestAction.description}</p>
-                   <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-400 group-hover:text-emerald-300 transition-colors">
-                      Execute Now <ArrowRight size={12} />
-                   </button>
-                </div>
-             )}
           </div>
         )}
 
-        <div className="flex items-center gap-3 px-2">
-          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-            {isUser ? "Authorized User" : "Veda AI Mentor"}
-          </span>
-          <div className="w-1 h-1 rounded-full bg-slate-700" />
-          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-            {formatTime(message.createdAt)}
-          </span>
+        <div className="flex items-center gap-3 px-1 opacity-0 group-hover/msg:opacity-100 transition-opacity">
+           <span className="text-[10px] text-slate-600 font-medium">
+             {formatTime(message.createdAt)}
+           </span>
         </div>
       </div>
     </Motion.div>
