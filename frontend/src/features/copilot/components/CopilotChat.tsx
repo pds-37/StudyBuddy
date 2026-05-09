@@ -126,7 +126,7 @@ export function CopilotChat() {
                   <h1 className="text-3xl font-black text-slate-900 dark:text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
                      Veda AI <span className="text-brand font-normal text-sm border border-brand/20 px-2 py-0.5 rounded-lg bg-brand/5">Command Center</span>
                   </h1>
-                  <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 text-sm mt-1 font-medium italic">Deeply contextual career guidance and adaptive study missions.</p>
+                  <p className="text-slate-400 text-sm mt-1 font-medium italic">Deeply contextual career guidance and adaptive study missions.</p>
                </div>
                <div className="flex items-center gap-4">
                   <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-panel border border-white/[0.08] text-[11px] font-bold text-slate-400 uppercase tracking-widest">
@@ -167,13 +167,13 @@ export function CopilotChat() {
              </button>
 
              <div className="space-y-4">
-                <h3 className="px-2 text-[10px] font-black text-slate-600 uppercase tracking-[0.3em]">Categories</h3>
+                <h3 className="px-2 text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Categories</h3>
                 <div className="space-y-2">
                     {categories.map(cat => (
                       <button 
                          key={cat.id} 
                          onClick={() => handleSendMessage(`Analyze my ${cat.label} progress and suggest next steps.`)}
-                         className="w-full p-4 rounded-2xl flex items-center justify-between transition-all group hover:bg-panel text-slate-400 hover:text-white"
+                         className="w-full p-4 rounded-2xl flex items-center justify-between transition-all group hover:bg-white/[0.04] text-slate-300 hover:text-white"
                       >
                          <div className="flex items-center gap-4">
                             <cat.icon size={18} className={cn("transition-transform group-hover:scale-110", cat.color)} />
@@ -186,7 +186,7 @@ export function CopilotChat() {
              </div>
 
              <div className="space-y-4 flex-1">
-                <h3 className="px-2 text-[10px] font-black text-slate-600 uppercase tracking-[0.3em]">Recent Missions</h3>
+                <h3 className="px-2 text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Recent Missions</h3>
                 <div className="space-y-2 max-h-[400px] overflow-y-auto custom-scrollbar">
                     {conversations.map(conv => {
                       const active = currentConversation?._id === conv._id;
@@ -196,13 +196,13 @@ export function CopilotChat() {
                           onClick={() => selectConversation(conv._id)}
                           className={cn(
                             "w-full p-4 rounded-2xl text-left transition-all group",
-                            active ? "bg-panel text-white" : "text-slate-400 hover:text-white hover:bg-panel"
+                            active ? "bg-white/[0.08] text-white shadow-lg" : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
                           )}
                         >
                            <p className={cn("text-sm font-bold truncate mb-1", active ? "text-white" : "group-hover:text-white")}>
                              {conv.messages.find(m => m.role === "user")?.content || "New Session"}
                            </p>
-                           <div className="flex items-center gap-2 text-[10px] font-black text-slate-600 uppercase">
+                           <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase">
                               <Clock3 size={12} /> {formatDate(conv.updatedAt)}
                            </div>
                         </button>
@@ -331,7 +331,7 @@ export function CopilotChat() {
             >
               <div className="p-8 space-y-8 min-w-[360px]">
                  <div className="flex items-center justify-between">
-                    <h3 className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em]">AI Mentor Insights</h3>
+                    <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">AI Mentor Insights</h3>
                     <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                  </div>
 
@@ -377,7 +377,7 @@ export function CopilotChat() {
 
                  <div className="pt-8 border-t border-white/5">
                     <div className="flex items-center justify-between mb-4">
-                       <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Recall Momentum</span>
+                       <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Recall Momentum</span>
                        <span className="text-[10px] font-black text-emerald-400">+8%</span>
                     </div>
                     <div className="h-1 w-full bg-panel rounded-full overflow-hidden">
@@ -431,7 +431,7 @@ function InsightRow({ label, message, color, icon: Icon }: any) {
     <div className="space-y-2">
       <div className="flex items-center gap-2">
         <Icon size={14} className={color} />
-        <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{label}</span>
+        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{label}</span>
       </div>
       <p className="text-[11px] text-slate-300 font-medium leading-relaxed">{message}</p>
     </div>
@@ -468,8 +468,8 @@ function MentorMessage({ message, index }: { message: any; index: number }) {
         <div className={cn(
           "px-8 py-5 rounded-[2.2rem] text-sm leading-relaxed shadow-2xl backdrop-blur-3xl transition-all border group/msg relative",
           isUser 
-            ? "bg-gradient-to-br from-brand to-purple-600 border-white/20 text-black rounded-tr-none" 
-            : "glass border-white/10 bg-panel text-slate-100 rounded-tl-none"
+            ? "bg-gradient-to-br from-brand to-purple-600 border-white/20 text-slate-900 rounded-tr-none" 
+            : "glass border-white/10 bg-white/[0.03] text-slate-100 rounded-tl-none"
         )}>
           <div className="whitespace-pre-wrap font-medium">{message.content}</div>
           
@@ -532,11 +532,11 @@ function MentorMessage({ message, index }: { message: any; index: number }) {
         )}
 
         <div className="flex items-center gap-3 px-2">
-          <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest opacity-60">
+          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
             {isUser ? "Authorized User" : "Veda AI Mentor"}
           </span>
-          <div className="w-1 h-1 rounded-full bg-slate-800" />
-          <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest opacity-60">
+          <div className="w-1 h-1 rounded-full bg-slate-700" />
+          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
             {formatTime(message.createdAt)}
           </span>
         </div>

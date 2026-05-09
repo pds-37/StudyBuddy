@@ -28,7 +28,7 @@ export function InsightCard({ title, description, actionLabel, actionUrl }: any)
         </div>
         <div>
           <h4 className="text-sm font-black text-slate-900 dark:text-slate-900 dark:text-white mb-1 uppercase tracking-wider">{title}</h4>
-          <p className="text-xs text-slate-500 dark:text-slate-500 dark:text-slate-400 leading-relaxed">{description}</p>
+          <p className="text-xs text-slate-400 leading-relaxed">{description}</p>
           {actionLabel && (
              <button className="mt-4 text-[10px] font-black uppercase tracking-[0.2em] text-brand hover:text-brand/80 transition-colors flex items-center gap-2">
                 {actionLabel} <ArrowRight size={12} />
@@ -54,7 +54,7 @@ export function MissionCard({ title, description, onClick }: any) {
           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-400">Roadmap Mission</span>
         </div>
         <h4 className="text-xl font-black text-slate-900 dark:text-slate-900 dark:text-white mb-2">{title}</h4>
-        <p className="text-sm text-slate-700 dark:text-slate-700 dark:text-slate-300 leading-relaxed mb-6">{description}</p>
+        <p className="text-sm text-slate-400 leading-relaxed mb-6">{description}</p>
         <button 
           onClick={onClick || (() => window.location.href = '/roadmap')}
           className="w-full py-3 rounded-2xl bg-cyan text-slate-950 text-xs font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-glow relative z-30"
@@ -81,10 +81,10 @@ export function FocusSprintCard({ title, data, onClick }: any) {
       </div>
       <h3 className="text-lg font-black text-slate-900 dark:text-slate-900 dark:text-white mb-2">{title}</h3>
       <div className="flex items-center gap-4 mb-6">
-         <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 dark:text-slate-500 dark:text-slate-400">
+         <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
             <Clock size={14} /> {data?.duration || 45} mins
          </div>
-         <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 dark:text-slate-500 dark:text-slate-400">
+         <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
             <Target size={14} /> {data?.difficulty || "Medium"}
          </div>
       </div>
@@ -114,14 +114,14 @@ export function RecallChallenge({ title, data, onClick }: any) {
       </p>
       <div className="grid gap-2">
         {data?.options?.map((option: string, i: number) => (
-           <button 
-            key={i} 
-            onClick={() => onClick?.(option)}
-            className="w-full p-4 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-amber-400/40 hover:bg-white/[0.06] transition-all text-sm font-medium text-slate-700 dark:text-slate-700 dark:text-slate-300 text-left group flex items-center justify-between relative z-30"
-           >
-              {option}
-              <div className="w-5 h-5 rounded-full border border-slate-200 dark:border-slate-200 dark:border-white/10 group-hover:border-amber-400/40" />
-           </button>
+            <button 
+             key={i} 
+             onClick={() => onClick?.(option)}
+             className="w-full p-4 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-amber-400/40 hover:bg-white/[0.06] transition-all text-sm font-medium text-slate-300 text-left group flex items-center justify-between relative z-30"
+            >
+               {option}
+               <div className="w-5 h-5 rounded-full border border-white/10 group-hover:border-amber-400/40" />
+            </button>
         ))}
       </div>
     </Motion.div>
@@ -140,7 +140,7 @@ export function WarningCard({ title, description }: any) {
       </div>
       <div>
         <h4 className="text-sm font-black text-red-400 uppercase tracking-widest mb-1">{title}</h4>
-        <p className="text-xs text-slate-500 dark:text-slate-500 dark:text-slate-400 leading-relaxed">{description}</p>
+        <p className="text-xs text-slate-400 leading-relaxed">{description}</p>
       </div>
     </Motion.div>
   );
@@ -158,7 +158,7 @@ export function RecoveryPlanCard({ title, description, onClick }: any) {
         <span className="text-[10px] font-black uppercase tracking-[0.2em]">Recovery Plan</span>
       </div>
       <h4 className="text-xl font-black text-slate-900 dark:text-slate-900 dark:text-white mb-2">{title}</h4>
-      <p className="text-sm text-slate-700 dark:text-slate-700 dark:text-slate-300 leading-relaxed mb-6">{description}</p>
+      <p className="text-sm text-slate-300 leading-relaxed mb-6">{description}</p>
       <button 
         onClick={onClick || (() => window.location.href = '/dashboard')}
         className="w-full py-3 rounded-2xl bg-emerald-400 text-slate-950 text-xs font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all relative z-30"
