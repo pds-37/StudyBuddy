@@ -202,8 +202,14 @@ RULES:
 4. Use cinematic, encouraging language.
 5. Provide ONLY valid JSON.`;
 
-  const response = await requestGroq([{ role: "user", content: prompt }], 3000, "llama-3.3-70b-versatile");
-
+  let response: string;
+  try {
+    response = await requestGroq([{ role: "user", content: prompt }], 3000, "llama-3.3-70b-versatile");
+  } catch (error) {
+    console.warn("Groq 70b failed for roadmap generation, falling back to 8b-instant:", error);
+    // Fallback to a faster, more available model to ensure onboarding completion
+    response = await requestGroq([{ role: "user", content: prompt }], 3000, "llama-3.1-8b-instant");
+  }
 
   try {
     const parsed = JSON.parse(extractJsonPayload(response));
