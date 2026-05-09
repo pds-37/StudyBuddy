@@ -1,113 +1,244 @@
-# StudyBuddy — Featuring Veda AI
+<div align="center">
 
-StudyBuddy is a next-generation AI Career Copilot designed to bridge the gap between your educational notes and professional career goals. Powered by **Veda AI**, it provides contextual guidance, roadmap generation, and skill-gap analysis based on your unique study materials.
+# 🎓 StudyBuddy
+### Powered by **Veda AI**
+
+*An AI-powered Cognitive Career Operating System for modern students, self-learners, and aspiring engineers.*
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js](https://img.shields.io/badge/Node.js-v18+-green.svg)](https://nodejs.org/)
+[![React](https://img.shields.io/badge/React-Vite-blue.svg)](https://vitejs.dev/)
+[![MongoDB](https://img.shields.io/badge/Database-MongoDB-brightgreen.svg)](https://mongodb.com/)
+
+</div>
 
 ---
 
-## ✨ Key Features
+## 🌟 What is StudyBuddy?
 
-- **🧠 Contextual AI Copilot**: A RAG-powered chat assistant that knows your notes, resume, and target career path.
-- **📊 AI Skill Gap Analysis**: Automatically compares your current skill set against industry-standard role requirements using semantic matching.
-- **🗺️ Dynamic Roadmaps**: Converts identified skill gaps into actionable, week-by-week learning milestones.
-- **💼 Job Matcher**: A live job feed that scores every listing based on your personal skill profile and notes.
-- **💻 C++ Sync Agent**: A lightning-fast, offline-first CLI tool for Windows/Unix that securely syncs your local markdown notes (e.g., from Obsidian/VS Code) to the cloud.
+StudyBuddy is **not** just another roadmap app, notes tool, or job board.
+
+> It is a **fully adaptive AI Cognitive Career Operating System** that evolves with every student.
+
+The platform continuously understands how users learn, where they struggle, what they forget, how their interests evolve, and which career opportunities realistically fit them — combining all of this into one unified, intelligent system.
+
+---
+
+## ✨ Core Features
+
+### 🧠 Veda AI — Adaptive Career Mentor
+A context-aware AI mentor that knows your roadmap, notes, projects, resume, and learning patterns. Veda acts as your strategic mentor, learning coach, roadmap planner, and career guide — all in one.
+
+- Answers questions using your own personal notes
+- Detects burnout and rebalances your roadmap
+- Suggests projects and interview preparation
+- Generates adaptive, personalized learning paths
+
+### 🗺️ Adaptive Multi-Track Roadmaps
+Dynamic AI roadmaps tailored to your skill level, learning velocity, available time, and career goals — with full support for parallel tracks.
+
+```
+Frontend Engineering  +  AI Foundations  +  System Design
+→ All simultaneously, without resetting existing progress
+```
+
+### 🧠 AI Knowledge Intelligence System
+Transforms your notes into an **active cognitive memory system** — not just storage.
+
+- Semantic search across all your notes
+- Tracks memory decay and predicts forgetting
+- Generates active recall prompts
+- Builds knowledge graphs linking concepts to projects
+
+### 📊 AI Skill Gap Intelligence
+Continuously compares your skills, projects, and roadmap progress against real industry hiring patterns to generate:
+- Readiness scores
+- Missing skill detection
+- Interview weakness analysis
+- Personalized improvement plans
+
+### 💼 AI Career Opportunity Engine
+An intelligent opportunity matching and readiness engine — not a generic job board.
+- Matches opportunities to your actual readiness
+- Provides ATS alignment analysis
+- Generates rejection recovery roadmaps
+- Tracks market trend intelligence
+
+### 📄 AI Resume Intelligence System
+A contextual AI-powered resume strategist that lets you maintain multiple role-specific versions.
+
+```
+Frontend Resume  |  AI Resume  |  Startup Resume  |  Internship Resume
+```
+
+- ATS analysis and JD keyword extraction
+- Resume vs job gap analysis
+- Bullet point impact rewriting
+- Interview alignment prediction
+
+### 🔁 Adaptive Recall & Memory System
+Spaced repetition powered by forgetting curve analysis to continuously reinforce weak concepts and interview-critical topics.
+
+### 🧩 Hybrid Career Intelligence
+Intelligently detects emerging hybrid career paths:
+
+| Track Combination | Detected Role |
+|---|---|
+| Frontend + AI | AI Frontend Engineer |
+| Backend + DevOps | Cloud Infrastructure Engineer |
+| AI + Cybersecurity | AI Security Engineer |
+
+### 💻 Offline-First C++ Sync Agent
+A high-performance C++17 CLI agent for local-first workflows, Obsidian/VS Code users, and terminal-based learning.
 
 ---
 
 ## 🏗️ Architecture
 
-The project is a Monorepo built for scalability and performance:
+```
+studybuddy/
+├── /frontend              # React + Vite SPA
+├── /backend               # Node.js + Express API
+│   └── /cpp-agent         # C++17 Offline Sync Agent
+└── /packages/shared       # Shared TypeScript types & Zod schemas
+```
 
-- **`/frontend`**: React + Vite SPA with TailwindCSS and Framer Motion.
-- **`/backend`**: Node.js + Express.js API with MongoDB and HuggingFace/Gemini/Groq AI integration.
-- **`/backend/cpp-agent`**: A high-performance C++17 CLI tool for local file operations and cloud syncing.
-- **`/packages/shared`**: Shared TypeScript types and Zod schemas for end-to-end type safety.
+### Frontend
+`React` · `Vite` · `TailwindCSS` · `Framer Motion` · `Zustand` · `Lucide Icons`
+
+### Backend
+`Node.js` · `Express.js` · `MongoDB` · `Mongoose` · `Zod` · `JWT`
+
+### AI Stack
+| Model | Used For |
+|---|---|
+| **Groq** | Low-latency mentor chat, conversational reasoning, realtime roadmap assistance |
+| **Google Gemini** | Roadmap generation, long-term planning, adaptive curriculum structuring |
+| **HuggingFace** | Semantic embeddings, note understanding, retrieval & knowledge graph systems |
+
+### CLI Agent
+`C++17` · `CPR` · `Nlohmann JSON`
 
 ---
 
 ## 🚀 Getting Started
 
-### 1. Prerequisites
+### Prerequisites
 
-- [Node.js v18+](https://nodejs.org/)
-- [MongoDB](https://www.mongodb.com/) (Local or Atlas)
-- [Cmake](https://cmake.org/) (Only for building the C++ Agent from source)
+- Node.js v18+
+- MongoDB
+- CMake *(for C++ Agent)*
 
-### 2. Environment Setup
+### 1. Clone & Configure
 
-1. Copy the example environment file at the root:
-   ```bash
-   cp .env.example .env
-   ```
-2. Fill in your API keys for **Groq**, **Google Gemini**, and **HuggingFace** in the `backend/.env` file.
+```bash
+git clone https://github.com/your-username/studybuddy.git
+cd studybuddy
+cp .env.example .env
+```
 
-### 3. Running the Web Platform
+Edit `backend/.env` with your API keys:
 
-Install dependencies:
+```env
+GROQ_API_KEY=your_groq_key
+GEMINI_API_KEY=your_gemini_key
+HUGGINGFACE_API_KEY=your_hf_key
+MONGODB_URI=your_mongodb_uri
+JWT_SECRET=your_jwt_secret
+```
+
+### 2. Install Dependencies
+
 ```bash
 npm install
 ```
 
-Start both backend and frontend in development mode:
+### 3. Run Development Servers
+
 ```bash
 npm run dev
 ```
 
-The app will be available at `http://localhost:5173`.
+Frontend available at: `http://localhost:5173`
 
 ---
 
-## 💻 Using the C++ Sync Agent (CLI)
+## 💻 C++ Sync Agent
 
-The StudyBuddy Agent allows you to manage your notes locally and sync them to your cloud profile.
+### Install (Windows)
 
-### Installation (Windows)
-We provide a simple PowerShell script to install the agent:
 ```powershell
 powershell -ExecutionPolicy Bypass -File "backend/cpp-agent/install.ps1"
 ```
-After installation, restart your terminal and type `studybuddy help`.
 
-### Initial Setup
-1. **Login** to the StudyBuddy web dashboard.
-2. Go to **Settings** to find your **API Token** and **User ID**.
-3. Configure the CLI:
-   ```bash
-   studybuddy config set sync_url http://localhost:5000/api
-   studybuddy config set auth_token <YOUR_TOKEN>
-   studybuddy config set user_id <YOUR_USER_ID>
-   ```
+Restart your terminal, then configure:
 
-### Commands
-- `studybuddy note add "Title"`: Create a new note from the terminal.
-- `studybuddy sync push`: Securely push local notes to the cloud.
-- `studybuddy sync pull`: Retrieve cloud notes to your local machine.
-- `studybuddy chat`: Start an AI-powered career consultation in your terminal.
+```bash
+studybuddy config set sync_url http://localhost:5000/api
+studybuddy config set auth_token <YOUR_TOKEN>
+studybuddy config set user_id <YOUR_USER_ID>
+```
+
+### CLI Commands
+
+```bash
+# Create a note
+studybuddy note add "Title"
+
+# Push notes to cloud
+studybuddy sync push
+
+# Pull notes from cloud
+studybuddy sync pull
+
+# Start AI mentor session in terminal
+studybuddy chat
+
+# View all commands
+studybuddy help
+```
 
 ---
 
 ## ☁️ Deployment
 
-The project includes a `render.yaml` blueprint for easy deployment to **Render**.
+One-click deployment via [Render](https://render.com) using the included `render.yaml`:
 
-1. Connect your GitHub repository to Render.
-2. Create a new **Blueprint**.
-3. Render will automatically provision:
-   - The Node.js API Web Service.
-   - The Static Site for the React Frontend.
-   - All necessary build/start commands.
+```bash
+# Provisions automatically:
+# ✅ Backend API service
+# ✅ React frontend
+# ✅ Environment configuration
+# ✅ Build pipelines
+```
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Full Tech Stack
 
-- **Frontend**: React, TailwindCSS, Zustand, Framer Motion, Lucide Icons.
-- **Backend**: Node.js, Express, Mongoose, Zod, JWT.
-- **AI/ML**: HuggingFace (Embeddings), Groq (LLM Inference), Google Gemini (Roadmap Generation).
-- **CLI**: C++17, CPR (HTTP client), Nlohmann JSON.
+| Layer | Technologies |
+|---|---|
+| **Frontend** | React, Vite, TailwindCSS, Framer Motion, Zustand, Lucide Icons |
+| **Backend** | Node.js, Express.js, MongoDB, Mongoose, Zod, JWT |
+| **AI/ML** | HuggingFace Embeddings, Groq LLM, Google Gemini, Semantic Search, Knowledge Graphs |
+| **CLI** | C++17, CPR, Nlohmann JSON |
+| **Deployment** | Render (render.yaml) |
+
+---
+
+## 🌟 Long-Term Vision
+
+> A platform that continuously understands how students learn, how memory changes, how careers evolve, how motivation fluctuates, and how opportunities emerge — then intelligently adapts everything in real time.
+
+StudyBuddy is built to grow from a student companion into a fully autonomous AI career operating system.
 
 ---
 
 ## 📄 License
 
-MIT © 2026 StudyBuddy AI.
+MIT © 2026 StudyBuddy AI
+
+---
+<div align="center">
+  <i>Built for students who refuse to learn the ordinary way.</i>
+</div>
