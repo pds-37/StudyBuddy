@@ -62,7 +62,7 @@ export function SkillGapPage() {
         animate={{ opacity: 1, y: 0 }}
         className="relative z-20 mb-10"
       >
-        <div className="rounded-[3rem] p-10 bg-gradient-to-br from-white/[0.05] to-transparent border border-white/[0.08] backdrop-blur-xl shadow-2xl relative overflow-hidden group">
+        <div className="rounded-[3rem] p-10 bg-gradient-to-br from-white/[0.05] to-transparent border border-white/[0.08] shadow-2xl relative overflow-hidden group">
            {/* Decorative Elements */}
            <div className="absolute top-0 right-0 w-96 h-96 bg-brand/10 blur-[120px] -mr-48 -mt-48 rounded-full" />
            <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan/5 blur-[100px] -ml-32 -mb-32 rounded-full" />
@@ -80,7 +80,7 @@ export function SkillGapPage() {
                  </p>
               </div>
               
-              <div className="flex flex-col sm:flex-row items-center gap-8 bg-black/40 border border-white/5 p-8 rounded-[2.5rem] backdrop-blur-md">
+              <div className="flex flex-col sm:flex-row items-center gap-8 bg-black/40 border border-white/5 p-8 rounded-[2.5rem]">
                  <ReadinessRing score={data.overallScore || 0} label="Readiness" />
                  <div className="hidden sm:block w-px h-24 bg-slate-100 dark:bg-slate-100 dark:bg-white/10" />
                  <div className="grid grid-cols-1 gap-5 min-w-[220px]">
@@ -181,7 +181,7 @@ export function SkillGapPage() {
            )}
 
            {/* Blockers Panel */}
-           <section className="p-8 rounded-[3rem] bg-white/[0.02] border border-white/[0.06] backdrop-blur-md">
+           <section className="p-8 rounded-[3rem] bg-white/[0.02] border border-white/[0.06]">
               <h3 className="text-[10px] font-black text-red-400 uppercase tracking-[0.3em] mb-8 flex items-center gap-2">
                  <ShieldAlert size={16} /> Critical Blockers
               </h3>
@@ -197,7 +197,7 @@ export function SkillGapPage() {
            </section>
 
            {/* Predictive Insights Panel */}
-           <section className="p-8 rounded-[3rem] bg-white/[0.02] border border-white/[0.06] backdrop-blur-md">
+           <section className="p-8 rounded-[3rem] bg-white/[0.02] border border-white/[0.06]">
               <h3 className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.3em] mb-8 flex items-center gap-2">
                  <TrendingUp size={16} /> Predictive Insights
               </h3>
