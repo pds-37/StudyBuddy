@@ -172,14 +172,17 @@ export function OnboardingPage() {
 
         {/* Navigation buttons */}
         {!showProfile && (
-          <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/[0.04]">
+          <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/[0.04]">
             <button type="button" onClick={handleBack} disabled={step === 0}
-              className="px-5 py-2.5 text-sm text-slate-500 hover:text-slate-900 dark:text-white transition disabled:opacity-30 disabled:cursor-not-allowed">
+              className="px-6 py-2.5 text-sm font-medium text-slate-400 hover:text-white transition-all disabled:opacity-20 disabled:cursor-not-allowed">
               ← Back
             </button>
             <button type="button" onClick={handleNext} disabled={!canAdvance}
-              className="rounded-xl bg-white px-6 py-2.5 text-sm font-bold text-slate-950 transition-all hover:bg-cyan-400 hover:shadow-[0_0_20px_rgba(34,211,238,0.15)] disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white">
-              {step === TOTAL_STEPS - 1 ? "See my profile →" : "Continue →"}
+              className="group relative overflow-hidden rounded-xl bg-[#F8FAFC] px-8 py-3 text-sm font-bold text-[#05070A] transition-all hover:bg-cyan-400 hover:shadow-[0_0_30px_rgba(34,211,238,0.3)] disabled:opacity-20 disabled:cursor-not-allowed disabled:hover:bg-[#F8FAFC]">
+              <span className="relative z-10 flex items-center gap-2">
+                {step === TOTAL_STEPS - 1 ? "See my profile" : "Continue"} 
+                <Motion.span animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>→</Motion.span>
+              </span>
             </button>
           </div>
         )}

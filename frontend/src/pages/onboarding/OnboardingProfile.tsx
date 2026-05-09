@@ -71,10 +71,10 @@ export function OnboardingProfile({ data, onComplete, isSubmitting }: Props) {
 
       <Motion.div className="pt-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
         <button type="button" onClick={onComplete} disabled={isSubmitting}
-          className="w-full rounded-2xl bg-gradient-to-r from-cyan to-blue-600 px-6 py-4 text-sm font-bold text-slate-950 transition-all hover:scale-[1.01] hover:shadow-[0_0_30px_rgba(40,176,243,0.3)] disabled:opacity-50 disabled:cursor-not-allowed">
+          className="w-full rounded-2xl bg-gradient-to-r from-cyan to-blue-600 px-6 py-4 text-sm font-bold text-[#05070A] transition-all hover:scale-[1.01] hover:shadow-[0_0_30px_rgba(40,176,243,0.3)] disabled:opacity-50 disabled:cursor-not-allowed">
           {isSubmitting ? (
             <span className="flex items-center justify-center gap-2">
-              <Motion.span className="w-4 h-4 border-2 border-slate-950/30 border-t-slate-950 rounded-full inline-block"
+              <Motion.span className="w-4 h-4 border-2 border-[#05070A]/30 border-t-[#05070A] rounded-full inline-block"
                 animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }} />
               Generating your adaptive roadmap...
             </span>
