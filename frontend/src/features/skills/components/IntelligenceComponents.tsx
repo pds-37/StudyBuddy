@@ -19,9 +19,9 @@ export function SkillMatrixCard({ gap }: { gap: SkillGapItem }) {
     <Motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-8 rounded-[3rem] glass border-white/[0.08] bg-white/[0.01] relative overflow-hidden group hover:bg-white/[0.03] transition-all duration-500 shadow-2xl"
+      className="p-8 rounded-[3rem] glass border-white/[0.08] bg-white/[0.01] relative overflow-hidden group hover:bg-white/[0.03] transition-all duration-500"
     >
-      <div className="absolute top-0 right-0 w-32 h-32 bg-brand/5 blur-3xl -mr-16 -mt-16 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute top-0 right-0 w-32 h-32 -mr-16 -mt-16 rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(124,92,255,0.05) 0%, transparent 70%)' }} />
       
       <div className="flex items-start justify-between mb-8 relative z-10">
         <div>

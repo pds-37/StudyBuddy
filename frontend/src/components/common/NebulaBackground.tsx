@@ -32,7 +32,8 @@ export function NebulaBackground({
           y: [0, -20, 0]
         }}
         transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute -top-[10%] -left-[5%] w-[50%] h-[50%] rounded-full bg-brand/20 blur-[100px]" 
+        className="absolute -top-[10%] -left-[5%] w-[50%] h-[50%] rounded-full" 
+        style={{ background: 'radial-gradient(circle, rgba(124, 92, 255, 0.15) 0%, transparent 60%)' }}
       />
 
       {/* Animated Cyan Glow */}
@@ -44,11 +45,15 @@ export function NebulaBackground({
           y: [0, 10, 0]
         }}
         transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-[-5%] right-[-5%] w-[45%] h-[45%] rounded-full bg-cyan/15 blur-[120px]" 
+        className="absolute bottom-[-5%] right-[-5%] w-[45%] h-[45%] rounded-full" 
+        style={{ background: 'radial-gradient(circle, rgba(34, 211, 238, 0.1) 0%, transparent 60%)' }}
       />
 
       {/* Subtle Central Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand/5 blur-[140px] rounded-full" />
+      <div 
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full" 
+        style={{ background: 'radial-gradient(circle, rgba(124, 92, 255, 0.05) 0%, transparent 60%)' }}
+      />
     </div>
   );
 }

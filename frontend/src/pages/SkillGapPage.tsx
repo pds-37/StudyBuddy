@@ -62,10 +62,10 @@ export function SkillGapPage() {
         animate={{ opacity: 1, y: 0 }}
         className="relative z-20 mb-10"
       >
-        <div className="rounded-[3rem] p-10 bg-gradient-to-br from-white/[0.05] to-transparent border border-white/[0.08] shadow-2xl relative overflow-hidden group">
+        <div className="rounded-[3rem] p-10 bg-gradient-to-br from-white/[0.05] to-transparent border border-white/[0.08] relative overflow-hidden group">
            {/* Decorative Elements */}
-           <div className="absolute top-0 right-0 w-96 h-96 bg-brand/10 blur-[120px] -mr-48 -mt-48 rounded-full" />
-           <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan/5 blur-[100px] -ml-32 -mb-32 rounded-full" />
+           <div className="absolute top-0 right-0 w-96 h-96 -mr-48 -mt-48 pointer-events-none rounded-full" style={{ background: 'radial-gradient(circle, rgba(124,92,255,0.15) 0%, transparent 70%)' }} />
+           <div className="absolute bottom-0 left-0 w-64 h-64 -ml-32 -mb-32 pointer-events-none rounded-full" style={{ background: 'radial-gradient(circle, rgba(34,211,238,0.08) 0%, transparent 70%)' }} />
            
            <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
               <div className="flex-1 text-center lg:text-left">
@@ -116,7 +116,7 @@ export function SkillGapPage() {
                      initial={{ opacity: 0, scale: 0.95 }}
                      animate={{ opacity: 1, scale: 1 }}
                      transition={{ delay: i * 0.1 }}
-                     className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 hover:border-brand/30 transition-all group shadow-xl"
+                     className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 hover:border-brand/30 transition-all group"
                    >
                       <div className="flex items-center justify-between mb-4">
                          <span className="text-xl font-black text-slate-900 dark:text-slate-900 dark:text-white group-hover:text-brand transition-colors">{match.role}</span>
@@ -166,8 +166,8 @@ export function SkillGapPage() {
            
            {/* Recovery Plan - High Priority */}
            {data.recommendations?.recoveryPlan && (
-             <section className="p-8 rounded-[3rem] bg-gradient-to-br from-brand/20 to-brand/5 border border-brand/30 relative overflow-hidden group shadow-[0_20px_50px_rgba(124,92,255,0.1)]">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-slate-100 dark:bg-slate-100 dark:bg-white/10 blur-3xl -mr-16 -mt-16 rounded-full" />
+             <section className="p-8 rounded-[3rem] bg-gradient-to-br from-brand/20 to-brand/5 border border-brand/30 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 -mr-16 -mt-16 pointer-events-none rounded-full" style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)' }} />
                 <h3 className="text-sm font-black text-slate-900 dark:text-slate-900 dark:text-white uppercase tracking-[0.2em] mb-4 flex items-center gap-2 relative z-10">
                    <Zap size={18} className="text-brand fill-brand" /> Recovery Strategy
                 </h3>

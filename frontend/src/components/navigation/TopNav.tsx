@@ -122,7 +122,7 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
               </Link>
               <Link 
                 to="/auth" 
-                className="px-6 py-3 rounded-full bg-slate-900 dark:bg-white text-white dark:text-obsidian text-sm font-black hover:bg-slate-800 dark:hover:bg-slate-200 transition-all hover:scale-105 shadow-xl"
+                className="px-6 py-3 rounded-full bg-white text-slate-900 text-sm font-black hover:bg-slate-200 transition-all hover:scale-105 shadow-xl"
               >
                 Get Started
               </Link>
@@ -157,7 +157,7 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
                <Link to="/auth" className="block w-full py-3 text-center rounded-xl border border-slate-200 dark:border-slate-200 dark:border-white/10 text-slate-900 dark:text-slate-900 dark:text-white font-medium">
                  Sign in
                </Link>
-               <Link to="/auth" className="block w-full py-3 text-center rounded-xl bg-white text-obsidian font-bold">
+               <Link to="/auth" className="block w-full py-3 text-center rounded-xl bg-white text-slate-900 font-bold">
                  Get Started
                </Link>
              </div>
