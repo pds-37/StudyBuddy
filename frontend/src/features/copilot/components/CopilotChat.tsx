@@ -1,60 +1,42 @@
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
-import { motion as Motion, AnimatePresence } from "framer-motion";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type RefObject } from "react";
+import { AnimatePresence, motion as Motion } from "framer-motion";
 import {
-  AlertCircle,
   Bot,
-  Clock3,
+  Check,
   Loader2,
-  Plus,
-  RefreshCw,
-  Send,
-  Sparkles,
-  UserRound,
-  PanelLeftClose,
-  PanelLeftOpen,
-  Brain,
-  Zap,
-  Flame,
-  Target,
-  ArrowRight,
-  TrendingUp,
+  Menu,
   MessageSquare,
-  History,
-  LayoutDashboard,
-  ShieldAlert,
-  ChevronRight,
-  Command
+  Plus,
+  Search,
+  Send,
+  UserRound,
+  X
 } from "lucide-react";
-import { cn } from "../../../lib/utils/cn";
-import { NebulaBackground } from "../../../components/common/NebulaBackground";
-import { formatTime, formatDate } from "../../../lib/utils/date";
-import { useCopilotStore } from "../../../store/copilot-store";
-import { useAppStore } from "../../../store/app-store";
 import type { CopilotMessage } from "@studybuddy/shared";
+import { cn } from "../../../lib/utils/cn";
+import { formatTime } from "../../../lib/utils/date";
 import * as notesApi from "../../../lib/api/notes";
-
-import { 
-  InsightCard, 
-  MissionCard, 
-  FocusSprintCard, 
-  RecallChallenge, 
-  WarningCard, 
-  RecoveryPlanCard 
+import { useAppStore } from "../../../store/app-store";
+import { useCopilotStore } from "../../../store/copilot-store";
+import {
+  FocusSprintCard,
+  InsightCard,
+  MissionCard,
+  RecallChallenge,
+  RecoveryPlanCard,
+  WarningCard
 } from "./MentorCards";
 
-const suggestedPrompts = [
-  "What should I focus on right now?",
-  "Why am I stuck lately?",
-  "Create a 1-hour study session",
-  "Analyze my roadmap progress"
+const starterPrompts = [
+  "What should I work on today?",
+  "Help me understand what I am stuck on",
+  "Make a focused study plan",
+  "Review my progress and suggest the next step"
 ] as const;
 
-const categories = [
-  { id: "career", label: "Career Path", icon: Target, color: "text-cyan-400" },
-  { id: "dsa", label: "DSA & Mastery", icon: Brain, color: "text-purple-400" },
-  { id: "recall", label: "Recall Recovery", icon: RefreshCw, color: "text-amber-400" },
-  { id: "recovery", label: "Focus Sprint", icon: Zap, color: "text-blue-400" }
-];
+function getConversationTitle(messages: CopilotMessage[]) {
+  return messages.find((message) => message.role === "user")?.content ?? "New chat";
+}
 
 export function CopilotChat() {
   const {
@@ -70,11 +52,11 @@ export function CopilotChat() {
     clearError
   } = useCopilotStore();
 
-  const user = useAppStore(state => state.user);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [isInsightsVisible, setIsInsightsVisible] = useState(true);
+  const user = useAppStore((state) => state.user);
   const [draft, setDraft] = useState("");
-  const messageRef = useRef<HTMLTextAreaElement>(null);
+  const [historyQuery, setHistoryQuery] = useState("");
+  const [mobileHistoryOpen, setMobileHistoryOpen] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const visibleMessages = useMemo(
@@ -82,27 +64,38 @@ export function CopilotChat() {
     [currentConversation?.messages]
   );
 
+  const filteredConversations = useMemo(() => {
+    const query = historyQuery.trim().toLowerCase();
+    if (!query) return conversations;
+    return conversations.filter((conversation) =>
+      getConversationTitle(conversation.messages).toLowerCase().includes(query)
+    );
+  }, [conversations, historyQuery]);
+
   useEffect(() => {
     void fetchConversations();
   }, [fetchConversations]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [visibleMessages, sending]);
 
   useEffect(() => {
-    if (!messageRef.current) return;
-    messageRef.current.style.height = "0px";
-    messageRef.current.style.height = `${Math.min(messageRef.current.scrollHeight, 160)}px`;
+    if (!textareaRef.current) return;
+    textareaRef.current.style.height = "0px";
+    textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 160)}px`;
   }, [draft]);
 
   const handleSendMessage = async (text?: string) => {
-    const messageToSend = text || draft.trim();
+    const messageToSend = text ?? draft.trim();
     if (!messageToSend || sending) return;
+
     setDraft("");
+    clearError();
+
     try {
       await storeSendMessage(messageToSend);
-    } catch (error) {
+    } catch {
       setDraft(messageToSend);
     }
   };
@@ -114,401 +107,375 @@ export function CopilotChat() {
     }
   };
 
+  const handleNewChat = () => {
+    void createNewConversation();
+    setMobileHistoryOpen(false);
+  };
+
+  const handleSelectChat = (conversationId: string) => {
+    selectConversation(conversationId);
+    setMobileHistoryOpen(false);
+  };
+
   return (
-    <div className="flex flex-col h-full overflow-hidden relative">
-      <NebulaBackground opacity={0.3} showGrid={false} />
+    <div className="flex h-[calc(100vh-96px)] min-h-[620px] overflow-hidden rounded-lg border border-white/[0.06] bg-[#0f1117]">
+      <ChatHistory
+        conversations={filteredConversations}
+        activeConversationId={currentConversation?._id}
+        query={historyQuery}
+        loading={loading}
+        onQueryChange={setHistoryQuery}
+        onNewChat={handleNewChat}
+        onSelectChat={handleSelectChat}
+        className="hidden lg:flex"
+      />
 
-      {/* ─── TOP STATUS BAR: MENTOR METRICS ─── */}
-      <header className="shrink-0 px-8 py-8 border-b border-white/[0.06] bg-obsidian">
-         <div className="max-w-[1600px] mx-auto">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-slate-400 text-sm font-medium">
-                   <span className="opacity-50">Veda</span>
-                   <ChevronRight size={14} className="opacity-30" />
-                   <span className="text-white font-bold">Command Center</span>
-                </div>
-                <div className="flex items-center gap-4">
-                   <button className="p-2 rounded-lg hover:bg-white/5 text-slate-400 transition-colors">
-                      <Send size={18} />
-                   </button>
-                   <button 
-                    onClick={() => setIsInsightsVisible(!isInsightsVisible)}
-                    className={cn("p-3 rounded-xl transition-colors", isInsightsVisible ? "bg-brand/10 text-brand shadow-glow" : "bg-panel border border-white/5 text-slate-400 hover:text-white")}
-                  >
-                     <LayoutDashboard size={18} />
-                  </button>
-               </div>
-            </div>
-         </div>
-      </header>
-
-      <div className="flex-1 flex overflow-hidden">
-        {/* ─── LEFT SIDEBAR: SESSIONS ─── */}
-        <Motion.aside 
-          initial={false}
-          animate={{ width: isSidebarCollapsed ? 0 : 280, opacity: isSidebarCollapsed ? 0 : 1 }}
-          className="shrink-0 bg-[#0d0d0d] relative z-20 flex flex-col h-full"
-        >
-          <div className="p-3 flex flex-col h-full">
-              {/* TOP NAVIGATION */}
-              <div className="space-y-1 mb-6">
-                <button 
-                  onClick={() => createNewConversation()}
-                  className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-white/5 text-slate-200 transition-colors group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center">
-                       <Bot size={16} />
-                    </div>
-                    <span className="text-sm font-medium">New chat</span>
-                  </div>
-                  <MessageSquare size={16} className="text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </button>
-                
-                <button className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 text-slate-400 transition-colors">
-                  <History size={18} />
-                  <span className="text-sm font-medium">Search chats</span>
-                </button>
-
-                <button className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 text-slate-400 transition-colors">
-                  <Command size={18} />
-                  <span className="text-sm font-medium">Codex</span>
-                </button>
-              </div>
-
-              {/* GPTS / TOOLS SECTION */}
-              <div className="space-y-1 mb-8">
-                 <h3 className="px-3 text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-2">Veda GPTs</h3>
-                 {categories.map(cat => (
-                    <button 
-                       key={cat.id} 
-                       className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 text-slate-400 transition-colors group"
-                    >
-                       <div className={cn("w-6 h-6 rounded-md flex items-center justify-center bg-white/5", cat.color)}>
-                          <cat.icon size={14} />
-                       </div>
-                       <span className="text-sm font-medium">{cat.label}</span>
-                    </button>
-                 ))}
-              </div>
-
-              {/* HISTORY SECTION */}
-              <div className="flex-1 overflow-y-auto space-y-1 min-h-0 custom-scrollbar pr-1">
-                 <h3 className="px-3 text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-2">History</h3>
-                 {conversations.map(conv => {
-                    const active = currentConversation?._id === conv._id;
-                    return (
-                      <button 
-                        key={conv._id}
-                        onClick={() => selectConversation(conv._id)}
-                        className={cn(
-                          "w-full p-3 rounded-lg text-left transition-all group flex items-center justify-between",
-                          active ? "bg-white/10 text-white" : "text-slate-400 hover:text-white hover:bg-white/5"
-                        )}
-                      >
-                         <span className="text-sm truncate flex-1">
-                           {conv.messages.find(m => m.role === "user")?.content || "New Session"}
-                         </span>
-                         {active && <div className="w-1.5 h-1.5 rounded-full bg-brand ml-2" />}
-                      </button>
-                    );
-                 })}
-              </div>
-
-              {/* USER PROFILE */}
-              <div className="mt-auto pt-4 border-t border-white/5">
-                 <button className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 text-slate-200 transition-colors">
-                    <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center text-slate-900 font-bold text-xs">
-                       {user?.name?.substring(0, 2).toUpperCase() || "US"}
-                    </div>
-                    <span className="text-sm font-medium">{user?.name || "Priyanshu Tiwari"}</span>
-                 </button>
-              </div>
-          </div>
-        </Motion.aside>
-
-        {/* ─── CENTER PANEL: MENTOR COMMAND CENTER ─── */}
-        <main className="flex-1 flex flex-col min-w-0 bg-[#171717] relative">
-          <div className="flex-1 overflow-y-auto custom-scrollbar px-6 py-10 scroll-smooth">
-             <div className="max-w-3xl mx-auto space-y-10">
-                {visibleMessages.length === 0 ? (
-                   <div className="flex h-full flex-col items-center justify-center text-center py-20">
-                      <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center text-white mb-6">
-                         <Bot size={32} />
-                      </div>
-                      <h1 className="text-2xl font-bold text-white mb-8">How can I help you today?</h1>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-xl">
-                         {suggestedPrompts.map(prompt => (
-                           <button
-                             key={prompt}
-                             onClick={() => handleSendMessage(prompt)}
-                             className="p-4 rounded-xl border border-white/10 hover:bg-white/5 text-left transition-all"
-                           >
-                             <p className="text-sm font-medium text-slate-300">{prompt}</p>
-                           </button>
-                         ))}
-                      </div>
-                   </div>
-                ) : (
-                  <>
-                    {visibleMessages.map((msg, i) => (
-                      <MentorMessage key={msg.id} message={msg} index={i} />
-                    ))}
-                    {sending && (
-                      <div className="flex gap-4 p-4">
-                         <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-white shrink-0">
-                            <Bot size={16} className="animate-spin" />
-                         </div>
-                         <div className="space-y-2 pt-1">
-                            <div className="flex gap-1.5">
-                               <div className="w-1.5 h-1.5 rounded-full bg-slate-600 animate-pulse" />
-                               <div className="w-1.5 h-1.5 rounded-full bg-slate-600 animate-pulse delay-75" />
-                               <div className="w-1.5 h-1.5 rounded-full bg-slate-600 animate-pulse delay-150" />
-                            </div>
-                         </div>
-                      </div>
-                    )}
-                  </>
-                )}
-                <div ref={messagesEndRef} />
-             </div>
-          </div>
-
-          {/* ─── CHATGPT STYLE INPUT ─── */}
-          <div className="px-6 pb-12 pt-4">
-             <div className="max-w-3xl mx-auto">
-                <div className="relative group">
-                   <div className="relative bg-[#2f2f2f] rounded-[1.5rem] flex items-end p-2 pr-4 shadow-2xl">
-                       <button className="p-3 text-slate-400 hover:text-white transition-colors">
-                          <Plus size={20} />
-                       </button>
-                       <textarea
-                          ref={messageRef}
-                          value={draft}
-                          onChange={(e) => setDraft(e.target.value)}
-                          onKeyDown={handleKeyDown}
-                          placeholder="Ask anything"
-                          className="flex-1 bg-transparent py-3 px-2 text-[16px] text-white outline-none resize-none max-h-40 min-h-[48px] custom-scrollbar placeholder-slate-500 font-normal leading-relaxed"
-                          rows={1}
-                       />
-                       <div className="flex items-center gap-2 pb-1.5">
-                          <button className="p-2 text-slate-400 hover:text-white transition-colors">
-                             <Sparkles size={20} />
-                          </button>
-                          <button
-                             onClick={() => void handleSendMessage()}
-                             disabled={!draft.trim() || sending}
-                             className={cn(
-                               "w-8 h-8 rounded-full flex items-center justify-center transition-all",
-                               draft.trim() ? "bg-white text-black" : "bg-[#676767] text-[#2f2f2f]"
-                             )}
-                          >
-                             <Send size={16} className="fill-current" />
-                          </button>
-                       </div>
-                    </div>
-                </div>
-                <p className="text-center text-[11px] text-slate-600 mt-3">
-                   Veda can make mistakes. Check important info.
-                </p>
-             </div>
-          </div>
-        </main>
-
-        {/* ─── RIGHT PANEL: AI INSIGHTS ─── */}
-        <AnimatePresence>
-          {isInsightsVisible && (
-            <Motion.aside 
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 360, opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              className="shrink-0 border-l border-white/[0.06] bg-ink"
+      <AnimatePresence>
+        {mobileHistoryOpen && (
+          <Motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/60 lg:hidden"
+          >
+            <Motion.div
+              initial={{ x: -320 }}
+              animate={{ x: 0 }}
+              exit={{ x: -320 }}
+              transition={{ type: "spring", stiffness: 360, damping: 34 }}
+              className="h-full w-[min(320px,88vw)]"
             >
-              <div className="p-8 space-y-8 min-w-[360px]">
-                 <div className="flex items-center justify-between">
-                    <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">AI Mentor Insights</h3>
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                 </div>
+              <ChatHistory
+                conversations={filteredConversations}
+                activeConversationId={currentConversation?._id}
+                query={historyQuery}
+                loading={loading}
+                onQueryChange={setHistoryQuery}
+                onNewChat={handleNewChat}
+                onSelectChat={handleSelectChat}
+                onClose={() => setMobileHistoryOpen(false)}
+              />
+            </Motion.div>
+          </Motion.div>
+        )}
+      </AnimatePresence>
 
-                 <div className="space-y-6">
-                    <InsightRow 
-                      label="Burnout Indicator" 
-                      message="Your skip rate increased by 12% this week. Consider a rest session." 
-                      color={(user as any)?.behaviorProfile?.skipRate > 30 ? "text-red-400" : "text-emerald-400"}
-                      icon={ShieldAlert}
-                    />
-                    
-                    <InsightRow 
-                      label="Learning Velocity" 
-                      message="Topic mastery is 15% faster than last month. Ready for advanced modules." 
-                      color="text-cyan-400"
-                      icon={TrendingUp}
-                    />
-
-                    <div className="p-6 rounded-[2rem] bg-panel border border-white/[0.06] space-y-4">
-                       <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Weak Concepts</h4>
-                       <div className="flex flex-wrap gap-2">
-                          {["Recursion", "DP Tables", "CSS Grid"].map(tag => (
-                            <span key={tag} className="px-3 py-1 rounded-full bg-red-400/10 border border-red-400/20 text-[9px] font-bold text-red-400 uppercase tracking-widest">{tag}</span>
-                          ))}
-                       </div>
-                    </div>
-
-                    <div className="p-6 rounded-[2.5rem] bg-gradient-to-br from-brand/10 to-purple-600/10 border border-brand/20 relative overflow-hidden group">
-                       <div className="relative z-10">
-                          <h4 className="text-xs font-black text-white uppercase tracking-widest mb-3 flex items-center gap-2">
-                             <Sparkles size={14} className="text-brand" /> 
-                             Veda Proactive Recommendation
-                          </h4>
-                          <p className="text-xs text-slate-300 leading-relaxed mb-4">
-                             You perform best between 9 PM and 11 PM. I've scheduled your heavy "Mission Execution" for that window.
-                          </p>
-                          <button className="text-[10px] font-black uppercase tracking-widest text-brand hover:text-white transition-colors">
-                             Optimize Schedule →
-                          </button>
-                       </div>
-                    </div>
-                 </div>
-
-                 <div className="pt-8 border-t border-white/5">
-                    <div className="flex items-center justify-between mb-4">
-                       <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Recall Momentum</span>
-                       <span className="text-[10px] font-black text-emerald-400">+8%</span>
-                    </div>
-                    <div className="h-1 w-full bg-panel rounded-full overflow-hidden">
-                       <Motion.div className="h-full bg-emerald-400" initial={{ width: 0 }} animate={{ width: "72%" }} />
-                    </div>
-                 </div>
-              </div>
-            </Motion.aside>
-          )}
-        </AnimatePresence>
-      </div>
-    </div>
-  );
-}
-
-/* ─── SUB-COMPONENTS ─── */
-
-function TopMetric({ label, value, icon: Icon, color }: any) {
-  return (
-    <Motion.div 
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="p-6 rounded-[2.5rem] glass border-white/5 bg-panel relative overflow-hidden"
-    >
-      <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 blur-3xl -mr-12 -mt-12 rounded-full" />
-      <div className="relative z-10">
-        <div className={cn("p-2 rounded-xl bg-white/[0.04] w-fit mb-4", color)}>
-          <Icon size={20} />
-        </div>
-        <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">{label}</p>
-        <p className="text-2xl font-black text-white">{value}</p>
-      </div>
-    </Motion.div>
-  );
-}
-
-function SuggestionChip({ icon: Icon, label, onClick }: any) {
-  return (
-    <button 
-      onClick={onClick}
-      className="flex items-center gap-2 px-4 py-2 rounded-full glass border-white/5 bg-panel hover:bg-panel/50 hover:border-brand/30 transition-all text-[10px] font-black text-slate-400 hover:text-white uppercase tracking-widest"
-    >
-      <Icon size={12} className="text-brand" />
-      {label}
-    </button>
-  );
-}
-
-function InsightRow({ label, message, color, icon: Icon }: any) {
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center gap-2">
-        <Icon size={14} className={color} />
-        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{label}</span>
-      </div>
-      <p className="text-[11px] text-slate-300 font-medium leading-relaxed">{message}</p>
-    </div>
-  );
-}
-
-function MentorMessage({ message, index }: { message: any; index: number }) {
-  const isUser = message.role === "user";
-  const metadata = message.metadata;
-
-  return (
-    <Motion.div 
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05 }}
-      className={cn(
-        "flex gap-4 w-full group/msg",
-        isUser ? "flex-row-reverse" : "flex-row"
-      )}
-    >
-      <div className={cn(
-        "w-8 h-8 rounded-full flex items-center justify-center shrink-0 border",
-        isUser 
-          ? "bg-brand text-slate-900 border-brand/20" 
-          : "bg-white/10 border-white/10 text-white"
-      )}>
-        {isUser ? <UserRound size={16} /> : <Bot size={16} />}
-      </div>
-
-      <div className={cn(
-        "flex flex-col gap-2 max-w-[85%]",
-        isUser ? "items-end" : "items-start"
-      )}>
-        <div className={cn(
-          "px-4 py-2 rounded-2xl text-[15px] leading-relaxed relative",
-          isUser 
-            ? "bg-[#2f2f2f] text-white" 
-            : "text-slate-100"
-        )}>
-          <div className="whitespace-pre-wrap">{message.content}</div>
-          
-          {!isUser && metadata?.saveableNote && (
+      <main className="flex min-w-0 flex-1 flex-col bg-[#141820]">
+        <header className="flex h-14 shrink-0 items-center justify-between border-b border-white/[0.06] px-4 sm:px-5">
+          <div className="flex min-w-0 items-center gap-3">
             <button
-              onClick={() => {
-                notesApi.createNote(metadata.saveableNote).then(() => {
-                  alert("Knowledge saved to your notes! 🧠");
-                }).catch(err => {
-                  console.error("Failed to save note:", err);
-                });
-              }}
-              className="mt-4 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-bold text-slate-400 hover:text-white transition-all opacity-0 group-hover/msg:opacity-100"
+              type="button"
+              onClick={() => setMobileHistoryOpen(true)}
+              className="rounded-md p-2 text-slate-400 hover:bg-white/[0.05] hover:text-white lg:hidden"
+              aria-label="Open chat history"
             >
-              <Plus size={10} /> Save to Note
+              <Menu size={18} />
             </button>
-          )}
-        </div>
+            <div className="min-w-0">
+              <h1 className="truncate text-sm font-semibold text-white">Veda</h1>
+              <p className="truncate text-xs text-slate-500">Your study and career copilot</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleNewChat}
+            className="inline-flex items-center gap-2 rounded-md border border-white/[0.08] px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-white/[0.05] hover:text-white"
+          >
+            <Plus size={14} />
+            New chat
+          </button>
+        </header>
 
-        {/* RICH METADATA CARDS */}
-        {!isUser && metadata && metadata.cards && metadata.cards.length > 0 && (
-          <div className="w-full space-y-4 max-w-lg mt-2">
-             <div className="grid grid-cols-1 gap-4">
-                {metadata.cards.map((card: any, i: number) => {
-                   switch (card.type) {
-                     case 'insight': return <InsightCard key={i} {...card} />;
-                     case 'mission': return <MissionCard key={i} {...card} />;
-                     case 'focus_sprint': return <FocusSprintCard key={i} {...card} />;
-                     case 'recall_challenge': return <RecallChallenge key={i} {...card} />;
-                     case 'warning': return <WarningCard key={i} {...card} />;
-                     case 'recovery': return <RecoveryPlanCard key={i} {...card} />;
-                     default: return null;
-                   }
-                })}
-             </div>
+        {error && (
+          <div className="mx-auto mt-4 flex w-[min(860px,calc(100%-32px))] items-center gap-2 rounded-md border border-red-400/20 bg-red-400/10 px-3 py-2 text-sm text-red-200">
+            <span className="min-w-0 flex-1">{error}</span>
+            <button type="button" onClick={clearError} className="rounded p-1 hover:bg-white/10" aria-label="Dismiss error">
+              <X size={14} />
+            </button>
           </div>
         )}
 
-        <div className="flex items-center gap-3 px-1 opacity-0 group-hover/msg:opacity-100 transition-opacity">
-           <span className="text-[10px] text-slate-600 font-medium">
-             {formatTime(message.createdAt)}
-           </span>
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <div className="mx-auto flex min-h-full w-full max-w-3xl flex-col px-4 py-8 sm:px-6">
+            {visibleMessages.length === 0 ? (
+              <EmptyState userName={user?.name} onPrompt={(prompt) => void handleSendMessage(prompt)} />
+            ) : (
+              <div className="space-y-7">
+                {visibleMessages.map((message, index) => (
+                  <ChatMessage key={message.id} message={message} index={index} />
+                ))}
+                {sending && <TypingIndicator />}
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+        </div>
+
+        <Composer
+          draft={draft}
+          sending={sending}
+          textareaRef={textareaRef}
+          onDraftChange={setDraft}
+          onKeyDown={handleKeyDown}
+          onSend={() => void handleSendMessage()}
+        />
+      </main>
+    </div>
+  );
+}
+
+function ChatHistory({
+  conversations,
+  activeConversationId,
+  query,
+  loading,
+  className,
+  onQueryChange,
+  onNewChat,
+  onSelectChat,
+  onClose
+}: {
+  conversations: Array<{ _id: string; messages: CopilotMessage[]; updatedAt: string }>;
+  activeConversationId?: string;
+  query: string;
+  loading: boolean;
+  className?: string;
+  onQueryChange: (value: string) => void;
+  onNewChat: () => void;
+  onSelectChat: (conversationId: string) => void;
+  onClose?: () => void;
+}) {
+  return (
+    <aside className={cn("w-72 shrink-0 flex-col border-r border-white/[0.06] bg-[#0b0d12]", className)}>
+      <div className="flex h-14 items-center gap-2 px-3">
+        <button
+          type="button"
+          onClick={onNewChat}
+          className="flex flex-1 items-center justify-center gap-2 rounded-md border border-white/[0.1] px-3 py-2 text-sm font-medium text-slate-200 hover:bg-white/[0.05]"
+        >
+          <Plus size={15} />
+          New chat
+        </button>
+        {onClose ? (
+          <button type="button" onClick={onClose} className="rounded-md p-2 text-slate-400 hover:bg-white/[0.05]" aria-label="Close history">
+            <X size={18} />
+          </button>
+        ) : null}
+      </div>
+
+      <div className="px-3 pb-3">
+        <label className="flex items-center gap-2 rounded-md border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-slate-500 focus-within:border-white/20">
+          <Search size={14} />
+          <input
+            value={query}
+            onChange={(event) => onQueryChange(event.target.value)}
+            placeholder="Search chats"
+            className="min-w-0 flex-1 bg-transparent text-sm text-slate-200 outline-none placeholder:text-slate-600"
+          />
+        </label>
+      </div>
+
+      <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-3">
+        {loading && conversations.length === 0 ? (
+          <div className="flex items-center gap-2 px-3 py-2 text-sm text-slate-500">
+            <Loader2 size={15} className="animate-spin" />
+            Loading
+          </div>
+        ) : conversations.length === 0 ? (
+          <p className="px-3 py-2 text-sm text-slate-500">No chats found.</p>
+        ) : (
+          <div className="space-y-1">
+            {conversations.map((conversation) => {
+              const active = activeConversationId === conversation._id;
+              return (
+                <button
+                  key={conversation._id}
+                  type="button"
+                  onClick={() => onSelectChat(conversation._id)}
+                  className={cn(
+                    "flex w-full items-start gap-2 rounded-md px-3 py-2 text-left transition-colors",
+                    active ? "bg-white/[0.08] text-white" : "text-slate-400 hover:bg-white/[0.04] hover:text-slate-100"
+                  )}
+                >
+                  <MessageSquare size={14} className="mt-0.5 shrink-0" />
+                  <span className="min-w-0">
+                    <span className="line-clamp-2 text-sm leading-5">{getConversationTitle(conversation.messages)}</span>
+                    <span className="mt-0.5 block text-[11px] text-slate-600">{formatTime(conversation.updatedAt)}</span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </aside>
+  );
+}
+
+function EmptyState({ userName, onPrompt }: { userName?: string; onPrompt: (prompt: string) => void }) {
+  return (
+    <div className="flex flex-1 flex-col justify-center">
+      <div className="mx-auto w-full max-w-2xl">
+        <div className="mb-8 text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-white/[0.1] bg-white/[0.03] text-slate-200">
+            <Bot size={22} />
+          </div>
+          <h2 className="text-2xl font-semibold text-white">
+            How can I help{userName ? `, ${userName.split(" ")[0]}` : ""}?
+          </h2>
+        </div>
+
+        <div className="grid gap-2 sm:grid-cols-2">
+          {starterPrompts.map((prompt) => (
+            <button
+              key={prompt}
+              type="button"
+              onClick={() => onPrompt(prompt)}
+              className="rounded-md border border-white/[0.08] bg-white/[0.025] p-4 text-left text-sm text-slate-300 hover:bg-white/[0.05] hover:text-white"
+            >
+              {prompt}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Composer({
+  draft,
+  sending,
+  textareaRef,
+  onDraftChange,
+  onKeyDown,
+  onSend
+}: {
+  draft: string;
+  sending: boolean;
+  textareaRef: RefObject<HTMLTextAreaElement | null>;
+  onDraftChange: (value: string) => void;
+  onKeyDown: (event: KeyboardEvent<HTMLTextAreaElement>) => void;
+  onSend: () => void;
+}) {
+  return (
+    <div className="shrink-0 bg-[#141820] px-4 pb-4 pt-3 sm:px-6">
+      <div className="mx-auto max-w-3xl">
+        <div className="flex items-end gap-2 rounded-xl border border-white/[0.1] bg-[#1c212b] p-2 shadow-lg shadow-black/15 focus-within:border-white/20">
+          <textarea
+            ref={textareaRef}
+            value={draft}
+            onChange={(event) => onDraftChange(event.target.value)}
+            onKeyDown={onKeyDown}
+            rows={1}
+            placeholder="Message Veda"
+            className="max-h-40 min-h-11 flex-1 resize-none bg-transparent px-3 py-3 text-sm leading-6 text-white outline-none placeholder:text-slate-500"
+          />
+          <button
+            type="button"
+            onClick={onSend}
+            disabled={!draft.trim() || sending}
+            className={cn(
+              "mb-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors",
+              draft.trim() && !sending
+                ? "bg-white text-slate-950 hover:bg-slate-200"
+                : "bg-white/[0.08] text-slate-600"
+            )}
+            aria-label="Send message"
+          >
+            {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+          </button>
+        </div>
+        <p className="mt-2 text-center text-[11px] text-slate-600">Veda can make mistakes. Check important details.</p>
+      </div>
+    </div>
+  );
+}
+
+function ChatMessage({ message, index }: { message: CopilotMessage; index: number }) {
+  const isUser = message.role === "user";
+  const metadata = message.metadata as any;
+
+  return (
+    <Motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: Math.min(index * 0.02, 0.16) }}
+      className={cn("flex gap-4", isUser && "justify-end")}
+    >
+      {!isUser && (
+        <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/[0.06] text-slate-200">
+          <Bot size={15} />
+        </div>
+      )}
+
+      <div className={cn("min-w-0 max-w-[min(720px,88%)]", isUser && "flex flex-col items-end")}>
+        <div
+          className={cn(
+            "rounded-2xl px-4 py-3 text-sm leading-6",
+            isUser ? "bg-[#2f3440] text-white" : "text-slate-100"
+          )}
+        >
+          <div className="whitespace-pre-wrap">{message.content}</div>
+        </div>
+
+        {!isUser && metadata?.saveableNote && (
+          <button
+            type="button"
+            onClick={() => {
+              notesApi.createNote(metadata.saveableNote).catch((error) => {
+                console.error("Failed to save note:", error);
+              });
+            }}
+            className="mt-2 inline-flex items-center gap-1.5 rounded-md border border-white/[0.08] px-2.5 py-1.5 text-xs text-slate-400 hover:bg-white/[0.05] hover:text-white"
+          >
+            <Check size={13} />
+            Save to notes
+          </button>
+        )}
+
+        {!isUser && metadata?.cards?.length > 0 && (
+          <div className="mt-3 grid w-full gap-3">
+            {metadata.cards.map((card: any, cardIndex: number) => {
+              switch (card.type) {
+                case "insight":
+                  return <InsightCard key={cardIndex} {...card} />;
+                case "mission":
+                  return <MissionCard key={cardIndex} {...card} />;
+                case "focus_sprint":
+                  return <FocusSprintCard key={cardIndex} {...card} />;
+                case "recall_challenge":
+                  return <RecallChallenge key={cardIndex} {...card} />;
+                case "warning":
+                  return <WarningCard key={cardIndex} {...card} />;
+                case "recovery":
+                  return <RecoveryPlanCard key={cardIndex} {...card} />;
+                default:
+                  return null;
+              }
+            })}
+          </div>
+        )}
+
+        <div className={cn("mt-1 flex items-center gap-1.5 text-[11px] text-slate-600", isUser && "justify-end")}>
+          {isUser ? <UserRound size={11} /> : <Bot size={11} />}
+          {formatTime(message.createdAt)}
         </div>
       </div>
     </Motion.div>
+  );
+}
+
+function TypingIndicator() {
+  return (
+    <div className="flex items-center gap-4">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/[0.06] text-slate-200">
+        <Bot size={15} />
+      </div>
+      <div className="flex items-center gap-1.5 rounded-2xl px-4 py-3">
+        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-slate-500" />
+        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-slate-500 [animation-delay:120ms]" />
+        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-slate-500 [animation-delay:240ms]" />
+      </div>
+    </div>
   );
 }
