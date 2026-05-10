@@ -1,6 +1,7 @@
 import { JobModel, ApplicationModel, type JobDocument } from "./job.model.js";
 import { UserModel } from "../users/user.model.js";
 import { RoadmapModel } from "../roadmaps/roadmap.model.js";
+import { studentIntelligenceService } from "../intelligence/student-intelligence.service.js";
 import { ApiError } from "../../utils/api-error.js";
 
 /**
@@ -65,6 +66,19 @@ export class CareerService {
       },
       { upsert: true, new: true }
     );
+
+    await studentIntelligenceService.emitEvent(userId, {
+      type: "JOB_TARGETED",
+      source: "jobs",
+      entityId: job._id.toString(),
+      payload: {
+        jobTitle: job.title,
+        company: job.company,
+        category: job.category,
+        requiredSkills: job.requiredSkills,
+        matchScore
+      }
+    }).catch(error => console.error("Student intelligence event failed:", error));
 
     return application;
   }

@@ -8,6 +8,7 @@ import { jobsService } from "../jobs/jobs.service.js";
 import { usersService } from "../users/users.service.js";
 import { UserModel } from "../users/user.model.js";
 import { RecommendationEngine } from "../../engines/recommendation.engine.js";
+import { studentIntelligenceService } from "../intelligence/student-intelligence.service.js";
 import type { CopilotMessage, JobListing, Roadmap } from "@studybuddy/shared";
 
 /** Creates a new conversation for a user. */
@@ -93,6 +94,13 @@ async function sendMessage(
   await conversation.save();
   await incrementAiUsage(userId);
 
+  studentIntelligenceService.emitEvent(userId, {
+    type: "MENTOR_INTERACTION",
+    source: "mentor",
+    entityId: conversationId,
+    payload: { messagePreview: message.slice(0, 160) }
+  }).catch(error => console.error("Student intelligence event failed:", error));
+
   return assistantMessage;
 }
 
@@ -124,18 +132,23 @@ async function incrementAiUsage(userId: string) {
 /** Builds comprehensive user context for AI responses. */
 async function buildUserContext(userId: string, currentQuery?: string, knownNoteContext?: string): Promise<string> {
   try {
-    const [profile, skillGapAnalysis, notesResult, roadmap, jobs, mentorPlan, nextAction] = await Promise.all([
+    const [profile, skillGapAnalysis, notesResult, roadmap, jobs, mentorPlan, nextAction, intelligenceProfile] = await Promise.all([
       usersService.getProfile(userId).catch(() => null),
       skillsService.analyzeSkillGap(userId).catch(() => null),
       notesService.listNotes(userId, { limit: 5, offset: 0 }).catch(() => ({ notes: [], total: 0 })),
       roadmapsService.getRoadmap(userId).catch(() => null),
       jobsService.getJobs(userId).catch(() => []),
       mentorService.getTodayPlan(userId).catch(() => null),
-      RecommendationEngine.getNextBestAction(userId).catch(() => null)
+      RecommendationEngine.getNextBestAction(userId).catch(() => null),
+      studentIntelligenceService.getProfile(userId).catch(() => null)
     ]);
 
     const notes = notesResult.notes;
     const context: string[] = [];
+
+    if (intelligenceProfile) {
+      context.push(studentIntelligenceService.buildMentorContext(intelligenceProfile));
+    }
 
     // User profile & Behavior
     if (profile) {

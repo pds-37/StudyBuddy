@@ -3,6 +3,7 @@ import { MemoryItemModel } from "../memory/memory.model.js";
 import { ConceptNodeModel } from "../knowledge/concept.model.js";
 import { ApiError } from "../../utils/api-error.js";
 import { vectorSearchService } from "../../services/ai/vector-search.service.js";
+import { studentIntelligenceService } from "../intelligence/student-intelligence.service.js";
 import type { CareerNote } from "@studybuddy/shared";
 
 type CreateNoteData = {
@@ -94,6 +95,13 @@ async function createNote(userId: string, data: CreateNoteData): Promise<CareerN
     easeFactor: 2.5
   }).catch(error => console.error("Failed to create MemoryItem for note:", error));
 
+  studentIntelligenceService.emitEvent(userId, {
+    type: "NOTE_CREATED",
+    source: "notes",
+    entityId: note._id.toString(),
+    payload: { title: note.title, topic: note.topic, tags: note.tags, linkedSkills: note.linkedSkills }
+  }).catch(error => console.error("Student intelligence event failed:", error));
+
   return toNote(note);
 }
 
@@ -156,6 +164,19 @@ async function runAnalysisPipeline(userId: string, note: NoteDocument): Promise<
 
   // Find and link related notes by shared concepts
   await linkRelatedNotes(userId, note._id.toString(), analysis.concepts);
+
+  await studentIntelligenceService.emitEvent(userId, {
+    type: "NOTE_UPDATED",
+    source: "notes",
+    entityId: note._id.toString(),
+    payload: {
+      title: note.title,
+      concepts: analysis.concepts,
+      difficulty: analysis.difficulty,
+      knowledgeLayer: analysis.knowledgeLayer,
+      interviewImportance: analysis.interviewRelevance.importance
+    }
+  }).catch(error => console.error("Student intelligence analysis event failed:", error));
 }
 
 /**
@@ -332,6 +353,13 @@ async function updateNote(userId: string, noteId: string, data: UpdateNoteData):
     );
   }
 
+  studentIntelligenceService.emitEvent(userId, {
+    type: "NOTE_UPDATED",
+    source: "notes",
+    entityId: noteId,
+    payload: { changedFields: Object.keys(data), title: note.title, topic: note.topic }
+  }).catch(error => console.error("Student intelligence event failed:", error));
+
   return toNote(note);
 }
 
@@ -357,6 +385,12 @@ async function deleteNote(userId: string, noteId: string): Promise<void> {
     { userId, relatedNoteIds: noteId },
     { $pull: { relatedNoteIds: noteId } }
   ).catch(() => {});
+
+  studentIntelligenceService.emitEvent(userId, {
+    type: "NOTE_DELETED",
+    source: "notes",
+    entityId: noteId
+  }).catch(error => console.error("Student intelligence event failed:", error));
 }
 
 /** Lists notes for the user with optional filtering. */

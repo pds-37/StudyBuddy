@@ -2,6 +2,7 @@ import { ProjectModel, type ProjectDocument } from "./project.model.js";
 import { UserModel } from "../users/user.model.js";
 import { groqService } from "../../services/ai/groq.service.js";
 import { ApiError } from "../../utils/api-error.js";
+import { studentIntelligenceService } from "../intelligence/student-intelligence.service.js";
 import type { ProjectMatch, CapstoneProject } from "@studybuddy/shared";
 import { randomUUID } from "crypto";
 
@@ -100,6 +101,19 @@ async function updateProjectStatus(userId: string, matchId: string, status: "in_
     { new: true }
   );
   if (!match) throw new ApiError(404, "Project match not found");
+
+  await studentIntelligenceService.emitEvent(userId, {
+    type: status === "completed" ? "PROJECT_COMPLETED" : "PROJECT_STARTED",
+    source: "projects",
+    entityId: match._id.toString(),
+    payload: {
+      projectTitle: match.project.title,
+      requiredSkills: match.project.requiredSkills,
+      difficulty: match.project.difficulty,
+      matchScore: match.matchScore
+    }
+  }).catch(error => console.error("Student intelligence event failed:", error));
+
   return toMatch(match);
 }
 

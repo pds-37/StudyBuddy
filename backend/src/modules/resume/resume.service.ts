@@ -1,6 +1,7 @@
 import { AIOrchestrator } from "../../core/ai-orchestrator.js";
 import { ApiError } from "../../utils/api-error.js";
 import { UserModel } from "../users/user.model.js";
+import { studentIntelligenceService } from "../intelligence/student-intelligence.service.js";
 import { ResumeModel } from "./resume.model.js";
 import type { ResumeTailorRequest, ResumeTailorResult } from "@studybuddy/shared";
 
@@ -38,6 +39,17 @@ async function tailorResume(userId: string, request: ResumeTailorRequest): Promi
   });
 
   await resumeVersion.save();
+
+  await studentIntelligenceService.emitEvent(userId, {
+    type: "RESUME_UPDATED",
+    source: "resume",
+    entityId: resumeVersion._id.toString(),
+    payload: {
+      targetRole: request.targetRole,
+      mode: request.mode,
+      atsScore: (result as any)?.atsScore ?? (result as any)?.score
+    }
+  }).catch(error => console.error("Student intelligence event failed:", error));
 
   return {
     versionId: resumeVersion._id,

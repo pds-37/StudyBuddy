@@ -11,3 +11,8 @@ intelligenceRouter.get("/revision-priorities", intelligenceController.getRevisio
 intelligenceRouter.get("/concepts", intelligenceController.getConcepts);
 intelligenceRouter.get("/decay-states", intelligenceController.getDecayStates);
 intelligenceRouter.get("/momentum", intelligenceController.getMomentum);
+intelligenceRouter.get("/profile", intelligenceController.getStudentProfile);
+intelligenceRouter.post("/profile/refresh", intelligenceController.refreshStudentProfile);
+intelligenceRouter.get("/timeline", intelligenceController.getTimeline);
+intelligenceRouter.get("/daily", intelligenceController.getDailyIntelligence);
+intelligenceRouter.get("/search", intelligenceController.searchUnified);

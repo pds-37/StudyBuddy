@@ -5,6 +5,7 @@ import { skillsService } from "../skills/skills.service.js";
 import { notesService } from "../notes/notes.service.js";
 import { AIOrchestrator } from "../../core/ai-orchestrator.js";
 import { ApiError } from "../../utils/api-error.js";
+import { studentIntelligenceService } from "../intelligence/student-intelligence.service.js";
 import type { Roadmap } from "@studybuddy/shared";
 
 type GenerateRoadmapRequest = {
@@ -120,6 +121,13 @@ async function generateRoadmap(userId: string, request: GenerateRoadmapRequest):
     insights: aiRoadmap.insights
   });
 
+  await studentIntelligenceService.emitEvent(userId, {
+    type: request.category === "Expansion" ? "TRACK_ADDED" : "ROADMAP_RECALIBRATED",
+    source: "roadmap",
+    entityId: roadmap._id.toString(),
+    payload: { targetRole: roadmap.targetRole, title: roadmap.title, trackId: roadmap.trackId }
+  }).catch(error => console.error("Student intelligence event failed:", error));
+
   return toRoadmap(roadmap);
 }
 
@@ -174,6 +182,9 @@ async function updateTaskStatus(
   }
 
   let taskFound = false;
+  let matchedTask: any = null;
+  let matchedMission: any = null;
+  let matchedPhase: any = null;
   for (const phase of roadmap.phases as any[]) {
     for (const mission of phase.missions as any[]) {
       for (const task of mission.tasks as any[]) {
@@ -181,6 +192,9 @@ async function updateTaskStatus(
           task.status = status;
           if (status === "completed") task.completedAt = new Date();
           taskFound = true;
+          matchedTask = task;
+          matchedMission = mission;
+          matchedPhase = phase;
           break;
         }
       }
@@ -237,6 +251,23 @@ async function updateTaskStatus(
       "success",
       "/roadmap"
     );
+  }
+
+  if (status === "completed" || status === "skipped") {
+    await studentIntelligenceService.emitEvent(userId, {
+      type: status === "completed" ? "ROADMAP_TASK_COMPLETED" : "ROADMAP_TASK_SKIPPED",
+      source: "roadmap",
+      entityId: taskId,
+      payload: {
+        roadmapId: roadmap._id.toString(),
+        roadmapTitle: roadmap.title,
+        targetRole: roadmap.targetRole,
+        taskTitle: matchedTask?.title,
+        taskType: matchedTask?.type,
+        missionTitle: matchedMission?.title,
+        phaseTitle: matchedPhase?.title
+      }
+    }).catch(error => console.error("Student intelligence event failed:", error));
   }
 
   return toRoadmap(roadmap);
@@ -341,6 +372,13 @@ async function injectExternalSkill(userId: string, skillName: string): Promise<R
   } as any);
 
   await roadmapDoc.save();
+  await studentIntelligenceService.emitEvent(userId, {
+    type: "ROADMAP_RECALIBRATED",
+    source: "roadmap",
+    entityId: roadmapDoc._id.toString(),
+    payload: { skillName, reason: "external_skill_injection" }
+  }).catch(error => console.error("Student intelligence event failed:", error));
+
   return toRoadmap(roadmapDoc);
 }
 
@@ -355,4 +393,3 @@ export const roadmapsService = {
   generateQuizForTask,
   rateRoadmap
 };
-

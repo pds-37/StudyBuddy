@@ -3,6 +3,7 @@ import { MemoryEngine } from "../../engines/memory.engine.js";
 import { DecayEngine } from "../../engines/decay.engine.js";
 import { PriorityEngine } from "../../engines/priority.engine.js";
 import { ApiError } from "../../utils/api-error.js";
+import { studentIntelligenceService } from "../intelligence/student-intelligence.service.js";
 import type { CareerNote, RecallGrade, RecallPrompt, RecallReviewResult, WeakTopic, RevisionPriority } from "@studybuddy/shared";
 
 type RecallStats = {
@@ -340,6 +341,20 @@ async function reviewNote(
 
   // Generate contextual feedback based on grade and history
   const feedback = generateFeedback(grade, note);
+
+  studentIntelligenceService.emitEvent(userId, {
+    type: grade === "good" ? "RECALL_PASSED" : grade === "weak" ? "RECALL_WEAK" : "RECALL_FAILED",
+    source: "recall",
+    entityId: noteId,
+    payload: {
+      noteTitle: note.title,
+      topic: topicFor(note),
+      grade,
+      score,
+      nextStrength,
+      concepts: note.concepts ?? []
+    }
+  }).catch(error => console.error("Student intelligence event failed:", error));
 
   return {
     note: toNote(note),
