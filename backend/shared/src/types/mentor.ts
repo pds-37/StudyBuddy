@@ -36,6 +36,12 @@ export type MentorTask = {
   estimatedMinutes: number;
   href: string;
   status: MentorTaskStatus;
+  startedAt?: string | null;
+  completedAt?: string | null;
+  confidenceScore?: number | null;
+  stuckCount?: number;
+  lastStuckAt?: string | null;
+  mentorNote?: string | null;
 };
 
 export type MentorWeakTopic = {

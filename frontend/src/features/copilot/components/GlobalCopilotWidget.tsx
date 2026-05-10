@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
-import { Bot, Loader2, MessageSquare, Send, Volume2, VolumeX, X, Sparkles, UserRound } from "lucide-react";
+import { Bot, Loader2, MessageSquare, Send, Volume2, VolumeX, X } from "lucide-react";
 import { cn } from "../../../lib/utils/cn";
 import { useCopilotStore } from "../../../store/copilot-store";
 import { useSpeechSynthesis } from "../../../hooks/useSpeechSynthesis";
@@ -80,51 +80,51 @@ export function GlobalCopilotWidget() {
       {/* AI Chat Drawer / Popover */}
       <div
         className={cn(
-          "fixed bottom-6 right-6 z-50 flex w-[min(calc(100vw-48px),400px)] flex-col overflow-hidden rounded-[2rem] border border-white/[0.08] bg-slate-50 dark:bg-panel bg-slate-50 dark:bg-panel/95 shadow-[0_20px_80px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-2xl transition-all duration-500",
-          isOpen ? "h-[600px] max-h-[calc(100vh-96px)] translate-y-0 opacity-100" : "pointer-events-none h-[600px] translate-y-12 opacity-0"
+          "fixed bottom-5 right-5 z-50 flex w-[min(calc(100vw-32px),360px)] flex-col overflow-hidden rounded-xl border border-white/[0.08] bg-[#10141c] shadow-2xl shadow-black/40 transition-all duration-300",
+          isOpen ? "h-[520px] max-h-[calc(100vh-80px)] translate-y-0 opacity-100" : "pointer-events-none h-[520px] translate-y-6 opacity-0"
         )}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/[0.04] bg-white/[0.02] p-4">
+        <div className="flex items-center justify-between border-b border-white/[0.06] px-4 py-3">
           <div className="flex items-center gap-3">
-            <div className="grid h-10 w-10 place-items-center rounded-xl bg-cyan/10 text-cyan border border-cyan/20">
+            <div className="grid h-9 w-9 place-items-center rounded-lg border border-cyan/20 bg-cyan/10 text-cyan">
               <Bot className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-900 dark:text-white">Veda AI</h3>
+              <h3 className="text-sm font-semibold text-white">Veda</h3>
               <div className="flex items-center gap-1.5">
-                <p className="text-[11px] text-slate-500 dark:text-slate-500 dark:text-slate-400">{isAuthenticated ? `Mentor for ${user?.name || "you"}` : "Guest Mode"}</p>
-                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-brand/10 border border-brand/20 text-brand font-bold uppercase tracking-tighter">Llama 3.1</span>
+                <p className="text-[11px] text-slate-500">{isAuthenticated ? `Mentor for ${user?.name || "you"}` : "Guest Mode"}</p>
               </div>
             </div>
           </div>
           <button
             onClick={() => setIsOpen(false)}
-            className="grid h-8 w-8 place-items-center rounded-full text-slate-500 dark:text-slate-500 dark:text-slate-400 transition hover:bg-white/[0.06] hover:text-slate-900 dark:text-slate-900 dark:text-white"
+            className="grid h-8 w-8 place-items-center rounded-md text-slate-500 transition hover:bg-white/[0.06] hover:text-white"
+            aria-label="Close Veda chat"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
         {/* Chat Area */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 space-y-4 overflow-y-auto p-4 custom-scrollbar">
           {visibleMessages.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center text-center">
-              <div className="mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-white/[0.02] border border-white/[0.04]">
+              <div className="mb-4 grid h-12 w-12 place-items-center rounded-xl border border-white/[0.06] bg-white/[0.03]">
                 <MessageSquare className="h-6 w-6 text-slate-500" />
               </div>
-              <p className="text-sm font-medium text-slate-900 dark:text-slate-900 dark:text-white">How can I help you today?</p>
-              <p className="mt-1 text-xs text-slate-500 max-w-[240px]">Ask me anything about your career roadmap, interview prep, or daily tasks.</p>
+              <p className="text-sm font-medium text-white">How can I help?</p>
+              <p className="mt-1 max-w-[240px] text-xs leading-5 text-slate-500">Ask about roadmap, recall, projects, resume, or jobs.</p>
             </div>
           ) : (
             visibleMessages.map((msg, i) => (
               <div key={msg.id || i} className={cn("flex flex-col gap-1.5", msg.role === "user" ? "items-end" : "items-start")}>
                 <div
                   className={cn(
-                    "max-w-[90%] rounded-[1.5rem] px-5 py-3 text-[13px] leading-relaxed shadow-xl backdrop-blur-3xl border transition-all",
+                    "max-w-[90%] rounded-2xl px-4 py-2.5 text-[13px] leading-relaxed",
                     msg.role === "user"
-                      ? "rounded-tr-none bg-gradient-to-br from-brand to-purple-600 border-white/20 text-slate-900 font-bold"
-                      : "rounded-tl-none border-white/10 bg-white/[0.03] text-slate-100"
+                      ? "bg-[#2f3440] text-white"
+                      : "border border-white/[0.07] bg-white/[0.035] text-slate-100"
                   )}
                 >
                   {msg.content}
@@ -133,12 +133,12 @@ export function GlobalCopilotWidget() {
                   <div className="flex items-center gap-3 px-2">
                     <button
                       onClick={() => isSpeaking ? stop() : speak(msg.content)}
-                      className="text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 text-slate-500 hover:text-brand transition-colors"
+                      className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-slate-500 transition-colors hover:text-cyan"
                     >
                       {isSpeaking ? <VolumeX size={10} /> : <Volume2 size={10} />}
                       {isSpeaking ? "Stop" : "Listen"}
                     </button>
-                    <span className="text-[9px] font-black text-slate-700 uppercase tracking-widest">{new Date(msg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-slate-700">{new Date(msg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                   </div>
                 )}
               </div>
@@ -146,7 +146,7 @@ export function GlobalCopilotWidget() {
           )}
           {sending && (
             <div className="flex justify-start">
-              <div className="inline-flex items-center gap-2 rounded-2xl border border-white/[0.04] bg-white/[0.02] px-4 py-2 text-xs text-slate-500 dark:text-slate-500 dark:text-slate-400">
+              <div className="inline-flex items-center gap-2 rounded-2xl border border-white/[0.06] bg-white/[0.03] px-4 py-2 text-xs text-slate-500">
                 <Loader2 className="h-3.5 w-3.5 animate-spin text-cyan" />
                 Thinking...
               </div>
@@ -156,25 +156,25 @@ export function GlobalCopilotWidget() {
         </div>
 
         {/* Input Area */}
-        <div className="p-4 bg-obsidian/50 border-t border-white/[0.04]">
-          <div className="relative group">
-             <div className="absolute -inset-0.5 bg-gradient-to-r from-brand to-purple-600 rounded-2xl blur opacity-0 group-focus-within:opacity-20 transition-opacity" />
-             <div className="relative flex items-end gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-1.5 focus-within:border-brand/40 transition-all">
+        <div className="border-t border-white/[0.06] p-3">
+          <div className="relative">
+             <div className="flex items-end gap-2 rounded-xl border border-white/[0.08] bg-white/[0.03] p-1.5 transition-all focus-within:border-white/20">
                 <textarea
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Ask Veda anything..."
-                  className="max-h-32 min-h-[44px] w-full resize-none bg-transparent px-4 py-2.5 text-[13px] text-white placeholder-slate-600 outline-none"
+                  placeholder="Message Veda"
+                  className="max-h-24 min-h-[40px] w-full resize-none bg-transparent px-3 py-2.5 text-[13px] text-white outline-none placeholder:text-slate-600"
                   rows={1}
                 />
                 <button
                   onClick={() => void handleSendMessage()}
                   disabled={!draft.trim() || sending}
                   className={cn(
-                    "grid h-10 w-10 shrink-0 place-items-center rounded-xl transition-all",
-                    draft.trim() ? "bg-brand text-slate-900 shadow-glow" : "bg-white/5 text-slate-600"
+                    "grid h-9 w-9 shrink-0 place-items-center rounded-lg transition-all",
+                    draft.trim() ? "bg-white text-slate-950" : "bg-white/[0.06] text-slate-600"
                   )}
+                  aria-label="Send message"
                 >
                   {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4 fill-current" />}
                 </button>

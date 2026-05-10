@@ -15,7 +15,12 @@ const mentorTaskSchema = new Schema(
     estimatedMinutes: { type: Number, required: true },
     href: { type: String, required: true },
     status: { type: String, enum: ["pending", "in_progress", "completed", "skipped"], default: "pending" },
-    completedAt: { type: Date, default: null }
+    startedAt: { type: Date, default: null },
+    completedAt: { type: Date, default: null },
+    confidenceScore: { type: Number, min: 1, max: 5, default: null },
+    stuckCount: { type: Number, default: 0 },
+    lastStuckAt: { type: Date, default: null },
+    mentorNote: { type: String, default: null }
   },
   { _id: false }
 );

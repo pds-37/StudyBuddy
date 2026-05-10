@@ -103,31 +103,59 @@ export function FocusSprintCard({ title, data, onClick }: any) {
 }
 
 export function RecallChallenge({ title, data, onClick }: any) {
+  const navigate = useNavigate();
+  const goToRecall = () => navigate(data?.actionUrl || "/recall");
+
   return (
-    <Motion.div 
+    <Motion.div
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
-      className="p-6 rounded-[2.5rem] border border-amber-400/20 bg-amber-400/5 relative z-20"
+      role="button"
+      tabIndex={0}
+      onClick={goToRecall}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          goToRecall();
+        }
+      }}
+      className="relative z-20 cursor-pointer rounded-2xl border border-amber-400/20 bg-amber-400/5 p-5 transition-colors hover:border-amber-400/40 hover:bg-amber-400/10"
     >
       <div className="flex items-center gap-2 mb-4 text-amber-400">
         <Brain size={18} />
         <span className="text-[10px] font-black uppercase tracking-[0.2em]">Recall Challenge</span>
       </div>
-      <p className="text-base font-bold text-slate-900 dark:text-slate-900 dark:text-white mb-6 leading-relaxed">
+      <p className="mb-5 text-base font-bold leading-relaxed text-slate-900 dark:text-slate-900 dark:text-white">
         {title}
       </p>
-      <div className="grid gap-2">
-        {data?.options?.map((option: string, i: number) => (
-            <button 
-             key={i} 
-             onClick={() => onClick?.(option)}
-             className="w-full p-4 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-amber-400/40 hover:bg-white/[0.06] transition-all text-sm font-medium text-slate-300 text-left group flex items-center justify-between relative z-30"
-            >
-               {option}
-               <div className="w-5 h-5 rounded-full border border-white/10 group-hover:border-amber-400/40" />
-            </button>
-        ))}
-      </div>
+      {data?.options?.length > 0 ? (
+        <div className="grid gap-2">
+          {data.options.map((option: string, i: number) => (
+              <button
+               key={i}
+               onClick={(event) => {
+                 event.stopPropagation();
+                 onClick?.(option);
+               }}
+               className="relative z-30 flex w-full items-center justify-between rounded-xl border border-white/5 bg-white/[0.03] p-3 text-left text-sm font-medium text-slate-300 transition-all hover:border-amber-400/40 hover:bg-white/[0.06]"
+              >
+                 {option}
+                 <div className="h-5 w-5 rounded-full border border-white/10" />
+              </button>
+          ))}
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            goToRecall();
+          }}
+          className="inline-flex items-center gap-2 rounded-lg bg-amber-400 px-3 py-2 text-xs font-bold text-slate-950 transition-colors hover:bg-amber-300"
+        >
+          Start recall <ArrowRight size={14} />
+        </button>
+      )}
     </Motion.div>
   );
 }

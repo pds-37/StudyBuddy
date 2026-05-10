@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Link, useNavigate } from "react-router-dom";
 import { motion as Motion } from "framer-motion";
 import { 
   Target, 
@@ -10,19 +10,50 @@ import {
   Clock, 
   ArrowRight,
   Zap,
-  Activity
+  Activity,
+  Loader2
 } from "lucide-react";
 import { skillsApi } from "../features/skills/api";
 import { NebulaBackground } from "../components/common/NebulaBackground";
 import { SkillMatrixCard, ReadinessRing } from "../features/skills/components/IntelligenceComponents";
 import { type SkillGapAnalysis } from "../features/skills/types";
 import { cn } from "../lib/utils/cn";
+import { adoptMentorStrategy } from "../lib/api/mentor";
+import { logBehavior } from "../lib/api/behavior";
+import { getApiErrorMessage } from "../lib/api/error";
 
 
 export function SkillGapPage() {
+  const navigate = useNavigate();
   const { data, isLoading, error } = useQuery<SkillGapAnalysis>({
     queryKey: ["skill-gap"],
     queryFn: skillsApi.getGapAnalysis as any
+  });
+
+  const adoptStrategy = useMutation({
+    mutationFn: async (analysis: SkillGapAnalysis) => {
+      const plan = await adoptMentorStrategy({
+        targetRole: analysis.targetRole,
+        recoveryPlan: analysis.recommendations.recoveryPlan ?? "Prioritize the biggest skill gaps and convert them into today's mentor tasks.",
+        nextSkills: analysis.recommendations.nextSkills ?? [],
+        gaps: (analysis.gaps ?? []).map((gap) => ({
+          skill: gap.skill,
+          gapScore: gap.gapScore,
+          userScore: gap.userScore
+        }))
+      });
+
+      await logBehavior("strategy_adopted", {
+        targetRole: analysis.targetRole,
+        focus: plan.focus,
+        nextSkills: analysis.recommendations.nextSkills ?? []
+      }).catch(() => undefined);
+
+      return plan;
+    },
+    onSuccess: () => {
+      navigate("/dashboard");
+    }
   });
 
   if (isLoading) {
@@ -174,9 +205,27 @@ export function SkillGapPage() {
                 <p className="text-xs text-slate-700 dark:text-slate-700 dark:text-slate-300 leading-relaxed mb-8 relative z-10 font-medium">
                    {data.recommendations.recoveryPlan}
                 </p>
-                <button className="w-full py-4 rounded-2xl bg-brand text-slate-900 dark:text-slate-900 dark:text-white text-[10px] font-black uppercase tracking-widest shadow-[0_15px_30px_rgba(124,92,255,0.4)] relative z-10 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all">
-                   Adopt Strategy <ArrowRight size={14} />
+                <button
+                  type="button"
+                  onClick={() => adoptStrategy.mutate(data)}
+                  disabled={adoptStrategy.isPending}
+                  className="w-full py-4 rounded-2xl bg-brand text-slate-900 dark:text-slate-900 dark:text-white text-[10px] font-black uppercase tracking-widest shadow-[0_15px_30px_rgba(124,92,255,0.4)] relative z-10 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all disabled:cursor-wait disabled:opacity-70"
+                >
+                   {adoptStrategy.isPending ? (
+                     <>
+                       <Loader2 size={14} className="animate-spin" /> Adopting Strategy
+                     </>
+                   ) : (
+                     <>
+                       Adopt Strategy <ArrowRight size={14} />
+                     </>
+                   )}
                 </button>
+                {adoptStrategy.isError && (
+                  <p className="mt-3 text-[11px] font-semibold text-red-300">
+                    {getApiErrorMessage(adoptStrategy.error, "Veda could not adopt this strategy yet. Please try again.")}
+                  </p>
+                )}
              </section>
            )}
 

@@ -16,7 +16,7 @@ import {
   Rocket,
   ArrowUpRight
 } from "lucide-react";
-import { getMentorToday, updateMentorTaskStatus } from "../lib/api/mentor";
+import { getMentorToday, recordMentorTaskFeedback, updateMentorTaskStatus } from "../lib/api/mentor";
 import { logBehavior } from "../lib/api/behavior";
 import { registerConfidence } from "../lib/api/memory";
 import { useFocusStore } from "../store/focus-store";
@@ -55,7 +55,7 @@ export function StudyPage() {
         await logBehavior("session_started", { taskId, type: foundTask.type });
         
         if (foundTask.status === "pending") {
-          await updateMentorTaskStatus(taskId!, "in_progress");
+          await recordMentorTaskFeedback(taskId!, { type: "start" });
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load task");
@@ -92,6 +92,7 @@ export function StudyPage() {
     try {
       setLoading(true);
       await updateMentorTaskStatus(task.id, "completed");
+      await recordMentorTaskFeedback(task.id, { type: "confidence", confidenceScore: score });
       await logBehavior("task_completed", { taskId: task.id, type: task.type, confidence: score });
       
       // The Confidence Engine: Update memory intervals based on self-assessment
@@ -124,11 +125,30 @@ export function StudyPage() {
 
   if (error || !task) {
     return (
-      <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-6 text-center">
-        <p className="text-red-200">{error || "Task not found"}</p>
-        <Link to="/dashboard" className="mt-4 inline-block text-sm text-cyan hover:underline">
-          Back to Dashboard
-        </Link>
+      <div className="mx-auto flex min-h-[60vh] max-w-2xl items-center justify-center">
+        <div className="w-full rounded-2xl border border-white/[0.08] bg-white/[0.03] p-8 text-center">
+          <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-brand/10 text-brand">
+            <Target size={24} />
+          </div>
+          <h1 className="text-2xl font-semibold text-white">This study task is no longer active</h1>
+          <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-slate-400">
+            {error || "The task may have expired, been recalibrated, or come from an older mentor plan."}
+          </p>
+          <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+            <Link
+              to="/dashboard"
+              className="inline-flex items-center justify-center rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand/90"
+            >
+              Back to dashboard
+            </Link>
+            <Link
+              to="/recall"
+              className="inline-flex items-center justify-center rounded-lg border border-white/[0.08] px-4 py-2.5 text-sm font-semibold text-slate-200 transition-colors hover:bg-white/[0.05]"
+            >
+              Go to recall
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }
@@ -304,7 +324,7 @@ export function StudyPage() {
                 onClick={() => navigate("/copilot")}
                 className="w-full py-2 text-xs font-bold text-slate-500 hover:text-brand transition-colors text-center"
               >
-                Open Full Veda Experience →
+                Open Full Veda Experience
               </button>
             </div>
 
@@ -342,7 +362,7 @@ export function StudyPage() {
                   <Brain size={32} />
                 </div>
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-900 dark:text-white">How confident do you feel?</h2>
-                <p className="mt-2 text-slate-500 dark:text-slate-500 dark:text-slate-400 text-sm">Be honest—this tunes Veda's memory engine to optimize your next review session.</p>
+                <p className="mt-2 text-slate-500 dark:text-slate-500 dark:text-slate-400 text-sm">Be honest - this tunes Veda's memory engine to optimize your next review session.</p>
               </div>
 
               <div className="mt-8 grid grid-cols-5 gap-3">

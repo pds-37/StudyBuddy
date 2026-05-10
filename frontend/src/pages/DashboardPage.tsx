@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowRight,
+  AlertTriangle,
   Brain,
   Briefcase,
   CheckCircle2,
@@ -11,6 +12,7 @@ import {
   Loader2,
   MessageSquare,
   NotebookText,
+  PlayCircle,
   RefreshCw,
   Route,
   ShieldCheck,
@@ -18,11 +20,12 @@ import {
   Target,
   Zap
 } from "lucide-react";
-import { getMentorToday, updateMentorTaskStatus } from "../lib/api/mentor";
+import { getMentorToday, recordMentorTaskFeedback, updateMentorTaskStatus } from "../lib/api/mentor";
 import { getNextBestAction, type NextBestAction } from "../lib/api/recommendations";
 import { getBehaviorProfile, logBehavior, type BehaviorProfile } from "../lib/api/behavior";
 import { subscribeToPushNotifications, getNotificationPermission } from "../lib/utils/push-notifications";
 import { cn } from "../lib/utils/cn";
+import { useCopilotStore } from "../store/copilot-store";
 import type { MentorTask, MentorTodayPlan } from "@studybuddy/shared";
 
 const taskIcons = {
@@ -53,13 +56,17 @@ function priorityClass(priority: MentorTask["priority"]) {
 }
 
 export function DashboardPage() {
+  const navigate = useNavigate();
   const [plan, setPlan] = useState<MentorTodayPlan | null>(null);
   const [bestAction, setBestAction] = useState<NextBestAction | null>(null);
   const [behavior, setBehavior] = useState<BehaviorProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [showPushPrompt, setShowPushPrompt] = useState(false);
   const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
+  const [stuckTaskId, setStuckTaskId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const setIsWidgetOpen = useCopilotStore((state) => state.setIsWidgetOpen);
+  const sendMessage = useCopilotStore((state) => state.sendMessage);
 
   const loadPlan = async () => {
     try {
@@ -98,6 +105,41 @@ export function DashboardPage() {
     () => plan?.tasks.filter((task) => task.status === "completed").length ?? 0,
     [plan]
   );
+  const activeTask = useMemo(
+    () => plan?.tasks.find((task) => task.status === "in_progress") ?? plan?.tasks.find((task) => task.status !== "completed"),
+    [plan]
+  );
+  const planProgress = plan?.tasks.length ? Math.round((completedTasks / plan.tasks.length) * 100) : 0;
+
+  const startTask = async (task: MentorTask) => {
+    try {
+      setUpdatingTaskId(task.id);
+      const nextPlan = await recordMentorTaskFeedback(task.id, { type: "start" });
+      await logBehavior("task_started", { taskId: task.id, type: task.type }).catch(() => undefined);
+      setPlan(nextPlan);
+      navigate(`/study/${task.id}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to start task");
+    } finally {
+      setUpdatingTaskId(null);
+    }
+  };
+
+  const handleStuck = async (task: MentorTask) => {
+    try {
+      setStuckTaskId(task.id);
+      const note = `I am stuck on "${task.title}". Break it into the smallest next step and explain what I should do first.`;
+      const nextPlan = await recordMentorTaskFeedback(task.id, { type: "stuck", note });
+      await logBehavior("task_stuck", { taskId: task.id, type: task.type }).catch(() => undefined);
+      setPlan(nextPlan);
+      setIsWidgetOpen(true);
+      void sendMessage(note);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to capture stuck signal");
+    } finally {
+      setStuckTaskId(null);
+    }
+  };
 
   const completeTask = async (task: MentorTask) => {
     try {
@@ -215,41 +257,92 @@ export function DashboardPage() {
         </div>
       )}
 
-      <div className="grid gap-10 xl:grid-cols-[minmax(0,1fr)_360px]">
-
-        <div className="rounded-lg border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white/[0.04] p-6 lg:p-8">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-            <div className="max-w-3xl">
-              <p className="text-xs font-semibold uppercase tracking-[0.38em] text-cyan">Today</p>
-              <h1 className="mt-3 text-3xl font-semibold leading-tight text-slate-900 dark:text-slate-900 dark:text-white lg:text-4xl">
-                {plan?.focus ?? "AI Dost mentor plan"}
-              </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-slate-700 dark:text-slate-700 dark:text-slate-300">
-                {plan?.mentorMessage ?? "Your daily mentor plan will appear here."}
-              </p>
-            </div>
-
-            <div className="flex shrink-0 items-center gap-4 rounded-lg border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full border border-brand/30 bg-brand/10 text-2xl font-semibold text-slate-900 dark:text-slate-900 dark:text-white">
-                {plan?.readinessScore ?? 0}
+      <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0c1017]">
+          <div className="border-b border-white/[0.06] px-6 py-5">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+              <div className="max-w-3xl">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-cyan">Veda Command Center</p>
+                <h1 className="mt-3 text-3xl font-semibold leading-tight text-white lg:text-5xl">
+                  {plan?.focus ?? "Daily mentor plan"}
+                </h1>
+                <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-400 lg:text-base">
+                  {plan?.mentorMessage ?? "Your daily mentor plan will appear here."}
+                </p>
               </div>
-              <div>
-                <p className="text-sm font-semibold text-slate-900 dark:text-slate-900 dark:text-white">Readiness</p>
-                <p className="mt-1 text-xs uppercase tracking-[0.24em] text-slate-500">{plan?.journeyStage ?? "setup"}</p>
-                <p className="mt-3 text-xs text-cyan">Next: {plan?.nextUnlock ?? "Roadmap"}</p>
+
+              <div className="grid min-w-[220px] grid-cols-2 gap-3 rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Readiness</p>
+                  <p className="mt-2 text-3xl font-semibold text-white">{plan?.readinessScore ?? 0}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Plan</p>
+                  <p className="mt-2 text-3xl font-semibold text-white">{planProgress}%</p>
+                </div>
+                <div className="col-span-2 h-2 overflow-hidden rounded-full bg-white/[0.06]">
+                  <div className="h-full rounded-full bg-cyan transition-all" style={{ width: `${planProgress}%` }} />
+                </div>
+                <p className="col-span-2 text-xs text-slate-500">Next unlock: <span className="text-cyan">{plan?.nextUnlock ?? "Roadmap"}</span></p>
               </div>
             </div>
           </div>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <Metric label="Notes" value={String(plan?.signals.totalNotes ?? 0)} icon={NotebookText} />
-            <Metric label="Recall Due" value={String(plan?.signals.recallDue ?? 0)} icon={Zap} />
-            <Metric label="Memory" value={formatStrength(plan?.signals.averageMemoryStrength ?? 0)} icon={Brain} />
-            <Metric label="Roadmap" value={formatPercent(plan?.signals.roadmapProgress ?? 0)} icon={Route} />
+          <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_280px]">
+            <div className="p-6">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-brand">Current Focus</p>
+                  <h2 className="mt-2 text-xl font-semibold text-white">{activeTask?.title ?? "No active task yet"}</h2>
+                </div>
+                <span className="rounded-full border border-white/[0.08] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                  {plan?.journeyStage ?? "setup"}
+                </span>
+              </div>
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-400">
+                {activeTask?.reason ?? "Complete onboarding and Veda will turn your goals into a focused execution path."}
+              </p>
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                {activeTask ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => void startTask(activeTask)}
+                      disabled={updatingTaskId === activeTask.id}
+                      className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand/90 disabled:cursor-wait disabled:opacity-70"
+                    >
+                      {updatingTaskId === activeTask.id ? <Loader2 size={16} className="animate-spin" /> : <PlayCircle size={16} />}
+                      Start Focus
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void handleStuck(activeTask)}
+                      disabled={stuckTaskId === activeTask.id}
+                      className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/[0.08] px-5 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/[0.05] disabled:cursor-wait disabled:opacity-70"
+                    >
+                      {stuckTaskId === activeTask.id ? <Loader2 size={16} className="animate-spin" /> : <AlertTriangle size={16} />}
+                      I'm Stuck
+                    </button>
+                  </>
+                ) : (
+                  <Link to="/onboarding" className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand/90">
+                    Configure Mentor
+                    <ArrowRight size={16} />
+                  </Link>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-px border-t border-white/[0.06] bg-white/[0.06] lg:border-l lg:border-t-0">
+              <Metric label="Notes" value={String(plan?.signals.totalNotes ?? 0)} icon={NotebookText} />
+              <Metric label="Recall" value={String(plan?.signals.recallDue ?? 0)} icon={Zap} />
+              <Metric label="Memory" value={formatStrength(plan?.signals.averageMemoryStrength ?? 0)} icon={Brain} />
+              <Metric label="Roadmap" value={formatPercent(plan?.signals.roadmapProgress ?? 0)} icon={Route} />
+            </div>
           </div>
         </div>
 
-        <div className="rounded-lg border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white/[0.04] p-6">
+        <div className="rounded-2xl border border-white/[0.08] bg-[#0c1017] p-6">
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-sm font-semibold text-slate-900 dark:text-slate-900 dark:text-white">SaaS Workspace</p>
@@ -293,26 +386,26 @@ export function DashboardPage() {
 
       <div className="grid gap-12 xl:grid-cols-[minmax(0,1fr)_360px]">
 
-        <div className="rounded-lg border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white/[0.04] p-6">
+        <div className="rounded-2xl border border-white/[0.08] bg-[#0c1017] p-6">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-900 dark:text-white">Mission List</h2>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400">
+              <h2 className="text-xl font-semibold text-white">Mission Queue</h2>
+              <p className="mt-1 text-sm text-slate-500">
                 {completedTasks}/{plan?.tasks.length ?? 0} complete
               </p>
             </div>
             <Link
               to="/copilot"
-              className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-slate-900 dark:text-slate-900 dark:text-white hover:bg-brand/90"
+              className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/[0.05]"
             >
-              Ask AI Dost
+              Ask Veda
               <ArrowRight size={16} />
             </Link>
           </div>
 
           <div className="mt-6 space-y-3">
             {plan?.tasks.length === 0 ? (
-              <div className="rounded-lg border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
+              <div className="rounded-lg border border-white/[0.08] bg-white/[0.03] p-5 text-sm text-slate-400">
                 No mentor tasks yet.
               </div>
             ) : (
@@ -321,7 +414,10 @@ export function DashboardPage() {
                   key={task.id}
                   task={task}
                   updating={updatingTaskId === task.id}
+                  stucking={stuckTaskId === task.id}
                   onToggle={() => void completeTask(task)}
+                  onStart={() => void startTask(task)}
+                  onStuck={() => void handleStuck(task)}
                 />
               ))
             )}
@@ -329,20 +425,20 @@ export function DashboardPage() {
         </div>
 
         <aside className="space-y-6">
-          <div className="rounded-lg border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white/[0.04] p-6">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-900 dark:text-white">Weak Topics</h2>
+          <div className="rounded-2xl border border-white/[0.08] bg-[#0c1017] p-6">
+            <h2 className="text-lg font-semibold text-white">Weak Topics</h2>
             <div className="mt-4 space-y-3">
               {(plan?.signals.weakTopics ?? []).length === 0 ? (
-                <p className="text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400">No weak topics yet.</p>
+                <p className="text-sm text-slate-500">No weak topics yet.</p>
               ) : (
                 plan?.signals.weakTopics.slice(0, 4).map((topic) => (
                   <Link
                     key={topic.topic}
                     to="/recall"
-                    className="block rounded-lg border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4"
+                    className="block rounded-lg border border-white/[0.08] bg-white/[0.03] p-4 transition hover:bg-white/[0.05]"
                   >
                     <div className="flex items-center justify-between gap-3">
-                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-900 dark:text-white">{topic.topic}</p>
+                      <p className="text-sm font-semibold text-white">{topic.topic}</p>
                       <span className="text-xs text-cyan">{formatStrength(topic.averageStrength)}</span>
                     </div>
                     <p className="mt-1 text-xs text-slate-500">{topic.dueCount} due</p>
@@ -352,8 +448,8 @@ export function DashboardPage() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white/[0.04] p-6">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-900 dark:text-white">Journey Signals</h2>
+          <div className="rounded-2xl border border-white/[0.08] bg-[#0c1017] p-6">
+            <h2 className="text-lg font-semibold text-white">Journey Signals</h2>
             <div className="mt-4 space-y-3 text-sm">
               <Signal label="Consistency Score" value={behavior ? `${behavior.consistencyScore}%` : "0%"} />
               <Signal label="Skip Rate" value={behavior ? `${behavior.skipRate}%` : "0%"} />
@@ -371,14 +467,12 @@ export function DashboardPage() {
 
 function Metric({ label, value, icon: Icon }: { label: string; value: string; icon: typeof Brain }) {
   return (
-    <div className="rounded-3xl border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4 p-8 flex flex-col items-center justify-center text-center relative group hover:border-brand/30 transition-all">
-      <div className="absolute top-4 right-4 text-cyan opacity-40 group-hover:scale-110 transition-transform">
-        <Icon size={18} />
+    <div className="bg-[#0c1017] p-5">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">{label}</p>
+        <Icon size={15} className="text-cyan/70" />
       </div>
-      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-3">{label}</p>
-      <p className="text-4xl font-bold text-slate-900 dark:text-slate-900 dark:text-white tracking-tight">
-        {value}
-      </p>
+      <p className="text-2xl font-semibold tracking-tight text-white">{value}</p>
     </div>
   );
 }
@@ -399,17 +493,31 @@ function UsageRow({ label, value, limit }: { label: string; value: number; limit
   );
 }
 
-function TaskRow({ task, updating, onToggle }: { task: MentorTask; updating: boolean; onToggle: () => void }) {
+function TaskRow({
+  task,
+  updating,
+  stucking,
+  onToggle,
+  onStart,
+  onStuck
+}: {
+  task: MentorTask;
+  updating: boolean;
+  stucking: boolean;
+  onToggle: () => void;
+  onStart: () => void;
+  onStuck: () => void;
+}) {
   const Icon = taskIcons[task.type];
   const isDone = task.status === "completed";
 
   return (
-    <div className={cn("rounded-lg border p-4 transition-colors", isDone ? "border-emerald-500/20 bg-emerald-500/5" : "border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4")}>
+    <div className={cn("rounded-xl border p-4 transition-colors", isDone ? "border-emerald-500/20 bg-emerald-500/5" : task.status === "in_progress" ? "border-brand/30 bg-brand/10" : "border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.045]")}>
       <div className="flex items-start gap-4">
         <button
           type="button"
           onClick={onToggle}
-          className="mt-1 text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white"
+          className="mt-1 text-slate-500 hover:text-white"
           aria-label={isDone ? "Mark task pending" : "Mark task complete"}
         >
           {updating ? <Loader2 className="animate-spin" size={20} /> : isDone ? <CheckCircle2 className="text-emerald-300" size={20} /> : <Circle size={20} />}
@@ -420,13 +528,45 @@ function TaskRow({ task, updating, onToggle }: { task: MentorTask; updating: boo
               <Icon size={12} />
               {task.priority}
             </span>
+            <span className="rounded-md border border-white/[0.08] px-2 py-1 text-xs text-slate-500">{task.status.replace("_", " ")}</span>
             <span className="text-xs text-slate-500">{task.estimatedMinutes} min</span>
+            {(task.stuckCount ?? 0) > 0 && (
+              <span className="inline-flex items-center gap-1 rounded-md border border-amber-400/20 bg-amber-400/10 px-2 py-1 text-xs font-semibold text-amber-300">
+                <AlertTriangle size={12} />
+                {task.stuckCount} stuck
+              </span>
+            )}
           </div>
-          <h3 className={cn("mt-3 text-base font-semibold", isDone ? "text-slate-500 dark:text-slate-500 dark:text-slate-400 line-through" : "text-slate-900 dark:text-slate-900 dark:text-white")}>{task.title}</h3>
-          <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-slate-500 dark:text-slate-400">{task.description}</p>
+          <h3 className={cn("mt-3 text-base font-semibold", isDone ? "text-slate-500 line-through" : "text-white")}>{task.title}</h3>
+          <p className="mt-1 text-sm leading-6 text-slate-400">{task.description}</p>
           <p className="mt-2 text-xs text-cyan">{task.reason}</p>
+          {task.mentorNote && (
+            <p className="mt-3 rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-xs leading-5 text-slate-400">
+              {task.mentorNote}
+            </p>
+          )}
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={onStart}
+              disabled={updating || isDone}
+              className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-xs font-semibold text-slate-950 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {updating ? <Loader2 size={14} className="animate-spin" /> : <PlayCircle size={14} />}
+              Start
+            </button>
+            <button
+              type="button"
+              onClick={onStuck}
+              disabled={stucking || isDone}
+              className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] px-3 py-2 text-xs font-semibold text-slate-300 transition hover:bg-white/[0.05] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {stucking ? <Loader2 size={14} className="animate-spin" /> : <AlertTriangle size={14} />}
+              Stuck
+            </button>
+          </div>
         </div>
-        <Link to={`/study/${task.id}`} className="shrink-0 rounded-lg border border-slate-200 dark:border-slate-200 dark:border-white/10 p-2 text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:bg-slate-50 dark:bg-white/5 hover:text-slate-900 dark:text-slate-900 dark:text-white">
+        <Link to={`/study/${task.id}`} className="shrink-0 rounded-lg border border-white/[0.08] p-2 text-slate-500 transition hover:bg-white/[0.05] hover:text-white">
           <ArrowRight size={16} />
         </Link>
       </div>
@@ -436,7 +576,7 @@ function TaskRow({ task, updating, onToggle }: { task: MentorTask; updating: boo
 
 function Signal({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-start justify-between gap-4 rounded-lg bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
+    <div className="flex items-start justify-between gap-4 rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2">
       <span className="text-slate-500">{label}</span>
       <span className="max-w-[180px] text-right text-slate-200">{value}</span>
     </div>

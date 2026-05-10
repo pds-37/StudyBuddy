@@ -28,6 +28,23 @@ type SkillGapSnapshot = {
   };
 } | null;
 
+type AdoptStrategyInput = {
+  targetRole?: string;
+  recoveryPlan: string;
+  nextSkills: string[];
+  gaps: Array<{
+    skill: string;
+    gapScore?: number;
+    userScore?: number;
+  }>;
+};
+
+type MentorTaskFeedbackInput = {
+  type: "start" | "stuck" | "confidence";
+  confidenceScore?: number;
+  note?: string;
+};
+
 const PLAN_LIMITS: Record<SaaSPlan, MentorSubscription["limits"]> = {
   free: {
     aiMessagesPerMonth: 100,
@@ -420,6 +437,80 @@ function buildTasks(date: string, user: MentorUser, signals: MentorSignals, skil
     .slice(0, 5);
 }
 
+function strategySkills(input: AdoptStrategyInput) {
+  const skills = [
+    ...input.nextSkills,
+    ...input.gaps
+      .slice()
+      .sort((left, right) => (right.gapScore ?? 0) - (left.gapScore ?? 0))
+      .map((gap) => gap.skill)
+  ];
+
+  return Array.from(new Set(skills.map((skill) => skill.trim()).filter(Boolean))).slice(0, 4);
+}
+
+function isAdoptedStrategyTask(item: { id: string; title: string }) {
+  return item.id.includes("adopted-strategy") || item.title.startsWith("Recovery focus:");
+}
+
+function buildAdoptedStrategyTasks(date: string, input: AdoptStrategyInput): MentorTask[] {
+  const skills = strategySkills(input);
+  const primarySkill = skills[0] ?? "your highest-impact skill gap";
+  const roleSuffix = input.targetRole ? ` for ${input.targetRole}` : "";
+
+  const tasks: MentorTask[] = [
+    task(date, {
+      type: "learn",
+      title: "Adopted strategy: recovery sprint",
+      description: input.recoveryPlan,
+      reason: `Veda is prioritizing the fastest recovery path${roleSuffix}.`,
+      priority: "high",
+      estimatedMinutes: 15,
+      href: "/dashboard"
+    }),
+    task(date, {
+      type: "roadmap",
+      title: `Recovery focus: ${primarySkill}`,
+      description: "Open your roadmap and move the first task tied to this skill into active execution.",
+      reason: "A strategy only works once it changes the next concrete task.",
+      priority: "high",
+      estimatedMinutes: 25,
+      href: "/roadmap"
+    })
+  ];
+
+  for (const skill of skills.slice(0, 3)) {
+    tasks.push(
+      task(date, {
+        type: "learn",
+        title: `Recovery focus: ${skill}`,
+        description: "Study the concept, create one note, and write one recall prompt from memory.",
+        reason: "This skill is part of the gap Veda flagged as blocking readiness.",
+        priority: skill === primarySkill ? "high" : "medium",
+        estimatedMinutes: skill === primarySkill ? 35 : 25,
+        href: "/notes"
+      })
+    );
+  }
+
+  tasks.push(
+    task(date, {
+      type: "reflection",
+      title: "Recovery focus: mentor check-in",
+      description: "Tell Veda what felt easy, what felt blocked, and what should be adjusted tomorrow.",
+      reason: "The mentor gets sharper when it sees friction, confidence, and follow-through.",
+      priority: "medium",
+      estimatedMinutes: 8,
+      href: "/copilot"
+    })
+  );
+
+  return tasks.map((item) => ({
+    ...item,
+    id: `${date}-adopted-strategy-${item.type}-${slug(item.title)}`
+  }));
+}
+
 function applyPreviousStatuses(nextTasks: MentorTask[], previous?: MentorDailyPlanDocument | null) {
   if (!previous) {
     return nextTasks;
@@ -431,7 +522,13 @@ function applyPreviousStatuses(nextTasks: MentorTask[], previous?: MentorDailyPl
     const old = previousById.get(item.id);
     return {
       ...item,
-      status: (old?.status as MentorTaskStatus | undefined) ?? item.status
+      status: (old?.status as MentorTaskStatus | undefined) ?? item.status,
+      startedAt: old?.startedAt ? old.startedAt.toISOString() : null,
+      completedAt: old?.completedAt ? old.completedAt.toISOString() : null,
+      confidenceScore: old?.confidenceScore ?? null,
+      stuckCount: old?.stuckCount ?? 0,
+      lastStuckAt: old?.lastStuckAt ? old.lastStuckAt.toISOString() : null,
+      mentorNote: old?.mentorNote ?? null
     };
   });
 }
@@ -454,7 +551,13 @@ function toTodayPlan(doc: MentorDailyPlanDocument): MentorTodayPlan {
       priority: item.priority as MentorTask["priority"],
       estimatedMinutes: item.estimatedMinutes,
       href: item.href,
-      status: item.status as MentorTaskStatus
+      status: item.status as MentorTaskStatus,
+      startedAt: item.startedAt?.toISOString() ?? null,
+      completedAt: item.completedAt?.toISOString() ?? null,
+      confidenceScore: item.confidenceScore ?? null,
+      stuckCount: item.stuckCount ?? 0,
+      lastStuckAt: item.lastStuckAt?.toISOString() ?? null,
+      mentorNote: item.mentorNote ?? null
     })),
     signals: doc.signals as MentorSignals,
     subscription: doc.subscription as MentorSubscription
@@ -510,6 +613,31 @@ async function getTodayPlan(userId: string): Promise<MentorTodayPlan> {
   return toTodayPlan(plan as MentorDailyPlanDocument);
 }
 
+async function adoptStrategy(userId: string, input: AdoptStrategyInput): Promise<MentorTodayPlan> {
+  await getTodayPlan(userId);
+
+  const date = todayKey();
+  const plan = await MentorDailyPlanModel.findOne({ userId, date });
+
+  if (!plan) {
+    throw new ApiError(404, "Mentor plan not found.");
+  }
+
+  const adoptedTasks = buildAdoptedStrategyTasks(date, input);
+  const existingTasks = plan.tasks.filter((item) => !isAdoptedStrategyTask(item));
+  const primarySkill = strategySkills(input)[0];
+
+  plan.focus = primarySkill ? `Recovery sprint: ${primarySkill}` : "Recovery sprint";
+  plan.mentorMessage = `Strategy adopted. ${input.recoveryPlan} I will keep this visible in today's plan and use your follow-through to tune the next recommendation.`;
+  plan.journeyStage = "learn";
+  plan.nextUnlock = "Recovery momentum";
+  plan.tasks = [...adoptedTasks, ...existingTasks].slice(0, 7) as typeof plan.tasks;
+
+  await plan.save();
+
+  return toTodayPlan(plan);
+}
+
 async function updateTaskStatus(userId: string, taskId: string, status: MentorTaskStatus): Promise<MentorTodayPlan> {
   const date = todayKey();
   const plan = await MentorDailyPlanModel.findOne({ userId, date });
@@ -524,7 +652,68 @@ async function updateTaskStatus(userId: string, taskId: string, status: MentorTa
   }
 
   taskItem.status = status;
+  taskItem.startedAt = status === "in_progress" && !taskItem.startedAt ? new Date() : taskItem.startedAt;
   taskItem.completedAt = status === "completed" ? new Date() : null;
+  await plan.save();
+
+  return toTodayPlan(plan);
+}
+
+async function recordTaskFeedback(userId: string, taskId: string, input: MentorTaskFeedbackInput): Promise<MentorTodayPlan> {
+  const date = todayKey();
+  const plan = await MentorDailyPlanModel.findOne({ userId, date });
+
+  if (!plan) {
+    return getTodayPlan(userId);
+  }
+
+  const taskItem = plan.tasks.find((item) => item.id === taskId);
+  if (!taskItem) {
+    throw new ApiError(404, "Mentor task not found.");
+  }
+
+  if (input.type === "start") {
+    taskItem.status = taskItem.status === "pending" ? "in_progress" : taskItem.status;
+    taskItem.startedAt = taskItem.startedAt ?? new Date();
+    taskItem.mentorNote = "Veda is watching this task as the current execution focus.";
+  }
+
+  if (input.type === "confidence") {
+    taskItem.confidenceScore = input.confidenceScore ?? taskItem.confidenceScore;
+    taskItem.mentorNote =
+      input.confidenceScore && input.confidenceScore <= 2
+        ? "Confidence is low. Veda will bias tomorrow toward review and smaller prerequisite steps."
+        : input.confidenceScore === 3
+          ? "Confidence is forming. Veda will keep this topic in the review loop."
+          : "Confidence is strong. Veda can move this topic toward projects and interviews.";
+  }
+
+  if (input.type === "stuck") {
+    taskItem.status = "in_progress";
+    taskItem.startedAt = taskItem.startedAt ?? new Date();
+    taskItem.stuckCount = (taskItem.stuckCount ?? 0) + 1;
+    taskItem.lastStuckAt = new Date();
+    taskItem.mentorNote = input.note?.trim()
+      ? `Stuck signal captured: ${input.note.trim()}`
+      : "Stuck signal captured. Veda should break this into a smaller prerequisite step.";
+
+    const unblockTask = task(date, {
+      type: "reflection",
+      title: `Unblock: ${taskItem.title}`,
+      description: "Write what blocked you, ask Veda for a hint, then retry the smallest next step.",
+      reason: "A stuck moment is useful data. The mentor should reduce friction before pushing harder.",
+      priority: "high",
+      estimatedMinutes: 10,
+      href: "/copilot"
+    });
+
+    unblockTask.id = `${date}-unblock-${slug(taskItem.id)}`;
+    const alreadyExists = plan.tasks.some((item) => item.id === unblockTask.id);
+    if (!alreadyExists) {
+      plan.tasks.unshift(unblockTask as any);
+    }
+  }
+
   await plan.save();
 
   return toTodayPlan(plan);
@@ -532,5 +721,7 @@ async function updateTaskStatus(userId: string, taskId: string, status: MentorTa
 
 export const mentorService = {
   getTodayPlan,
-  updateTaskStatus
+  adoptStrategy,
+  updateTaskStatus,
+  recordTaskFeedback
 };
