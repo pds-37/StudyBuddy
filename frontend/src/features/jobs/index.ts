@@ -1,1 +1,1 @@
-export { CareerIntelligenceDashboard as JobsWorkspace } from "./components/CareerIntelligenceDashboard";
+export { JobsList as JobsWorkspace } from "./components/JobsList";

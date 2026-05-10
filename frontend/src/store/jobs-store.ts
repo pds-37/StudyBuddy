@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { getRecommendations } from "../lib/api/jobs";
+import { getJobs } from "../lib/api/jobs";
 import { getApiErrorMessage } from "../lib/api/error";
 import type { JobListing } from "@studybuddy/shared";
 
@@ -33,8 +33,7 @@ export const useJobsStore = create<JobsState>((set, get) => ({
     set({ loading: true, error: null });
 
     try {
-      const recommendations = await getRecommendations();
-      const jobs = recommendations.map(r => r.job);
+      const jobs = await getJobs();
       set({
         jobs,
         loading: false,
