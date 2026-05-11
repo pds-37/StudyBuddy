@@ -1,12 +1,23 @@
 import { type RequestHandler } from "express";
 import { notesService } from "./notes.service.js";
-import { createNoteSchema, updateNoteSchema, noteIdParamSchema, notesQuerySchema } from "./notes.validation.js";
+import { createNoteSchema, updateNoteSchema, noteIdParamSchema, notesQuerySchema, learningIngestionSchema } from "./notes.validation.js";
 
 /** Creates a new note for the authenticated user. */
 const create: RequestHandler = async (request, response, next) => {
   try {
     const body = createNoteSchema.parse(request.body);
     const note = await notesService.createNote(request.userId ?? "", body);
+    response.status(201).json({ note });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/** Ingests raw learning text and lets the memory engine extract structure. */
+const ingest: RequestHandler = async (request, response, next) => {
+  try {
+    const body = learningIngestionSchema.parse(request.body);
+    const note = await notesService.ingestLearning(request.userId ?? "", body);
     response.status(201).json({ note });
   } catch (error) {
     next(error);
@@ -58,6 +69,29 @@ const list: RequestHandler = async (request, response, next) => {
   }
 };
 
+const contradictions: RequestHandler = async (request, response, next) => {
+  try {
+    const items = await notesService.listContradictions(request.userId ?? "");
+    response.json({ items });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const resolveContradiction: RequestHandler = async (request, response, next) => {
+  try {
+    const params = noteIdParamSchema.parse(request.params);
+    const note = await notesService.resolveContradiction(
+      request.userId ?? "",
+      params.id,
+      typeof request.body?.resolutionNote === "string" ? request.body.resolutionNote : undefined
+    );
+    response.json({ note });
+  } catch (error) {
+    next(error);
+  }
+};
+
 /** Searches notes using semantic vector search. */
 const search: RequestHandler = async (request, response, next) => {
   try {
@@ -96,10 +130,13 @@ const updateEmbeddings: RequestHandler = async (request, response, next) => {
 
 export const notesController = {
   create,
+  ingest,
   get,
   update,
   remove,
   list,
+  contradictions,
+  resolveContradiction,
   search,
   updateEmbeddings
 };

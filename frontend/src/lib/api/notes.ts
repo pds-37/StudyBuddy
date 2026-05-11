@@ -36,9 +36,30 @@ type NoteResponse = {
   note: CareerNote;
 };
 
+export type ContradictionItem = {
+  noteId: string;
+  title: string;
+  topic?: string;
+  signals: string[];
+  contentPreview: string;
+  updatedAt: string;
+};
+
+type IngestLearningRequest = {
+  text: string;
+  source?: "cli" | "web" | "youtube" | "pdf" | "blog" | "github";
+  sourceUrl?: string;
+};
+
 /** Creates a new note. */
 export async function createNote(data: CreateNoteRequest): Promise<CareerNote> {
   const response = await apiClient.post<NoteResponse>("/notes", data);
+  return response.data.note;
+}
+
+/** Captures raw natural-language learning and lets AI Dost extract structure. */
+export async function ingestLearning(data: IngestLearningRequest): Promise<CareerNote> {
+  const response = await apiClient.post<NoteResponse>("/notes/ingest", data);
   return response.data.note;
 }
 
@@ -57,6 +78,16 @@ export async function updateNote(id: string, data: UpdateNoteRequest): Promise<C
 /** Deletes a note. */
 export async function deleteNote(id: string): Promise<void> {
   await apiClient.delete(`/notes/${id}`);
+}
+
+export async function listContradictions(): Promise<ContradictionItem[]> {
+  const response = await apiClient.get<{ items: ContradictionItem[] }>("/notes/contradictions");
+  return response.data.items;
+}
+
+export async function resolveContradiction(id: string, resolutionNote?: string): Promise<CareerNote> {
+  const response = await apiClient.post<NoteResponse>(`/notes/${id}/resolve-contradiction`, { resolutionNote });
+  return response.data.note;
 }
 
 /** Lists notes with optional filtering. */

@@ -5,6 +5,12 @@ export const createNoteSchema = noteSchema;
 
 export const updateNoteSchema = noteSchema.partial();
 
+export const learningIngestionSchema = z.object({
+  text: z.string().min(1),
+  source: z.enum(["cli", "web", "youtube", "pdf", "blog", "github"]).default("web"),
+  sourceUrl: z.string().url().optional()
+});
+
 export const noteIdParamSchema = z.object({
   id: z.string().min(1)
 });

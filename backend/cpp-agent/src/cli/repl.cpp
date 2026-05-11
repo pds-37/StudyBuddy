@@ -22,6 +22,7 @@ void printHelp() {
   COMMANDS:
 
     note add "Title" [--tags=tag1,tag2]     Create a new note
+    learn add "What I learned today"        Capture learning instantly
     note list                               List all local notes
     note search "query"                     Search notes by keyword
     note delete <note_id>                   Soft-delete a note
@@ -32,7 +33,8 @@ void printHelp() {
     sync status                             Check sync bridge health
     sync queue                              Show offline queue size
 
-    chat                                    Start AI chat (Groq)
+    ask "question"                          Ask AI Dost using local notes first
+    chat                                    Start AI chat
 
     config show                             Display current config
     config set <key> <value>                Update a config value
@@ -65,8 +67,46 @@ void executeCommand(Config& config, const std::string& input) {
 
   if (cmd.module.empty()) return;
 
+  // ── learn commands ───────────────────────────────────────────
+  if (cmd.module == "learn") {
+    if (cmd.action == "add") {
+      std::string learning = cmd.args.empty() ? "" : cmd.args[0];
+      for (size_t i = 1; i < cmd.args.size(); ++i) {
+        learning += " " + cmd.args[i];
+      }
+      if (learning.empty()) {
+        std::cout << "  What did you learn today? ";
+        std::getline(std::cin, learning);
+      }
+
+      if (learning.empty()) {
+        std::cout << "  Nothing captured.\n";
+        return;
+      }
+
+      std::string title = learning;
+      const std::vector<std::string> starters = {
+        "Today I learned ", "today i learned ", "I learned ", "i learned ",
+        "Learned ", "learned ", "Studied ", "studied ", "Watched ", "watched "
+      };
+      for (const auto& starter : starters) {
+        if (title.rfind(starter, 0) == 0) {
+          title = title.substr(starter.size());
+          break;
+        }
+      }
+      if (title.size() > 80) title = title.substr(0, 80);
+
+      auto note = modules::createNote(config, title, {"learning-log"}, learning);
+      std::cout << "  Captured learning: " << note.meta.note_id.substr(0, 8) << "...\n";
+      std::cout << "  Recall is scheduled now. Run: recall start\n";
+    } else {
+      std::cout << "  Try: learn add \"Learned BFS traversal today\"\n";
+    }
+  }
+
   // ── note commands ────────────────────────────────────────────
-  if (cmd.module == "note") {
+  else if (cmd.module == "note") {
     if (cmd.action == "add") {
       std::string title = cmd.args.empty() ? "" : cmd.args[0];
       if (title.empty()) {
@@ -225,6 +265,29 @@ void executeCommand(Config& config, const std::string& input) {
     } else {
       std::cout << "  Try: recall start\n";
     }
+  }
+
+  // ── ask command ──────────────────────────────────────────────
+  else if (cmd.module == "ask") {
+    std::string question = cmd.action;
+    for (const auto& arg : cmd.args) {
+      if (!question.empty()) question += " ";
+      question += arg;
+    }
+    if (question.empty()) {
+      std::cout << "  Ask: ";
+      std::getline(std::cin, question);
+    }
+    if (question.empty()) return;
+
+    std::vector<ai::Message> messages;
+    messages.push_back({"system", ai::buildSystemPrompt(config)});
+    messages.push_back({"user", question});
+    std::cout << "\n  AI Dost > ";
+    auto response = ai::chatCompletion(config, messages, [](const std::string& token) {
+      std::cout << token;
+    });
+    std::cout << "\n\n";
   }
 
   // ── chat command ─────────────────────────────────────────────

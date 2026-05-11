@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import type { CareerNote, KnowledgeHealthMetrics, RevisionPriority, ConceptNode } from "@studybuddy/shared";
-import { listNotes, createNote as apiCreateNote, deleteNote as apiDeleteNote, updateNote as apiUpdateNote, searchNotesVector } from "../lib/api/notes";
+import { listNotes, createNote as apiCreateNote, deleteNote as apiDeleteNote, updateNote as apiUpdateNote, searchNotesVector, ingestLearning as apiIngestLearning, listContradictions as apiListContradictions, resolveContradiction as apiResolveContradiction, type ContradictionItem } from "../lib/api/notes";
 import { getKnowledgeHealth, getRevisionPriorities, getConcepts } from "../lib/api/intelligence";
 
 interface NotesStore {
@@ -13,6 +13,7 @@ interface NotesStore {
   knowledgeHealth: KnowledgeHealthMetrics | null;
   revisionPriorities: RevisionPriority[];
   concepts: ConceptNode[];
+  contradictions: ContradictionItem[];
   healthLoading: boolean;
 
   // Search
@@ -25,8 +26,11 @@ interface NotesStore {
   // Core actions
   fetchNotes: () => Promise<void>;
   createNote: (data: any) => Promise<void>;
+  ingestLearning: (text: string) => Promise<void>;
   deleteNote: (id: string) => Promise<void>;
   updateNote: (id: string, data: any) => Promise<void>;
+  fetchContradictions: () => Promise<void>;
+  resolveContradiction: (id: string, resolutionNote?: string) => Promise<void>;
   setActiveNote: (note: CareerNote | null) => void;
 
   // Intelligence actions
@@ -49,6 +53,7 @@ export const useNotesStore = create<NotesStore>((set, get) => ({
   knowledgeHealth: null,
   revisionPriorities: [],
   concepts: [],
+  contradictions: [],
   healthLoading: false,
 
   // Search state
@@ -83,6 +88,19 @@ export const useNotesStore = create<NotesStore>((set, get) => ({
     }
   },
 
+  ingestLearning: async (text: string) => {
+    set({ loading: true, error: null });
+    try {
+      const newNote = await apiIngestLearning({ text, source: "web" });
+      set({
+        notes: [newNote, ...get().notes],
+        loading: false
+      });
+    } catch (err: any) {
+      set({ error: err.message || "Failed to ingest learning", loading: false });
+    }
+  },
+
   deleteNote: async (id: string) => {
     try {
       await apiDeleteNote(id);
@@ -104,6 +122,28 @@ export const useNotesStore = create<NotesStore>((set, get) => ({
       });
     } catch (err: any) {
       set({ error: err.message || "Failed to update note" });
+    }
+  },
+
+  fetchContradictions: async () => {
+    try {
+      const contradictions = await apiListContradictions();
+      set({ contradictions });
+    } catch (err: any) {
+      console.error("Failed to fetch contradictions:", err);
+    }
+  },
+
+  resolveContradiction: async (id: string, resolutionNote?: string) => {
+    try {
+      const updated = await apiResolveContradiction(id, resolutionNote);
+      set({
+        contradictions: get().contradictions.filter((item) => item.noteId !== id),
+        notes: get().notes.map((note) => note.id === id ? updated : note),
+        activeNote: get().activeNote?.id === id ? updated : get().activeNote
+      });
+    } catch (err: any) {
+      set({ error: err.message || "Failed to resolve contradiction" });
     }
   },
 

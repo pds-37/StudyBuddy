@@ -19,6 +19,11 @@ copilotRouter.get(
   copilotController.getConversations
 );
 
+copilotRouter.post(
+  "/chat",
+  copilotController.quickChat
+);
+
 copilotRouter.get(
   "/conversations/:conversationId",
   validateRequest(copilotValidation.getConversation),

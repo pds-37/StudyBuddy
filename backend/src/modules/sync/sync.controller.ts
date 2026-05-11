@@ -42,6 +42,43 @@ const pullNotes: RequestHandler = async (request, response, next) => {
   }
 };
 
+const pullConcepts: RequestHandler = async (request, response, next) => {
+  try {
+    const result = await syncService.pullConcepts(request.userId ?? "", (request.query.since as string) ?? null);
+    response.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const pullMemory: RequestHandler = async (request, response, next) => {
+  try {
+    const result = await syncService.pullMemory(request.userId ?? "", (request.query.since as string) ?? null);
+    response.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const pushRecall: RequestHandler = async (request, response, next) => {
+  try {
+    const reviews = Array.isArray(request.body?.reviews) ? request.body.reviews : [];
+    const result = await syncService.pushRecall(request.userId ?? "", reviews);
+    response.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const pullMentorMemory: RequestHandler = async (request, response, next) => {
+  try {
+    const result = await syncService.pullMentorMemory(request.userId ?? "", (request.query.since as string) ?? null);
+    response.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 /**
  * GET /api/sync/status
  * Health check for the sync bridge.
@@ -60,5 +97,9 @@ const getStatus: RequestHandler = async (request, response, next) => {
 export const syncController = {
   pushNotes,
   pullNotes,
+  pullConcepts,
+  pullMemory,
+  pushRecall,
+  pullMentorMemory,
   getStatus,
 };

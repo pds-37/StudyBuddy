@@ -478,3 +478,9 @@ export const recallService = {
   reviewNote,
   getStats
 };
+
+export const __recallTestUtils = {
+  gradeFromScore,
+  applyStrength,
+  scheduleNext
+};

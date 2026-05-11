@@ -9,6 +9,7 @@ import {
   History,
   AlertCircle,
   BookOpen,
+  CheckCircle2,
   X,
   Loader2
 } from "lucide-react";
@@ -21,6 +22,7 @@ import {
   TodaysFocusStrip,
   NoteDetailPanel
 } from "../features/notes/components/KnowledgeComponents";
+import type { ContradictionItem } from "../lib/api/notes";
 
 const collections = [
   { id: "all", label: "All Knowledge", icon: BookOpen, color: "text-slate-400" },
@@ -33,10 +35,11 @@ export function NotesPage() {
   const {
     notes, loading, error,
     knowledgeHealth, revisionPriorities, concepts,
+    contradictions,
     healthLoading, searchResults, searchLoading,
     activeNote,
-    fetchNotes, createNote, deleteNote,
-    fetchKnowledgeHealth, fetchRevisionPriorities, fetchConcepts,
+    fetchNotes, createNote, ingestLearning, deleteNote,
+    fetchKnowledgeHealth, fetchRevisionPriorities, fetchConcepts, fetchContradictions, resolveContradiction,
     searchNotes, clearSearch, setActiveNote
   } = useNotesStore();
 
@@ -44,6 +47,7 @@ export function NotesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isInsightsVisible, setIsInsightsVisible] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [learningText, setLearningText] = useState("");
   const [newNote, setNewNote] = useState({ title: "", content: "", topic: "", tags: [] as string[] });
 
   // Load everything on mount
@@ -52,7 +56,8 @@ export function NotesPage() {
     void fetchKnowledgeHealth();
     void fetchRevisionPriorities();
     void fetchConcepts();
-  }, [fetchNotes, fetchKnowledgeHealth, fetchRevisionPriorities, fetchConcepts]);
+    void fetchContradictions();
+  }, [fetchNotes, fetchKnowledgeHealth, fetchRevisionPriorities, fetchConcepts, fetchContradictions]);
 
   // Semantic search with debounce
   useEffect(() => {
@@ -80,6 +85,18 @@ export function NotesPage() {
       void fetchRevisionPriorities();
       void fetchConcepts();
     }, 3000);
+  };
+
+  const handleIngestLearning = async () => {
+    const text = learningText.trim();
+    if (!text) return;
+    await ingestLearning(text);
+    setLearningText("");
+    setTimeout(() => {
+      void fetchKnowledgeHealth();
+      void fetchRevisionPriorities();
+      void fetchConcepts();
+    }, 1500);
   };
 
   const handleNoteAction = useCallback((action: string, noteId: string) => {
@@ -162,6 +179,25 @@ export function NotesPage() {
               className="px-5 py-2 bg-brand text-slate-900 text-[10px] font-bold uppercase tracking-wider hover:bg-brand/90 transition-colors flex items-center gap-2"
             >
               <Plus size={14} /> Ingest Knowledge
+            </button>
+          </div>
+
+          <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto]">
+            <textarea
+              value={learningText}
+              onChange={(event) => setLearningText(event.target.value)}
+              placeholder="What did you learn today? e.g., Learned useEffect dependencies and closures."
+              rows={2}
+              className="min-h-[72px] w-full resize-none border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-brand"
+            />
+            <button
+              type="button"
+              onClick={handleIngestLearning}
+              disabled={!learningText.trim() || loading}
+              className="inline-flex items-center justify-center gap-2 bg-cyan px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-950 transition hover:bg-cyan/90 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {loading ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+              Learn Add
             </button>
           </div>
 
@@ -327,12 +363,20 @@ export function NotesPage() {
               className="shrink-0 p-6 hidden 2xl:flex flex-col z-10 border-l border-white/[0.04] overflow-y-auto custom-scrollbar"
             >
               <div className="min-w-[250px]">
-                <KnowledgeInsightsPanel
-                  health={knowledgeHealth}
-                  priorities={revisionPriorities}
-                />
-              </div>
-            </Motion.aside>
+              <KnowledgeInsightsPanel
+                health={knowledgeHealth}
+                priorities={revisionPriorities}
+              />
+              <ContradictionReview
+                items={contradictions}
+                onOpen={(noteId) => {
+                  const note = notes.find((item) => item.id === noteId);
+                  if (note) setActiveNote(note);
+                }}
+                onResolve={(noteId) => void resolveContradiction(noteId, "Clarified from contradiction review.")}
+              />
+            </div>
+          </Motion.aside>
           )}
         </AnimatePresence>
       </div>
@@ -447,6 +491,46 @@ export function NotesPage() {
           </div>
         )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+function ContradictionReview({
+  items,
+  onOpen,
+  onResolve
+}: {
+  items: ContradictionItem[];
+  onOpen: (noteId: string) => void;
+  onResolve: (noteId: string) => void;
+}) {
+  if (items.length === 0) return null;
+
+  return (
+    <div className="mt-8 border-t border-white/5 pt-6">
+      <h3 className="text-[10px] font-bold uppercase tracking-widest text-amber-400">Contradiction Review</h3>
+      <div className="mt-4 space-y-3">
+        {items.slice(0, 5).map((item) => (
+          <div key={item.noteId} className="border border-amber-400/20 bg-amber-400/5 p-3">
+            <button
+              type="button"
+              onClick={() => onOpen(item.noteId)}
+              className="block w-full text-left"
+            >
+              <p className="text-[11px] font-semibold text-slate-200 line-clamp-1">{item.title}</p>
+              <p className="mt-1 text-[10px] leading-4 text-slate-500 line-clamp-2">{item.signals[0]}</p>
+            </button>
+            <button
+              type="button"
+              onClick={() => onResolve(item.noteId)}
+              className="mt-3 inline-flex items-center gap-1.5 text-[10px] font-semibold text-emerald-300 hover:text-emerald-200"
+            >
+              <CheckCircle2 size={12} />
+              Mark clarified
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

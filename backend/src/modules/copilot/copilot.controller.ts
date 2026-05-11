@@ -39,9 +39,24 @@ export const sendMessage = asyncHandler(async (req: Request, res: Response) => {
   res.json({ message: aiResponse });
 });
 
+/** One-shot chat endpoint used by the offline C++ agent. */
+export const quickChat = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.userId ?? "";
+  const message = String(req.body?.message ?? "");
+  const conversationId = await copilotService.createConversation(userId);
+  const aiResponse = await copilotService.sendMessage(conversationId, userId, message);
+
+  res.json({
+    response: aiResponse.content,
+    message: aiResponse.content,
+    metadata: aiResponse.metadata
+  });
+});
+
 export const copilotController = {
   createConversation,
   getConversations,
   getConversation,
-  sendMessage
+  sendMessage,
+  quickChat
 };

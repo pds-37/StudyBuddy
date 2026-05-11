@@ -1,5 +1,9 @@
 import { NoteModel, type NoteDocument } from "../notes/note.model.js";
 import { vectorSearchService } from "../../services/ai/vector-search.service.js";
+import { ConceptNodeModel } from "../knowledge/concept.model.js";
+import { MemoryItemModel } from "../memory/memory.model.js";
+import { StudentIntelligenceEventModel, StudentIntelligenceProfileModel } from "../intelligence/student-intelligence.model.js";
+import { MemoryEngine } from "../../engines/memory.engine.js";
 
 /** Shape of a note coming from the C++ agent. */
 export type SyncNotePayload = {
@@ -30,6 +34,16 @@ type SyncResult = {
 
 type PullResult = {
   notes: ReturnType<typeof toSyncShape>[];
+};
+
+type RecallSyncPayload = {
+  note_id: string;
+  quality?: number;
+  strength?: number;
+  next_review_at?: string | null;
+  last_reviewed?: string | null;
+  review_count?: number;
+  lapse_count?: number;
 };
 
 /** Converts a Mongoose note document to the canonical sync shape. */
@@ -157,6 +171,118 @@ async function pullNotes(userId: string, since: string | null): Promise<PullResu
   };
 }
 
+async function pullConcepts(userId: string, since: string | null) {
+  const filter: Record<string, any> = { userId };
+  if (since) filter.updatedAt = { $gt: new Date(since) };
+
+  const concepts = await ConceptNodeModel.find(filter).sort({ updatedAt: 1 });
+  return {
+    concepts: concepts.map((concept) => ({
+      id: concept._id.toString(),
+      name: concept.name,
+      category: concept.category,
+      difficulty: concept.difficulty,
+      note_ids: concept.noteIds,
+      related_concept_ids: concept.relatedConceptIds,
+      interview_frequency: concept.interviewFrequency,
+      retention_score: concept.retentionScore ?? 0,
+      retention_state: concept.retentionState ?? "critical",
+      mastery_validated: concept.masteryValidated ?? false,
+      last_reviewed: concept.lastReviewed ? concept.lastReviewed.toISOString() : null,
+      execution_evidence: concept.executionEvidence ?? 0,
+      updated_at: concept.updatedAt.toISOString()
+    }))
+  };
+}
+
+async function pullMemory(userId: string, since: string | null) {
+  const filter: Record<string, any> = { userId };
+  if (since) filter.updatedAt = { $gt: new Date(since) };
+
+  const items = await MemoryItemModel.find(filter).sort({ updatedAt: 1 });
+  return {
+    memory: items.map((item) => ({
+      id: item._id.toString(),
+      note_id: item.noteId,
+      content: item.content,
+      type: item.type,
+      next_review: item.nextReview.toISOString(),
+      strength: item.strength ?? 0,
+      interval: item.interval ?? 1,
+      repetitions: item.repetitions ?? 0,
+      ease_factor: item.easeFactor ?? 2.5,
+      updated_at: item.updatedAt.toISOString()
+    }))
+  };
+}
+
+async function pushRecall(userId: string, reviews: RecallSyncPayload[]) {
+  const accepted: string[] = [];
+  const rejected: Array<{ note_id: string; reason: string }> = [];
+
+  for (const review of reviews) {
+    const note = await NoteModel.findOne({ noteId: review.note_id, userId });
+    if (!note) {
+      rejected.push({ note_id: review.note_id, reason: "note not found" });
+      continue;
+    }
+
+    if (typeof review.quality === "number") {
+      await MemoryEngine.processRecall(userId, note._id.toString(), Math.max(0, Math.min(5, review.quality)));
+    }
+
+    if (typeof review.strength === "number") note.strength = Math.max(0, Math.min(1, review.strength));
+    if (review.next_review_at !== undefined) note.nextReviewAt = review.next_review_at ? new Date(review.next_review_at) : new Date();
+    if (review.last_reviewed !== undefined) note.lastReviewed = review.last_reviewed ? new Date(review.last_reviewed) : null;
+    if (typeof review.review_count === "number") note.reviewCount = review.review_count;
+    if (typeof review.lapse_count === "number") note.lapseCount = review.lapse_count;
+    note.syncedAt = new Date();
+    await note.save();
+    accepted.push(review.note_id);
+  }
+
+  return { accepted, rejected };
+}
+
+async function pullMentorMemory(userId: string, since: string | null) {
+  const [profile, events] = await Promise.all([
+    StudentIntelligenceProfileModel.findOne({ userId }),
+    StudentIntelligenceEventModel.find({
+      userId,
+      ...(since ? { updatedAt: { $gt: new Date(since) } } : {})
+    }).sort({ createdAt: -1 }).limit(100)
+  ]);
+
+  return {
+    profile: profile ? {
+      user_id: profile.userId,
+      target_roles: profile.targetRoles,
+      active_tracks: profile.activeTracks,
+      weak_concepts: profile.weakConcepts,
+      strong_concepts: profile.strongConcepts,
+      recall_health: profile.recallHealth,
+      memory_retention: profile.memoryRetention,
+      consistency_score: profile.consistencyScore,
+      learning_velocity: profile.learningVelocity,
+      emotional_state: profile.emotionalState,
+      adaptive_difficulty: profile.adaptiveDifficulty,
+      daily_intelligence: profile.dailyIntelligence,
+      system_memory: profile.systemMemory,
+      updated_at: profile.updatedAt.toISOString()
+    } : null,
+    events: events.map((event) => ({
+      id: event._id.toString(),
+      type: event.type,
+      source: event.source,
+      entity_id: event.entityId ?? null,
+      payload: event.payload,
+      impact: event.impact,
+      created_at: event.createdAt.toISOString(),
+      updated_at: event.updatedAt.toISOString()
+    }))
+  };
+}
+
 /** Returns sync health/status information for the given user. */
 async function getSyncStatus(userId: string) {
   const lastPushed = await NoteModel.findOne({ userId, sourceType: "manual" })
@@ -180,5 +306,9 @@ async function getSyncStatus(userId: string) {
 export const syncService = {
   pushNotes,
   pullNotes,
+  pullConcepts,
+  pullMemory,
+  pushRecall,
+  pullMentorMemory,
   getSyncStatus,
 };

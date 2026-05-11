@@ -72,10 +72,44 @@ async function searchNotes(
     }
   }
 
-  // Sort by similarity (highest first) and limit results
-  return results
+  const ranked = results
     .sort((a, b) => b.similarity - a.similarity)
     .slice(0, limit);
+
+  if (ranked.length > 0) {
+    return ranked;
+  }
+
+  const queryTokens = tokenize(query);
+  if (queryTokens.size === 0) return [];
+
+  const textNotes = await NoteModel.find({ userId, deleted: { $ne: true } })
+    .sort({ updatedAt: -1 })
+    .limit(100);
+
+  return textNotes
+    .map((note) => {
+      const noteTokens = tokenize(`${note.title} ${note.topic ?? ""} ${note.tags.join(" ")} ${(note.concepts ?? []).join(" ")} ${note.content}`);
+      let matches = 0;
+      for (const token of queryTokens) {
+        if (noteTokens.has(token)) matches += 1;
+      }
+      return { note: toNote(note), similarity: matches / Math.max(queryTokens.size, 1) };
+    })
+    .filter((result) => result.similarity > 0)
+    .sort((a, b) => b.similarity - a.similarity)
+    .slice(0, limit);
+}
+
+function tokenize(value: string) {
+  return new Set(
+    value
+      .toLowerCase()
+      .replace(/[^a-z0-9+#\s-]/g, " ")
+      .split(/\s+/)
+      .map((token) => token.trim())
+      .filter((token) => token.length > 2)
+  );
 }
 
 /** Updates the embedding for a note. */
