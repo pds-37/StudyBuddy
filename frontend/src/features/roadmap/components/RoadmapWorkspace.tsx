@@ -109,63 +109,43 @@ export function RoadmapWorkspace() {
           ))}
 
           {/* TOP BANNER */}
-          <div className="relative rounded-3xl border border-white/[0.06] bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
-            <div className="absolute top-0 right-0 w-[600px] h-full opacity-60 pointer-events-none">
-               {/* Decorative Nebula Placeholder */}
-               <div className="absolute inset-0 bg-gradient-to-r from-obsidian via-transparent to-transparent z-10" />
-               <div className="absolute top-[-50%] right-[-10%] w-96 h-96 bg-brand/30 blur-[100px] rounded-full" />
-               <div className="absolute bottom-[-20%] right-[10%] w-64 h-64 bg-cyan-500/20 blur-[80px] rounded-full" />
-            </div>
-
-            <div className="relative z-10 p-8">
-               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+          <div className="relative group overflow-hidden rounded-[2.5rem] border border-white/[0.08] bg-[#0c1017] p-10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.4)] transition-all hover:border-brand/30">
+            <div className="absolute inset-0 bg-gradient-to-br from-brand/10 via-transparent to-cyan/5 opacity-40 pointer-events-none" />
+            <div className="absolute -top-24 -right-24 w-96 h-96 bg-brand/10 rounded-full blur-[120px] pointer-events-none group-hover:scale-125 transition-transform duration-1000" />
+            
+            <div className="relative z-10">
+               <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                       <Route className="w-4 h-4 text-brand" />
-                       <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand">Learning OS</span>
+                    <div className="flex items-center gap-3 mb-4">
+                       <div className="w-10 h-10 rounded-xl bg-brand/10 flex items-center justify-center text-brand">
+                          <Compass className="w-6 h-6" />
+                       </div>
+                       <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-brand/80">Strategy OS</span>
                     </div>
-                    <h1 className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
+                    <h1 className="text-5xl font-black text-white tracking-tight leading-none mb-4">
                        Intelligence Roadmap
-                       {user?.psychologicalProfile?.identityNarrative && (
-                         <span className="px-3 py-1 rounded-full bg-brand/10 border border-brand/30 text-[10px] font-bold text-brand uppercase tracking-[0.2em] animate-pulse">
-                           {user.psychologicalProfile.identityNarrative}
-                         </span>
-                       )}
                     </h1>
+                    <p className="text-slate-400 text-lg max-w-xl leading-relaxed">
+                       Your personal path to <span className="text-white font-semibold underline decoration-brand/30 underline-offset-4">{currentRoadmap?.targetRole || "Success"}</span>, optimized by Veda.
+                    </p>
                  </div>
                  
-                 <div className="flex items-center gap-3">
-                    {roadmaps.length > 1 && (
-                      <div className="flex items-center gap-1 p-1 bg-white/5 border border-white/10 rounded-2xl">
-                        {roadmaps.map(r => (
-                          <button 
-                            key={r.id}
-                            onClick={() => setCurrentRoadmap(r)}
-                            className={cn(
-                              "px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all",
-                              currentRoadmap?.id === r.id ? "bg-brand text-slate-900 dark:text-slate-900 dark:text-white" : "text-slate-500 hover:text-slate-300"
-                            )}
-                          >
-                            {r.category === "Career" ? r.targetRole.split(" ")[0] : r.title.split(" ")[0]}
-                          </button>
-                        ))}
-                      </div>
-                    )}
+                 <div className="flex items-center gap-4">
                     <button 
                       onClick={() => setIsExpansionOpen(true)}
-                      className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-bold text-slate-900 dark:text-slate-900 dark:text-white flex items-center gap-2 transition-all group"
+                      className="group/btn relative px-8 py-4 rounded-2xl bg-white text-slate-950 text-sm font-black transition-all hover:bg-slate-100 active:scale-95 shadow-[0_20px_40px_rgba(255,255,255,0.1)] flex items-center gap-2"
                     >
-                      <Plus className="w-4 h-4 text-brand group-hover:rotate-90 transition-transform duration-300" />
-                      <span>Explore New Direction</span>
+                      <Plus className="w-5 h-5 transition-transform group-hover/btn:rotate-90" />
+                      Expand Direction
                     </button>
                  </div>
                </div>
 
-               <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                  <TopMetric label="Readiness Score" value={`${currentRoadmap?.readinessScore || 0}%`} sub="↑ 12% this week" color="text-cyan-400" border="border-cyan-400" />
-                  <TopMetric label="Skill Consistency" value={(currentRoadmap?.consistencyScore ?? 0) > 70 ? "85%" : "60%"} sub="Strong consistency" color="text-purple-400" border="border-purple-400" />
-                  <TopMetric label="Recall Health" value="68%" sub="Needs improvement" color="text-emerald-400" border="border-emerald-400" />
-                  <TopMetric label="Market Alignment" value="+12%" sub="Keep it up!" color="text-blue-400" border="border-blue-400" />
+               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <TopMetric label="Readiness" value={`${currentRoadmap?.readinessScore || 0}%`} sub="Target: 95%" color="text-cyan" />
+                  <TopMetric label="Consistency" value="88%" sub="Elite Level" color="text-brand" />
+                  <TopMetric label="Recall" value="62%" sub="Needs Focus" color="text-amber-400" />
+                  <TopMetric label="Timeline" value="Week 4" sub="Phase 1 of 3" color="text-emerald-400" />
                </div>
             </div>
           </div>

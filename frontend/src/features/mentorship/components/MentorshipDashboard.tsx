@@ -45,65 +45,70 @@ export function MentorshipDashboard() {
       )}
 
       <div className="grid gap-6 sm:grid-cols-2">
-        {matches.map(match => (
-          <div key={match.id} className="rounded-2xl border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white/[0.02] p-6 relative overflow-hidden group hover:border-brand/30 transition-all">
-            <div className="absolute top-0 right-0 bg-brand/10 text-brand text-xs font-bold px-3 py-1 rounded-bl-lg">
-              {match.matchScore}% Match
+        {matches.map((match, idx) => (
+          <div key={match.id} className="group relative rounded-3xl border border-white/[0.08] bg-[#0c1017] p-8 transition-all hover:border-brand/40 hover:shadow-[0_20px_80px_-20px_rgba(124,92,255,0.15)] animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${idx * 0.1}s` }}>
+            <div className="absolute top-0 right-0 bg-brand text-slate-950 text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-bl-2xl shadow-[0_0_20px_rgba(124,92,255,0.3)]">
+              {match.matchScore}% Synergy
             </div>
             
-            <div className="flex items-start gap-4 mb-4">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand/20 to-cyan/20 flex items-center justify-center text-xl font-bold text-slate-900 dark:text-slate-900 dark:text-white shrink-0">
-                {match.mentor.name.charAt(0)}
+            <div className="flex items-start gap-6 mb-6">
+              <div className="relative shrink-0">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand to-cyan p-[2px]">
+                  <div className="w-full h-full rounded-2xl bg-[#0c1017] flex items-center justify-center text-2xl font-black text-white">
+                    {match.mentor.name.charAt(0)}
+                  </div>
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 border-4 border-[#0c1017] rounded-full" />
               </div>
-              <div>
-                <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-900 dark:text-white">{match.mentor.name}</h3>
-                <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400 mt-1">
-                  <Briefcase className="w-4 h-4" />
+              <div className="min-w-0">
+                <h3 className="text-2xl font-bold text-white tracking-tight truncate">{match.mentor.name}</h3>
+                <div className="flex items-center gap-2 text-sm text-slate-400 mt-1">
+                  <Briefcase className="w-4 h-4 text-brand" />
                   {match.mentor.role}
                 </div>
-                <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400 mt-0.5">
+                <div className="flex items-center gap-2 text-sm text-slate-500 mt-1">
                   <Building2 className="w-4 h-4" />
                   {match.mentor.company}
                 </div>
               </div>
             </div>
 
-            <p className="text-sm text-slate-700 dark:text-slate-700 dark:text-slate-300 mb-4 line-clamp-2">
-              "{match.mentor.bio}"
-            </p>
+            <div className="relative mb-6">
+               <p className="text-sm text-slate-400 leading-relaxed italic">
+                 "{match.mentor.bio}"
+               </p>
+            </div>
 
-            <div className="space-y-2 mb-6">
-              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Why they're a fit</div>
-              <ul className="text-sm text-slate-700 dark:text-slate-700 dark:text-slate-300 space-y-1">
+            <div className="space-y-3 mb-8">
+              <div className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em]">Contextual Alignment</div>
+              <ul className="space-y-2">
                 {match.matchReasons.map((reason, i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <Sparkles className="w-4 h-4 text-brand shrink-0 mt-0.5" />
-                    <span>{reason}</span>
+                  <li key={i} className="flex items-start gap-3">
+                    <Sparkles className="w-4 h-4 text-cyan mt-0.5 shrink-0" />
+                    <span className="text-xs text-slate-300 font-medium">{reason}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
             {match.status === "pending" ? (
-              <div className="flex gap-3">
+              <div className="flex gap-4">
                 <button
                   onClick={() => updateStatus(match.id, "accepted")}
-                  className="flex-1 flex items-center justify-center gap-2 bg-white text-black py-2 rounded-lg text-sm font-medium hover:bg-slate-200 transition"
+                  className="flex-2 flex-1 flex items-center justify-center gap-2 bg-white text-slate-950 py-3 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-100 transition shadow-[0_15px_30px_rgba(255,255,255,0.1)]"
                 >
-                  <Check className="w-4 h-4" />
-                  Request Mentorship
+                  Request Connection
                 </button>
                 <button
                   onClick={() => updateStatus(match.id, "declined")}
-                  className="flex-1 flex items-center justify-center gap-2 bg-slate-50 dark:bg-slate-50 dark:bg-white/5 text-slate-700 dark:text-slate-700 dark:text-slate-300 py-2 rounded-lg text-sm font-medium hover:bg-slate-100 dark:bg-slate-100 dark:bg-white/10 hover:text-slate-900 dark:text-slate-900 dark:text-white transition"
+                  className="px-4 flex items-center justify-center bg-white/[0.04] border border-white/[0.08] text-slate-500 py-3 rounded-xl hover:bg-red-500/10 hover:text-red-400 transition"
                 >
-                  <X className="w-4 h-4" />
-                  Decline
+                  <X className="w-5 h-5" />
                 </button>
               </div>
             ) : match.status === "accepted" ? (
-              <div className="space-y-3">
-                <div className="bg-green-500/10 text-green-400 text-sm font-medium py-2 rounded-lg text-center flex items-center justify-center gap-2">
+              <div className="space-y-4">
+                <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest py-3 rounded-xl text-center flex items-center justify-center gap-3">
                   <Check className="w-4 h-4" />
                   Mentorship Active
                 </div>
@@ -111,14 +116,21 @@ export function MentorshipDashboard() {
                   to="/copilot"
                   onClick={() => {
                     const { sendMessage } = useCopilotStore.getState();
-                    void sendMessage(`I'm now being mentored by ${match.mentor.name}, who is a ${match.mentor.role} at ${match.mentor.company}. Can you help me prepare a first message to them or suggest how I can best learn from their expertise in ${match.mentor.role}?`);
+                    void sendMessage(`I'm now being mentored by ${match.mentor.name}, who is a ${match.mentor.role} at ${match.mentor.company}. Can you help me prepare a first message?`);
                   }}
-                  className="w-full flex items-center justify-center gap-2 bg-brand text-slate-900 dark:text-slate-900 dark:text-white py-3 rounded-xl text-xs font-bold uppercase tracking-widest hover:scale-[1.02] transition shadow-lg shadow-brand/20"
+                  className="w-full flex items-center justify-center gap-3 bg-brand text-white py-4 rounded-2xl text-xs font-black uppercase tracking-[0.2em] hover:scale-[1.02] transition shadow-lg shadow-brand/20"
                 >
                   <MessageSquare className="w-4 h-4" />
-                  Chat about Mentor
+                  Initiate Discussion
                 </Link>
               </div>
+            ) : (
+              <div className="bg-white/[0.02] border border-white/[0.06] text-slate-600 text-[10px] font-black uppercase tracking-widest py-3 rounded-xl text-center">
+                Archived
+              </div>
+            )}
+          </div>
+        ))}
 
             ) : (
               <div className="bg-slate-800/50 text-slate-500 text-sm font-medium py-2 rounded-lg text-center">

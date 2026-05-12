@@ -160,45 +160,49 @@ export function NotesPage() {
   return (
     <div className="flex flex-col h-full overflow-hidden relative bg-[#05070A]">
       {/* ─── TOP: KNOWLEDGE STATUS HEADER ─── */}
-      <header className="shrink-0 px-8 pt-8 pb-5 z-20 border-b border-white/[0.04]">
-        <div className="max-w-[1600px] mx-auto space-y-7">
+      <header className="shrink-0 px-8 pt-10 pb-8 z-20 border-b border-white/[0.06] bg-[#0c1017]">
+        <div className="max-w-[1600px] mx-auto space-y-10">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-base font-semibold text-slate-100 flex items-center gap-3">
-                Knowledge OS
-                <span className="text-brand text-[9px] border border-brand/20 px-2 py-0.5 bg-brand/5 font-bold tracking-wider uppercase">
-                  Intelligence
-                </span>
-              </h1>
-              <p className="text-slate-600 text-[11px] mt-1.5 font-medium">
-                Transforming scattered learning into structured long-term mastery.
-              </p>
+            <div className="flex items-center gap-6">
+              <div className="w-16 h-16 rounded-[1.25rem] bg-brand/10 flex items-center justify-center text-brand border border-brand/20 shadow-[0_0_40px_rgba(124,92,255,0.1)]">
+                <Brain size={32} />
+              </div>
+              <div>
+                <h1 className="text-3xl font-black text-white tracking-tight">
+                  Knowledge Intelligence
+                </h1>
+                <p className="text-slate-500 text-sm mt-1 font-medium">
+                  Transforming raw data into long-term structured mastery.
+                </p>
+              </div>
             </div>
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="px-5 py-2 bg-brand text-slate-900 text-[10px] font-bold uppercase tracking-wider hover:bg-brand/90 transition-colors flex items-center gap-2"
+              className="px-8 py-4 bg-white text-slate-950 text-xs font-black uppercase tracking-[0.2em] hover:bg-slate-100 transition-all active:scale-95 shadow-[0_20px_40px_rgba(255,255,255,0.1)] flex items-center gap-3 rounded-2xl"
             >
-              <Plus size={14} /> Ingest Knowledge
+              <Plus size={16} strokeWidth={3} /> Ingest Knowledge
             </button>
           </div>
 
-          <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto]">
-            <textarea
-              value={learningText}
-              onChange={(event) => setLearningText(event.target.value)}
-              placeholder="What did you learn today? e.g., Learned useEffect dependencies and closures."
-              rows={2}
-              className="min-h-[72px] w-full resize-none border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-brand"
-            />
-            <button
-              type="button"
-              onClick={handleIngestLearning}
-              disabled={!learningText.trim() || loading}
-              className="inline-flex items-center justify-center gap-2 bg-cyan px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-950 transition hover:bg-cyan/90 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              {loading ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
-              Learn Add
-            </button>
+          <div className="group relative">
+            <div className="absolute inset-0 bg-brand/5 rounded-3xl blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity" />
+            <div className="relative flex gap-3 p-1 bg-white/[0.02] border border-white/[0.08] rounded-[1.5rem] focus-within:border-brand/40 transition-all">
+              <textarea
+                value={learningText}
+                onChange={(event) => setLearningText(event.target.value)}
+                placeholder="What did you learn today? Veda will extract concepts and build connections..."
+                className="w-full bg-transparent border-0 px-6 py-4 text-lg text-white outline-none placeholder:text-slate-600 focus:ring-0 resize-none min-h-[80px]"
+              />
+              <button
+                type="button"
+                onClick={handleIngestLearning}
+                disabled={!learningText.trim() || loading}
+                className="shrink-0 inline-flex items-center justify-center gap-3 bg-brand px-8 py-2 text-sm font-black uppercase tracking-widest text-white transition-all hover:bg-brand/90 disabled:opacity-40 rounded-2xl m-1 shadow-lg shadow-brand/20"
+              >
+                {loading ? <Loader2 size={18} className="animate-spin" /> : <Sparkles size={18} />}
+                Process
+              </button>
+            </div>
           </div>
 
           {/* Live metrics bar */}

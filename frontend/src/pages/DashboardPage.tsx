@@ -214,44 +214,56 @@ export function DashboardPage() {
       )}
 
       {bestAction && (
-        <div className="relative overflow-hidden rounded-xl border border-cyan/30 bg-gradient-to-r from-cyan/20 via-cyan/5 to-transparent p-6 shadow-[0_0_40px_-10px_rgba(34,211,238,0.15)]">
-          <div className="flex items-start gap-4">
-            <div className="flex shrink-0 items-center justify-center rounded-full bg-cyan/20 p-3 text-cyan">
-              <Brain size={24} />
-            </div>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan/80">Veda AI Recommendation</p>
-              <h2 className="mt-1 text-xl font-bold text-slate-900 dark:text-slate-900 dark:text-white">Your Next Best Action</h2>
-              <p className="mt-2 text-sm leading-relaxed text-slate-700 dark:text-slate-700 dark:text-slate-300">
-                {bestAction.reason}
-              </p>
-              
-              <div className="mt-4">
-                {bestAction.action === "task" && bestAction.data && (
-                  <button className="inline-flex items-center gap-2 rounded-lg bg-cyan px-4 py-2 text-sm font-semibold text-slate-900 transition-colors hover:bg-cyan/90">
-                    <Target size={16} />
-                    Start: {bestAction.data.title || "Next Task"}
-                  </button>
-                )}
-                {bestAction.action === "revision" && (
-                  <Link to="/recall" className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-slate-900 transition-colors hover:bg-emerald-400">
-                    <Zap size={16} />
-                    Start Quick Revision
-                  </Link>
-                )}
-                {bestAction.action === "generate" && (
-                  <Link to="/roadmap" className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-slate-900 dark:text-slate-900 dark:text-white transition-colors hover:bg-brand/90">
-                    <Route size={16} />
-                    Generate Next Roadmap
-                  </Link>
-                )}
-                {bestAction.action === "recalibrate" && (
-                  <Link to="/onboarding" className="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-slate-900 transition-colors hover:bg-amber-400">
-                    <RefreshCw size={16} />
-                    Recalibrate Roadmap
-                  </Link>
-                )}
+        <div className="group relative overflow-hidden rounded-[2rem] border border-cyan/20 bg-[#0c1017] p-8 shadow-[0_0_80px_-20px_rgba(34,211,238,0.2)] transition-all hover:border-cyan/40">
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan/10 via-transparent to-transparent opacity-50" />
+          <div className="absolute -top-24 -right-24 w-64 h-64 bg-cyan/10 rounded-full blur-[100px] pointer-events-none" />
+          
+          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+            <div className="flex items-start gap-6">
+              <div className="flex shrink-0 items-center justify-center rounded-2xl bg-cyan/10 p-4 text-cyan shadow-[0_0_30px_rgba(34,211,238,0.1)] group-hover:scale-110 transition-transform duration-500">
+                <Brain size={32} />
               </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-cyan animate-pulse" />
+                  <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan/80">Veda Intelligence Insight</p>
+                </div>
+                <h2 className="text-3xl font-bold text-white tracking-tight">Your Next Best Action</h2>
+                <p className="mt-3 text-base leading-relaxed text-slate-400 max-w-2xl">
+                  {bestAction.reason}
+                </p>
+              </div>
+            </div>
+            
+            <div className="shrink-0">
+              {bestAction.action === "task" && bestAction.data && (
+                <button className="group/btn relative inline-flex items-center gap-3 rounded-2xl bg-cyan px-8 py-4 text-sm font-bold text-slate-950 transition-all hover:scale-105 active:scale-95 shadow-[0_20px_40px_rgba(34,211,238,0.2)]">
+                  <Target size={18} />
+                  Start: {bestAction.data.title || "Next Task"}
+                  <ArrowRight size={16} className="ml-1 transition-transform group-hover/btn:translate-x-1" />
+                </button>
+              )}
+              {bestAction.action === "revision" && (
+                <Link to="/recall" className="group/btn relative inline-flex items-center gap-3 rounded-2xl bg-emerald-500 px-8 py-4 text-sm font-bold text-slate-950 transition-all hover:scale-105 active:scale-95 shadow-[0_20px_40px_rgba(16,185,129,0.2)]">
+                  <Zap size={18} />
+                  Start Quick Revision
+                  <ArrowRight size={16} className="ml-1 transition-transform group-hover/btn:translate-x-1" />
+                </Link>
+              )}
+              {bestAction.action === "generate" && (
+                <Link to="/roadmap" className="group/btn relative inline-flex items-center gap-3 rounded-2xl bg-brand px-8 py-4 text-sm font-bold text-white transition-all hover:scale-105 active:scale-95 shadow-[0_20px_40px_rgba(124,92,255,0.2)]">
+                  <Route size={18} />
+                  Generate Roadmap
+                  <ArrowRight size={16} className="ml-1 transition-transform group-hover/btn:translate-x-1" />
+                </Link>
+              )}
+              {bestAction.action === "recalibrate" && (
+                <Link to="/onboarding" className="group/btn relative inline-flex items-center gap-3 rounded-2xl bg-amber-500 px-8 py-4 text-sm font-bold text-slate-950 transition-all hover:scale-105 active:scale-95 shadow-[0_20px_40px_rgba(245,158,11,0.2)]">
+                  <RefreshCw size={18} />
+                  Recalibrate Path
+                  <ArrowRight size={16} className="ml-1 transition-transform group-hover/btn:translate-x-1" />
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -259,31 +271,38 @@ export function DashboardPage() {
 
       <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0c1017]">
-          <div className="border-b border-white/[0.06] px-6 py-5">
-            <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+          <div className="border-b border-white/[0.06] px-8 py-10">
+            <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-cyan">Veda Command Center</p>
-                <h1 className="mt-3 text-3xl font-semibold leading-tight text-white lg:text-5xl">
-                  {plan?.focus ?? "Daily mentor plan"}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-brand/10 flex items-center justify-center text-brand">
+                    <Sparkles size={20} />
+                  </div>
+                  <p className="text-[11px] font-bold uppercase tracking-[0.4em] text-cyan">Veda Command Center</p>
+                </div>
+                <h1 className="text-4xl font-black leading-[1.1] text-white lg:text-6xl tracking-tight">
+                  {plan?.focus ?? "Strategic Execution"}
                 </h1>
-                <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-400 lg:text-base">
-                  {plan?.mentorMessage ?? "Your daily mentor plan will appear here."}
+                <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-400">
+                  {plan?.mentorMessage ?? "Synchronizing your goals with active intelligence."}
                 </p>
               </div>
 
-              <div className="grid min-w-[220px] grid-cols-2 gap-3 rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Readiness</p>
-                  <p className="mt-2 text-3xl font-semibold text-white">{plan?.readinessScore ?? 0}</p>
+              <div className="grid min-w-[280px] grid-cols-2 gap-px rounded-2xl border border-white/[0.08] bg-white/[0.06] overflow-hidden">
+                <div className="bg-[#0c1017] p-5">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">System Readiness</p>
+                  <p className="mt-2 text-4xl font-black text-white">{plan?.readinessScore ?? 0}<span className="text-sm font-normal text-slate-600 ml-1">%</span></p>
                 </div>
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Plan</p>
-                  <p className="mt-2 text-3xl font-semibold text-white">{planProgress}%</p>
+                <div className="bg-[#0c1017] p-5">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Plan Velocity</p>
+                  <p className="mt-2 text-4xl font-black text-white">{planProgress}<span className="text-sm font-normal text-slate-600 ml-1">%</span></p>
                 </div>
-                <div className="col-span-2 h-2 overflow-hidden rounded-full bg-white/[0.06]">
-                  <div className="h-full rounded-full bg-cyan transition-all" style={{ width: `${planProgress}%` }} />
+                <div className="col-span-2 bg-[#0c1017] px-5 pb-5">
+                   <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06] mb-3">
+                    <div className="h-full rounded-full bg-gradient-to-r from-brand to-cyan transition-all duration-1000" style={{ width: `${planProgress}%` }} />
+                  </div>
+                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">Next Milestone: <span className="text-cyan">{plan?.nextUnlock ?? "Core Logic"}</span></p>
                 </div>
-                <p className="col-span-2 text-xs text-slate-500">Next unlock: <span className="text-cyan">{plan?.nextUnlock ?? "Roadmap"}</span></p>
               </div>
             </div>
           </div>

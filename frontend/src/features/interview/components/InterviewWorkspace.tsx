@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Mic, BrainCircuit, Play, Clock, AlertTriangle } from "lucide-react";
+import { Mic, BrainCircuit, Play, Clock, AlertTriangle, AlertCircle } from "lucide-react";
 import { useInterviewStore } from "../../../store/interview-store";
 import { useAppStore } from "../../../store/app-store";
 import { InterviewSession } from "./InterviewSession";
@@ -37,60 +37,94 @@ export function InterviewWorkspace() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {error && (
-        <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+        <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 shrink-0" />
           {error}
         </div>
       )}
 
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-gradient-to-br from-white/[0.05] to-transparent p-8 text-center">
-        <div className="mx-auto w-16 h-16 rounded-2xl bg-brand/10 text-brand flex items-center justify-center mb-6">
-          <Mic className="w-8 h-8" />
+      <div className="relative group overflow-hidden rounded-[2rem] border border-white/[0.08] bg-[#0c1017] p-12 text-center transition-all hover:border-brand/30">
+        <div className="absolute inset-0 bg-gradient-to-br from-brand/5 via-transparent to-cyan/5 opacity-50" />
+        
+        <div className="relative z-10">
+          <div className="mx-auto w-20 h-20 rounded-[1.5rem] bg-brand/10 text-brand flex items-center justify-center mb-8 shadow-[0_0_40px_rgba(124,92,255,0.15)] group-hover:scale-110 transition-transform duration-500">
+            <Mic className="w-10 h-10" />
+          </div>
+          
+          <h2 className="text-3xl font-bold text-white mb-4 tracking-tight">AI Interview Simulator</h2>
+          <p className="text-slate-400 max-w-xl mx-auto mb-10 leading-relaxed text-lg">
+            Master your next role as a <span className="text-brand font-semibold underline decoration-brand/30 underline-offset-4">{user.targetRoles[0]}</span>. 
+            Receive real-time feedback using the STAR method.
+          </p>
+          
+          <button
+            onClick={handleStart}
+            disabled={loading}
+            className="group/btn relative inline-flex items-center gap-3 bg-white text-slate-950 px-10 py-4 rounded-2xl font-bold hover:bg-slate-100 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-wait shadow-[0_20px_50px_rgba(255,255,255,0.1)]"
+          >
+            {loading ? (
+              <>
+                <BrainCircuit className="w-5 h-5 animate-pulse" />
+                Veda is preparing...
+              </>
+            ) : (
+              <>
+                <Play className="w-5 h-5 fill-current" />
+                Launch Session
+              </>
+            )}
+          </button>
         </div>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-900 dark:text-white mb-3">AI Interview Simulator</h2>
-        <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 max-w-lg mx-auto mb-8 leading-relaxed">
-          Practice interviewing for your target role: <strong className="text-slate-900 dark:text-slate-900 dark:text-white">{user.targetRoles[0]}</strong>. 
-          The AI will ask behavioral and technical questions and score your answers using the STAR method.
-        </p>
-        <button
-          onClick={handleStart}
-          disabled={loading}
-          className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-xl font-medium hover:bg-slate-200 transition disabled:opacity-50"
-        >
-          {loading ? (
-            "Preparing session..."
-          ) : (
-            <>
-              <Play className="w-5 h-5 fill-current" />
-              Start Mock Interview
-            </>
-          )}
-        </button>
       </div>
 
       {sessions.length > 0 && (
-        <div>
-          <h3 className="text-lg font-medium text-slate-900 dark:text-slate-900 dark:text-white mb-4">Past Sessions</h3>
-          <div className="grid gap-3 sm:grid-cols-2">
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-bold text-white flex items-center gap-3">
+              <Clock className="w-5 h-5 text-slate-500" />
+              Interview History
+            </h3>
+            <span className="text-xs text-slate-500 font-mono">{sessions.length} sessions</span>
+          </div>
+          
+          <div className="grid gap-4 sm:grid-cols-2">
             {sessions.map(s => (
-              <div key={s.id} className="rounded-xl border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-black/20 p-5 flex flex-col gap-3">
-                <div className="flex justify-between items-start">
+              <div 
+                key={s.id} 
+                className="group/card relative rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 transition-all hover:bg-white/[0.04] hover:border-white/[0.12]"
+              >
+                <div className="flex justify-between items-start mb-4">
                   <div>
-                    <div className="font-medium text-slate-200">{s.targetRole}</div>
-                    <div className="text-xs text-slate-500 flex items-center gap-1 mt-1">
-                      <Clock className="w-3 h-3" />
-                      {new Date(s.createdAt).toLocaleDateString()}
+                    <div className="font-bold text-lg text-white group-hover/card:text-brand transition-colors">{s.targetRole}</div>
+                    <div className="text-sm text-slate-500 mt-1 flex items-center gap-2">
+                      {new Date(s.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                     </div>
                   </div>
-                  <span className={`text-[10px] uppercase tracking-wider px-2 py-1 rounded-md ${s.status === 'completed' ? 'bg-green-500/20 text-green-400' : 'bg-brand/20 text-brand-300'}`}>
+                  <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border ${
+                    s.status === 'completed' 
+                      ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400' 
+                      : 'border-brand/20 bg-brand/10 text-brand'
+                  }`}>
                     {s.status}
                   </span>
                 </div>
+                
                 {s.status === "completed" && s.overallScore !== undefined && (
-                  <div className="mt-auto pt-3 border-t border-white/5 flex items-end justify-between">
-                    <span className="text-xs text-slate-500 dark:text-slate-500 dark:text-slate-400">Overall Score</span>
-                    <span className="font-bold text-cyan">{s.overallScore}/10</span>
+                  <div className="flex items-end justify-between pt-4 border-t border-white/[0.06]">
+                    <div className="flex gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <div 
+                          key={i} 
+                          className={`w-1.5 h-1.5 rounded-full ${i < (s.overallScore || 0) / 2 ? 'bg-cyan' : 'bg-white/10'}`} 
+                        />
+                      ))}
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-black text-cyan leading-none">{s.overallScore}</div>
+                      <div className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter mt-1">Score / 10</div>
+                    </div>
                   </div>
                 )}
               </div>

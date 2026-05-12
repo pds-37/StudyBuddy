@@ -7,6 +7,10 @@ import { useAppStore } from "../store/app-store";
 import { OnboardingLeftPanel } from "./onboarding/OnboardingLeftPanel";
 import { OnboardingProfile } from "./onboarding/OnboardingProfile";
 import {
+  Sparkles,
+  AlertCircle
+} from "lucide-react";
+import {
   type OnboardingData,
   defaultData,
   isStepComplete,
@@ -138,24 +142,33 @@ export function OnboardingPage() {
       </div>
 
       {/* ── Right Panel ── */}
-      <div className="flex flex-col rounded-[2rem] border border-white/[0.06] bg-white/[0.015] p-6 lg:p-8 shadow-[0_40px_100px_rgba(0,0,0,0.3)]">
+      <div className="flex flex-col rounded-[2.5rem] border border-white/[0.08] bg-[#0c1017] p-8 lg:p-12 shadow-[0_80px_150px_-30px_rgba(0,0,0,0.5)] relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-12 opacity-[0.02] pointer-events-none">
+          <Sparkles size={300} className="text-brand" />
+        </div>
+
         {/* Mobile progress bar */}
-        <div className="lg:hidden flex gap-1.5 mb-6">
+        <div className="lg:hidden flex gap-2 mb-10">
           {Array.from({ length: TOTAL_STEPS }, (_, i) => (
-            <div key={i} className={`h-1 flex-1 rounded-full transition-all duration-500 ${i <= step ? "bg-cyan-400" : "bg-white/[0.06]"}`} />
+            <div key={i} className={`h-1.5 flex-1 rounded-full transition-all duration-700 ${i <= step ? "bg-brand shadow-[0_0_10px_rgba(124,92,255,0.5)]" : "bg-white/[0.06]"}`} />
           ))}
         </div>
 
         {/* Step content */}
-        <div className="flex-1 overflow-y-auto pr-1 scrollbar-thin">
+        <div className="relative z-10 flex-1 overflow-y-auto pr-2 custom-scrollbar">
           <AnimatePresence mode="wait">
             {showProfile ? (
               <OnboardingProfile key="profile" data={data} onComplete={handleComplete} isSubmitting={isSubmitting} />
             ) : (
               <Motion.div key={`step-${step}`}
-                initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -30 }}
-                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}>
+                initial={{ opacity: 0, y: 20, filter: "blur(10px)" }} 
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                exit={{ opacity: 0, y: -20, filter: "blur(10px)" }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
+                <div className="mb-10">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand mb-2 block">Step {step + 1} of {TOTAL_STEPS}</span>
+                  <h2 className="text-4xl font-black text-white tracking-tight leading-tight">{STEP_TITLES[step]}</h2>
+                </div>
                 {stepComponents[step]}
               </Motion.div>
             )}
@@ -163,24 +176,42 @@ export function OnboardingPage() {
         </div>
 
         {/* Error */}
-        {error && (
-          <Motion.p className="mt-4 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200"
-            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-            {error}
-          </Motion.p>
-        )}
+        <AnimatePresence>
+          {error && (
+            <Motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mt-6"
+            >
+              <div className="rounded-2xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-200 flex items-center gap-3">
+                <AlertCircle className="w-5 h-5 shrink-0" />
+                {error}
+              </div>
+            </Motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Navigation buttons */}
         {!showProfile && (
-          <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/[0.04]">
-            <button type="button" onClick={handleBack} disabled={step === 0}
-              className="px-6 py-2.5 text-sm font-medium text-slate-400 hover:text-white transition-all disabled:opacity-20 disabled:cursor-not-allowed">
-              ← Back
+          <div className="relative z-10 flex items-center justify-between mt-12 pt-8 border-t border-white/[0.06]">
+            <button 
+              type="button" 
+              onClick={handleBack} 
+              disabled={step === 0}
+              className="group flex items-center gap-2 px-6 py-3 text-sm font-bold text-slate-500 hover:text-white transition-all disabled:opacity-0 disabled:pointer-events-none"
+            >
+              <Motion.span animate={{ x: [0, -4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>←</Motion.span>
+              Previous
             </button>
-            <button type="button" onClick={handleNext} disabled={!canAdvance}
-              className="group relative overflow-hidden rounded-xl bg-[#F8FAFC] px-8 py-3 text-sm font-bold text-[#05070A] transition-all hover:bg-cyan-400 hover:shadow-[0_0_30px_rgba(34,211,238,0.3)] disabled:opacity-20 disabled:cursor-not-allowed disabled:hover:bg-[#F8FAFC]">
-              <span className="relative z-10 flex items-center gap-2">
-                {step === TOTAL_STEPS - 1 ? "See my profile" : "Continue"} 
+            <button 
+              type="button" 
+              onClick={handleNext} 
+              disabled={!canAdvance}
+              className="group relative overflow-hidden rounded-2xl bg-white px-10 py-4 text-sm font-black text-slate-950 transition-all hover:bg-brand hover:text-white hover:shadow-[0_20px_40px_rgba(124,92,255,0.3)] disabled:opacity-20 disabled:grayscale disabled:cursor-not-allowed"
+            >
+              <span className="relative z-10 flex items-center gap-3">
+                {step === TOTAL_STEPS - 1 ? "Initialize Profile" : "Continue"} 
                 <Motion.span animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>→</Motion.span>
               </span>
             </button>
