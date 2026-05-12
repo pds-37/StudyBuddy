@@ -132,13 +132,6 @@ export function MentorshipDashboard() {
           </div>
         ))}
 
-            ) : (
-              <div className="bg-slate-800/50 text-slate-500 text-sm font-medium py-2 rounded-lg text-center">
-                Declined
-              </div>
-            )}
-          </div>
-        ))}
         {matches.length === 0 && !loading && (
           <div className="col-span-2 text-center py-12 text-slate-500 dark:text-slate-500 dark:text-slate-400">
             No mentors found. Try updating your target role or skills.
