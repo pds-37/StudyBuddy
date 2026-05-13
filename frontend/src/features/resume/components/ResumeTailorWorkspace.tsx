@@ -33,19 +33,23 @@ const modeOptions: Array<{ value: ResumeMode; label: string; icon: ReactNode }> 
   { value: "ats_optimized", label: "ATS Focus", icon: <Activity size={14} /> }
 ];
 
-export function ResumeTailorWorkspace() {
+export function ResumeTailorWorkspace({ initialResult }: { initialResult?: any }) {
   const [targetRole, setTargetRole] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [currentResume, setCurrentResume] = useState("");
   const [tone, setTone] = useState<ResumeTailorTone>("impact");
   const [mode, setMode] = useState<ResumeMode>("technical");
-  const [result, setResult] = useState<ResumeTailorResult | null>(null);
+  const [result, setResult] = useState<ResumeTailorResult | null>(initialResult || null);
   const [isLoading, setLoading] = useState(false);
   const [isParsing, setIsParsing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
   // Collaborative edit state
   const [acceptedBullets, setAcceptedBullets] = useState<Set<number>>(new Set());
+
+  useEffect(() => {
+    if (initialResult) setResult(initialResult);
+  }, [initialResult]);
 
   const canSubmit = targetRole.trim().length >= 2 && currentResume.trim().length >= 50 && !isLoading && !isParsing;
 

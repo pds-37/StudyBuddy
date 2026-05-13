@@ -276,7 +276,7 @@ export function JobsList({ refreshTrigger }: JobsListProps) {
                           href={job.applyUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-obsidian font-black text-sm hover:bg-slate-200 transition-all shadow-[0_10px_20px_rgba(255,255,255,0.05)]"
+                          className="flex items-center gap-2 px-6 py-3 rounded-xl bg-brand text-white font-black text-sm hover:bg-brand/90 transition-all shadow-[0_10px_20px_rgba(124,92,255,0.2)]"
                         >
                           Apply Now
                           <ExternalLink size={16} />

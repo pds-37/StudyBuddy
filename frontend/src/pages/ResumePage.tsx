@@ -7,6 +7,12 @@ import { cn } from "../lib/utils/cn";
 export function ResumePage() {
   const [activeTab, setActiveTab] = useState<"builder" | "versions">("builder");
   const [versions, setVersions] = useState<ResumeVersion[]>([]);
+  const [selectedVersion, setSelectedVersion] = useState<ResumeVersion | null>(null);
+
+  const handleViewResult = (v: ResumeVersion) => {
+    setSelectedVersion(v);
+    setActiveTab("builder");
+  };
 
   useEffect(() => {
     if (activeTab === "versions") {
@@ -64,7 +70,7 @@ export function ResumePage() {
       <main className="flex-1 overflow-y-auto custom-scrollbar p-8">
         <div className="max-w-[1600px] mx-auto h-full">
           {activeTab === "builder" ? (
-            <ResumeTailorWorkspace />
+            <ResumeTailorWorkspace initialResult={selectedVersion?.structuredData} />
           ) : (
             <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
               {versions.length > 0 ? (versions.map((v) => (
@@ -79,7 +85,10 @@ export function ResumePage() {
                   <p className="text-[11px] text-slate-500 line-clamp-2">{v.targetRole}</p>
                   
                   <div className="mt-6 flex items-center gap-3">
-                    <button className="flex-1 px-4 py-2 rounded-xl bg-white/[0.05] text-[10px] font-bold text-slate-300 hover:bg-white/[0.08] transition-colors">
+                    <button 
+                      onClick={() => handleViewResult(v)}
+                      className="flex-1 px-4 py-2 rounded-xl bg-white/[0.05] text-[10px] font-bold text-slate-300 hover:bg-white/[0.08] transition-colors"
+                    >
                       View Results
                     </button>
                   </div>

@@ -207,6 +207,7 @@ async function updateTaskStatus(
     throw new ApiError(404, "Task not found in roadmap");
   }
 
+  roadmap.markModified("phases");
   await roadmap.save();
 
   // Trigger Behavioral Intelligence Engine

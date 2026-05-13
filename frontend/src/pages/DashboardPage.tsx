@@ -569,7 +569,7 @@ function TaskRow({
               type="button"
               onClick={onStart}
               disabled={updating || isDone}
-              className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-xs font-semibold text-slate-950 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#ffffff] px-3 py-2 text-xs font-semibold text-slate-950 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {updating ? <Loader2 size={14} className="animate-spin" /> : <PlayCircle size={14} />}
               Start

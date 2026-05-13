@@ -133,7 +133,7 @@ export function RoadmapWorkspace() {
                  <div className="flex items-center gap-4">
                     <button 
                       onClick={() => setIsExpansionOpen(true)}
-                      className="group/btn relative px-8 py-4 rounded-2xl bg-white text-slate-950 text-sm font-black transition-all hover:bg-slate-100 active:scale-95 shadow-[0_20px_40px_rgba(255,255,255,0.1)] flex items-center gap-2"
+                      className="group/btn relative px-8 py-4 rounded-2xl bg-[#ffffff] text-slate-950 text-sm font-black transition-all hover:bg-slate-100 active:scale-95 shadow-[0_20px_40px_rgba(255,255,255,0.1)] flex items-center gap-2"
                     >
                       <Plus className="w-5 h-5 transition-transform group-hover/btn:rotate-90" />
                       Expand Direction

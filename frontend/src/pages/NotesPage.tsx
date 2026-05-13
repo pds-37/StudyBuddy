@@ -194,20 +194,9 @@ export function NotesPage() {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <label className="px-8 py-4 bg-brand text-slate-950 text-xs font-black uppercase tracking-[0.2em] hover:bg-brand/90 transition-all active:scale-95 shadow-[0_20px_40px_rgba(124,92,255,0.2)] flex items-center gap-3 rounded-2xl cursor-pointer">
-                {loading ? <Loader2 size={16} strokeWidth={3} className="text-slate-950 animate-spin" /> : <Upload size={16} strokeWidth={3} className="text-slate-950" />}
-                Upload Material
-                <input
-                  type="file"
-                  className="hidden"
-                  accept=".pdf,.txt,.md"
-                  onChange={handleFileUpload}
-                  disabled={loading}
-                />
-              </label>
               <button
                 onClick={() => setIsCreateModalOpen(true)}
-                className="px-8 py-4 bg-white text-slate-950 text-xs font-black uppercase tracking-[0.2em] hover:bg-slate-100 transition-all active:scale-95 shadow-[0_20px_40px_rgba(255,255,255,0.1)] flex items-center gap-3 rounded-2xl"
+                className="px-8 py-4 bg-[#ffffff] text-slate-950 text-xs font-black uppercase tracking-[0.2em] hover:bg-slate-100 transition-all active:scale-95 shadow-[0_20px_40px_rgba(255,255,255,0.1)] flex items-center gap-3 rounded-2xl"
               >
                 <Plus size={16} strokeWidth={3} /> Ingest Knowledge
               </button>
@@ -216,21 +205,31 @@ export function NotesPage() {
 
           <div className="group relative">
             <div className="absolute inset-0 bg-brand/5 rounded-3xl blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity" />
-            <div className="relative flex gap-3 p-1 bg-white/[0.02] border border-white/[0.08] rounded-[1.5rem] focus-within:border-brand/40 transition-all">
+            <div className="relative flex items-end gap-3 p-2 bg-white/[0.02] border border-white/[0.08] rounded-[1.5rem] focus-within:border-brand/40 transition-all">
+              <label className="shrink-0 p-3 text-slate-400 hover:text-white cursor-pointer hover:bg-white/5 rounded-xl transition-all self-end mb-1">
+                {loading ? <Loader2 size={20} className="animate-spin" /> : <Plus size={20} />}
+                <input
+                  type="file"
+                  className="hidden"
+                  accept=".pdf,.txt,.md"
+                  onChange={handleFileUpload}
+                  disabled={loading}
+                />
+              </label>
               <textarea
                 value={learningText}
                 onChange={(event) => setLearningText(event.target.value)}
                 placeholder="What did you learn today? Veda will extract concepts and build connections..."
-                className="w-full bg-transparent border-0 px-6 py-4 text-lg text-white outline-none placeholder:text-slate-600 focus:ring-0 resize-none min-h-[80px]"
+                className="w-full bg-transparent border-0 px-2 py-4 text-base text-white outline-none placeholder:text-slate-500 focus:ring-0 resize-none min-h-[60px]"
               />
               <button
                 type="button"
                 onClick={handleIngestLearning}
                 disabled={!learningText.trim() || loading}
-                className="shrink-0 inline-flex items-center justify-center gap-3 bg-brand px-8 py-2 text-sm font-black uppercase tracking-widest text-white transition-all hover:bg-brand/90 disabled:opacity-40 rounded-2xl m-1 shadow-lg shadow-brand/20"
+                className="shrink-0 inline-flex items-center justify-center gap-2 bg-brand p-3 text-sm font-black uppercase text-slate-900 transition-all hover:bg-brand/90 disabled:opacity-40 rounded-xl mb-1 self-end"
               >
                 {loading ? <Loader2 size={18} className="animate-spin" /> : <Sparkles size={18} />}
-                Process
+                Ingest
               </button>
             </div>
           </div>
