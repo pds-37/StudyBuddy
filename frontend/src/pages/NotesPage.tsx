@@ -114,7 +114,8 @@ export function NotesPage() {
         void fetchConcepts();
       }, 1500);
     } catch (err: any) {
-      alert(err.message || "Failed to upload study material");
+      const serverMsg = err.response?.data?.message || err.message;
+      alert(`Upload failed: ${serverMsg}`);
       e.target.value = '';
     }
   };
