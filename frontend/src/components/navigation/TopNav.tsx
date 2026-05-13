@@ -42,10 +42,10 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
       className={cn(
         "sticky top-0 z-40 w-full transition-all duration-300 h-20 flex items-center shrink-0",
         isAppShell 
-          ? "bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4" 
+          ? "bg-obsidian border-b border-white/5" 
           : isScrolled 
-            ? "bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4 shadow-sm"
-            : "bg-transparent"
+            ? "bg-obsidian/95 backdrop-blur-xl shadow-sm border-b border-white/5"
+            : "bg-obsidian/80 backdrop-blur-lg"
       )}
     >
       <div className={cn(
