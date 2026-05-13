@@ -4,7 +4,7 @@ import {
   AlertCircle, CheckCircle2, Copy, FileText, Loader2, Sparkles, Wand2, 
   Target, Shield, Zap, ChevronRight, RotateCcw, Brain, Activity,
   Briefcase, Code, BarChart3, MessageSquare, AlertTriangle, Info,
-  Check, X
+  Check, X, Download
 } from "lucide-react";
 import { tailorResume } from "../../../lib/api/resume";
 import { logBehavior } from "../../../lib/api/behavior";
@@ -110,6 +110,37 @@ export function ResumeTailorWorkspace({ initialResult }: { initialResult?: any }
     if (next.has(index)) next.delete(index);
     else next.add(index);
     setAcceptedBullets(next);
+  };
+
+  const handleDownload = () => {
+    if (!result) return;
+    const content = `
+Target Role: ${result.targetHeadline}
+Summary:
+${result.tailoredSummary}
+
+Experience Updates:
+${result.bulletRewrites.map(b => `- ${b.after}`).join('\n')}
+
+Project Updates:
+${result.projectAnalysis.map(p => `${p.projectName}:\n- ${p.engineeringStorytelling}`).join('\n\n')}
+
+Missing Proof Points to Add:
+${result.missingProofPoints.map(p => `- ${p}`).join('\n')}
+
+ATS Keywords:
+${result.keywordAdditions.join(', ')}
+    `.trim();
+
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Tailored_Resume_${new Date().toISOString().slice(0,10)}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -236,11 +267,20 @@ export function ResumeTailorWorkspace({ initialResult }: { initialResult?: any }
         ) : (
           <div className="flex-1 overflow-y-auto custom-scrollbar">
             {/* Intelligence Header */}
-            <div className="p-8 border-b border-white/[0.04] bg-white/[0.01] grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="space-y-4">
-                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Role Fit Analysis</p>
-                <p className="text-sm text-slate-300 leading-relaxed italic">"{result.roleFitSummary}"</p>
+            <div className="p-8 border-b border-white/[0.04] bg-white/[0.01] flex flex-col gap-8 relative">
+              <div className="absolute top-8 right-8">
+                <button
+                  onClick={handleDownload}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 text-xs font-bold text-slate-300 hover:bg-white/10 transition-all border border-white/5"
+                >
+                  <Download size={14} /> Download Document
+                </button>
               </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-4">
+                <div className="space-y-4">
+                  <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Role Fit Analysis</p>
+                  <p className="text-sm text-slate-300 leading-relaxed italic">"{result.roleFitSummary}"</p>
+                </div>
               <div className="space-y-4">
                 <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">ATS Readiness</p>
                 <div className="flex items-end gap-4">

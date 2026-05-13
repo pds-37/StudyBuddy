@@ -89,7 +89,7 @@ export function DashboardPage() {
 
   useEffect(() => {
     void loadPlan();
-    
+
     // Check for push notification permission
     if (getNotificationPermission() === "default") {
       setShowPushPrompt(true);
@@ -149,13 +149,13 @@ export function DashboardPage() {
         task.id,
         isCompleting ? "completed" : "pending"
       );
-      
+
       if (isCompleting) {
         await logBehavior("task_completed", { taskId: task.id, type: task.type });
       } else {
         await logBehavior("task_skipped", { taskId: task.id, type: task.type });
       }
-      
+
       setPlan(nextPlan);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update task");
@@ -179,7 +179,7 @@ export function DashboardPage() {
     <section className="space-y-12">
 
       {showPushPrompt && (
-        <div 
+        <div
           className="rounded-3xl border border-brand/20 bg-brand/5 p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_0_50px_rgba(124,92,255,0.1)] animate-in fade-in slide-in-from-top-4 duration-500"
         >
           <div className="flex items-center gap-4 text-center sm:text-left">
@@ -192,13 +192,13 @@ export function DashboardPage() {
             </div>
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
-            <button 
+            <button
               onClick={() => setShowPushPrompt(false)}
               className="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-slate-50 dark:bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-slate-500 dark:text-slate-400 text-sm font-bold hover:bg-slate-100 dark:bg-slate-100 dark:bg-white/10 transition"
             >
               Later
             </button>
-            <button 
+            <button
               onClick={handleEnableNotifications}
               className="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-brand text-slate-900 dark:text-slate-900 dark:text-white text-sm font-bold shadow-lg shadow-brand/20 hover:bg-brand/90 transition"
             >
@@ -217,7 +217,7 @@ export function DashboardPage() {
         <div className="group relative overflow-hidden rounded-[2rem] border border-cyan/20 bg-[#0c1017] p-8 shadow-[0_0_80px_-20px_rgba(34,211,238,0.2)] transition-all hover:border-cyan/40">
           <div className="absolute inset-0 bg-gradient-to-br from-cyan/10 via-transparent to-transparent opacity-50" />
           <div className="absolute -top-24 -right-24 w-64 h-64 bg-cyan/10 rounded-full blur-[100px] pointer-events-none" />
-          
+
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
             <div className="flex items-start gap-6">
               <div className="flex shrink-0 items-center justify-center rounded-2xl bg-cyan/10 p-4 text-cyan shadow-[0_0_30px_rgba(34,211,238,0.1)] group-hover:scale-110 transition-transform duration-500">
@@ -234,7 +234,7 @@ export function DashboardPage() {
                 </p>
               </div>
             </div>
-            
+
             <div className="shrink-0">
               {bestAction.action === "task" && bestAction.data && (
                 <button className="group/btn relative inline-flex items-center gap-3 rounded-2xl bg-cyan px-8 py-4 text-sm font-bold text-slate-950 transition-all hover:scale-105 active:scale-95 shadow-[0_20px_40px_rgba(34,211,238,0.2)]">
@@ -298,7 +298,7 @@ export function DashboardPage() {
                   <p className="mt-2 text-4xl font-black text-white">{planProgress}<span className="text-sm font-normal text-slate-600 ml-1">%</span></p>
                 </div>
                 <div className="col-span-2 bg-[#0c1017] px-5 pb-5">
-                   <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06] mb-3">
+                  <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06] mb-3">
                     <div className="h-full rounded-full bg-gradient-to-r from-brand to-cyan transition-all duration-1000" style={{ width: `${planProgress}%` }} />
                   </div>
                   <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">Next Milestone: <span className="text-cyan">{plan?.nextUnlock ?? "Core Logic"}</span></p>
@@ -569,7 +569,8 @@ function TaskRow({
               type="button"
               onClick={onStart}
               disabled={updating || isDone}
-              className="inline-flex items-center gap-2 rounded-lg bg-[#ffffff] px-3 py-2 text-xs font-semibold text-slate-950 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
+              style={{ backgroundColor: "#f8fafc", color: "#0f172a" }}
+              className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {updating ? <Loader2 size={14} className="animate-spin" /> : <PlayCircle size={14} />}
               Start
