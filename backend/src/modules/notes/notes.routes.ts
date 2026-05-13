@@ -3,7 +3,7 @@ import { authenticate } from "../../middlewares/authenticate.js";
 import { notesController } from "./notes.controller.js";
 import multer from "multer";
 
-const upload = multer({ dest: "uploads/" });
+const upload = multer({ storage: multer.memoryStorage() });
 
 export const notesRouter = Router();
 

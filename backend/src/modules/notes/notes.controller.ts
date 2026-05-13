@@ -143,14 +143,11 @@ const uploadFile: RequestHandler = async (request, response, next) => {
 
     let text = "";
     if (file.mimetype === "application/pdf") {
-      const dataBuffer = await fs.readFile(file.path);
-      const data = await pdfParse(dataBuffer);
+      const data = await pdfParse(file.buffer);
       text = data.text;
     } else {
-      text = await fs.readFile(file.path, "utf-8");
+      text = file.buffer.toString("utf-8");
     }
-
-    await fs.unlink(file.path).catch(() => {});
 
     if (!text || !text.trim()) {
       return response.status(400).json({ error: "Could not extract text from file" });
