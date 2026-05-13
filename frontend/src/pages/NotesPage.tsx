@@ -399,6 +399,9 @@ export function NotesPage() {
               <KnowledgeInsightsPanel
                 health={knowledgeHealth}
                 priorities={revisionPriorities}
+                loading={loading}
+                onIngestClick={() => setIsCreateModalOpen(true)}
+                onFileUpload={handleFileUpload}
               />
               <ContradictionReview
                 items={contradictions}

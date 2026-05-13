@@ -22,7 +22,9 @@ import {
   ArrowRight,
   CheckCircle2,
   XCircle,
-  BarChart3
+  BarChart3,
+  Upload,
+  Loader2
 } from "lucide-react";
 import { cn } from "../../../lib/utils/cn";
 import type { CareerNote, KnowledgeHealthMetrics, RevisionPriority } from "@studybuddy/shared";
@@ -292,9 +294,12 @@ function KnowledgeLayerBadge({ layer }: { layer: string }) {
 
 // ─── KNOWLEDGE INSIGHTS PANEL ───
 
-export function KnowledgeInsightsPanel({ health, priorities }: {
+export function KnowledgeInsightsPanel({ health, priorities, onIngestClick, onFileUpload, loading }: {
   health: KnowledgeHealthMetrics | null;
   priorities: RevisionPriority[];
+  onIngestClick?: () => void;
+  onFileUpload?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  loading?: boolean;
 }) {
   return (
     <div className="space-y-8">
@@ -342,9 +347,25 @@ export function KnowledgeInsightsPanel({ health, priorities }: {
         <p className="text-[10px] text-slate-500 leading-relaxed mb-4">
           Upload any lecture, PDF, or video and Veda will create a mastery plan with recall prompts.
         </p>
-        <button className="w-full py-2 bg-brand text-slate-900 text-[10px] font-semibold hover:bg-brand/90 transition-colors flex items-center justify-center gap-1.5">
-          <Plus size={12} /> Ingest knowledge
-        </button>
+        <div className="flex flex-col gap-2">
+          <button 
+            onClick={onIngestClick}
+            className="w-full py-2 bg-brand text-slate-900 text-[10px] font-semibold hover:bg-brand/90 transition-colors flex items-center justify-center gap-1.5"
+          >
+            <Plus size={12} /> Ingest knowledge
+          </button>
+          <label className="w-full py-2 border border-brand/30 text-brand text-[10px] font-semibold hover:bg-brand/10 transition-colors flex items-center justify-center gap-1.5 cursor-pointer text-center relative overflow-hidden">
+            {loading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
+            {loading ? "Uploading..." : "Upload Material"}
+            <input
+              type="file"
+              className="hidden"
+              accept=".pdf,.txt,.md"
+              onChange={onFileUpload}
+              disabled={loading}
+            />
+          </label>
+        </div>
       </div>
     </div>
   );
