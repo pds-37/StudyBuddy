@@ -397,6 +397,7 @@ function normalizeResumeTailorResult(value: unknown): ResumeTailorResult {
 
 /** Parses raw resume text into structured JSON. */
 async function parseResumeToJSON(resumeText: string) {
+  const text = resumeText || "";
   const prompt = `You are an expert technical recruiter parsing a resume. Extract the raw structure of the following resume.
 Return ONLY valid JSON matching this schema:
 {
@@ -411,7 +412,7 @@ Return ONLY valid JSON matching this schema:
 }
 
 RESUME TEXT:
-${resumeText.substring(0, 5000)}
+${text.substring(0, 5000)}
 `;
   const response = await requestGroq([{ role: "user", content: prompt }], 2000, "llama-3.1-8b-instant");
   try { return JSON.parse(extractJsonPayload(response)); } catch(e) { return { skills: [], experience: [] }; }
@@ -462,10 +463,9 @@ async function generateResumeTailoring(
   request: ResumeTailorRequest,
   userContext: string
 ): Promise<ResumeTailorResult> {
-  const [parsedResume, parsedJD] = await Promise.all([
-    parseResumeToJSON(request.currentResume),
-    parseJDToJSON(request.jobDescription || "")
-  ]);
+  // Run sequentially to avoid Groq rate limit (429) on free tier
+  const parsedResume = await parseResumeToJSON(request.currentResume);
+  const parsedJD = await parseJDToJSON(request.jobDescription || "");
 
   const gapReport = await analyzeSkillGaps(parsedResume, parsedJD);
 
