@@ -386,11 +386,80 @@ function normalizeResumeTailorResult(value: unknown): ResumeTailorResult {
   };
 }
 
+/** Parses raw resume text into structured JSON. */
+async function parseResumeToJSON(resumeText: string) {
+  const prompt = `You are an expert technical recruiter parsing a resume. Extract the raw structure of the following resume.
+Return ONLY valid JSON matching this schema:
+{
+  "summary": "Full summary text if available",
+  "skills": ["Skill 1", "Skill 2"],
+  "experience": [
+    { "company": "", "title": "", "duration": "", "bullets": ["", ""] }
+  ],
+  "education": [
+    { "institution": "", "degree": "", "year": "" }
+  ]
+}
+
+RESUME TEXT:
+${resumeText.substring(0, 5000)}
+`;
+  const response = await requestGroq([{ role: "user", content: prompt }], 2000, "llama-3.1-8b-instant");
+  try { return JSON.parse(extractJsonPayload(response)); } catch(e) { return { skills: [], experience: [] }; }
+}
+
+/** Parses raw JD text into structured JSON. */
+async function parseJDToJSON(jdText: string) {
+  if (!jdText) return { required_skills: [], preferred_skills: [], keywords: [] };
+  const prompt = `You are an expert job description parser. Extract the key requirements.
+Return ONLY valid JSON matching this schema:
+{
+  "role_title": "",
+  "company_context": "",
+  "required_skills": ["Skill 1", "Skill 2"],
+  "preferred_skills": [""],
+  "keywords": [""]
+}
+
+JOB DESCRIPTION:
+${jdText.substring(0, 5000)}
+`;
+  const response = await requestGroq([{ role: "user", content: prompt }], 1500, "llama-3.1-8b-instant");
+  try { return JSON.parse(extractJsonPayload(response)); } catch(e) { return { required_skills: [], keywords: [] }; }
+}
+
+/** Analyzes the gap between structured resume and structured JD. */
+async function analyzeSkillGaps(parsedResume: any, parsedJD: any) {
+  const prompt = `Compare the candidate's resume with the target job description.
+Return ONLY valid JSON matching this schema:
+{
+  "matching_skills": ["Skill present in both"],
+  "missing_required_skills": ["Critical skills missing from resume"],
+  "missing_keywords": ["Important buzzwords missing"]
+}
+
+RESUME JSON:
+${JSON.stringify(parsedResume)}
+
+JOB DESCRIPTION JSON:
+${JSON.stringify(parsedJD)}
+`;
+  const response = await requestGroq([{ role: "user", content: prompt }], 1500, "llama-3.1-8b-instant");
+  try { return JSON.parse(extractJsonPayload(response)); } catch(e) { return { missing_required_skills: [], missing_keywords: [] }; }
+}
+
 /** Generates role-specific resume edits and ATS guidance. */
 async function generateResumeTailoring(
   request: ResumeTailorRequest,
   userContext: string
 ): Promise<ResumeTailorResult> {
+  const [parsedResume, parsedJD] = await Promise.all([
+    parseResumeToJSON(request.currentResume),
+    parseJDToJSON(request.jobDescription || "")
+  ]);
+
+  const gapReport = await analyzeSkillGaps(parsedResume, parsedJD);
+
   const prompt = `You are Veda, an expert Technical Recruiter and Career Positioning AI. Your goal is to strategically reposition the user's resume for the role of "${request.targetRole}" while maintaining absolute integrity.
 
 RESUME MODE: ${request.mode || "technical"} (Adapt tone and emphasis accordingly)
@@ -398,17 +467,21 @@ TONE: ${request.tone ?? "impact"}
 
 CONTEXT:
 - Target Role: ${request.targetRole}
-- Job Description: ${request.jobDescription || "Standard industry expectations for this role."}
 - User Profile: ${userContext}
-- Current Resume Content:
-${request.currentResume}
+- Parsed Job Description:
+${JSON.stringify(parsedJD, null, 2)}
+- Parsed Resume Data:
+${JSON.stringify(parsedResume, null, 2)}
+- Skill Gap Report (Crucial input):
+${JSON.stringify(gapReport, null, 2)}
 
 CRITICAL RULES (IDENTITY INTEGRITY):
 1. NEVER fabricate experience, employers, or dates.
 2. NEVER create fake degrees or certifications.
-3. NEVER invent specific metrics or numbers (e.g., "Increased sales by 40%").
+3. NEVER invent specific metrics or numbers.
 4. ONLY improve framing, clarity, and relevance based on existing evidence.
 5. If a metric is missing but needed, use "[Quantifiable Impact]" as a placeholder.
+6. Use the Gap Report to naturally incorporate missing keywords ONLY where the candidate's experience genuinely supports it.
 
 OBJECTIVES:
 1. ROLE FIT: Analyze how the user's existing background maps to the specific JD.
