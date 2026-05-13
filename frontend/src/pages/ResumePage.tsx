@@ -70,7 +70,7 @@ export function ResumePage() {
       <main className="flex-1 overflow-y-auto custom-scrollbar p-8">
         <div className="max-w-[1600px] mx-auto h-full">
           {activeTab === "builder" ? (
-            <ResumeTailorWorkspace initialResult={selectedVersion?.structuredData} />
+            <ResumeTailorWorkspace initialResult={selectedVersion?.result} />
           ) : (
             <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
               {versions.length > 0 ? (versions.map((v) => (

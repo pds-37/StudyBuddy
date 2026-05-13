@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useState, useEffect, type FormEvent, type ReactNode } from "react";
 import { isAxiosError } from "axios";
 import {
   AlertCircle, CheckCircle2, Copy, FileText, Loader2, Sparkles, Wand2, 
