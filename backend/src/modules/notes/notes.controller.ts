@@ -2,8 +2,10 @@ import { type RequestHandler } from "express";
 import { notesService } from "./notes.service.js";
 import { createNoteSchema, updateNoteSchema, noteIdParamSchema, notesQuerySchema, learningIngestionSchema } from "./notes.validation.js";
 import fs from "fs/promises";
-// @ts-ignore - pdf-parse has no default export in types but works at runtime
-import pdfParse from "pdf-parse";
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
+const pdfParse = require("pdf-parse");
 
 /** Creates a new note for the authenticated user. */
 const create: RequestHandler = async (request, response, next) => {
