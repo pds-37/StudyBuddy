@@ -114,7 +114,44 @@ export function ResumeTailorWorkspace({ initialResult }: { initialResult?: any }
 
   const handleDownload = () => {
     if (!result) return;
-    const content = `
+    
+    let content = "";
+
+    if (result.fullyWrittenResume) {
+      const r = result.fullyWrittenResume;
+      content += `${r.personalInfo?.name || "Candidate Name"}\n`;
+      if (r.personalInfo?.contactInfo) content += `${r.personalInfo.contactInfo}\n`;
+      content += `\n${r.headline}\n`;
+      content += `\nSUMMARY\n${r.summary}\n`;
+      
+      content += `\nSKILLS\n${r.skills.join(", ")}\n`;
+      
+      if (r.experience?.length) {
+        content += `\nEXPERIENCE\n`;
+        r.experience.forEach((exp: any) => {
+          content += `\n${exp.title} | ${exp.company} | ${exp.duration} ${exp.location ? `| ${exp.location}` : ''}\n`;
+          exp.bullets.forEach((b: string) => content += `- ${b}\n`);
+        });
+      }
+
+      if (r.projects?.length) {
+        content += `\nPROJECTS\n`;
+        r.projects.forEach((proj: any) => {
+          content += `\n${proj.name} ${proj.duration ? `| ${proj.duration}` : ''}\n${proj.description}\n`;
+          proj.bullets.forEach((b: string) => content += `- ${b}\n`);
+        });
+      }
+
+      if (r.education?.length) {
+        content += `\nEDUCATION\n`;
+        r.education.forEach((edu: any) => {
+          content += `\n${edu.degree} - ${edu.institution} (${edu.year})\n`;
+          if (edu.details) content += `${edu.details}\n`;
+        });
+      }
+    } else {
+      // Fallback to legacy gap analysis download
+      content = `
 Target Role: ${result.targetHeadline}
 Summary:
 ${result.tailoredSummary}
@@ -130,7 +167,8 @@ ${result.missingProofPoints.map(p => `- ${p}`).join('\n')}
 
 ATS Keywords:
 ${result.keywordAdditions.join(', ')}
-    `.trim();
+      `.trim();
+    }
 
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);

@@ -381,8 +381,17 @@ function normalizeResumeTailorResult(value: unknown): ResumeTailorResult {
       weakDiscussionAreas: Array.isArray(payload.interviewAlignment?.weakDiscussionAreas) ? payload.interviewAlignment.weakDiscussionAreas.map(String) : [],
       projectExplanationGaps: Array.isArray(payload.interviewAlignment?.projectExplanationGaps) ? payload.interviewAlignment.projectExplanationGaps.map(String) : []
     },
-    missingProofPoints: Array.isArray(payload.missingProofPoints) ? payload.missingProofPoints.map(String).slice(0, 8) : [],
-    nextActions: Array.isArray(payload.nextActions) ? payload.nextActions.map(String).slice(0, 6) : []
+  missingProofPoints: Array.isArray(payload.missingProofPoints) ? payload.missingProofPoints.map(String).slice(0, 8) : [],
+  nextActions: Array.isArray(payload.nextActions) ? payload.nextActions.map(String).slice(0, 6) : [],
+  fullyWrittenResume: payload.fullyWrittenResume ? {
+    personalInfo: payload.fullyWrittenResume.personalInfo,
+    headline: String(payload.fullyWrittenResume.headline || ""),
+    summary: String(payload.fullyWrittenResume.summary || ""),
+    skills: Array.isArray(payload.fullyWrittenResume.skills) ? payload.fullyWrittenResume.skills : [],
+    experience: Array.isArray(payload.fullyWrittenResume.experience) ? payload.fullyWrittenResume.experience : [],
+    projects: Array.isArray(payload.fullyWrittenResume.projects) ? payload.fullyWrittenResume.projects : [],
+    education: Array.isArray(payload.fullyWrittenResume.education) ? payload.fullyWrittenResume.education : []
+  } : undefined
   };
 }
 
@@ -529,7 +538,22 @@ RESPONSE STRUCTURE (JSON):
     "projectExplanationGaps": ["What architectural details are missing from the project descriptions"]
   },
   "missingProofPoints": ["Specific evidence the user should find in their history"],
-  "nextActions": ["Step-by-step editing priorities"]
+  "nextActions": ["Step-by-step editing priorities"],
+  "fullyWrittenResume": {
+    "personalInfo": { "name": "Extract if present", "contactInfo": "Extract if present" },
+    "headline": "Role-aligned headline",
+    "summary": "Full tailored summary",
+    "skills": ["Skill 1", "Skill 2"],
+    "experience": [
+      { "company": "Company", "title": "Title", "duration": "Dates", "location": "Location", "bullets": ["Rewritten bullet 1", "Rewritten bullet 2"] }
+    ],
+    "projects": [
+      { "name": "Project Name", "description": "Short desc", "duration": "Dates", "bullets": ["Rewritten bullet 1"] }
+    ],
+    "education": [
+      { "institution": "University", "degree": "Degree", "year": "Year", "details": "GPA/Honors" }
+    ]
+  }
 }
 
 Return ONLY valid JSON. No commentary.`;

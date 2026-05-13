@@ -53,6 +53,15 @@ export type ResumeTailorResult = {
   interviewAlignment: InterviewAlignment;
   missingProofPoints: string[];
   nextActions: string[];
+  fullyWrittenResume?: {
+    personalInfo?: { name: string; contactInfo: string };
+    headline: string;
+    summary: string;
+    skills: string[];
+    experience: Array<{ company: string; title: string; duration: string; location?: string; bullets: string[] }>;
+    projects: Array<{ name: string; description: string; duration?: string; bullets: string[] }>;
+    education: Array<{ institution: string; degree: string; year: string; details?: string }>;
+  };
 };
 
 export type ResumeVersion = {
