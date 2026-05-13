@@ -77,7 +77,7 @@ export const useNotesStore = create<NotesStore>((set, get) => ({
   },
 
   createNote: async (data) => {
-    set({ loading: true, error: null });
+    set({ loading: true });
     try {
       const newNote = await apiCreateNote(data);
       set({
@@ -85,12 +85,13 @@ export const useNotesStore = create<NotesStore>((set, get) => ({
         loading: false
       });
     } catch (err: any) {
-      set({ error: err.message || "Failed to create note", loading: false });
+      set({ loading: false });
+      throw err;
     }
   },
 
   ingestLearning: async (text: string) => {
-    set({ loading: true, error: null });
+    set({ loading: true });
     try {
       const newNote = await apiIngestLearning({ text, source: "web" });
       set({
@@ -98,12 +99,13 @@ export const useNotesStore = create<NotesStore>((set, get) => ({
         loading: false
       });
     } catch (err: any) {
-      set({ error: err.message || "Failed to ingest learning", loading: false });
+      set({ loading: false });
+      throw err;
     }
   },
 
   uploadStudyMaterial: async (file: File) => {
-    set({ loading: true, error: null });
+    set({ loading: true });
     try {
       const newNote = await apiUploadStudyMaterial(file);
       set({
@@ -111,7 +113,8 @@ export const useNotesStore = create<NotesStore>((set, get) => ({
         loading: false
       });
     } catch (err: any) {
-      set({ error: err.message || "Failed to upload file", loading: false });
+      set({ loading: false });
+      throw err;
     }
   },
 

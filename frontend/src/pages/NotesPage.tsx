@@ -104,16 +104,19 @@ export function NotesPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    await uploadStudyMaterial(file);
+    try {
+      await uploadStudyMaterial(file);
+      e.target.value = '';
 
-    // reset input
-    e.target.value = '';
-
-    setTimeout(() => {
-      void fetchKnowledgeHealth();
-      void fetchRevisionPriorities();
-      void fetchConcepts();
-    }, 1500);
+      setTimeout(() => {
+        void fetchKnowledgeHealth();
+        void fetchRevisionPriorities();
+        void fetchConcepts();
+      }, 1500);
+    } catch (err: any) {
+      alert(err.message || "Failed to upload study material");
+      e.target.value = '';
+    }
   };
 
   const handleNoteAction = useCallback((action: string, noteId: string) => {
