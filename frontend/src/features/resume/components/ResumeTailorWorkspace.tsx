@@ -305,6 +305,7 @@ ${result.keywordAdditions.join(', ')}
                 </div>
               </div>
             </div>
+          </div>
 
             {/* Main Tabs/Grid */}
             <div className="p-8 space-y-12">
