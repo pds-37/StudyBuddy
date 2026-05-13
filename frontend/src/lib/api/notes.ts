@@ -63,6 +63,18 @@ export async function ingestLearning(data: IngestLearningRequest): Promise<Caree
   return response.data.note;
 }
 
+/** Uploads a study material file for ingestion. */
+export async function uploadStudyMaterial(file: File): Promise<CareerNote> {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await apiClient.post<NoteResponse>("/notes/upload", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data"
+    }
+  });
+  return response.data.note;
+}
+
 /** Retrieves a single note by ID. */
 export async function getNote(id: string): Promise<CareerNote> {
   const response = await apiClient.get<NoteResponse>(`/notes/${id}`);

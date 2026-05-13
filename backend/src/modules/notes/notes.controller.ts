@@ -1,6 +1,8 @@
 import { type RequestHandler } from "express";
 import { notesService } from "./notes.service.js";
 import { createNoteSchema, updateNoteSchema, noteIdParamSchema, notesQuerySchema, learningIngestionSchema } from "./notes.validation.js";
+import fs from "fs/promises";
+import pdfParse from "pdf-parse";
 
 /** Creates a new note for the authenticated user. */
 const create: RequestHandler = async (request, response, next) => {
@@ -128,6 +130,40 @@ const updateEmbeddings: RequestHandler = async (request, response, next) => {
   }
 };
 
+/** Uploads a file, extracts text, and ingests it. */
+const uploadFile: RequestHandler = async (request, response, next) => {
+  try {
+    const file = (request as any).file;
+    if (!file) {
+      return response.status(400).json({ error: "No file uploaded" });
+    }
+
+    let text = "";
+    if (file.mimetype === "application/pdf") {
+      const dataBuffer = await fs.readFile(file.path);
+      const data = await pdfParse(dataBuffer);
+      text = data.text;
+    } else {
+      text = await fs.readFile(file.path, "utf-8");
+    }
+
+    await fs.unlink(file.path).catch(() => {});
+
+    if (!text || !text.trim()) {
+      return response.status(400).json({ error: "Could not extract text from file" });
+    }
+
+    const note = await notesService.ingestLearning(request.userId ?? "", {
+      text,
+      source: file.mimetype === "application/pdf" ? "pdf" : "web"
+    });
+
+    response.status(201).json({ note });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const notesController = {
   create,
   ingest,
@@ -138,5 +174,6 @@ export const notesController = {
   contradictions,
   resolveContradiction,
   search,
-  updateEmbeddings
+  updateEmbeddings,
+  uploadFile
 };

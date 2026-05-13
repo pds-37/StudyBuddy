@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import type { CareerNote, KnowledgeHealthMetrics, RevisionPriority, ConceptNode } from "@studybuddy/shared";
-import { listNotes, createNote as apiCreateNote, deleteNote as apiDeleteNote, updateNote as apiUpdateNote, searchNotesVector, ingestLearning as apiIngestLearning, listContradictions as apiListContradictions, resolveContradiction as apiResolveContradiction, type ContradictionItem } from "../lib/api/notes";
+import { listNotes, createNote as apiCreateNote, deleteNote as apiDeleteNote, updateNote as apiUpdateNote, searchNotesVector, ingestLearning as apiIngestLearning, listContradictions as apiListContradictions, resolveContradiction as apiResolveContradiction, uploadStudyMaterial as apiUploadStudyMaterial, type ContradictionItem } from "../lib/api/notes";
 import { getKnowledgeHealth, getRevisionPriorities, getConcepts } from "../lib/api/intelligence";
 
 interface NotesStore {
@@ -27,6 +27,7 @@ interface NotesStore {
   fetchNotes: () => Promise<void>;
   createNote: (data: any) => Promise<void>;
   ingestLearning: (text: string) => Promise<void>;
+  uploadStudyMaterial: (file: File) => Promise<void>;
   deleteNote: (id: string) => Promise<void>;
   updateNote: (id: string, data: any) => Promise<void>;
   fetchContradictions: () => Promise<void>;
@@ -98,6 +99,19 @@ export const useNotesStore = create<NotesStore>((set, get) => ({
       });
     } catch (err: any) {
       set({ error: err.message || "Failed to ingest learning", loading: false });
+    }
+  },
+
+  uploadStudyMaterial: async (file: File) => {
+    set({ loading: true, error: null });
+    try {
+      const newNote = await apiUploadStudyMaterial(file);
+      set({
+        notes: [newNote, ...get().notes],
+        loading: false
+      });
+    } catch (err: any) {
+      set({ error: err.message || "Failed to upload file", loading: false });
     }
   },
 

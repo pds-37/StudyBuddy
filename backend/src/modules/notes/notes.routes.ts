@@ -1,10 +1,15 @@
 import { Router } from "express";
 import { authenticate } from "../../middlewares/authenticate.js";
 import { notesController } from "./notes.controller.js";
+import multer from "multer";
+
+const upload = multer({ dest: "uploads/" });
 
 export const notesRouter = Router();
 
 notesRouter.use(authenticate);
+
+notesRouter.post("/upload", upload.single("file"), notesController.uploadFile);
 
 // Vector search endpoints
 notesRouter.get("/search/vector", notesController.search);

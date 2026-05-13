@@ -11,7 +11,8 @@ import {
   BookOpen,
   CheckCircle2,
   X,
-  Loader2
+  Loader2,
+  Upload
 } from "lucide-react";
 import { cn } from "../lib/utils/cn";
 import { useNotesStore } from "../store/notes-store";
@@ -40,7 +41,7 @@ export function NotesPage() {
     activeNote,
     fetchNotes, createNote, ingestLearning, deleteNote,
     fetchKnowledgeHealth, fetchRevisionPriorities, fetchConcepts, fetchContradictions, resolveContradiction,
-    searchNotes, clearSearch, setActiveNote
+    searchNotes, clearSearch, setActiveNote, uploadStudyMaterial
   } = useNotesStore();
 
   const [activeCollection, setActiveCollection] = useState("all");
@@ -92,6 +93,22 @@ export function NotesPage() {
     if (!text) return;
     await ingestLearning(text);
     setLearningText("");
+    setTimeout(() => {
+      void fetchKnowledgeHealth();
+      void fetchRevisionPriorities();
+      void fetchConcepts();
+    }, 1500);
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    await uploadStudyMaterial(file);
+
+    // reset input
+    e.target.value = '';
+
     setTimeout(() => {
       void fetchKnowledgeHealth();
       void fetchRevisionPriorities();
@@ -176,12 +193,25 @@ export function NotesPage() {
                 </p>
               </div>
             </div>
-            <button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="px-8 py-4 bg-white text-slate-950 text-xs font-black uppercase tracking-[0.2em] hover:bg-slate-100 transition-all active:scale-95 shadow-[0_20px_40px_rgba(255,255,255,0.1)] flex items-center gap-3 rounded-2xl"
-            >
-              <Plus size={16} strokeWidth={3} /> Ingest Knowledge
-            </button>
+            <div className="flex items-center gap-4">
+              <label className="px-8 py-4 bg-brand text-slate-950 text-xs font-black uppercase tracking-[0.2em] hover:bg-brand/90 transition-all active:scale-95 shadow-[0_20px_40px_rgba(124,92,255,0.2)] flex items-center gap-3 rounded-2xl cursor-pointer">
+                {loading ? <Loader2 size={16} strokeWidth={3} className="text-slate-950 animate-spin" /> : <Upload size={16} strokeWidth={3} className="text-slate-950" />}
+                Upload Material
+                <input
+                  type="file"
+                  className="hidden"
+                  accept=".pdf,.txt,.md"
+                  onChange={handleFileUpload}
+                  disabled={loading}
+                />
+              </label>
+              <button
+                onClick={() => setIsCreateModalOpen(true)}
+                className="px-8 py-4 bg-white text-slate-950 text-xs font-black uppercase tracking-[0.2em] hover:bg-slate-100 transition-all active:scale-95 shadow-[0_20px_40px_rgba(255,255,255,0.1)] flex items-center gap-3 rounded-2xl"
+              >
+                <Plus size={16} strokeWidth={3} /> Ingest Knowledge
+              </button>
+            </div>
           </div>
 
           <div className="group relative">
