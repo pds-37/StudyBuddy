@@ -463,11 +463,15 @@ async function generateResumeTailoring(
   request: ResumeTailorRequest,
   userContext: string
 ): Promise<ResumeTailorResult> {
-  // Run sequentially to avoid Groq rate limit (429) on free tier
+  // Run sequentially with delays to avoid Groq rate limit (429) on free tier
   const parsedResume = await parseResumeToJSON(request.currentResume);
+  await new Promise(r => setTimeout(r, 1500));
+  
   const parsedJD = await parseJDToJSON(request.jobDescription || "");
+  await new Promise(r => setTimeout(r, 1500));
 
   const gapReport = await analyzeSkillGaps(parsedResume, parsedJD);
+  await new Promise(r => setTimeout(r, 2000));
 
   const prompt = `You are Veda, an expert Technical Recruiter and Career Positioning AI. Your goal is to strategically reposition the user's resume for the role of "${request.targetRole}" while maintaining absolute integrity.
 
@@ -558,16 +562,22 @@ RESPONSE STRUCTURE (JSON):
 
 Return ONLY valid JSON. No commentary.`;
 
-  const response = await requestGroq(
-    [
-      {
-        role: "system",
-        content: "You return strict JSON for resume tailoring. Never include markdown fences or commentary."
-      },
-      { role: "user", content: prompt }
-    ],
-    2400
-  );
+  const messages: GroqMessage[] = [
+    {
+      role: "system",
+      content: "You return strict JSON for resume tailoring. Never include markdown fences or commentary."
+    },
+    { role: "user", content: prompt }
+  ];
+
+  let response: string;
+  try {
+    // 70b is much better at massive JSON generation
+    response = await requestGroq(messages, 3500, "llama-3.3-70b-versatile");
+  } catch (err) {
+    console.warn("Groq 70b failed for tailoring, falling back to 8b-instant:", err);
+    response = await requestGroq(messages, 3000, "llama-3.1-8b-instant");
+  }
 
   try {
     return normalizeResumeTailorResult(JSON.parse(extractJsonPayload(response)));
