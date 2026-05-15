@@ -91,9 +91,9 @@ export function GlobalCopilotWidget() {
               <Bot className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-white">Veda</h3>
+              <h3 className="text-sm font-semibold text-white">Veda (Your AI Dost)</h3>
               <div className="flex items-center gap-1.5">
-                <p className="text-[11px] text-slate-500">{isAuthenticated ? `Mentor for ${user?.name || "you"}` : "Guest Mode"}</p>
+                <p className="text-[11px] text-slate-500">{isAuthenticated ? `Mentor Dost for ${user?.name || "you"}` : "Guest Mode"}</p>
               </div>
             </div>
           </div>
@@ -113,8 +113,8 @@ export function GlobalCopilotWidget() {
               <div className="mb-4 grid h-12 w-12 place-items-center rounded-xl border border-white/[0.06] bg-white/[0.03]">
                 <MessageSquare className="h-6 w-6 text-slate-500" />
               </div>
-              <p className="text-sm font-medium text-white">How can I help?</p>
-              <p className="mt-1 max-w-[240px] text-xs leading-5 text-slate-500">Ask about roadmap, recall, projects, resume, or jobs.</p>
+              <p className="text-sm font-medium text-white">Hey there! How can I help?</p>
+              <p className="mt-1 max-w-[240px] text-xs leading-5 text-slate-500">Ask your dost about roadmap, recall, projects, resume, or jobs.</p>
             </div>
           ) : (
             visibleMessages.map((msg, i) => (
@@ -163,7 +163,7 @@ export function GlobalCopilotWidget() {
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Message Veda"
+                  placeholder="Message your Dost..."
                   className="max-h-24 min-h-[40px] w-full resize-none bg-transparent px-3 py-2.5 text-[13px] text-white outline-none placeholder:text-slate-600"
                   rows={1}
                 />

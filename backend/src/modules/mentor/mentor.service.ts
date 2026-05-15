@@ -242,33 +242,33 @@ function readinessScore(signals: MentorSignals, skillGap: SkillGapSnapshot) {
 
 function mentorMessage(stage: MentorJourneyStage, signals: MentorSignals) {
   if (stage === "setup") {
-    return "Start by telling AI Dost your target role and current skills. The mentor gets sharper once it has your baseline.";
+    return "Hey! Start by telling me your target role and current skills. Once I have your baseline, we can crush your goals together.";
   }
 
   if (stage === "recall") {
     const topic = signals.weakTopics[0]?.topic;
     return topic
-      ? `Today is a retention day. Review ${topic} first so new learning has something solid to attach to.`
-      : "Today is a retention day. Clear your due recall before adding too much new material.";
+      ? `Today is a retention day, my friend. Let's review ${topic} first so the new stuff actually sticks in your brain.`
+      : "Today is a retention day! Let's clear out those due recall items before piling on new material, okay?";
   }
 
   if (stage === "build") {
-    return "You are past passive learning. Move one project task forward and capture what you learn as notes.";
+    return "You've moved past passive learning! Time to get your hands dirty. Move one project task forward and jot down what you learn.";
   }
 
   if (stage === "interview") {
-    return "You are close enough to start interview reps. Practice explaining your projects and weak topics out loud.";
+    return "You're getting so close! Let's start doing some interview reps. Try explaining your projects and weak topics out loud—you got this.";
   }
 
   if (stage === "job_search") {
-    return "Shift into proof mode: tune your resume, apply selectively, and keep recall active so interviews stay sharp.";
+    return "Alright, shift into proof mode! Let's tune that resume, apply selectively, and keep your memory sharp for those upcoming interviews.";
   }
 
   if (stage === "plan") {
-    return "Build the roadmap before studying more. A clear path prevents scattered effort.";
+    return "Let's build a solid roadmap before you just study randomly. A clear path means no wasted effort, my friend.";
   }
 
-  return "Keep the loop tight today: learn one thing, write one note, test recall, then adjust.";
+  return "Let's keep things focused today: learn one concept, write one solid note, test your recall, and we'll adjust from there.";
 }
 
 function nextUnlock(stage: MentorJourneyStage) {
@@ -306,8 +306,8 @@ function buildTasks(date: string, user: MentorUser, signals: MentorSignals, skil
     tasks.push(task(date, {
       type: "onboarding",
       title: "Finish mentor onboarding",
-      description: "Set your target role, current skills, and experience level.",
-      reason: "AI Dost needs a baseline before it can guide your journey.",
+      description: "Let's set your target role, current skills, and experience level.",
+      reason: "I need a baseline before I can guide your journey properly, my friend.",
       priority: "high",
       estimatedMinutes: 8,
       href: "/onboarding"
@@ -319,8 +319,8 @@ function buildTasks(date: string, user: MentorUser, signals: MentorSignals, skil
     tasks.push(task(date, {
       type: "skill_gap",
       title: "Run skill gap diagnosis",
-      description: "Compare your current skills with your target role.",
-      reason: "The mentor uses this to choose the next skill instead of guessing.",
+      description: "Let's compare your current skills with your target role.",
+      reason: "I use this to pick the absolute best next skill for you instead of just guessing.",
       priority: "high",
       estimatedMinutes: 5,
       href: "/skill-gap"
@@ -332,7 +332,7 @@ function buildTasks(date: string, user: MentorUser, signals: MentorSignals, skil
       type: "roadmap",
       title: "Generate your roadmap",
       description: "Create the first structured path from your target role and skill gaps.",
-      reason: "A daily mentor needs a north star to sequence your work.",
+      reason: "Every great journey needs a north star to map things out.",
       priority: "high",
       estimatedMinutes: 6,
       href: "/roadmap"
@@ -343,8 +343,8 @@ function buildTasks(date: string, user: MentorUser, signals: MentorSignals, skil
     tasks.push(task(date, {
       type: "recall",
       title: `Clear ${signals.recallDue} due recall ${signals.recallDue === 1 ? "item" : "items"}`,
-      description: "Answer from memory before reading your notes.",
-      reason: "Retention is the core signal for whether learning is actually sticking.",
+      description: "Try to answer from memory before you peek at your notes.",
+      reason: "Retention is everything. This shows me if what we're learning is actually sticking.",
       priority: "high",
       estimatedMinutes: Math.min(30, Math.max(8, signals.recallDue * 4)),
       href: "/recall"
@@ -355,8 +355,8 @@ function buildTasks(date: string, user: MentorUser, signals: MentorSignals, skil
     tasks.push(task(date, {
       type: "learn",
       title: `Patch weak topic: ${weakTopic.topic}`,
-      description: "Review your note, rewrite the explanation, then test yourself again.",
-      reason: `${weakTopic.topic} is currently at ${Math.round(weakTopic.averageStrength * 100)}% strength.`,
+      description: "Review your note, rewrite the explanation in your own words, and test yourself again.",
+      reason: `Looks like ${weakTopic.topic} is currently at ${Math.round(weakTopic.averageStrength * 100)}% strength. Let's fix that!`,
       priority: signals.recallDue > 0 ? "medium" : "high",
       estimatedMinutes: 20,
       href: "/notes"
@@ -365,8 +365,8 @@ function buildTasks(date: string, user: MentorUser, signals: MentorSignals, skil
     tasks.push(task(date, {
       type: "learn",
       title: `Study next skill: ${nextSkill}`,
-      description: "Spend one focused block learning the next high-impact skill.",
-      reason: "This is one of the largest gaps for your target role.",
+      description: "Spend one solid, focused block learning this next high-impact skill.",
+      reason: "This is one of the biggest missing pieces for your target role. Nailing this will be huge.",
       priority: "high",
       estimatedMinutes: 35,
       href: "/roadmap"
@@ -377,8 +377,8 @@ function buildTasks(date: string, user: MentorUser, signals: MentorSignals, skil
     tasks.push(task(date, {
       type: "roadmap",
       title: `Advance milestone: ${signals.activeMilestone}`,
-      description: "Make concrete progress and mark the milestone when evidence exists.",
-      reason: "Roadmap progress converts learning into a visible journey.",
+      description: "Make concrete progress today and mark the milestone when you have evidence.",
+      reason: "Roadmap progress is how we turn learning into a visible, winning journey.",
       priority: stage === "recall" ? "medium" : "high",
       estimatedMinutes: 30,
       href: "/roadmap"
@@ -387,9 +387,9 @@ function buildTasks(date: string, user: MentorUser, signals: MentorSignals, skil
 
   tasks.push(task(date, {
     type: "note",
-    title: "Capture one mentor-grade note",
-    description: "Write a short explanation, example, and one recall question.",
-    reason: "The AI mentor becomes personal only when your memory base grows.",
+    title: "Capture one solid note",
+    description: "Write a short explanation, an example, and one recall question.",
+    reason: "I can be way more helpful once your personal memory base starts growing.",
     priority: signals.totalNotes < 5 ? "high" : "medium",
     estimatedMinutes: 10,
     href: "/notes"
@@ -399,8 +399,8 @@ function buildTasks(date: string, user: MentorUser, signals: MentorSignals, skil
     tasks.push(task(date, {
       type: "project",
       title: "Choose a portfolio project",
-      description: "Pick a project that proves the skills from your current roadmap.",
-      reason: "Projects turn knowledge into interview evidence.",
+      description: "Pick a cool project that actually proves the skills from your roadmap.",
+      reason: "Projects are how we turn knowledge into hard interview evidence.",
       priority: "medium",
       estimatedMinutes: 12,
       href: "/projects"
@@ -409,8 +409,8 @@ function buildTasks(date: string, user: MentorUser, signals: MentorSignals, skil
     tasks.push(task(date, {
       type: "project",
       title: `Move project forward: ${signals.activeProject}`,
-      description: "Ship one small, demonstrable improvement today.",
-      reason: "A mentor should push you toward proof, not only study.",
+      description: "Ship one small, demonstrable improvement to your project today.",
+      reason: "I want to push you toward shipping proof, not just studying theory.",
       priority: stage === "build" ? "high" : "medium",
       estimatedMinutes: 45,
       href: "/projects"
@@ -421,8 +421,8 @@ function buildTasks(date: string, user: MentorUser, signals: MentorSignals, skil
     tasks.push(task(date, {
       type: "interview",
       title: "Practice one interview round",
-      description: "Answer one technical or project question and review the feedback.",
-      reason: "Interview skill improves through reps, not only knowledge.",
+      description: "Answer one technical or project question and we'll review the feedback together.",
+      reason: "Interview skills improve through actual reps, not just reading.",
       priority: stage === "interview" ? "high" : "medium",
       estimatedMinutes: 20,
       href: "/interview"
@@ -628,7 +628,7 @@ async function adoptStrategy(userId: string, input: AdoptStrategyInput): Promise
   const primarySkill = strategySkills(input)[0];
 
   plan.focus = primarySkill ? `Recovery sprint: ${primarySkill}` : "Recovery sprint";
-  plan.mentorMessage = `Strategy adopted. ${input.recoveryPlan} I will keep this visible in today's plan and use your follow-through to tune the next recommendation.`;
+  plan.mentorMessage = `Got it! Strategy adopted. ${input.recoveryPlan} I'll keep this visible in today's plan, and we'll see how you do so we can tune the next steps. You got this!`;
   plan.journeyStage = "learn";
   plan.nextUnlock = "Recovery momentum";
   plan.tasks = [...adoptedTasks, ...existingTasks].slice(0, 7) as typeof plan.tasks;
@@ -675,17 +675,17 @@ async function recordTaskFeedback(userId: string, taskId: string, input: MentorT
   if (input.type === "start") {
     taskItem.status = taskItem.status === "pending" ? "in_progress" : taskItem.status;
     taskItem.startedAt = taskItem.startedAt ?? new Date();
-    taskItem.mentorNote = "Veda is watching this task as the current execution focus.";
+    taskItem.mentorNote = "I'm keeping an eye on this—let's get it done!";
   }
 
   if (input.type === "confidence") {
     taskItem.confidenceScore = input.confidenceScore ?? taskItem.confidenceScore;
     taskItem.mentorNote =
       input.confidenceScore && input.confidenceScore <= 2
-        ? "Confidence is low. Veda will bias tomorrow toward review and smaller prerequisite steps."
+        ? "Hey, it's totally okay to feel shaky here. We'll take it step by step tomorrow with some review."
         : input.confidenceScore === 3
-          ? "Confidence is forming. Veda will keep this topic in the review loop."
-          : "Confidence is strong. Veda can move this topic toward projects and interviews.";
+          ? "Confidence is building! Let's keep this in our review loop until you completely master it."
+          : "Awesome confidence! You're ready to put this into practice in projects and interviews. Proud of you!";
   }
 
   if (input.type === "stuck") {
@@ -694,14 +694,14 @@ async function recordTaskFeedback(userId: string, taskId: string, input: MentorT
     taskItem.stuckCount = (taskItem.stuckCount ?? 0) + 1;
     taskItem.lastStuckAt = new Date();
     taskItem.mentorNote = input.note?.trim()
-      ? `Stuck signal captured: ${input.note.trim()}`
-      : "Stuck signal captured. Veda should break this into a smaller prerequisite step.";
+      ? `Got it: ${input.note.trim()}`
+      : "I see you're stuck. Don't stress, I'll help break this down into smaller, easier steps.";
 
     const unblockTask = task(date, {
       type: "reflection",
       title: `Unblock: ${taskItem.title}`,
-      description: "Write what blocked you, ask Veda for a hint, then retry the smallest next step.",
-      reason: "A stuck moment is useful data. The mentor should reduce friction before pushing harder.",
+      description: "Just write out what blocked you. I'm here to give you a hint so we can tackle the next tiny step.",
+      reason: "Getting stuck is just part of the process, man! I'll help smooth out the friction so we can keep moving.",
       priority: "high",
       estimatedMinutes: 10,
       href: "/copilot"
