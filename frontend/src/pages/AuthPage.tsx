@@ -1,13 +1,24 @@
 import { type FormEvent, useState } from "react";
 import { isAxiosError } from "axios";
-import { useNavigate, Link } from "react-router-dom";
-import { useGoogleLogin, GoogleLogin } from "@react-oauth/google";
+import { Link, useNavigate } from "react-router-dom";
+import { useGoogleLogin } from "@react-oauth/google";
+import {
+  ArrowRight,
+  Brain,
+  CheckCircle2,
+  Eye,
+  EyeOff,
+  Loader2,
+  Lock,
+  Mail,
+  Sparkles,
+  Target,
+  User as UserIcon
+} from "lucide-react";
 import { authApi } from "../features/auth/api";
 import { type AuthMode } from "../features/auth/types";
 import { useAppStore } from "../store/app-store";
-import { Shield, Lock, Mail, User as UserIcon, Sparkles, Route, Target, Briefcase } from "lucide-react";
 import { cn } from "../lib/utils/cn";
-import { NebulaBackground } from "../components/common/NebulaBackground";
 import "./AuthPage.css";
 
 function getAuthErrorMessage(error: unknown) {
@@ -27,6 +38,7 @@ export function AuthPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isSubmitting, setSubmitting] = useState(false);
+  const isSignup = mode === "signup";
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
@@ -50,7 +62,7 @@ export function AuthPage() {
     setError("");
     setSubmitting(true);
     try {
-      const result = mode === "signup"
+      const result = isSignup
         ? await authApi.signup({ name, email, password })
         : await authApi.login({ email, password });
       setSession(result.accessToken, result.refreshToken, result.user);
@@ -64,71 +76,97 @@ export function AuthPage() {
 
   return (
     <div className="auth-page">
-      <div className="auth-page__glow" />
-      
       <div className="auth-shell">
         <section className="auth-brand-panel">
-          <div className="auth-eyebrow">
-            <Sparkles size={14} />
-            Career OS
+          <div className="auth-brand-panel__topline">
+            <span className="auth-signal-dot" />
+            Veda workspace
           </div>
-          <h1>Build your future with confidence.</h1>
+          <h1>One calm place for your next career move.</h1>
           <p>
-            Join 10,000+ professionals using AI to navigate their career paths with precision.
+            StudyBuddy keeps your roadmap, recall, interviews, and mentor actions aligned in one focused command center.
           </p>
-          
-          <div className="auth-trust-grid">
-            {[
-              { icon: Route, label: "Personalized Learning Roadmaps" },
-              { icon: Target, label: "AI-Powered Mock Interviews" },
-              { icon: Briefcase, label: "Direct Industry Mentorship" }
-            ].map((item) => (
-              <div key={item.label} className="auth-trust-item">
-                <div className="auth-trust-icon">
-                  <item.icon size={18} />
+
+          <div className="auth-command-card" aria-hidden="true">
+            <div className="auth-command-card__header">
+              <div>
+                <span>Today</span>
+                <strong>Execution Plan</strong>
+              </div>
+              <Sparkles size={18} />
+            </div>
+            <div className="auth-progress-line">
+              <span style={{ width: "72%" }} />
+            </div>
+            <div className="auth-mini-grid">
+              {[
+                { label: "Focus", value: "3 tasks", icon: Target },
+                { label: "Recall", value: "12 due", icon: Brain },
+                { label: "Ready", value: "84%", icon: CheckCircle2 }
+              ].map((item) => (
+                <div key={item.label} className="auth-mini-card">
+                  <item.icon size={16} />
+                  <span>{item.label}</span>
+                  <strong>{item.value}</strong>
                 </div>
-                <span>{item.label}</span>
+              ))}
+            </div>
+          </div>
+
+          <div className="auth-trust-row">
+            {["Private by default", "Adaptive roadmap", "AI mentor"].map((item) => (
+              <div key={item} className="auth-trust-pill">
+                <CheckCircle2 size={14} />
+                {item}
               </div>
             ))}
           </div>
         </section>
 
         <section className="auth-card">
-          <div className="auth-card-head text-center">
-            <img src="/brand/studybuddy-logo.png" alt="StudyBuddy" className="h-20 w-auto mx-auto mb-3 object-contain drop-shadow-[0_0_15px_rgba(202,138,247,0.2)]" />
-            <p className="text-slate-500 text-sm mt-2">Enter your details to access your workspace.</p>
+          <div className="auth-card-head">
+            <img src="/brand/studybuddy-logo.png" alt="StudyBuddy" className="auth-logo" />
+            <div>
+              <p className="auth-card-kicker">{isSignup ? "Start your workspace" : "Welcome back"}</p>
+              <h2>{isSignup ? "Create your account" : "Log in to StudyBuddy"}</h2>
+            </div>
           </div>
 
-          <div className="auth-tabs">
-            <button 
+          <div className="auth-tabs" aria-label="Authentication mode">
+            <button
+              type="button"
               className={cn("auth-tab", mode === "signup" && "active")}
               onClick={() => setMode("signup")}
+              aria-pressed={mode === "signup"}
             >
               Sign Up
             </button>
-            <button 
+            <button
+              type="button"
               className={cn("auth-tab", mode === "login" && "active")}
               onClick={() => setMode("login")}
+              aria-pressed={mode === "login"}
             >
               Login
             </button>
           </div>
 
-          <button 
+          <button
             className="google-btn-custom"
             onClick={() => googleLogin()}
             disabled={isSubmitting}
+            type="button"
           >
-            <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" alt="Google" width={20} />
+            <span className="google-mark" aria-hidden="true">G</span>
             Continue with Google
           </button>
 
           <div className="auth-divider">
-            <span>or email</span>
+            <span>or continue with email</span>
           </div>
 
           <form onSubmit={handleSubmit} className="auth-form">
-            {mode === "signup" && (
+            {isSignup && (
               <div className="auth-input-group">
                 <label>Full Name</label>
                 <div className="auth-input-wrap">
@@ -137,8 +175,9 @@ export function AuthPage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="auth-input"
-                    placeholder="mr pds"
+                    placeholder="Your name"
                     required
+                    autoComplete="name"
                   />
                 </div>
               </div>
@@ -155,6 +194,7 @@ export function AuthPage() {
                   placeholder="you@example.com"
                   required
                   type="email"
+                  autoComplete="email"
                 />
               </div>
             </div>
@@ -167,34 +207,41 @@ export function AuthPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="auth-input"
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                   required
                   minLength={8}
                   type={showPassword ? "text" : "password"}
+                  autoComplete={isSignup ? "new-password" : "current-password"}
                 />
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 text-slate-500 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-colors"
+                  className="auth-password-toggle"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
-                  {showPassword ? <Shield size={16} /> : <Lock size={16} />}
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
             </div>
 
-
             {error && (
-              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-medium">
+              <div className="auth-error" role="alert">
                 {error}
               </div>
             )}
 
-            <button
-              disabled={isSubmitting}
-              className="btn-auth-submit"
-              type="submit"
-            >
-              {isSubmitting ? "Wait a moment..." : mode === "signup" ? "Create Account" : "Enter Workspace"}
+            <button disabled={isSubmitting} className="btn-auth-submit" type="submit">
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={17} className="auth-spin" />
+                  Securing session
+                </>
+              ) : (
+                <>
+                  {isSignup ? "Create Account" : "Enter Workspace"}
+                  <ArrowRight size={17} />
+                </>
+              )}
             </button>
           </form>
 
@@ -206,4 +253,3 @@ export function AuthPage() {
     </div>
   );
 }
-
