@@ -14,7 +14,7 @@ import {
 
 type IntelligenceEventInput = {
   type: StudentIntelligenceEventType;
-  source: "notes" | "recall" | "roadmap" | "projects" | "resume" | "jobs" | "mentor" | "skills" | "behavior" | "system";
+  source: "notes" | "recall" | "roadmap" | "projects" | "resume" | "jobs" | "company-prep" | "mentor" | "skills" | "behavior" | "system";
   entityId?: string;
   payload?: Record<string, unknown>;
 };

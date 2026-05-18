@@ -5,6 +5,7 @@ import { mentorService } from "../mentor/mentor.service.js";
 import { skillsService } from "../skills/skills.service.js";
 import { roadmapsService } from "../roadmaps/roadmaps.service.js";
 import { jobsService } from "../jobs/jobs.service.js";
+import { companyPrepService } from "../company-prep/company-prep.service.js";
 import { usersService } from "../users/users.service.js";
 import { UserModel } from "../users/user.model.js";
 import { RecommendationEngine } from "../../engines/recommendation.engine.js";
@@ -132,12 +133,13 @@ async function incrementAiUsage(userId: string) {
 /** Builds comprehensive user context for AI responses. */
 async function buildUserContext(userId: string, currentQuery?: string, knownNoteContext?: string): Promise<string> {
   try {
-    const [profile, skillGapAnalysis, notesResult, roadmap, jobs, mentorPlan, nextAction, intelligenceProfile] = await Promise.all([
+    const [profile, skillGapAnalysis, notesResult, roadmap, jobs, companyPrepContext, mentorPlan, nextAction, intelligenceProfile] = await Promise.all([
       usersService.getProfile(userId).catch(() => null),
       skillsService.analyzeSkillGap(userId).catch(() => null),
       notesService.listNotes(userId, { limit: 5, offset: 0 }).catch(() => ({ notes: [], total: 0 })),
       roadmapsService.getRoadmap(userId).catch(() => null),
       jobsService.getJobs(userId).catch(() => []),
+      companyPrepService.getVedaContext(userId).catch(() => ""),
       mentorService.getTodayPlan(userId).catch(() => null),
       RecommendationEngine.getNextBestAction(userId).catch(() => null),
       studentIntelligenceService.getProfile(userId).catch(() => null)
@@ -218,6 +220,10 @@ async function buildUserContext(userId: string, currentQuery?: string, knownNote
         .map((job: any) => `${job.title} at ${job.company}${job.matchScore ? ` (${job.matchScore}% match)` : ""}`)
         .join(", ");
       context.push(`Recommended Jobs: ${topJobs}`);
+    }
+
+    if (companyPrepContext) {
+      context.push(companyPrepContext);
     }
 
     return context.join("\n\n");

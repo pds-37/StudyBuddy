@@ -15,6 +15,7 @@ type CreateNoteData = {
   sourceUrl?: string;
   strength?: number;
   nextReviewAt?: string;
+  metadata?: Record<string, unknown>;
 };
 
 type UpdateNoteData = Partial<CreateNoteData>;
@@ -215,7 +216,8 @@ async function createNote(userId: string, data: CreateNoteData): Promise<CareerN
       confusionSignals: localAnalysis.confusionSignals,
       knowledgeLayer: localAnalysis.knowledgeLayer,
       interviewRelevance: localAnalysis.interviewRelevance,
-      analysisProvider: "local-fallback"
+      analysisProvider: "local-fallback",
+      ...(data.metadata ?? {})
     },
     concepts: localAnalysis.concepts,
     difficulty: localAnalysis.difficulty,
@@ -289,12 +291,17 @@ async function runAnalysisPipeline(userId: string, note: NoteDocument): Promise<
     console.warn("AI note analysis unavailable; using local extraction fallback:", error);
   }
 
+  const currentNote = await NoteModel.findById(note._id).select("metadata").catch(() => null);
+  const existingMetadata = ((currentNote?.metadata ?? note.metadata ?? {}) as Record<string, unknown>);
+  const preservedCompanyPrep = existingMetadata.companyPrep;
+
   // Update note with enriched analysis data
   await NoteModel.updateOne(
     { _id: note._id },
     {
       $set: {
         metadata: {
+          ...(preservedCompanyPrep ? { companyPrep: preservedCompanyPrep } : {}),
           summary: analysis.summary,
           concepts: analysis.concepts,
           flashcards: analysis.flashcards,

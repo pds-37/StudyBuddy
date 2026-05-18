@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import {
   ArrowRight,
   Briefcase,
+  Building2,
   FilePenLine,
   FileText,
   LayoutDashboard,
@@ -112,6 +113,15 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
         icon: Briefcase,
         keywords: ["career", "openings", "matches"],
         run: () => navigate("/jobs")
+      },
+      {
+        id: "companies",
+        label: "Open company type prep",
+        description: "Study hiring procedures and question patterns by company type.",
+        group: "Navigate",
+        icon: Building2,
+        keywords: ["companies", "interview", "prep", "hiring"],
+        run: () => navigate("/companies")
       },
       {
         id: "resume",

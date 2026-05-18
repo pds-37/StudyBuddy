@@ -8,6 +8,8 @@ import { ProtectedRoute } from "./ProtectedRoute";
 // Lazy-loaded pages
 const AuthPage = lazy(() => import("../pages/AuthPage").then(m => ({ default: m.AuthPage })));
 const CopilotPage = lazy(() => import("../pages/CopilotPage").then(m => ({ default: m.CopilotPage })));
+const CompaniesPage = lazy(() => import("../pages/CompaniesPage").then(m => ({ default: m.CompaniesPage })));
+const CompanyTypeDetailPage = lazy(() => import("../pages/CompanyTypeDetailPage").then(m => ({ default: m.CompanyTypeDetailPage })));
 const DashboardPage = lazy(() => import("../pages/DashboardPage").then(m => ({ default: m.DashboardPage })));
 const JobsPage = lazy(() => import("../pages/JobsPage").then(m => ({ default: m.JobsPage })));
 const LandingPage = lazy(() => import("../pages/LandingPage").then(m => ({ default: m.LandingPage })));
@@ -52,6 +54,8 @@ export function AppRouter() {
             <Route path="/notes" element={<NotesPage />} />
             <Route path="/recall" element={<RecallPage />} />
             <Route path="/jobs" element={<JobsPage />} />
+            <Route path="/companies" element={<CompaniesPage />} />
+            <Route path="/companies/:companyTypeId" element={<CompanyTypeDetailPage />} />
             <Route path="/resume" element={<ResumePage />} />
             <Route path="/roadmap" element={<RoadmapPage />} />
             <Route path="/focus" element={<FocusPage />} />

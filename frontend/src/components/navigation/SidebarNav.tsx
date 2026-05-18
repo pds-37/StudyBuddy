@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import {
   Briefcase,
+  Building2,
   FilePenLine,
   FileText,
   Brain,
@@ -34,6 +35,7 @@ const navGroups = [
   ],
   [
     { name: "Jobs", href: "/jobs", icon: Briefcase },
+    { name: "Companies", href: "/companies", icon: Building2 },
     { name: "Mentors", href: "/mentorship", icon: Users },
     { name: "Projects", href: "/projects", icon: FolderKanban },
     { name: "Resume", href: "/resume", icon: FilePenLine },
@@ -98,7 +100,7 @@ export function SidebarNav({ isCollapsed = false, onToggleCollapsed }: SidebarNa
             groupIndex > 0 && "pt-2 mt-2 border-t border-white/[0.05]"
           )}>
             {group.map((item) => {
-              const isActive = location.pathname === item.href;
+              const isActive = location.pathname === item.href || location.pathname.startsWith(`${item.href}/`);
               return (
                 <Link
                   key={item.name}

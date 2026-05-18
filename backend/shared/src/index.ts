@@ -6,6 +6,7 @@ export * from "./schemas/onboarding.schema.js";
 export * from "./schemas/resume.schema.js";
 export * from "./schemas/roadmap.schema.js";
 export * from "./types/auth.js";
+export * from "./types/company-prep.js";
 export * from "./types/copilot.js";
 export * from "./types/job.js";
 export * from "./types/mentor.js";

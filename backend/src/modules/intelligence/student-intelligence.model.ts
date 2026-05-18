@@ -14,6 +14,10 @@ export const STUDENT_INTELLIGENCE_EVENT_TYPES = [
   "PROJECT_COMPLETED",
   "JOB_TARGETED",
   "JOB_APPLIED",
+  "COMPANY_TYPE_TARGETED",
+  "COMPANY_PREP_QUESTION_ATTEMPTED",
+  "COMPANY_PREP_QUESTION_SOLVED",
+  "COMPANY_PREP_APPROACH_SAVED",
   "INTERVIEW_FAILED",
   "INTERVIEW_PASSED",
   "RESUME_UPDATED",
@@ -31,7 +35,7 @@ const intelligenceEventSchema = new Schema(
     type: { type: String, enum: STUDENT_INTELLIGENCE_EVENT_TYPES, required: true, index: true },
     source: {
       type: String,
-      enum: ["notes", "recall", "roadmap", "projects", "resume", "jobs", "mentor", "skills", "behavior", "system"],
+      enum: ["notes", "recall", "roadmap", "projects", "resume", "jobs", "company-prep", "mentor", "skills", "behavior", "system"],
       required: true,
       index: true
     },

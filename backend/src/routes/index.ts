@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { authRouter } from "../modules/auth/auth.routes.js";
 import { copilotRouter } from "../modules/copilot/copilot.routes.js";
+import { companyPrepRouter } from "../modules/company-prep/company-prep.routes.js";
 import { jobsRouter } from "../modules/jobs/jobs.routes.js";
 import { notesRouter } from "../modules/notes/notes.routes.js";
 import { resumeRouter } from "../modules/resume/resume.routes.js";
@@ -30,6 +31,7 @@ apiRouter.use("/notes", notesRouter);
 apiRouter.use("/recall", recallRouter);
 apiRouter.use("/jobs", jobsRouter);
 apiRouter.use("/copilot", copilotRouter);
+apiRouter.use("/company-prep", companyPrepRouter);
 apiRouter.use("/mentor", mentorRouter);
 apiRouter.use("/resume", resumeRouter);
 apiRouter.use("/interview", interviewRouter);
@@ -42,4 +44,3 @@ apiRouter.use("/behavior", behaviorRouter);
 apiRouter.use("/knowledge", knowledgeRouter);
 apiRouter.use("/memory", memoryRouter);
 apiRouter.use("/intelligence", intelligenceRouter);
-
