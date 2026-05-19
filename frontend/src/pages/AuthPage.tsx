@@ -9,7 +9,11 @@ import {
   Loader2,
   Lock,
   Mail,
-  User as UserIcon
+  User as UserIcon,
+  ShieldCheck,
+  CreditCard,
+  Sparkles,
+  Quote
 } from "lucide-react";
 import { authApi } from "../features/auth/api";
 import { type AuthMode } from "../features/auth/types";
@@ -24,10 +28,15 @@ function getAuthErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : "Authentication failed.";
 }
 
+const marqueeCompanies = [
+  "Google", "Microsoft", "Amazon", "Meta", "Apple",
+  "Netflix", "Spotify", "Stripe", "Uber", "Airbnb"
+];
+
 export function AuthPage() {
   const navigate = useNavigate();
   const setSession = useAppStore((state) => state.setSession);
-  const [mode, setMode] = useState<AuthMode>("signup");
+  const [mode, setMode] = useState<AuthMode>("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -72,134 +81,231 @@ export function AuthPage() {
 
   return (
     <div className="auth-page">
-      <section className="auth-card" aria-label="StudyBuddy authentication">
-        <div className="auth-card-head">
-          <img src="/brand/studybuddy-logo.png" alt="StudyBuddy" className="auth-logo" />
-          <p className="auth-card-kicker">{isSignup ? "Create your account" : "Welcome back"}</p>
-          <h1>{isSignup ? "Start with StudyBuddy" : "Log in to StudyBuddy"}</h1>
-          <p className="auth-card-copy">
-            {isSignup
-              ? "Set up your private learning workspace in a few seconds."
-              : "Continue to your notes, roadmap, and VEDA workspace."}
+      {/* ── Left Panel: Marketing ── */}
+      <aside className="auth-left" aria-label="StudyBuddy value proposition">
+        {/* Brand */}
+        <div className="auth-brand">
+          <img src="/brand/studybuddy-logo.png" alt="StudyBuddy" className="auth-brand-logo" />
+          <span className="auth-brand-name">StudyBuddy</span>
+          <span className="auth-brand-badge">PRO</span>
+        </div>
+
+        {/* Hero copy */}
+        <div className="auth-hero-copy">
+          <p className="auth-hero-kicker">
+            <span className="auth-kicker-dash" />
+            YOUR CAREER COPILOT
+          </p>
+          <h1 className="auth-hero-title">
+            From campus<br />
+            to your <em>dream</em><br />
+            company.
+          </h1>
+          <p className="auth-hero-subtitle">
+            AI-powered interview prep, smart notes, and a personalised
+            roadmap — built for students who mean business.
           </p>
         </div>
 
-        <div className="auth-tabs" aria-label="Authentication mode">
-          <button
-            type="button"
-            className={cn("auth-tab", mode === "signup" && "active")}
-            onClick={() => setMode("signup")}
-            aria-pressed={mode === "signup"}
-          >
-            Sign Up
-          </button>
-          <button
-            type="button"
-            className={cn("auth-tab", mode === "login" && "active")}
-            onClick={() => setMode("login")}
-            aria-pressed={mode === "login"}
-          >
-            Login
-          </button>
+        {/* Scrolling company marquee */}
+        <div className="auth-marquee-wrap" aria-hidden="true">
+          <div className="auth-marquee-track">
+            {[...marqueeCompanies, ...marqueeCompanies].map((company, i) => (
+              <span key={`${company}-${i}`} className="auth-marquee-item">
+                <span className="auth-marquee-dot" />
+                {company}
+              </span>
+            ))}
+          </div>
         </div>
 
-        <button
-          className="google-btn-custom"
-          onClick={() => googleLogin()}
-          disabled={isSubmitting}
-          type="button"
-        >
-          <span className="google-mark" aria-hidden="true">G</span>
-          Continue with Google
-        </button>
-
-        <div className="auth-divider">
-          <span>or email</span>
+        {/* Stats */}
+        <div className="auth-stats-row">
+          <div className="auth-stat-card">
+            <strong>12<span className="auth-stat-highlight">k+</span></strong>
+            <span>Students placed</span>
+          </div>
+          <div className="auth-stat-card">
+            <strong>94<span className="auth-stat-highlight">%</span></strong>
+            <span>Interview rate</span>
+          </div>
+          <div className="auth-stat-card">
+            <strong>3<span className="auth-stat-highlight">x</span></strong>
+            <span>Faster prep</span>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="auth-form">
-          {isSignup && (
+        {/* Testimonial */}
+        <blockquote className="auth-testimonial">
+          <Quote size={18} className="auth-quote-icon" />
+          <p>
+            "Got my Google offer in 6 weeks. The company-wise question list and
+            VEDA's daily nudges made all the difference."
+          </p>
+          <footer>
+            <span className="auth-testimonial-avatar">P</span>
+            <div>
+              <strong>Priya Sharma</strong>
+              <span>SDE-2 at Google · IIT Delhi 2024</span>
+            </div>
+          </footer>
+        </blockquote>
+      </aside>
+
+      {/* ── Right Panel: Auth Form ── */}
+      <section className="auth-right" aria-label="StudyBuddy authentication">
+        <div className="auth-form-container">
+          {/* Header */}
+          <div className="auth-form-head">
+            <h2 className="auth-welcome">{isSignup ? "Get started." : "Welcome back."}</h2>
+            <p className="auth-welcome-sub">
+              {isSignup
+                ? "Create your account to begin your placement journey."
+                : "Sign in to continue your placement journey."}
+            </p>
+          </div>
+
+          {/* Tabs */}
+          <div className="auth-tabs" aria-label="Authentication mode">
+            <button
+              type="button"
+              className={cn("auth-tab", mode === "login" && "active")}
+              onClick={() => setMode("login")}
+              aria-pressed={mode === "login"}
+            >
+              Sign in
+            </button>
+            <button
+              type="button"
+              className={cn("auth-tab", mode === "signup" && "active")}
+              onClick={() => setMode("signup")}
+              aria-pressed={mode === "signup"}
+            >
+              Create account
+            </button>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="auth-form">
+            {isSignup && (
+              <div className="auth-input-group">
+                <label>Full Name</label>
+                <div className="auth-input-wrap">
+                  <UserIcon size={17} />
+                  <input
+                    value={name}
+                    onChange={(event) => setName(event.target.value)}
+                    className="auth-input"
+                    placeholder="Your name"
+                    required
+                    autoComplete="name"
+                  />
+                </div>
+              </div>
+            )}
+
             <div className="auth-input-group">
-              <label>Full Name</label>
+              <label>Email address</label>
               <div className="auth-input-wrap">
-                <UserIcon size={17} />
+                <Mail size={17} />
                 <input
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
                   className="auth-input"
-                  placeholder="Your name"
+                  placeholder="you@college.edu"
                   required
-                  autoComplete="name"
+                  type="email"
+                  autoComplete="email"
                 />
               </div>
             </div>
-          )}
 
-          <div className="auth-input-group">
-            <label>Email Address</label>
-            <div className="auth-input-wrap">
-              <Mail size={17} />
-              <input
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                className="auth-input"
-                placeholder="you@example.com"
-                required
-                type="email"
-                autoComplete="email"
-              />
+            <div className="auth-input-group">
+              <label>Password</label>
+              <div className="auth-input-wrap">
+                <Lock size={17} />
+                <input
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  className="auth-input"
+                  placeholder="Enter your password"
+                  required
+                  minLength={8}
+                  type={showPassword ? "text" : "password"}
+                  autoComplete={isSignup ? "new-password" : "current-password"}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="auth-password-toggle"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+              {!isSignup && (
+                <a href="#" className="auth-forgot-link">Forgot password?</a>
+              )}
             </div>
-          </div>
 
-          <div className="auth-input-group">
-            <label>Password</label>
-            <div className="auth-input-wrap">
-              <Lock size={17} />
-              <input
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                className="auth-input"
-                placeholder="Enter your password"
-                required
-                minLength={8}
-                type={showPassword ? "text" : "password"}
-                autoComplete={isSignup ? "new-password" : "current-password"}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="auth-password-toggle"
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </div>
-          </div>
-
-          {error && (
-            <div className="auth-error" role="alert">
-              {error}
-            </div>
-          )}
-
-          <button disabled={isSubmitting} className="btn-auth-submit" type="submit">
-            {isSubmitting ? (
-              <>
-                <Loader2 size={17} className="auth-spin" />
-                Securing session
-              </>
-            ) : (
-              <>
-                {isSignup ? "Create Account" : "Enter Workspace"}
-                <ArrowRight size={17} />
-              </>
+            {error && (
+              <div className="auth-error" role="alert">
+                {error}
+              </div>
             )}
-          </button>
-        </form>
 
-        <p className="auth-footer">
-          By continuing, you agree to our <Link to="#">Terms</Link> and <Link to="#">Privacy</Link>.
-        </p>
+            <button disabled={isSubmitting} className="btn-auth-submit" type="submit">
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={17} className="auth-spin" />
+                  Securing session…
+                </>
+              ) : (
+                <>
+                  {isSignup ? "Create Account" : `Sign in to StudyBuddy`}
+                  <ArrowRight size={17} />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Social divider */}
+          <div className="auth-divider">
+            <span>or continue with</span>
+          </div>
+
+          {/* Social buttons */}
+          <div className="auth-social-row">
+            <button
+              className="auth-social-btn"
+              onClick={() => googleLogin()}
+              disabled={isSubmitting}
+              type="button"
+            >
+              <span className="google-mark" aria-hidden="true">G</span>
+              Google
+            </button>
+          </div>
+
+          {/* Switch mode */}
+          <p className="auth-switch-mode">
+            {isSignup ? "Already have an account? " : "Don't have an account? "}
+            <button
+              type="button"
+              className="auth-switch-btn"
+              onClick={() => setMode(isSignup ? "login" : "signup")}
+            >
+              {isSignup ? "Sign in →" : "Start free →"}
+            </button>
+          </p>
+
+          {/* Trust badges */}
+          <div className="auth-trust-row">
+            <span><ShieldCheck size={14} /> SSL encrypted</span>
+            <span><CreditCard size={14} /> No card needed</span>
+            <span><Sparkles size={14} /> Free forever plan</span>
+          </div>
+        </div>
       </section>
     </div>
   );
