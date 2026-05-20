@@ -460,17 +460,15 @@ export function ServerWakeUpLoader({ isReady = false, onComplete }: ServerWakeUp
               }}
             />
             
-            {/* Elegant Floating Letter 'V' */}
-            <span 
-              className="relative z-50 text-[42px] font-normal italic leading-none select-none drop-shadow-[0_0_24px_rgba(202,138,247,0.7)]"
+            {/* Elegant Floating App Logo */}
+            <img 
+              src="/brand/studybuddy-logo.png" 
+              alt="StudyBuddy Logo" 
+              className="relative z-50 h-12 w-auto object-contain select-none pointer-events-none drop-shadow-[0_0_24px_rgba(202,138,247,0.55)]"
               style={{
-                fontFamily: "'Instrument Serif', Georgia, serif",
-                color: "rgba(240, 230, 255, 0.92)",
                 animation: "float 4s ease-in-out infinite",
               }}
-            >
-              V
-            </span>
+            />
           </div>
         </div>
 
