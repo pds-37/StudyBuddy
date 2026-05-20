@@ -22,6 +22,7 @@ export function AppProviders({ children }: AppProvidersProps) {
 
   const [isServerCold, setServerCold] = useState(false);
   const [isReady, setReady] = useState(false);
+  const [loaderComplete, setLoaderComplete] = useState(false);
 
   useEffect(() => {
     hydrateSession();
@@ -55,8 +56,8 @@ export function AppProviders({ children }: AppProvidersProps) {
     void authApi.me().then(setUser).catch(clearSession);
   }, [accessToken, clearSession, setUser, isReady]);
 
-  if (!isReady && isServerCold) {
-    return <ServerWakeUpLoader />;
+  if (isServerCold && !loaderComplete) {
+    return <ServerWakeUpLoader isReady={isReady} onComplete={() => setLoaderComplete(true)} />;
   }
 
   if (!isReady) {
