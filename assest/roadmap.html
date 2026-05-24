@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>StudyBuddy — Intelligence Roadmap</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:      #080a0e;
+  --bg2:     #0d1018;
+  --bg3:     #121620;
+  --bg4:     #181d28;
+  --line:    #1e2535;
+  --line2:   #262f42;
+  --fg:      #e2e5ee;
+  --fg2:     #8892a8;
+  --fg3:     #454f66;
+  --gold:    #c9a84c;
+  --gold2:   #e2c47a;
+  --goldd:   #1c1608;
+  --purple:  #7c5cbf;
+  --purple2: #a07ee0;
+  --purpled: #150f28;
+  --teal:    #2ec4a0;
+  --teald:   #061f1a;
+  --red:     #e05555;
+  --redd:    #200e0e;
+  --blue:    #4e8ef0;
+  --blued:   #0a1528;
+  --serif:   'Instrument Serif', Georgia, serif;
+  --sans:    'Sora', sans-serif;
+  --mono:    'JetBrains Mono', monospace;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:13px;-webkit-font-smoothing:antialiased}
+
+/* ── SCROLLBARS ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:2px}
+
+/* ── LAYOUT ── */
+.app{display:grid;grid-template-rows:52px 1fr;height:100vh;overflow:hidden}
+
+/* ── TOPBAR ── */
+.topbar{
+  background:var(--bg2);
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;
+  padding:0 20px;gap:12px;
+  position:relative;z-index:20;
+}
+.tb-logo{display:flex;align-items:center;gap:8px;margin-right:16px}
+.tb-logo-mark{
+  width:28px;height:28px;border-radius:7px;
+  background:var(--purpled);border:1px solid rgba(160,126,224,.3);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-style:italic;font-size:14px;color:var(--purple2);
+}
+.tb-logo-name{font-size:14px;font-weight:600;color:var(--fg);letter-spacing:-.01em}
+.tb-search{
+  flex:1;max-width:340px;
+  display:flex;align-items:center;gap:8px;
+  background:var(--bg3);border:1px solid var(--line);border-radius:8px;
+  padding:6px 12px;cursor:pointer;
+}
+.tb-search span{font-size:12px;color:var(--fg3)}
+.tb-search kbd{
+  margin-left:auto;font-family:var(--mono);font-size:10px;
+  padding:1px 6px;border:1px solid var(--line2);border-radius:4px;
+  color:var(--fg3);background:var(--bg4);
+}
+.tb-nav{display:flex;align-items:center;gap:2px;margin-left:auto}
+.tb-nav a{
+  padding:5px 12px;border-radius:7px;font-size:12px;font-weight:500;
+  color:var(--fg3);text-decoration:none;transition:all .15s;cursor:pointer;
+}
+.tb-nav a:hover{color:var(--fg);background:var(--bg3)}
+.tb-nav a.active{color:var(--purple2);background:var(--purpled)}
+.tb-right{display:flex;align-items:center;gap:10px;margin-left:16px}
+.tb-badge{
+  display:flex;align-items:center;gap:6px;
+  padding:4px 10px;border-radius:20px;
+  background:var(--goldd);border:1px solid rgba(201,168,76,.25);
+  font-family:var(--mono);font-size:10px;color:var(--gold);font-weight:500;
+}
+.tb-bell{
+  width:30px;height:30px;border-radius:8px;
+  background:var(--bg3);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  position:relative;
+}
+.tb-bell::after{
+  content:'';position:absolute;top:6px;right:7px;
+  width:5px;height:5px;border-radius:50%;
+  background:var(--red);border:1.5px solid var(--bg2);
+}
+.tb-avatar{
+  width:30px;height:30px;border-radius:50%;
+  background:linear-gradient(135deg,var(--purple),var(--blue));
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:600;color:#fff;cursor:pointer;
+}
+
+/* ── BODY LAYOUT ── */
+.body{display:grid;grid-template-columns:1fr 300px;overflow:hidden}
+
+/* ── MAIN SCROLL ── */
+.main{overflow-y:auto;padding:24px 24px 40px}
+
+/* ── HERO BANNER ── */
+.hero{
+  background:var(--bg2);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:28px 32px;
+  margin-bottom:20px;
+  position:relative;
+  overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;
+  top:-60px;right:-60px;
+  width:300px;height:300px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(124,92,191,.10) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-eyebrow{
+  font-family:var(--mono);font-size:10px;font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--purple2);
+  margin-bottom:14px;display:flex;align-items:center;gap:7px;
+}
+.hero-eyebrow::before{content:'';display:block;width:18px;height:1px;background:var(--purple2)}
+.hero-heading{
+  font-family:var(--serif);font-size:38px;
+  color:var(--fg);line-height:1.12;margin-bottom:8px;
+}
+.hero-heading em{font-style:italic;color:var(--purple2)}
+.hero-sub{font-size:13px;color:var(--fg2);margin-bottom:28px}
+.hero-sub strong{color:var(--fg);text-decoration:underline;text-underline-offset:2px}
+
+/* METRICS ROW */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+.metric{background:var(--bg3);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.metric-label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg3);margin-bottom:10px}
+.metric-ring{position:relative;width:52px;height:52px;margin-bottom:8px}
+.metric-ring svg{transform:rotate(-90deg)}
+.metric-ring-bg{fill:none;stroke:var(--line2);stroke-width:3}
+.metric-ring-fill{fill:none;stroke-width:3;stroke-linecap:round;transition:stroke-dashoffset .8s cubic-bezier(.16,1,.3,1)}
+.metric-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:500}
+.metric-name{font-size:11.5px;font-weight:500;color:var(--fg2);margin-bottom:2px}
+.metric-target{font-size:10.5px;color:var(--fg3)}
+
+/* CTA BUTTONS */
+.hero-actions{display:flex;gap:10px}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:9px 16px;border-radius:9px;font-size:12.5px;font-weight:500;
+  border:1px solid;cursor:pointer;font-family:var(--sans);transition:all .15s;
+}
+.btn-primary{background:var(--purple);border-color:var(--purple);color:#fff}
+.btn-primary:hover{background:var(--purple2);border-color:var(--purple2);transform:translateY(-1px);box-shadow:0 4px 20px rgba(124,92,191,.3)}
+.btn-ghost{background:transparent;border-color:var(--line2);color:var(--fg2)}
+.btn-ghost:hover{border-color:var(--fg3);color:var(--fg);background:var(--bg3)}
+
+/* ── TWO-COL GRID ── */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+
+/* ── SECTION CARD ── */
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.card-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px;border-bottom:1px solid var(--line);
+}
+.card-title{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:10.5px;font-weight:500;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--fg2);
+}
+.card-title-icon{
+  width:22px;height:22px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;font-size:11px;
+}
+.card-action{font-size:11px;color:var(--fg3);cursor:pointer;text-decoration:none;transition:color .15s}
+.card-action:hover{color:var(--purple2)}
+
+/* ── PHASE TIMELINE ── */
+.phase-list{padding:16px 20px;display:flex;flex-direction:column;gap:0}
+.phase-item{
+  display:flex;align-items:flex-start;gap:14px;
+  padding:14px 0;border-bottom:1px solid var(--line);
+  cursor:pointer;transition:background .15s;
+  border-radius:8px;padding-left:4px;
+}
+.phase-item:last-child{border-bottom:none}
+.phase-item:hover{background:var(--bg3);padding-left:8px}
+.phase-item.active{background:var(--purpled);border-color:rgba(124,92,191,.2);border:1px solid rgba(124,92,191,.2);border-radius:10px;padding:14px 12px;margin-bottom:4px}
+
+.phase-node{
+  width:32px;height:32px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:11px;font-weight:500;
+  margin-top:2px;border:1.5px solid;
+}
+.pn-done  {background:var(--teald);border-color:var(--teal);color:var(--teal)}
+.pn-active{background:var(--purpled);border-color:var(--purple2);color:var(--purple2);animation:nodePulse 2s ease-in-out infinite}
+.pn-locked{background:var(--bg3);border-color:var(--line2);color:var(--fg3)}
+@keyframes nodePulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(160,126,224,.3)}
+  50%    {box-shadow:0 0 0 6px rgba(160,126,224,0)}
+}
+
+.phase-info{flex:1;min-width:0}
+.phase-name{font-size:13px;font-weight:600;color:var(--fg);margin-bottom:3px}
+.phase-desc{font-size:11.5px;color:var(--fg3);line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.phase-meta{
+  display:flex;align-items:center;gap:8px;margin-top:8px;
+}
+.phase-tag{
+  font-family:var(--mono);font-size:10px;padding:2px 8px;
+  border-radius:20px;border:1px solid;font-weight:500;
+}
+.pt-active{background:var(--purpled);border-color:rgba(160,126,224,.35);color:var(--purple2)}
+.pt-locked{background:var(--bg4);border-color:var(--line);color:var(--fg3)}
+.pt-done  {background:var(--teald);border-color:rgba(46,196,160,.35);color:var(--teal)}
+
+.phase-progress-wrap{width:80px;height:3px;background:var(--line2);border-radius:2px;overflow:hidden}
+.phase-progress-fill{height:100%;border-radius:2px;background:var(--purple2)}
+
+/* connector line */
+.phase-connector{width:1px;height:12px;background:var(--line2);margin:0 0 0 19px}
+
+/* ── EXECUTION TASKS ── */
+.tasks-list{padding:12px 16px;display:flex;flex-direction:column;gap:10px}
+.task-card{
+  background:var(--bg3);border:1px solid var(--line);border-radius:12px;
+  padding:13px 14px;cursor:pointer;transition:all .15s;
+}
+.task-card:hover{border-color:var(--line2);background:var(--bg4)}
+.task-card.featured{border-color:rgba(78,142,240,.25);background:var(--blued)}
+
+.task-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.task-type{
+  font-family:var(--mono);font-size:9.5px;font-weight:500;
+  letter-spacing:.1em;padding:2px 8px;border-radius:4px;
+  text-transform:uppercase;
+}
+.tt-learn  {background:#0a1c10;color:#4ade80;border:1px solid rgba(74,222,128,.2)}
+.tt-practice{background:#0f0d1e;color:var(--purple2);border:1px solid rgba(160,126,224,.2)}
+.tt-revise {background:var(--goldd);color:var(--gold);border:1px solid rgba(201,168,76,.2)}
+
+.task-dur{font-family:var(--mono);font-size:10px;color:var(--fg3)}
+.task-diff{
+  margin-left:auto;font-family:var(--mono);font-size:10px;
+  padding:2px 7px;border-radius:4px;
+}
+.td-easy  {background:#0a1c10;color:#4ade80}
+.td-med   {background:var(--goldd);color:var(--gold)}
+.td-hard  {background:var(--redd);color:var(--red)}
+
+.task-title{font-size:13px;font-weight:600;color:var(--fg);margin-bottom:5px;line-height:1.35}
+.task-veda{
+  display:flex;align-items:flex-start;gap:6px;
+  font-size:11.5px;color:var(--fg3);font-style:italic;line-height:1.5;
+}
+.task-veda-icon{
+  width:16px;height:16px;border-radius:50%;flex-shrink:0;margin-top:1px;
+  background:var(--purpled);border:1px solid rgba(160,126,224,.4);
+  display:flex;align-items:center;justify-content:center;font-size:8px;color:var(--purple2);
+}
+
+.task-actions{display:flex;gap:6px;margin-top:10px}
+.task-btn{
+  flex:1;padding:6px;text-align:center;border-radius:7px;
+  font-size:11px;font-weight:500;cursor:pointer;
+  border:1px solid var(--line2);background:var(--bg2);color:var(--fg2);
+  transition:all .15s;font-family:var(--sans);
+}
+.task-btn:hover{background:var(--bg3);color:var(--fg)}
+.task-btn.primary{background:var(--purple);border-color:var(--purple);color:#fff}
+.task-btn.primary:hover{background:var(--purple2)}
+
+/* ── PATH VISUAL ── */
+.path-wrap{padding:20px;overflow-x:auto}
+.path-track{display:flex;align-items:center;gap:0;min-width:max-content}
+.path-step{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  width:110px;cursor:pointer;
+}
+.path-node{
+  width:42px;height:42px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;border:2px solid;transition:all .2s;
+}
+.path-node.done  {background:var(--teald);border-color:var(--teal);color:var(--teal)}
+.path-node.active{background:var(--purpled);border-color:var(--purple2);color:var(--purple2);box-shadow:0 0 0 6px rgba(124,92,191,.12)}
+.path-node.locked{background:var(--bg3);border-color:var(--line2);color:var(--fg3)}
+.path-label{font-size:11px;color:var(--fg3);text-align:center;max-width:90px;line-height:1.35}
+.path-label.active{color:var(--purple2);font-weight:500}
+.path-line{width:60px;height:1px;background:var(--line2);margin-bottom:22px;flex-shrink:0}
+.path-line.done{background:var(--teal)}
+
+/* ── WEEK CALENDAR ── */
+.week-grid{
+  display:grid;grid-template-columns:repeat(7,1fr);
+  gap:4px;padding:16px 20px;
+}
+.wday{text-align:center}
+.wday-label{font-family:var(--mono);font-size:9.5px;color:var(--fg3);margin-bottom:5px;letter-spacing:.06em}
+.wday-cell{
+  height:40px;border-radius:8px;border:1px solid var(--line);
+  background:var(--bg3);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;
+  cursor:pointer;transition:all .15s;
+}
+.wday-cell:hover{border-color:var(--line2);background:var(--bg4)}
+.wday-cell.today{border-color:rgba(124,92,191,.4);background:var(--purpled)}
+.wday-cell.done {background:var(--teald);border-color:rgba(46,196,160,.3)}
+.wday-num{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--fg2)}
+.wday-dot{width:4px;height:4px;border-radius:50%;background:var(--teal)}
+.wday-cell.today .wday-num{color:var(--purple2)}
+
+/* ── RIGHT PANEL ── */
+.right{
+  border-left:1px solid var(--line);
+  background:var(--bg2);
+  overflow-y:auto;
+  display:flex;flex-direction:column;
+}
+
+.rp-section{padding:16px;border-bottom:1px solid var(--line)}
+.rp-title{
+  font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--fg3);margin-bottom:12px;
+  display:flex;align-items:center;gap:6px;
+}
+.rp-title::before{content:'';display:block;width:3px;height:12px;border-radius:2px;background:var(--purple2)}
+
+/* VEDA insight */
+.veda-insight{
+  background:var(--purpled);border:1px solid rgba(124,92,191,.2);
+  border-radius:12px;padding:14px;margin-bottom:10px;
+}
+.vi-header{
+  display:flex;align-items:center;gap:7px;
+  font-size:12.5px;font-weight:600;color:var(--fg);margin-bottom:8px;
+}
+.vi-orb{
+  width:22px;height:22px;border-radius:50%;
+  background:radial-gradient(circle at 38% 32%,rgba(160,126,224,.8),rgba(80,50,140,.6));
+  border:1px solid rgba(160,126,224,.3);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-style:italic;font-size:10px;color:rgba(220,200,255,.9);
+}
+.vi-body{font-size:12px;color:var(--fg2);line-height:1.6}
+.vi-action{
+  margin-top:10px;width:100%;padding:7px;
+  background:var(--purple);border:none;border-radius:8px;
+  font-size:12px;font-weight:500;color:#fff;cursor:pointer;
+  font-family:var(--sans);transition:background .15s;
+}
+.vi-action:hover{background:var(--purple2)}
+
+/* Insight list */
+.insight-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 0;border-bottom:1px solid var(--line);
+}
+.insight-item:last-child{border-bottom:none}
+.ii-icon{
+  width:26px;height:26px;border-radius:7px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:12px;
+}
+.ii-text{flex:1;min-width:0}
+.ii-msg{font-size:12px;color:var(--fg2);line-height:1.5;margin-bottom:4px}
+.ii-link{font-size:11px;color:var(--purple2);cursor:pointer;font-weight:500;letter-spacing:.03em}
+.ii-link:hover{color:var(--purple2);opacity:.8}
+
+/* Score ring */
+.score-ring-wrap{
+  display:flex;align-items:center;gap:16px;
+  background:var(--bg3);border:1px solid var(--line);border-radius:12px;
+  padding:14px 16px;margin-bottom:10px;
+}
+.score-ring{position:relative;width:56px;height:56px;flex-shrink:0}
+.score-ring svg{transform:rotate(-90deg);display:block}
+.score-ring-bg  {fill:none;stroke:var(--line2);stroke-width:3}
+.score-ring-fill{fill:none;stroke:url(#sg);stroke-width:3;stroke-linecap:round;stroke-dasharray:138;stroke-dashoffset:110;transition:stroke-dashoffset .8s cubic-bezier(.16,1,.3,1)}
+.score-ring-val{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:14px;font-weight:500;color:var(--fg);
+}
+.score-info{flex:1}
+.score-label{font-size:11.5px;font-weight:600;color:var(--fg);margin-bottom:3px}
+.score-desc{font-size:11px;color:var(--fg3);line-height:1.5}
+
+/* CTA sprint */
+.sprint-cta{
+  width:100%;padding:11px;
+  background:linear-gradient(135deg,var(--purple),#5b3fa8);
+  border:none;border-radius:10px;
+  font-size:13px;font-weight:600;color:#fff;
+  cursor:pointer;font-family:var(--sans);
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  transition:all .2s;
+  box-shadow:0 4px 16px rgba(124,92,191,.25);
+}
+.sprint-cta:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(124,92,191,.4)}
+
+/* Quick actions */
+.qa-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.qa-btn{
+  background:var(--bg3);border:1px solid var(--line);border-radius:10px;
+  padding:10px 6px;text-align:center;cursor:pointer;transition:all .15s;
+}
+.qa-btn:hover{background:var(--bg4);border-color:var(--line2)}
+.qa-icon{font-size:16px;margin-bottom:4px}
+.qa-label{font-size:10.5px;color:var(--fg3);line-height:1.2}
+
+/* heatmap row */
+.heatmap{display:flex;gap:3px;padding:4px 0}
+.hm-cell{
+  width:10px;height:10px;border-radius:2px;
+  background:var(--line);transition:background .15s;cursor:pointer;
+}
+.hm-cell:hover{opacity:.8}
+.hm-1{background:#1e1a36}.hm-2{background:#3a2d6b}.hm-3{background:#6c4fc2}.hm-4{background:var(--purple2)}
+.heatmap-labels{
+  display:flex;justify-content:space-between;
+  font-family:var(--mono);font-size:9px;color:var(--fg3);
+  padding:2px 0;margin-bottom:6px;
+}
+
+/* banner alert */
+.alert-banner{
+  background:var(--goldd);border:1px solid rgba(201,168,76,.25);
+  border-radius:10px;padding:10px 14px;
+  display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;
+}
+.ab-icon{font-size:14px;margin-top:1px;flex-shrink:0}
+.ab-text{flex:1}
+.ab-title{font-size:12px;font-weight:600;color:var(--gold2);margin-bottom:2px}
+.ab-sub{font-size:11px;color:rgba(201,168,76,.65);line-height:1.5}
+
+/* ── ANIMATIONS ── */
+.fade-in{animation:fadeIn .5s ease both}
+.fade-in-1{animation:fadeIn .5s .1s ease both}
+.fade-in-2{animation:fadeIn .5s .2s ease both}
+.fade-in-3{animation:fadeIn .5s .3s ease both}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── SVG ICONS (inline) ── */
+.icon{display:inline-block;vertical-align:middle}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ══ TOPBAR ══ -->
+<header class="topbar">
+  <div class="tb-logo">
+    <div class="tb-logo-mark">V</div>
+    <span class="tb-logo-name">StudyBuddy</span>
+  </div>
+
+  <div class="tb-search">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="var(--fg3)" stroke-width="1.6"><circle cx="6.5" cy="6.5" r="5"/><path d="M11 11l3 3" stroke-linecap="round"/></svg>
+    <span>Search actions, notes, roadmaps…</span>
+    <kbd>⌘K</kbd>
+  </div>
+
+  <nav class="tb-nav">
+    <a onclick="setTab(this,'dashboard')">Dashboard</a>
+    <a class="active" onclick="setTab(this,'roadmap')">Roadmap</a>
+    <a onclick="setTab(this,'notes')">Notes</a>
+    <a onclick="setTab(this,'interview')">Interview</a>
+    <a onclick="setTab(this,'jobs')">Jobs</a>
+  </nav>
+
+  <div class="tb-right">
+    <div class="tb-badge">
+      <svg width="10" height="10" viewBox="0 0 12 12" fill="var(--gold)"><path d="M6 1l1.5 3h3l-2.4 1.8.9 3L6 7l-3 1.8.9-3L1.5 4h3z"/></svg>
+      PRO MEMBER
+    </div>
+    <div class="tb-bell">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="var(--fg2)" stroke-width="1.6"><path d="M6 13a2 2 0 004 0M8 2a5 5 0 00-5 5v3H2v1h12v-1h-1V7a5 5 0 00-5-5z"/></svg>
+    </div>
+    <div class="tb-avatar">P</div>
+  </div>
+</header>
+
+<!-- ══ BODY ══ -->
+<div class="body">
+
+  <!-- ── MAIN ── -->
+  <main class="main">
+
+    <!-- HERO -->
+    <div class="hero fade-in">
+      <div class="hero-eyebrow">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="var(--purple2)" stroke-width="1.5"><path d="M8 2l1.6 3.2L13 6l-2.5 2.4.6 3.4L8 10.2 4.9 11.8l.6-3.4L3 6l3.4-.8z"/></svg>
+        Strategy OS · Intelligence Roadmap
+      </div>
+      <h1 class="hero-heading">Your path to <em>Software Engineer</em><br/>optimised by VEDA</h1>
+      <p class="hero-sub">Personalised for <strong>Priyanshu Tiwari</strong> based on your skills, pace, and target companies.</p>
+
+      <!-- METRICS -->
+      <div class="metrics">
+        <div class="metric" onclick="">
+          <div class="metric-label">Readiness</div>
+          <div class="metric-ring">
+            <svg width="52" height="52" viewBox="0 0 52 52">
+              <circle class="metric-ring-bg" cx="26" cy="26" r="20"/>
+              <circle class="metric-ring-fill" cx="26" cy="26" r="20" style="stroke:var(--red);stroke-dasharray:125.66;stroke-dashoffset:106.8"/>
+            </svg>
+            <div class="metric-val" style="color:var(--red)">15%</div>
+          </div>
+          <div class="metric-name">Readiness Score</div>
+          <div class="metric-target">Target: 95%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Consistency</div>
+          <div class="metric-ring">
+            <svg width="52" height="52" viewBox="0 0 52 52">
+              <circle class="metric-ring-bg" cx="26" cy="26" r="20"/>
+              <circle class="metric-ring-fill" cx="26" cy="26" r="20" style="stroke:var(--gold);stroke-dasharray:125.66;stroke-dashoffset:50.3"/>
+            </svg>
+            <div class="metric-val" style="color:var(--gold)">60%</div>
+          </div>
+          <div class="metric-name">Elite Level</div>
+          <div class="metric-target">Last 7 days</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Recall</div>
+          <div class="metric-ring">
+            <svg width="52" height="52" viewBox="0 0 52 52">
+              <circle class="metric-ring-bg" cx="26" cy="26" r="20"/>
+              <circle class="metric-ring-fill" cx="26" cy="26" r="20" style="stroke:var(--teal);stroke-dasharray:125.66;stroke-dashoffset:75.4"/>
+            </svg>
+            <div class="metric-val" style="color:var(--teal)">40%</div>
+          </div>
+          <div class="metric-name">Recall Health</div>
+          <div class="metric-target">Needs focus</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Timeline</div>
+          <div class="metric-ring">
+            <svg width="52" height="52" viewBox="0 0 52 52">
+              <circle class="metric-ring-bg" cx="26" cy="26" r="20"/>
+              <circle class="metric-ring-fill" cx="26" cy="26" r="20" style="stroke:var(--purple2);stroke-dasharray:125.66;stroke-dashoffset:83.8"/>
+            </svg>
+            <div class="metric-val" style="color:var(--purple2)">W1</div>
+          </div>
+          <div class="metric-name">Phase 1 of 3</div>
+          <div class="metric-target">~14 weeks total</div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <button class="btn btn-primary" onclick="toast('Expanding direction…')">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 3h8v8M3 13L13 3" stroke-linecap="round"/></svg>
+          Expand direction
+        </button>
+        <button class="btn btn-ghost" onclick="toast('Simplifying roadmap…')">Simplify roadmap →</button>
+        <button class="btn btn-ghost" onclick="toast('Regenerating with VEDA…')">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 8A6 6 0 112 8M2 4v4h4" stroke-linecap="round"/></svg>
+          Regenerate
+        </button>
+      </div>
+    </div>
+
+    <!-- PATH OVERVIEW -->
+    <div class="card fade-in-1" style="margin-bottom:16px">
+      <div class="card-header">
+        <div class="card-title">
+          <div class="card-title-icon" style="background:var(--purpled)">🗺</div>
+          Journey Path
+        </div>
+        <a class="card-action" onclick="toast('Opening full path view…')">View full path →</a>
+      </div>
+      <div class="path-wrap">
+        <div class="path-track">
+          <div class="path-step" onclick="selectPhase(0)">
+            <div class="path-node active">◎</div>
+            <div class="path-label active">Foundations of Coding</div>
+          </div>
+          <div class="path-line"></div>
+          <div class="path-step" onclick="selectPhase(1)">
+            <div class="path-node locked">⊙</div>
+            <div class="path-label">JS &amp; Git Essentials</div>
+          </div>
+          <div class="path-line"></div>
+          <div class="path-step" onclick="selectPhase(2)">
+            <div class="path-node locked">⊙</div>
+            <div class="path-label">System Design &amp; Python</div>
+          </div>
+          <div class="path-line"></div>
+          <div class="path-step" onclick="selectPhase(3)">
+            <div class="path-node locked">⊙</div>
+            <div class="path-label">Final Project &amp; Review</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASES + TASKS -->
+    <div class="grid2 fade-in-2">
+
+      <!-- PHASES -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon" style="background:var(--purpled)">📍</div>
+            Journey Phases
+          </div>
+          <a class="card-action">15% overall</a>
+        </div>
+        <div class="phase-list" id="phase-list">
+
+          <div class="phase-item active" onclick="selectPhase(0)">
+            <div class="phase-node pn-active">1</div>
+            <div class="phase-info">
+              <div class="phase-name">Foundations of Coding</div>
+              <div class="phase-desc">Building the fundamental blocks of programming to unlock your potential</div>
+              <div class="phase-meta">
+                <span class="phase-tag pt-active">In Progress</span>
+                <div class="phase-progress-wrap"><div class="phase-progress-fill" style="width:15%"></div></div>
+                <span style="font-family:var(--mono);font-size:10px;color:var(--fg3)">15%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="phase-connector"></div>
+
+          <div class="phase-item" onclick="selectPhase(1)">
+            <div class="phase-node pn-locked">2</div>
+            <div class="phase-info">
+              <div class="phase-name">JavaScript &amp; Git Essentials</div>
+              <div class="phase-desc">Mastering the tools of the trade for front and backend development</div>
+              <div class="phase-meta">
+                <span class="phase-tag pt-locked">Locked</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="phase-connector"></div>
+
+          <div class="phase-item" onclick="selectPhase(2)">
+            <div class="phase-node pn-locked">3</div>
+            <div class="phase-info">
+              <div class="phase-name">System Design &amp; Python</div>
+              <div class="phase-desc">Scalable patterns and scripting for backend and system development</div>
+              <div class="phase-meta">
+                <span class="phase-tag pt-locked">Locked</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="phase-connector"></div>
+
+          <div class="phase-item" onclick="selectPhase(3)">
+            <div class="phase-node pn-locked">4</div>
+            <div class="phase-info">
+              <div class="phase-name">Final Project &amp; Review</div>
+              <div class="phase-desc">Applying learned skills to a comprehensive project and reinforcing key concepts</div>
+              <div class="phase-meta">
+                <span class="phase-tag pt-locked">Locked</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TASKS -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon" style="background:var(--blued)">⚡</div>
+            Execution Tasks
+          </div>
+          <a class="card-action" onclick="toast('Loading all tasks…')">View all →</a>
+        </div>
+        <div class="tasks-list">
+
+          <div class="task-card featured">
+            <div class="task-top">
+              <span class="task-type tt-learn">Learn</span>
+              <span class="task-dur">20m</span>
+              <span class="task-diff td-easy">Easy</span>
+            </div>
+            <div class="task-title">Implement a simple array in JavaScript</div>
+            <div class="task-veda">
+              <div class="task-veda-icon">V</div>
+              "Remember, arrays are indexed collections of the same data type"
+            </div>
+            <div class="task-actions">
+              <button class="task-btn primary" onclick="toast('Starting task…')">▶ Start</button>
+              <button class="task-btn" onclick="toast('Saving for later…')">Later</button>
+            </div>
+          </div>
+
+          <div class="task-card">
+            <div class="task-top">
+              <span class="task-type tt-practice">Practice</span>
+              <span class="task-dur">30m</span>
+              <span class="task-diff td-easy">Easy</span>
+            </div>
+            <div class="task-title">Practice traversing an array in Python</div>
+            <div class="task-veda">
+              <div class="task-veda-icon">V</div>
+              "Use a for loop to iterate through each element"
+            </div>
+            <div class="task-actions">
+              <button class="task-btn" onclick="toast('Starting practice…')">▶ Start</button>
+            </div>
+          </div>
+
+          <div class="task-card">
+            <div class="task-top">
+              <span class="task-type tt-revise">Revise</span>
+              <span class="task-dur">20m</span>
+              <span class="task-diff td-med">Medium</span>
+            </div>
+            <div class="task-title">Revise the differences between arrays and linked lists</div>
+            <div class="task-veda">
+              <div class="task-veda-icon">V</div>
+              "Focus on how data is accessed and the implications for performance"
+            </div>
+            <div class="task-actions">
+              <button class="task-btn" onclick="toast('Starting revision…')">▶ Revise</button>
+            </div>
+          </div>
+
+          <button class="btn btn-ghost" style="width:100%;justify-content:center;font-size:12px;margin-top:2px" onclick="toast('Adding custom objective…')">
+            + Add custom objective
+          </button>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- WEEKLY CALENDAR -->
+    <div class="card fade-in-3">
+      <div class="card-header">
+        <div class="card-title">
+          <div class="card-title-icon" style="background:var(--teald)">📅</div>
+          This Week
+        </div>
+        <a class="card-action">You're ahead of 35% of learners</a>
+      </div>
+      <div class="week-grid">
+        <div class="wday">
+          <div class="wday-label">MON</div>
+          <div class="wday-cell done"><span class="wday-num">19</span><div class="wday-dot"></div></div>
+        </div>
+        <div class="wday">
+          <div class="wday-label">TUE</div>
+          <div class="wday-cell done"><span class="wday-num">20</span><div class="wday-dot"></div></div>
+        </div>
+        <div class="wday">
+          <div class="wday-label">WED</div>
+          <div class="wday-cell done"><span class="wday-num">21</span><div class="wday-dot"></div></div>
+        </div>
+        <div class="wday">
+          <div class="wday-label">THU</div>
+          <div class="wday-cell today"><span class="wday-num">22</span></div>
+        </div>
+        <div class="wday">
+          <div class="wday-label">FRI</div>
+          <div class="wday-cell"><span class="wday-num" style="color:var(--fg3)">23</span></div>
+        </div>
+        <div class="wday">
+          <div class="wday-label">SAT</div>
+          <div class="wday-cell"><span class="wday-num" style="color:var(--fg3)">24</span></div>
+        </div>
+        <div class="wday">
+          <div class="wday-label">SUN</div>
+          <div class="wday-cell"><span class="wday-num" style="color:var(--fg3)">25</span></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── RIGHT PANEL ── -->
+  <aside class="right">
+
+    <!-- VEDA INSIGHT -->
+    <div class="rp-section">
+      <div class="rp-title">AI Mentor Insights</div>
+
+      <div class="veda-insight">
+        <div class="vi-header">
+          <div class="vi-orb">V</div>
+          Excellent progress, Priyanshu! ✦
+        </div>
+        <div class="vi-body">You've been consistent for 3 days. Your recall on Arrays is improving. Keep it up — you're building real momentum.</div>
+        <button class="vi-action" onclick="toast('Opening VEDA chat…')">Chat with VEDA →</button>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:0">
+        <div class="insight-item">
+          <div class="ii-icon" style="background:var(--goldd)">⚠</div>
+          <div class="ii-text">
+            <div class="ii-msg">You tend to struggle with consistency. Short daily tasks build a stronger foundation.</div>
+            <span class="ii-link" onclick="toast('Opening daily schedule…')">VIEW DAILY SCHEDULE →</span>
+          </div>
+        </div>
+        <div class="insight-item">
+          <div class="ii-icon" style="background:var(--blued)">📊</div>
+          <div class="ii-text">
+            <div class="ii-msg">Your readiness score is 15. Focus on completing daily tasks to improve your score.</div>
+            <span class="ii-link" onclick="toast('Tracking readiness score…')">TRACK READINESS SCORE →</span>
+          </div>
+        </div>
+        <div class="insight-item">
+          <div class="ii-icon" style="background:var(--teald)">🔄</div>
+          <div class="ii-text">
+            <div class="ii-msg">Dedicate 30 min/day to revising previously covered material to boost recall.</div>
+            <span class="ii-link" onclick="toast('Starting revision session…')">START REVISION →</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEXT BEST ACTION -->
+    <div class="rp-section">
+      <div class="rp-title">Next Best Action</div>
+
+      <div class="alert-banner" style="margin-bottom:12px">
+        <div class="ab-icon">💡</div>
+        <div class="ab-text">
+          <div class="ab-title">Recommended</div>
+          <div class="ab-sub">Based on your progress and recent performance, start a focus on Graph Traversal sprint.</div>
+        </div>
+      </div>
+
+      <button class="sprint-cta" onclick="toast('Starting 40-min sprint…')">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="3,2 13,8 3,14" fill="currentColor"/></svg>
+        Start 40-min Sprint
+      </button>
+    </div>
+
+    <!-- READINESS SCORE -->
+    <div class="rp-section">
+      <div class="rp-title">Readiness Score</div>
+      <div class="score-ring-wrap">
+        <div class="score-ring">
+          <svg width="56" height="56" viewBox="0 0 56 56">
+            <defs>
+              <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="var(--purple)"/>
+                <stop offset="100%" stop-color="var(--purple2)"/>
+              </linearGradient>
+            </defs>
+            <circle class="score-ring-bg"   cx="28" cy="28" r="22"/>
+            <circle class="score-ring-fill" cx="28" cy="28" r="22"/>
+          </svg>
+          <div class="score-ring-val">15</div>
+        </div>
+        <div class="score-info">
+          <div class="score-label">15 / 100 points</div>
+          <div class="score-desc">Complete daily tasks to raise your score. Target: 95 for top companies.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIVITY HEATMAP -->
+    <div class="rp-section">
+      <div class="rp-title">Activity</div>
+      <div class="heatmap-labels">
+        <span>4 weeks ago</span><span>Today</span>
+      </div>
+      <div class="heatmap" id="heatmap"></div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="rp-section">
+      <div class="rp-title">Quick Actions</div>
+      <div class="qa-grid">
+        <div class="qa-btn" onclick="toast('Opening VEDA chat…')">
+          <div class="qa-icon">💬</div>
+          <div class="qa-label">Ask VEDA</div>
+        </div>
+        <div class="qa-btn" onclick="toast('Starting recall session…')">
+          <div class="qa-icon">🔁</div>
+          <div class="qa-label">Recall</div>
+        </div>
+        <div class="qa-btn" onclick="toast('Starting quiz…')">
+          <div class="qa-icon">🧠</div>
+          <div class="qa-label">Quiz</div>
+        </div>
+        <div class="qa-btn" onclick="toast('Opening notes…')">
+          <div class="qa-icon">📝</div>
+          <div class="qa-label">Notes</div>
+        </div>
+        <div class="qa-btn" onclick="toast('Opening interview prep…')">
+          <div class="qa-icon">🎤</div>
+          <div class="qa-label">Interview</div>
+        </div>
+        <div class="qa-btn" onclick="toast('Adding objective…')">
+          <div class="qa-icon">＋</div>
+          <div class="qa-label">Inject</div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+</div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" style="
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);
+  background:var(--bg4);border:1px solid var(--line2);border-radius:10px;
+  padding:10px 18px;font-size:12.5px;color:var(--fg);z-index:100;
+  transition:transform .25s cubic-bezier(.16,1,.3,1),opacity .25s;
+  opacity:0;pointer-events:none;white-space:nowrap;
+"></div>
+
+<script>
+/* ── TAB ── */
+function setTab(el, name) {
+  document.querySelectorAll('.tb-nav a').forEach(a => a.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* ── PHASE SELECT ── */
+function selectPhase(idx) {
+  // Visual feedback only
+  const items = document.querySelectorAll('.phase-item');
+  items.forEach((item, i) => {
+    item.classList.toggle('active', i === idx);
+  });
+}
+
+/* ── HEATMAP ── */
+(function(){
+  const w = document.getElementById('heatmap');
+  const classes = ['','hm-1','hm-2','hm-3','hm-4'];
+  for(let i=0;i<28;i++){
+    const d = document.createElement('div');
+    d.className = 'hm-cell';
+    // random activity, recent days more active
+    const weight = i > 20 ? .7 : .35;
+    const v = Math.random() < weight ? Math.ceil(Math.random()*4) : 0;
+    if(v) d.classList.add(classes[v]);
+    d.title = v ? `${v} tasks` : 'No activity';
+    w.appendChild(d);
+  }
+})();
+
+/* ── TOAST ── */
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.opacity = '1';
+  el.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(-50%) translateY(60px)';
+  }, 2200);
+}
+</script>
+</body>
+</html>
