@@ -21,11 +21,13 @@ import {
   Zap
 } from "lucide-react";
 import { getMentorToday, recordMentorTaskFeedback, updateMentorTaskStatus } from "../lib/api/mentor";
-import { getNextBestAction, type NextBestAction } from "../lib/api/recommendations";
+import { getNextBestAction, type NextBestAction, type RecommendedTaskData } from "../lib/api/recommendations";
 import { getBehaviorProfile, logBehavior, type BehaviorProfile } from "../lib/api/behavior";
 import { subscribeToPushNotifications, getNotificationPermission } from "../lib/utils/push-notifications";
 import { cn } from "../lib/utils/cn";
 import { useCopilotStore } from "../store/copilot-store";
+import { useAppStore } from "../store/app-store";
+import { demoBehaviorProfile, demoNextBestAction, demoTodayPlan } from "../lib/demo/student-demo";
 import type { MentorTask, MentorTodayPlan } from "@studybuddy/shared";
 
 const taskIcons = {
@@ -55,8 +57,65 @@ function priorityClass(priority: MentorTask["priority"]) {
   return "border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white/[0.04] text-slate-700 dark:text-slate-700 dark:text-slate-300";
 }
 
+function normalizeMatchValue(value?: string | null) {
+  return value?.trim().toLowerCase().replace(/\s+/g, " ") ?? "";
+}
+
+function recommendedTaskId(data: RecommendedTaskData | null) {
+  return data?.id ?? data?._id ?? null;
+}
+
+function recommendedTaskRoute(data: RecommendedTaskData | null) {
+  if (data?.href) return data.href;
+
+  if (data?.type === "recall" || data?.type === "revision" || data?.type === "quiz") {
+    return "/recall";
+  }
+
+  if (data?.type === "project") {
+    return "/projects";
+  }
+
+  if (data?.type === "note") {
+    return "/notes";
+  }
+
+  if (data?.type === "interview") {
+    return "/interview";
+  }
+
+  if (data?.type === "job") {
+    return "/jobs";
+  }
+
+  if (data?.type === "onboarding") {
+    return "/onboarding";
+  }
+
+  return "/roadmap";
+}
+
+function findRecommendedTask(plan: MentorTodayPlan | null, data: RecommendedTaskData | null) {
+  if (!plan || !data) return null;
+
+  const id = recommendedTaskId(data);
+  if (id) {
+    const idMatch = plan.tasks.find((task) => task.id === id);
+    if (idMatch) return idMatch;
+  }
+
+  const title = normalizeMatchValue(data.title);
+  if (title) {
+    const titleMatch = plan.tasks.find((task) => normalizeMatchValue(task.title) === title);
+    if (titleMatch) return titleMatch;
+  }
+
+  return null;
+}
+
 export function DashboardPage() {
   const navigate = useNavigate();
+  const isDemoMode = useAppStore((state) => state.isDemoMode);
   const [plan, setPlan] = useState<MentorTodayPlan | null>(null);
   const [bestAction, setBestAction] = useState<NextBestAction | null>(null);
   const [behavior, setBehavior] = useState<BehaviorProfile | null>(null);
@@ -69,6 +128,15 @@ export function DashboardPage() {
   const sendMessage = useCopilotStore((state) => state.sendMessage);
 
   const loadPlan = async () => {
+    if (isDemoMode) {
+      setPlan(demoTodayPlan);
+      setBestAction(demoNextBestAction);
+      setBehavior(demoBehaviorProfile);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
@@ -94,7 +162,7 @@ export function DashboardPage() {
     if (getNotificationPermission() === "default") {
       setShowPushPrompt(true);
     }
-  }, []);
+  }, [isDemoMode]);
 
   const handleEnableNotifications = async () => {
     const success = await subscribeToPushNotifications();
@@ -110,8 +178,21 @@ export function DashboardPage() {
     [plan]
   );
   const planProgress = plan?.tasks.length ? Math.round((completedTasks / plan.tasks.length) * 100) : 0;
+  const recommendedTask = useMemo(() => {
+    if (bestAction?.action !== "task") return null;
+    return findRecommendedTask(plan, bestAction.data) ?? (bestAction.data ? null : activeTask ?? null);
+  }, [activeTask, bestAction, plan]);
 
   const startTask = async (task: MentorTask) => {
+    if (isDemoMode) {
+      setPlan((current) => current ? {
+        ...current,
+        tasks: current.tasks.map((item) => item.id === task.id ? { ...item, status: "in_progress" } : item)
+      } : current);
+      navigate(task.href);
+      return;
+    }
+
     try {
       setUpdatingTaskId(task.id);
       const nextPlan = await recordMentorTaskFeedback(task.id, { type: "start" });
@@ -125,7 +206,49 @@ export function DashboardPage() {
     }
   };
 
+  const startBestActionTask = async () => {
+    if (bestAction?.action !== "task") return;
+
+    if (recommendedTask) {
+      await startTask(recommendedTask);
+      return;
+    }
+
+    const route = recommendedTaskRoute(bestAction.data);
+
+    if (isDemoMode) {
+      navigate(route);
+      return;
+    }
+
+    try {
+      setUpdatingTaskId("next-best-action");
+      await logBehavior("task_started", {
+        taskId: recommendedTaskId(bestAction.data),
+        title: bestAction.data?.title,
+        type: bestAction.data?.type,
+        source: "next_best_action"
+      }).catch(() => undefined);
+      navigate(route);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to open recommended task");
+    } finally {
+      setUpdatingTaskId(null);
+    }
+  };
+
   const handleStuck = async (task: MentorTask) => {
+    if (isDemoMode) {
+      const note = `I am stuck on "${task.title}". Break it into the smallest next step and explain what I should do first.`;
+      setIsWidgetOpen(true);
+      void sendMessage(note);
+      setPlan((current) => current ? {
+        ...current,
+        tasks: current.tasks.map((item) => item.id === task.id ? { ...item, stuckCount: (item.stuckCount ?? 0) + 1, mentorNote: "Demo signal captured: Veda would now break this into a smaller step." } : item)
+      } : current);
+      return;
+    }
+
     try {
       setStuckTaskId(task.id);
       const note = `I am stuck on "${task.title}". Break it into the smallest next step and explain what I should do first.`;
@@ -142,6 +265,15 @@ export function DashboardPage() {
   };
 
   const completeTask = async (task: MentorTask) => {
+    if (isDemoMode) {
+      const nextStatus = task.status === "completed" ? "pending" : "completed";
+      setPlan((current) => current ? {
+        ...current,
+        tasks: current.tasks.map((item) => item.id === task.id ? { ...item, status: nextStatus } : item)
+      } : current);
+      return;
+    }
+
     try {
       setUpdatingTaskId(task.id);
       const isCompleting = task.status !== "completed";
@@ -169,7 +301,7 @@ export function DashboardPage() {
       <div className="flex min-h-[520px] items-center justify-center">
         <div className="flex items-center gap-3 text-slate-700 dark:text-slate-700 dark:text-slate-300">
           <Loader2 className="animate-spin text-brand" size={20} />
-          Loading AI Dost...
+          Loading your placement plan...
         </div>
       </div>
     );
@@ -213,6 +345,23 @@ export function DashboardPage() {
         </div>
       )}
 
+      {isDemoMode && (
+        <div className="rounded-lg border border-[#ca8af7]/25 bg-[#120d1c] p-4">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#ca8af7]">Recruiter demo workspace</p>
+              <p className="mt-2 text-sm leading-6 text-slate-300">
+                This seeded profile shows the full USP loop: memory signals, roadmap progress, project proof, resume readiness, interview prep, and Veda's next best action.
+              </p>
+            </div>
+            <Link to="/pricing" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-2 text-xs font-black uppercase tracking-widest text-slate-950">
+              View SaaS plans
+              <ArrowRight size={14} />
+            </Link>
+          </div>
+        </div>
+      )}
+
       {bestAction && (
         <div className="group relative overflow-hidden rounded-[2rem] border border-cyan/20 bg-[#0c1017] p-8 shadow-[0_0_80px_-20px_rgba(34,211,238,0.2)] transition-all hover:border-cyan/40">
           <div className="absolute inset-0 bg-gradient-to-br from-cyan/10 via-transparent to-transparent opacity-50" />
@@ -226,9 +375,9 @@ export function DashboardPage() {
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <div className="w-1.5 h-1.5 rounded-full bg-cyan animate-pulse" />
-                  <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan/80">Veda Intelligence Insight</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan/80">Veda next best action</p>
                 </div>
-                <h2 className="text-3xl font-bold text-white tracking-tight">Your Next Best Action</h2>
+                <h2 className="text-3xl font-bold text-white tracking-tight">Do this first today</h2>
                 <p className="mt-3 text-base leading-relaxed text-slate-400 max-w-2xl">
                   {bestAction.reason}
                 </p>
@@ -236,31 +385,36 @@ export function DashboardPage() {
             </div>
 
             <div className="shrink-0">
-              {bestAction.action === "task" && bestAction.data && (
-                <button className="group/btn relative inline-flex items-center gap-3 rounded-2xl bg-cyan px-8 py-4 text-sm font-bold text-slate-950 transition-all hover:scale-105 active:scale-95 shadow-[0_20px_40px_rgba(34,211,238,0.2)]">
-                  <Target size={18} />
-                  Start: {bestAction.data.title || "Next Task"}
+              {bestAction.action === "task" && (
+                <button
+                  type="button"
+                  onClick={() => void startBestActionTask()}
+                  disabled={updatingTaskId === (recommendedTask?.id ?? "next-best-action")}
+                  className="group/btn relative inline-flex items-center gap-3 rounded-2xl bg-cyan px-8 py-4 text-sm font-bold text-slate-950 transition-all hover:scale-105 active:scale-95 disabled:cursor-wait disabled:opacity-70 shadow-[0_20px_40px_rgba(34,211,238,0.2)]"
+                >
+                  {updatingTaskId === (recommendedTask?.id ?? "next-best-action") ? <Loader2 size={18} className="animate-spin" /> : <Target size={18} />}
+                  {recommendedTask ? "Start task" : "Open next step"}
                   <ArrowRight size={16} className="ml-1 transition-transform group-hover/btn:translate-x-1" />
                 </button>
               )}
               {bestAction.action === "revision" && (
                 <Link to="/recall" className="group/btn relative inline-flex items-center gap-3 rounded-2xl bg-emerald-500 px-8 py-4 text-sm font-bold text-slate-950 transition-all hover:scale-105 active:scale-95 shadow-[0_20px_40px_rgba(16,185,129,0.2)]">
                   <Zap size={18} />
-                  Start Quick Revision
+                  Start recall block
                   <ArrowRight size={16} className="ml-1 transition-transform group-hover/btn:translate-x-1" />
                 </Link>
               )}
               {bestAction.action === "generate" && (
                 <Link to="/roadmap" className="group/btn relative inline-flex items-center gap-3 rounded-2xl bg-brand px-8 py-4 text-sm font-bold text-white transition-all hover:scale-105 active:scale-95 shadow-[0_20px_40px_rgba(124,92,255,0.2)]">
                   <Route size={18} />
-                  Generate Roadmap
+                  Generate roadmap
                   <ArrowRight size={16} className="ml-1 transition-transform group-hover/btn:translate-x-1" />
                 </Link>
               )}
               {bestAction.action === "recalibrate" && (
                 <Link to="/onboarding" className="group/btn relative inline-flex items-center gap-3 rounded-2xl bg-amber-500 px-8 py-4 text-sm font-bold text-slate-950 transition-all hover:scale-105 active:scale-95 shadow-[0_20px_40px_rgba(245,158,11,0.2)]">
                   <RefreshCw size={18} />
-                  Recalibrate Path
+                  Recalibrate path
                   <ArrowRight size={16} className="ml-1 transition-transform group-hover/btn:translate-x-1" />
                 </Link>
               )}
@@ -278,7 +432,7 @@ export function DashboardPage() {
                   <div className="w-10 h-10 rounded-xl bg-brand/10 flex items-center justify-center text-brand">
                     <Sparkles size={20} />
                   </div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.4em] text-cyan">Veda Command Center</p>
+                <p className="text-[11px] font-bold uppercase tracking-[0.4em] text-cyan">Today</p>
                 </div>
                 <h1 className="text-4xl font-black leading-[1.1] text-white lg:text-6xl tracking-tight">
                   {plan?.focus ?? "Strategic Execution"}
@@ -290,18 +444,18 @@ export function DashboardPage() {
 
               <div className="grid min-w-[280px] grid-cols-2 gap-px rounded-2xl border border-white/[0.08] bg-white/[0.06] overflow-hidden">
                 <div className="bg-[#0c1017] p-5">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">System Readiness</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Placement readiness</p>
                   <p className="mt-2 text-4xl font-black text-white">{plan?.readinessScore ?? 0}<span className="text-sm font-normal text-slate-600 ml-1">%</span></p>
                 </div>
                 <div className="bg-[#0c1017] p-5">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Plan Velocity</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Today's progress</p>
                   <p className="mt-2 text-4xl font-black text-white">{planProgress}<span className="text-sm font-normal text-slate-600 ml-1">%</span></p>
                 </div>
                 <div className="col-span-2 bg-[#0c1017] px-5 pb-5">
                   <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06] mb-3">
                     <div className="h-full rounded-full bg-gradient-to-r from-brand to-cyan transition-all duration-1000" style={{ width: `${planProgress}%` }} />
                   </div>
-                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">Next Milestone: <span className="text-cyan">{plan?.nextUnlock ?? "Core Logic"}</span></p>
+                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">Next unlock: <span className="text-cyan">{plan?.nextUnlock ?? "Core Logic"}</span></p>
                 </div>
               </div>
             </div>
@@ -311,7 +465,7 @@ export function DashboardPage() {
             <div className="p-6">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-brand">Current Focus</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-brand">Priority task</p>
                   <h2 className="mt-2 text-xl font-semibold text-white">{activeTask?.title ?? "No active task yet"}</h2>
                 </div>
                 <span className="rounded-full border border-white/[0.08] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">
