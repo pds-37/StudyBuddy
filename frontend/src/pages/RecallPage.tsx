@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
+import { useLocation } from "react-router-dom";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 import {
   Brain,
@@ -40,6 +41,8 @@ const promptTypeConfig: Record<string, { icon: React.ReactNode; label: string; c
 };
 
 export function RecallPage() {
+  const location = useLocation();
+  const focusedNoteId = useMemo(() => new URLSearchParams(location.search).get("noteId") ?? undefined, [location.search]);
   const [prompts, setPrompts] = useState<RecallPrompt[]>([]);
   const [stats, setStats] = useState<RecallStats | null>(null);
   const [priorities, setPriorities] = useState<RevisionPriority[]>([]);
@@ -58,7 +61,7 @@ export function RecallPage() {
       setLoading(true);
       setError(null);
       const [nextPrompts, nextStats, nextPriorities] = await Promise.all([
-        getDueRecallPrompts(10),
+        getDueRecallPrompts(focusedNoteId ? 1 : 10, focusedNoteId),
         getRecallStats(),
         getRevisionPriorities(5)
       ]);
@@ -70,7 +73,7 @@ export function RecallPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [focusedNoteId]);
 
   useEffect(() => {
     void loadRecall();
@@ -118,13 +121,15 @@ export function RecallPage() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-base font-semibold text-slate-100 flex items-center gap-3">
-                Memory Training
+                {focusedNoteId ? "Focused Recall" : "Memory Training"}
                 <span className="text-cyan-400 text-[9px] border border-cyan-500/20 px-2 py-0.5 bg-cyan-500/5 font-bold tracking-wider uppercase">
                   Recall Engine
                 </span>
               </h1>
               <p className="text-slate-600 text-[11px] mt-1.5 font-medium">
-                Active recall strengthens neural pathways. Passive re-reading doesn&apos;t.
+                {focusedNoteId
+                  ? "Reviewing the exact note you selected from Knowledge Intelligence."
+                  : "Active recall strengthens neural pathways. Passive re-reading doesn&apos;t."}
               </p>
             </div>
             <button

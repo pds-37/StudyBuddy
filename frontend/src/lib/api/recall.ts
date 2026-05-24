@@ -11,8 +11,8 @@ export type RecallStats = {
   retentionScore: number;
 };
 
-export async function getDueRecallPrompts(limit = 10): Promise<RecallPrompt[]> {
-  const response = await apiClient.get<{ prompts: RecallPrompt[] }>("/recall/due", { params: { limit } });
+export async function getDueRecallPrompts(limit = 10, noteId?: string): Promise<RecallPrompt[]> {
+  const response = await apiClient.get<{ prompts: RecallPrompt[] }>("/recall/due", { params: { limit, noteId } });
   return response.data.prompts;
 }
 

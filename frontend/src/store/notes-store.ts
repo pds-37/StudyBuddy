@@ -25,9 +25,9 @@ interface NotesStore {
 
   // Core actions
   fetchNotes: () => Promise<void>;
-  createNote: (data: any) => Promise<void>;
-  ingestLearning: (text: string) => Promise<void>;
-  uploadStudyMaterial: (file: File) => Promise<void>;
+  createNote: (data: any) => Promise<CareerNote>;
+  ingestLearning: (text: string) => Promise<CareerNote>;
+  uploadStudyMaterial: (file: File) => Promise<CareerNote>;
   deleteNote: (id: string) => Promise<void>;
   updateNote: (id: string, data: any) => Promise<void>;
   fetchContradictions: () => Promise<void>;
@@ -84,6 +84,7 @@ export const useNotesStore = create<NotesStore>((set, get) => ({
         notes: [newNote, ...get().notes],
         loading: false
       });
+      return newNote;
     } catch (err: any) {
       set({ loading: false });
       throw err;
@@ -98,6 +99,7 @@ export const useNotesStore = create<NotesStore>((set, get) => ({
         notes: [newNote, ...get().notes],
         loading: false
       });
+      return newNote;
     } catch (err: any) {
       set({ loading: false });
       throw err;
@@ -112,6 +114,7 @@ export const useNotesStore = create<NotesStore>((set, get) => ({
         notes: [newNote, ...get().notes],
         loading: false
       });
+      return newNote;
     } catch (err: any) {
       set({ loading: false });
       throw err;

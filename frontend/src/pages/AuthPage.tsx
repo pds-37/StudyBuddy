@@ -4,16 +4,16 @@ import { Link, useNavigate } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
 import {
   ArrowRight,
+  CreditCard,
   Eye,
   EyeOff,
   Loader2,
   Lock,
   Mail,
-  User as UserIcon,
+  Quote,
   ShieldCheck,
-  CreditCard,
   Sparkles,
-  Quote
+  User as UserIcon
 } from "lucide-react";
 import { authApi } from "../features/auth/api";
 import { type AuthMode } from "../features/auth/types";
@@ -28,9 +28,17 @@ function getAuthErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : "Authentication failed.";
 }
 
-const marqueeCompanies = [
-  "Google", "Microsoft", "Amazon", "Meta", "Apple",
-  "Netflix", "Spotify", "Stripe", "Uber", "Airbnb"
+const marqueeItems = [
+  "Roadmap",
+  "Recall",
+  "Projects",
+  "Resume",
+  "Interview",
+  "Jobs",
+  "Skill gaps",
+  "Veda",
+  "Notes",
+  "Mentors"
 ];
 
 export function AuthPage() {
@@ -81,91 +89,82 @@ export function AuthPage() {
 
   return (
     <div className="auth-page">
-      {/* ── Left Panel: Marketing ── */}
       <aside className="auth-left" aria-label="StudyBuddy value proposition">
-        {/* Brand */}
         <div className="auth-brand">
           <img src="/brand/studybuddy-logo.png" alt="StudyBuddy" className="auth-brand-logo" />
           <span className="auth-brand-name">StudyBuddy</span>
           <span className="auth-brand-badge">PRO</span>
         </div>
 
-        {/* Hero copy */}
         <div className="auth-hero-copy">
           <p className="auth-hero-kicker">
             <span className="auth-kicker-dash" />
-            YOUR CAREER COPILOT
+            STUDENT CAREER OS
           </p>
           <h1 className="auth-hero-title">
-            From campus<br />
-            to your <em>dream</em><br />
-            company.
+            One daily plan<br />
+            for your <em>placement</em><br />
+            prep.
           </h1>
           <p className="auth-hero-subtitle">
-            AI-powered interview prep, smart notes, and a personalised
-            roadmap — built for students who mean business.
+            Veda connects roadmap, recall, projects, resume, interview prep, and jobs so the next useful action is always clear.
           </p>
         </div>
 
-        {/* Scrolling company marquee */}
         <div className="auth-marquee-wrap" aria-hidden="true">
           <div className="auth-marquee-track">
-            {[...marqueeCompanies, ...marqueeCompanies].map((company, i) => (
-              <span key={`${company}-${i}`} className="auth-marquee-item">
+            {[...marqueeItems, ...marqueeItems].map((item, i) => (
+              <span key={`${item}-${i}`} className="auth-marquee-item">
                 <span className="auth-marquee-dot" />
-                {company}
+                {item}
               </span>
             ))}
           </div>
         </div>
 
-        {/* Stats */}
         <div className="auth-stats-row">
           <div className="auth-stat-card">
-            <strong>12<span className="auth-stat-highlight">k+</span></strong>
-            <span>Students placed</span>
+            <strong>7<span className="auth-stat-highlight">d</span></strong>
+            <span>Placement sprint</span>
           </div>
           <div className="auth-stat-card">
-            <strong>94<span className="auth-stat-highlight">%</span></strong>
-            <span>Interview rate</span>
+            <strong>6<span className="auth-stat-highlight">+</span></strong>
+            <span>Prep signals</span>
           </div>
           <div className="auth-stat-card">
-            <strong>3<span className="auth-stat-highlight">x</span></strong>
-            <span>Faster prep</span>
+            <strong>1<span className="auth-stat-highlight">st</span></strong>
+            <span>Daily action</span>
           </div>
         </div>
 
-        {/* Testimonial */}
         <blockquote className="auth-testimonial">
           <Quote size={18} className="auth-quote-icon" />
           <p>
-            "Got my Google offer in 6 weeks. The company-wise question list and
-            VEDA's daily nudges made all the difference."
+            "The demo profile shows the real product loop: Veda explains why today's task matters using memory, roadmap, project, and resume signals."
           </p>
           <footer>
-            <span className="auth-testimonial-avatar">P</span>
+            <span className="auth-testimonial-avatar">S</span>
             <div>
-              <strong>Priya Sharma</strong>
-              <span>SDE-2 at Google · IIT Delhi 2024</span>
+              <strong>StudyBuddy demo</strong>
+              <span>Unified student intelligence loop</span>
             </div>
           </footer>
         </blockquote>
       </aside>
 
-      {/* ── Right Panel: Auth Form ── */}
       <section className="auth-right" aria-label="StudyBuddy authentication">
         <div className="auth-form-container">
-          {/* Header */}
           <div className="auth-form-head">
             <h2 className="auth-welcome">{isSignup ? "Get started." : "Welcome back."}</h2>
             <p className="auth-welcome-sub">
-              {isSignup
-                ? "Create your account to begin your placement journey."
-                : "Sign in to continue your placement journey."}
+              {isSignup ? "Create your account to begin your placement journey." : "Sign in to continue your placement journey."}
             </p>
+            <Link to="/demo" className="mt-4 inline-flex text-sm font-bold text-[#ca8af7] hover:text-white">
+              Try the recruiter demo first
+              <ArrowRight size={15} className="ml-1" />
+            </Link>
           </div>
 
-          {/* Tabs */}
           <div className="auth-tabs" aria-label="Authentication mode">
             <button
               type="button"
@@ -185,7 +184,6 @@ export function AuthPage() {
             </button>
           </div>
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="auth-form">
             {isSignup && (
               <div className="auth-input-group">
@@ -258,23 +256,21 @@ export function AuthPage() {
               {isSubmitting ? (
                 <>
                   <Loader2 size={17} className="auth-spin" />
-                  Securing session…
+                  Securing session...
                 </>
               ) : (
                 <>
-                  {isSignup ? "Create Account" : `Sign in to StudyBuddy`}
+                  {isSignup ? "Create Account" : "Sign in to StudyBuddy"}
                   <ArrowRight size={17} />
                 </>
               )}
             </button>
           </form>
 
-          {/* Social divider */}
           <div className="auth-divider">
             <span>or continue with</span>
           </div>
 
-          {/* Social buttons */}
           <div className="auth-social-row">
             <button
               className="auth-social-btn"
@@ -287,7 +283,6 @@ export function AuthPage() {
             </button>
           </div>
 
-          {/* Switch mode */}
           <p className="auth-switch-mode">
             {isSignup ? "Already have an account? " : "Don't have an account? "}
             <button
@@ -295,15 +290,14 @@ export function AuthPage() {
               className="auth-switch-btn"
               onClick={() => setMode(isSignup ? "login" : "signup")}
             >
-              {isSignup ? "Sign in →" : "Start free →"}
+              {isSignup ? "Sign in" : "Start free"}
             </button>
           </p>
 
-          {/* Trust badges */}
           <div className="auth-trust-row">
             <span><ShieldCheck size={14} /> SSL encrypted</span>
             <span><CreditCard size={14} /> No card needed</span>
-            <span><Sparkles size={14} /> Free forever plan</span>
+            <span><Sparkles size={14} /> Free plan</span>
           </div>
         </div>
       </section>

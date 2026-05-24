@@ -41,13 +41,13 @@ export function DashboardLayout() {
   }, [isSidebarCollapsed]);
 
   return (
-    <div className="relative flex h-screen w-full bg-white dark:bg-obsidian">
+    <div className="premium-shell relative flex h-screen w-full bg-obsidian text-slate-100">
       <NebulaBackground />
 
       <aside 
         className={cn(
-          "relative hidden h-full shrink-0 border-r border-slate-200 dark:border-white/[0.06] bg-white dark:bg-ink",
-          isSidebarCollapsed ? "w-[84px]" : "w-[280px]"
+          "relative hidden h-full shrink-0 border-r border-white/[0.07] bg-[#0b0d10]/92 backdrop-blur-xl transition-[width] duration-300 lg:block",
+          isSidebarCollapsed ? "w-[80px]" : "w-[264px]"
         )}
       >
         <SidebarNav
@@ -59,8 +59,8 @@ export function DashboardLayout() {
       <div className="flex h-full min-w-0 flex-1 flex-col overflow-hidden relative z-10">
         <TopNav onOpenCommand={() => setCommandOpen(true)} />
         <main className="flex-1 overflow-y-auto custom-scrollbar overflow-x-hidden">
-          <div className="flex min-h-full flex-col p-6 lg:p-12">
-            <div className="max-w-[1600px] mx-auto w-full flex-1 min-h-0 animate-fade-in overflow-x-hidden">
+          <div className="flex min-h-full flex-col px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
+            <div className="mx-auto w-full max-w-[1480px] flex-1 min-h-0 animate-fade-in overflow-x-hidden">
               <Outlet />
             </div>
           </div>

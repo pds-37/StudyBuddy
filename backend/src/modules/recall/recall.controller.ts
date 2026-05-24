@@ -5,7 +5,7 @@ import { recallQuerySchema, recallReviewSchema } from "./recall.validation.js";
 const due: RequestHandler = async (request, response, next) => {
   try {
     const query = recallQuerySchema.parse(request.query);
-    const prompts = await recallService.getDuePrompts(request.userId ?? "", query.limit);
+    const prompts = await recallService.getDuePrompts(request.userId ?? "", query.limit, query.noteId);
     response.json({ prompts });
   } catch (error) {
     next(error);

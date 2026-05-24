@@ -6,21 +6,28 @@ import {
   ChevronRight,
   Database,
   Cloud,
-  Zap
+  Zap,
+  CreditCard,
+  BarChart3
 } from "lucide-react";
 import { cn } from "../lib/utils/cn";
 import { NebulaBackground } from "../components/common/NebulaBackground";
 
 export function SettingsPage() {
-  const { user } = useAppStore();
+  const { user, isDemoMode } = useAppStore();
+  const plan = user?.subscription?.plan ?? "free";
+  const aiUsage = user?.usage?.aiMessagesThisMonth ?? (isDemoMode ? 142 : 0);
+  const mentorPlans = user?.usage?.mentorPlansGenerated ?? (isDemoMode ? 18 : 0);
+  const aiLimit = plan === "team" ? 10000 : plan === "pro" ? 2000 : 100;
+  const notesLimit = plan === "team" ? 50000 : plan === "pro" ? 10000 : 250;
 
   return (
     <div className="flex flex-col min-h-full relative pb-20">
       <NebulaBackground opacity={0.1} />
       
       <header className="py-10 border-b border-white/[0.04] mb-10 relative z-10">
-        <h1 className="text-4xl font-black text-slate-900 dark:text-slate-900 dark:text-white tracking-tight">System Settings</h1>
-        <p className="mt-2 text-slate-500 font-medium italic">Configure your Veda Brain and workspace environment.</p>
+        <h1 className="text-4xl font-black text-slate-900 dark:text-slate-900 dark:text-white tracking-tight">Account Settings</h1>
+        <p className="mt-2 text-slate-500 font-medium">Manage your student profile, SaaS plan, and Veda workspace limits.</p>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-12 relative z-10">
@@ -49,9 +56,32 @@ export function SettingsPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <SettingInput label="Target Role" value="Senior Frontend Engineer" disabled />
-                <SettingInput label="Consistency Score" value="84%" disabled />
+                <SettingInput label="Target Role" value={user?.targetRoles?.[0] || "Not set"} disabled />
+                <SettingInput label="Consistency Score" value={`${user?.behaviorProfile?.consistencyScore ?? 0}%`} disabled />
               </div>
+            </div>
+          </section>
+
+          <section className="space-y-6">
+            <div className="flex items-center gap-3 px-2">
+              <CreditCard className="w-5 h-5 text-emerald-400" />
+              <h2 className="text-lg font-bold text-slate-900 dark:text-slate-900 dark:text-white uppercase tracking-widest text-[11px]">Plan & Usage</h2>
+            </div>
+            
+            <div className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 space-y-6">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-bold text-white capitalize">{isDemoMode ? "Pro Student demo" : `${plan} plan`}</p>
+                  <p className="mt-1 text-xs text-slate-500">Transparent limits for AI messages, mentor plans, notes, and projects.</p>
+                </div>
+                <a href="/pricing" className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2 text-xs font-black uppercase tracking-widest text-slate-950">
+                  View pricing
+                  <ChevronRight size={14} />
+                </a>
+              </div>
+              <UsageMeter label="AI messages" value={aiUsage} limit={aiLimit} />
+              <UsageMeter label="Mentor plans generated" value={mentorPlans} limit={30} />
+              <UsageMeter label="Notes tracked" value={isDemoMode ? 42 : 0} limit={notesLimit} />
             </div>
           </section>
 
@@ -87,6 +117,7 @@ export function SettingsPage() {
               <InfrastructureItem icon={Cloud} label="AI Orchestration" status="Connected" color="text-emerald-400" />
               <InfrastructureItem icon={Shield} label="Knowledge Persistence" status="Encrypted" color="text-cyan-400" />
               <InfrastructureItem icon={Bell} label="Push Notifications" status="Active" color="text-brand" />
+              <InfrastructureItem icon={BarChart3} label="Student Intelligence" status="Live" color="text-amber-400" />
             </div>
           </section>
         </div>
@@ -160,6 +191,22 @@ function InfrastructureItem({ icon: Icon, label, status, color }: any) {
       <div className="flex items-center gap-2">
         <span className={cn("text-[10px] font-black uppercase tracking-widest", color)}>{status}</span>
         <ChevronRight size={14} className="text-slate-700" />
+      </div>
+    </div>
+  );
+}
+
+function UsageMeter({ label, value, limit }: { label: string; value: number; limit: number }) {
+  const percent = Math.min(100, Math.round((value / limit) * 100));
+
+  return (
+    <div>
+      <div className="flex items-center justify-between text-xs">
+        <span className="font-semibold text-slate-400">{label}</span>
+        <span className="font-mono text-slate-300">{value}/{limit}</span>
+      </div>
+      <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
+        <div className="h-full rounded-full bg-gradient-to-r from-brand to-cyan" style={{ width: `${percent}%` }} />
       </div>
     </div>
   );

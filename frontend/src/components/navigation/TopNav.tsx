@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Command, Menu, Search, Sparkles, X, Bell } from "lucide-react";
+import { Command, Menu, Search, Sparkles, X } from "lucide-react";
 import { cn } from "../../lib/utils/cn";
 import { useAppStore } from "../../store/app-store";
 import { NotificationsPopover } from "../NotificationsPopover";
@@ -8,7 +8,8 @@ import { NotificationsPopover } from "../NotificationsPopover";
 const landingSections = [
   { label: "Home", href: "#home" },
   { label: "Features", href: "#features" },
-  { label: "How it works", href: "#how-to-use" }
+  { label: "How it works", href: "#how-to-use" },
+  { label: "Pricing", href: "#pricing" }
 ] as const;
 
 type TopNavProps = {
@@ -17,7 +18,7 @@ type TopNavProps = {
 
 export function TopNav({ onOpenCommand }: TopNavProps) {
   const location = useLocation();
-  const { isAuthenticated, user } = useAppStore();
+  const { isAuthenticated, user, isDemoMode } = useAppStore();
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const isLandingPage = location.pathname === "/";
@@ -40,23 +41,23 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 w-full transition-all duration-300 h-20 flex items-center shrink-0",
+        "sticky top-0 z-40 flex h-16 w-full shrink-0 items-center transition-all duration-300",
         isAppShell 
-          ? "bg-obsidian border-b border-white/5" 
+          ? "border-b border-white/[0.07] bg-[#07080a]/82 backdrop-blur-xl" 
           : isScrolled 
-            ? "bg-obsidian/95 backdrop-blur-xl shadow-sm border-b border-white/5"
-            : "bg-obsidian/80 backdrop-blur-lg"
+            ? "border-b border-white/[0.07] bg-[#07080a]/90 shadow-sm backdrop-blur-xl"
+            : "bg-[#07080a]/70 backdrop-blur-lg"
       )}
     >
       <div className={cn(
-        "mx-auto flex items-center justify-between px-8 w-full",
+        "mx-auto flex w-full items-center justify-between px-4 sm:px-6 lg:px-8",
         isAppShell ? "max-w-full" : "max-w-7xl"
       )}>
         {/* Left Side: Brand or Search */}
         <div className="flex items-center gap-8 flex-1">
           {(!isAppShell || isLandingPage) && (
             <Link to="/" className="flex items-center group">
-              <img src="/brand/studybuddy-logo.png" alt="StudyBuddy Logo" className="h-12 w-auto object-contain scale-[1.3] origin-left drop-shadow-lg" />
+              <img src="/brand/studybuddy-logo.png" alt="StudyBuddy Logo" className="h-10 w-auto origin-left object-contain" />
             </Link>
           )}
 
@@ -64,11 +65,11 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
             <div className="flex-1 max-w-xl">
               <button
                 onClick={onOpenCommand}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-slate-100 dark:bg-white/[0.06] border border-slate-200 dark:border-white/[0.15] hover:bg-slate-200 dark:hover:bg-white/[0.1] hover:border-slate-300 dark:hover:border-white/[0.25] transition-all group text-slate-900 dark:text-slate-900 dark:text-white shadow-lg"
+                className="group flex w-full items-center gap-3 rounded-lg border border-white/[0.08] bg-white/[0.035] px-3.5 py-2.5 text-white shadow-[0_12px_36px_rgba(0,0,0,0.16)] transition-all hover:border-white/[0.13] hover:bg-white/[0.055]"
               >
-                <Search size={20} className="text-brand shrink-0" />
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-700 dark:text-slate-300">Search actions, notes, or roadmaps...</span>
-                <div className="ml-auto flex items-center gap-1.5 px-2 py-1 rounded-lg border border-slate-200 dark:border-white/20 bg-slate-200 dark:bg-slate-200 dark:bg-white/10 text-[10px] font-black text-slate-900 dark:text-slate-900 dark:text-white">
+                <Search size={18} className="shrink-0 text-brand" />
+                <span className="truncate text-sm font-medium text-slate-400">Search tasks, notes, resume, jobs...</span>
+                <div className="ml-auto flex items-center gap-1.5 rounded-md border border-white/[0.09] bg-white/[0.045] px-2 py-1 text-[10px] font-bold text-slate-300">
                   <Command size={10} />
                   <span>K</span>
                 </div>
@@ -79,12 +80,12 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
 
         {/* Center: Navigation (Landing Only) */}
         {isLandingPage && (
-          <nav className="hidden lg:flex items-center gap-10">
+          <nav className="hidden items-center gap-8 lg:flex">
             {landingSections.map((item) => (
               <a
                 key={item.label}
                 href={item.href}
-                className="text-sm font-bold text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-all hover:translate-y-[-1px]"
+                className="text-sm font-semibold text-slate-500 transition-all hover:text-white"
               >
                 {item.label}
               </a>
@@ -95,21 +96,23 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
         {/* Right Side: Actions/Profile */}
         <div className="flex items-center gap-6 flex-1 justify-end">
           {isAppShell ? (
-            <div className="flex items-center gap-5">
-              <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand/10 border border-brand/20 text-brand text-[10px] font-black uppercase tracking-widest">
+            <div className="flex items-center gap-3">
+              <div className="hidden items-center gap-2 rounded-full border border-brand/20 bg-brand/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-brand lg:flex">
                 <Sparkles size={14} />
-                <span>Pro Member</span>
+                <span>{isDemoMode ? "Demo Pro" : "Student Plan"}</span>
               </div>
               
               <NotificationsPopover />
 
-              <div className="flex items-center gap-4 pl-4 border-l border-slate-200 dark:border-white/5 group cursor-pointer">
+              <div className="group flex cursor-pointer items-center gap-3 border-l border-white/[0.07] pl-3">
                 <div className="text-right hidden sm:block">
-                  <p className="text-sm font-bold text-slate-900 dark:text-slate-900 dark:text-white group-hover:text-brand transition-colors">{user?.name || "User"}</p>
-                  <p className="text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest">Free Tier</p>
+                  <p className="text-sm font-semibold text-white transition-colors group-hover:text-brand">{user?.name || "User"}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                    {isDemoMode ? "Recruiter Demo" : user?.subscription?.plan ?? "Free Tier"}
+                  </p>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-brand to-cyan p-[1px] transition-transform group-hover:scale-105">
-                  <div className="w-full h-full rounded-full bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4 flex items-center justify-center text-slate-900 dark:text-white text-xs font-bold">
+                <div className="h-9 w-9 rounded-lg border border-brand/25 bg-brand/10 transition-transform group-hover:scale-105">
+                  <div className="flex h-full w-full items-center justify-center text-xs font-bold text-brand">
                     {userInitials}
                   </div>
                 </div>
@@ -117,12 +120,15 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
             </div>
           ) : (
             <div className="flex items-center gap-4">
-              <Link to="/auth" className="px-5 py-2.5 text-sm font-bold text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white transition-colors">
+              <Link to="/auth" className="px-4 py-2.5 text-sm font-semibold text-slate-500 transition-colors hover:text-white">
                 Log in
+              </Link>
+              <Link to="/demo" className="px-4 py-2.5 text-sm font-semibold text-slate-500 transition-colors hover:text-white">
+                Demo
               </Link>
               <Link 
                 to="/auth" 
-                className="px-6 py-3 rounded-full bg-white text-slate-900 text-sm font-black hover:bg-slate-200 transition-all hover:scale-105 shadow-xl"
+                className="premium-button rounded-lg px-5 py-2.5 text-sm font-bold transition-all"
               >
                 Get Started
               </Link>
@@ -132,7 +138,7 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMenuOpen(!isMenuOpen)}
-            className="p-2.5 rounded-xl lg:hidden text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white hover:bg-slate-50 dark:bg-slate-50 dark:bg-white/5 transition-all"
+            className="rounded-lg p-2.5 text-slate-500 transition-all hover:bg-white/[0.05] hover:text-white lg:hidden"
           >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -141,12 +147,12 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="lg:hidden bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
+        <div className="absolute left-4 right-4 top-[72px] rounded-xl border border-white/[0.08] bg-[#0b0d10]/95 p-4 shadow-2xl backdrop-blur-xl lg:hidden">
            {isLandingPage && landingSections.map((item) => (
              <a
                key={item.label}
                href={item.href}
-               className="block text-lg font-medium text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white"
+               className="block rounded-lg px-3 py-2 text-base font-medium text-slate-400 hover:bg-white/[0.05] hover:text-white"
                onClick={() => setMenuOpen(false)}
              >
                {item.label}
@@ -154,11 +160,14 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
            ))}
            {!isAuthenticated && (
              <div className="pt-4 space-y-4">
-               <Link to="/auth" className="block w-full py-3 text-center rounded-xl border border-slate-200 dark:border-slate-200 dark:border-white/10 text-slate-900 dark:text-slate-900 dark:text-white font-medium">
+               <Link to="/auth" className="block w-full rounded-lg border border-white/[0.08] py-3 text-center font-medium text-white">
                  Sign in
                </Link>
-               <Link to="/auth" className="block w-full py-3 text-center rounded-xl bg-white text-slate-900 font-bold">
+               <Link to="/auth" className="premium-button block w-full rounded-lg py-3 text-center font-bold">
                  Get Started
+               </Link>
+               <Link to="/demo" className="block w-full rounded-lg border border-brand/30 py-3 text-center font-bold text-brand">
+                 Try Demo
                </Link>
              </div>
            )}

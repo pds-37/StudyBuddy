@@ -11,6 +11,7 @@ const CopilotPage = lazy(() => import("../pages/CopilotPage").then(m => ({ defau
 const CompaniesPage = lazy(() => import("../pages/CompaniesPage").then(m => ({ default: m.CompaniesPage })));
 const CompanyTypeDetailPage = lazy(() => import("../pages/CompanyTypeDetailPage").then(m => ({ default: m.CompanyTypeDetailPage })));
 const DashboardPage = lazy(() => import("../pages/DashboardPage").then(m => ({ default: m.DashboardPage })));
+const DemoPage = lazy(() => import("../pages/DemoPage").then(m => ({ default: m.DemoPage })));
 const JobsPage = lazy(() => import("../pages/JobsPage").then(m => ({ default: m.JobsPage })));
 const LandingPage = lazy(() => import("../pages/LandingPage").then(m => ({ default: m.LandingPage })));
 const NotFoundPage = lazy(() => import("../pages/NotFoundPage").then(m => ({ default: m.NotFoundPage })));
@@ -23,6 +24,7 @@ const SkillGapPage = lazy(() => import("../pages/SkillGapPage").then(m => ({ def
 const InterviewPage = lazy(() => import("../pages/InterviewPage").then(m => ({ default: m.InterviewPage })));
 const MentorshipPage = lazy(() => import("../pages/MentorshipPage").then(m => ({ default: m.MentorshipPage })));
 const ProjectsPage = lazy(() => import("../pages/ProjectsPage").then(m => ({ default: m.ProjectsPage })));
+const PricingPage = lazy(() => import("../pages/PricingPage").then(m => ({ default: m.PricingPage })));
 const StudyPage = lazy(() => import("../pages/StudyPage").then(m => ({ default: m.StudyPage })));
 const KnowledgePage = lazy(() => import("../pages/KnowledgePage").then(m => ({ default: m.KnowledgePage })));
 const SettingsPage = lazy(() => import("../pages/SettingsPage").then(m => ({ default: m.SettingsPage })));
@@ -46,6 +48,8 @@ export function AppRouter() {
         <Route element={<MarketingLayout />}>
           <Route index element={<LandingPage />} />
           <Route path="/auth" element={<AuthPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/demo" element={<DemoPage />} />
         </Route>
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>

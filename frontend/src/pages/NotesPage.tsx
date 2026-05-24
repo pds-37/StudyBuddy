@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 import {
   Plus,
@@ -33,6 +34,7 @@ const collections = [
 ];
 
 export function NotesPage() {
+  const navigate = useNavigate();
   const {
     notes, loading, error,
     knowledgeHealth, revisionPriorities, concepts,
@@ -50,6 +52,12 @@ export function NotesPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [learningText, setLearningText] = useState("");
   const [newNote, setNewNote] = useState({ title: "", content: "", topic: "", tags: [] as string[] });
+  const [automatedNote, setAutomatedNote] = useState<{
+    id: string;
+    title: string;
+    cardCount: number;
+    nextReviewAt?: string;
+  } | null>(null);
 
   // Load everything on mount
   useEffect(() => {
@@ -74,9 +82,15 @@ export function NotesPage() {
 
   const handleCreateNote = async () => {
     if (!newNote.title || !newNote.content) return;
-    await createNote({
+    const created = await createNote({
       ...newNote,
       tags: typeof newNote.tags === 'string' ? (newNote.tags as unknown as string).split(',').map((t: string) => t.trim()) : newNote.tags
+    });
+    setAutomatedNote({
+      id: created.id,
+      title: created.title,
+      cardCount: created.metadata?.flashcards?.length ?? 0,
+      nextReviewAt: created.nextReviewAt
     });
     setIsCreateModalOpen(false);
     setNewNote({ title: "", content: "", topic: "", tags: [] });
@@ -91,7 +105,13 @@ export function NotesPage() {
   const handleIngestLearning = async () => {
     const text = learningText.trim();
     if (!text) return;
-    await ingestLearning(text);
+    const created = await ingestLearning(text);
+    setAutomatedNote({
+      id: created.id,
+      title: created.title,
+      cardCount: created.metadata?.flashcards?.length ?? 0,
+      nextReviewAt: created.nextReviewAt
+    });
     setLearningText("");
     setTimeout(() => {
       void fetchKnowledgeHealth();
@@ -105,7 +125,13 @@ export function NotesPage() {
     if (!file) return;
 
     try {
-      await uploadStudyMaterial(file);
+      const created = await uploadStudyMaterial(file);
+      setAutomatedNote({
+        id: created.id,
+        title: created.title,
+        cardCount: created.metadata?.flashcards?.length ?? 0,
+        nextReviewAt: created.nextReviewAt
+      });
       e.target.value = '';
 
       setTimeout(() => {
@@ -127,14 +153,13 @@ export function NotesPage() {
     if (action === "view" || action === "detail") {
       setActiveNote(note);
     } else if (action === "recall") {
-      // Navigate to recall with this note context
-      window.location.href = "/recall";
+      navigate(`/recall?noteId=${encodeURIComponent(noteId)}`);
     }
-  }, [notes, setActiveNote]);
+  }, [navigate, notes, setActiveNote]);
 
   const handleStartRevision = useCallback((noteId: string) => {
-    window.location.href = "/recall";
-  }, []);
+    navigate(`/recall?noteId=${encodeURIComponent(noteId)}`);
+  }, [navigate]);
 
   // Filter notes based on collection
   const filteredNotes = useMemo(() => {
@@ -251,6 +276,43 @@ export function NotesPage() {
               priorities={revisionPriorities}
               onStartRevision={handleStartRevision}
             />
+          </div>
+        </div>
+      )}
+
+      {automatedNote && (
+        <div className="shrink-0 px-8 py-4 border-b border-brand/10 bg-brand/[0.045]">
+          <div className="max-w-[1600px] mx-auto flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-brand/25 bg-brand/10 text-brand">
+                <CheckCircle2 size={18} />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-white">Recall automation is ready for “{automatedNote.title}”</p>
+                <p className="mt-1 text-xs text-slate-400">
+                  {automatedNote.cardCount > 0
+                    ? `${automatedNote.cardCount} flashcards were generated and scheduled for review.`
+                    : "A focused recall prompt was scheduled from this note."}
+                  {automatedNote.nextReviewAt ? ` Next review: ${new Date(automatedNote.nextReviewAt).toLocaleString()}.` : ""}
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setAutomatedNote(null)}
+                className="rounded-lg border border-white/[0.08] px-4 py-2 text-xs font-semibold text-slate-400 transition hover:bg-white/[0.05] hover:text-white"
+              >
+                Dismiss
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate(`/recall?noteId=${encodeURIComponent(automatedNote.id)}`)}
+                className="premium-button rounded-lg px-4 py-2 text-xs font-bold"
+              >
+                Start recall now
+              </button>
+            </div>
           </div>
         </div>
       )}

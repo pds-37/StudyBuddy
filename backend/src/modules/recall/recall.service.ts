@@ -268,7 +268,12 @@ function applyStrength(current: number, grade: RecallGrade) {
  * Gets due prompts with intelligent prioritization.
  * Prioritizes by: urgency (decay), interview importance, lapse count.
  */
-async function getDuePrompts(userId: string, limit = 10): Promise<RecallPrompt[]> {
+async function getDuePrompts(userId: string, limit = 10, noteId?: string): Promise<RecallPrompt[]> {
+  if (noteId) {
+    const note = await NoteModel.findOne({ _id: noteId, userId, deleted: { $ne: true } });
+    return note ? [toPrompt(note)] : [];
+  }
+
   const notes = await NoteModel.find({
     userId,
     deleted: { $ne: true },

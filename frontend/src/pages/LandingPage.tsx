@@ -25,41 +25,41 @@ import "./LandingPage.css";
 const features = [
   {
     icon: Brain,
-    title: "Smarter recall",
-    text: "Spaced repetition for your notes. StudyBuddy knows when you're about to forget a concept."
+    title: "Memory-aware learning",
+    text: "Recall and forgetting signals shape what Veda asks you to revise before interviews expose the gap."
   },
   {
     icon: Target,
-    title: "Career-aware AI",
-    text: "Your AI mentor, Veda, understands your career goals and guides your study accordingly."
+    title: "Placement execution plan",
+    text: "Roadmap, projects, resume, interview prep, and job targets collapse into one daily priority list."
   },
   {
     icon: Briefcase,
-    title: "Resume-to-Role",
-    text: "Turn your study proofs into role-specific bullet points that recruiters actually care about."
+    title: "Proof-first resume loop",
+    text: "Turn completed tasks and shipped projects into role-specific resume proof instead of generic bullets."
   }
 ];
 
 const steps = [
   {
-    title: "Sync your notes",
-    text: "Keep writing in Markdown. Our CLI syncs your local vault into the cloud workspace."
+    title: "Set your placement goal",
+    text: "Tell Veda your target role, timeline, weak areas, and daily availability."
   },
   {
-    title: "Define your target",
-    text: "Tell StudyBuddy the role you want. It analyzes your notes against industry expectations."
+    title: "Follow today's plan",
+    text: "Study, revise, build, interview, and apply from one student-friendly dashboard."
   },
   {
-    title: "Execute daily",
-    text: "Follow your dashboard tasks: recall, projects, and interview prep tailored to your gaps."
+    title: "Prove readiness",
+    text: "Convert roadmap progress, project evidence, and interview signals into a sharper resume."
   }
 ];
 
 const trustItems = [
-  "Local-first Markdown",
-  "Built for developers",
-  "Privacy by design",
-  "AI-driven execution"
+  "Unified student intelligence",
+  "Memory-aware roadmap",
+  "Project proof loop",
+  "Placement-ready workflow"
 ];
 
 export function LandingPage() {
@@ -78,21 +78,21 @@ export function LandingPage() {
               transition={{ duration: 0.5 }}
             >
               <Sparkles size={16} />
-              AI career workspace
+              AI student career OS
             </Motion.span>
             <Motion.h1 
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
             >
-              Turn scattered study notes into a daily career plan.
+              Veda turns your placement goal into today's exact plan.
             </Motion.h1>
             <Motion.p 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              StudyBuddy connects your notes, resume, roadmap, recall queue, and AI mentor so the next useful task is always obvious.
+              StudyBuddy connects notes, recall, roadmap, projects, resume, interviews, and jobs into one adaptive dashboard for college placements.
             </Motion.p>
 
             <div className="landing-hero__actions">
@@ -100,24 +100,28 @@ export function LandingPage() {
                 Open workspace
                 <ArrowRight size={18} />
               </Link>
+              <Link to="/demo" className="btn-secondary">
+                Try demo
+                <Play size={16} />
+              </Link>
               <a href="#features" className="btn-secondary">
                 See workflow
-                <Play size={16} />
+                <ChevronRight size={16} />
               </a>
             </div>
 
             <div className="landing-hero__stats">
               <div className="landing-stat">
-                <strong>10x</strong>
-                <span>Faster recall</span>
+                <strong>7-day</strong>
+                <span>Placement sprint</span>
               </div>
               <div className="landing-stat">
                 <strong>1 App</strong>
-                <span>For all career loops</span>
+                <span>For the prep loop</span>
               </div>
               <div className="landing-stat">
-                <strong>Role-first</strong>
-                <span>Career context</span>
+                <strong>AI Mentor</strong>
+                <span>With student context</span>
               </div>
             </div>
           </div>
@@ -143,10 +147,9 @@ export function LandingPage() {
         <section className="landing-features" id="features">
           <div className="landing-section-head">
             <span className="eyebrow">Why StudyBuddy?</span>
-            <h2>Built for developers, not just for notes.</h2>
+            <h2>Built for placement prep, not just note storage.</h2>
             <p>
-              Traditional note apps are where ideas go to die. StudyBuddy turns your knowledge 
-              into career progression through active feedback loops.
+              Traditional tools split your prep across notes, tasks, job boards, and resume docs. StudyBuddy unifies the loop so every action improves readiness.
             </p>
           </div>
 
@@ -179,10 +182,9 @@ export function LandingPage() {
         <section className="landing-howto" id="how-to-use">
           <div className="landing-section-head">
             <span className="eyebrow">How it works</span>
-            <h2>Three steps to a clearer career path.</h2>
+            <h2>Three steps to a clearer placement path.</h2>
             <p>
-              StudyBuddy integrates with your existing workflow, adding a layer of 
-              intelligence that plans your daily execution.
+              StudyBuddy adds the student intelligence layer: what you know, what you forget, what you build, and what your target role needs.
             </p>
           </div>
 
@@ -204,17 +206,36 @@ export function LandingPage() {
           </div>
         </section>
 
+        <section className="landing-pricing" id="pricing">
+          <div className="landing-section-head">
+            <span className="eyebrow">Premium SaaS</span>
+            <h2>Free to start. Pro when your prep gets serious.</h2>
+            <p>
+              Usage limits are transparent: AI messages, notes tracked, mentor plans, and projects.
+            </p>
+          </div>
+          <div className="landing-price-strip">
+            <div>
+              <strong>Pro Student</strong>
+              <span>2,000 AI messages, 10,000 notes, 50 projects, resume and interview intelligence.</span>
+            </div>
+            <Link to="/pricing" className="btn-primary">
+              View pricing
+              <ArrowRight size={18} />
+            </Link>
+          </div>
+        </section>
+
         <section className="landing-cta">
           <div>
             <span className="eyebrow">Ready to start?</span>
             <h2>Turn study chaos into a clear career system.</h2>
             <p>
-              Join other developers using StudyBuddy to bridge their skill gaps and 
-              land their dream roles with precision.
+              Explore a seeded student workspace with roadmap, recall, project proof, resume readiness, and Veda's next best action.
             </p>
           </div>
-          <Link to={startPath} className="btn-primary">
-            Launch StudyBuddy
+          <Link to="/demo" className="btn-primary">
+            Try recruiter demo
             <ArrowRight size={18} />
           </Link>
         </section>

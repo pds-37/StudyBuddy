@@ -335,6 +335,35 @@
   line-height: 1.6;
 }
 
+.landing-pricing {
+  margin-top: 8rem;
+}
+
+.landing-price-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 2rem;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(202, 138, 247, 0.25);
+  background: linear-gradient(135deg, rgba(202, 138, 247, 0.08), rgba(40, 176, 243, 0.05));
+}
+
+.landing-price-strip strong {
+  display: block;
+  color: var(--text-primary);
+  font-size: 1.25rem;
+}
+
+.landing-price-strip span {
+  display: block;
+  max-width: 42rem;
+  margin-top: 0.5rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
 .landing-cta {
   margin-top: 6rem;
   padding: 4rem;
@@ -377,4 +406,5 @@
   .landing-hero__visual { height: 28rem; }
   .landing-cta { flex-direction: column; text-align: center; padding: 2.5rem; }
   .landing-cta p { margin-left: auto; margin-right: auto; }
+  .landing-price-strip { flex-direction: column; align-items: flex-start; }
 }

@@ -161,6 +161,8 @@ npm run dev
 
 Frontend available at: `http://localhost:5173`
 
+Recruiter/demo workspace: `http://localhost:5173/demo`
+
 ---
 
 ## 💻 C++ Sync Agent

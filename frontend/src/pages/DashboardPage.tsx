@@ -308,31 +308,31 @@ export function DashboardPage() {
   }
 
   return (
-    <section className="space-y-12">
+    <section className="space-y-8">
 
       {showPushPrompt && (
         <div
-          className="rounded-3xl border border-brand/20 bg-brand/5 p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_0_50px_rgba(124,92,255,0.1)] animate-in fade-in slide-in-from-top-4 duration-500"
+          className="premium-card flex flex-col items-center justify-between gap-5 rounded-xl p-5 animate-in fade-in slide-in-from-top-4 duration-500 sm:flex-row"
         >
           <div className="flex items-center gap-4 text-center sm:text-left">
-            <div className="w-12 h-12 rounded-2xl bg-brand/20 flex items-center justify-center text-brand shrink-0">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-brand/20 bg-brand/10 text-brand">
               <Zap size={24} />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-900 dark:text-white">Enable Proactive Nudges</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400">Let Veda AI alert you when you're falling behind or have knowledge about to fade.</p>
+              <h3 className="text-base font-semibold text-white">Enable proactive nudges</h3>
+              <p className="text-sm text-slate-400">Let Veda alert you when you're falling behind or have knowledge about to fade.</p>
             </div>
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <button
               onClick={() => setShowPushPrompt(false)}
-              className="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-slate-50 dark:bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-slate-500 dark:text-slate-400 text-sm font-bold hover:bg-slate-100 dark:bg-slate-100 dark:bg-white/10 transition"
+              className="flex-1 rounded-lg border border-white/[0.08] px-5 py-2.5 text-sm font-semibold text-slate-400 transition hover:bg-white/[0.05] hover:text-white sm:flex-none"
             >
               Later
             </button>
             <button
               onClick={handleEnableNotifications}
-              className="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-brand text-slate-900 dark:text-slate-900 dark:text-white text-sm font-bold shadow-lg shadow-brand/20 hover:bg-brand/90 transition"
+              className="premium-button flex-1 rounded-lg px-5 py-2.5 text-sm font-bold transition sm:flex-none"
             >
               Enable Now
             </button>
@@ -346,15 +346,15 @@ export function DashboardPage() {
       )}
 
       {isDemoMode && (
-        <div className="rounded-lg border border-[#ca8af7]/25 bg-[#120d1c] p-4">
+        <div className="rounded-xl border border-brand/20 bg-brand/[0.055] p-4">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#ca8af7]">Recruiter demo workspace</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-brand">Recruiter demo workspace</p>
               <p className="mt-2 text-sm leading-6 text-slate-300">
                 This seeded profile shows the full USP loop: memory signals, roadmap progress, project proof, resume readiness, interview prep, and Veda's next best action.
               </p>
             </div>
-            <Link to="/pricing" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-2 text-xs font-black uppercase tracking-widest text-slate-950">
+            <Link to="/pricing" className="premium-button inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-xs font-bold uppercase tracking-widest">
               View SaaS plans
               <ArrowRight size={14} />
             </Link>
@@ -363,21 +363,18 @@ export function DashboardPage() {
       )}
 
       {bestAction && (
-        <div className="group relative overflow-hidden rounded-[2rem] border border-cyan/20 bg-[#0c1017] p-8 shadow-[0_0_80px_-20px_rgba(34,211,238,0.2)] transition-all hover:border-cyan/40">
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan/10 via-transparent to-transparent opacity-50" />
-          <div className="absolute -top-24 -right-24 w-64 h-64 bg-cyan/10 rounded-full blur-[100px] pointer-events-none" />
-
+        <div className="premium-panel group relative overflow-hidden rounded-xl p-6 transition-all hover:border-white/[0.14]">
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
             <div className="flex items-start gap-6">
-              <div className="flex shrink-0 items-center justify-center rounded-2xl bg-cyan/10 p-4 text-cyan shadow-[0_0_30px_rgba(34,211,238,0.1)] group-hover:scale-110 transition-transform duration-500">
-                <Brain size={32} />
+              <div className="flex shrink-0 items-center justify-center rounded-lg border border-cyan/20 bg-cyan/10 p-3 text-cyan transition-transform duration-300 group-hover:scale-105">
+                <Brain size={24} />
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <div className="w-1.5 h-1.5 rounded-full bg-cyan animate-pulse" />
+                  <div className="h-1.5 w-1.5 rounded-full bg-cyan" />
                 <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan/80">Veda next best action</p>
                 </div>
-                <h2 className="text-3xl font-bold text-white tracking-tight">Do this first today</h2>
+                <h2 className="text-2xl font-semibold text-white">Do this first today</h2>
                 <p className="mt-3 text-base leading-relaxed text-slate-400 max-w-2xl">
                   {bestAction.reason}
                 </p>
@@ -390,7 +387,7 @@ export function DashboardPage() {
                   type="button"
                   onClick={() => void startBestActionTask()}
                   disabled={updatingTaskId === (recommendedTask?.id ?? "next-best-action")}
-                  className="group/btn relative inline-flex items-center gap-3 rounded-2xl bg-cyan px-8 py-4 text-sm font-bold text-slate-950 transition-all hover:scale-105 active:scale-95 disabled:cursor-wait disabled:opacity-70 shadow-[0_20px_40px_rgba(34,211,238,0.2)]"
+                  className="group/btn relative inline-flex items-center gap-3 rounded-lg bg-cyan px-6 py-3 text-sm font-bold text-slate-950 transition-all hover:brightness-110 active:scale-[0.98] disabled:cursor-wait disabled:opacity-70"
                 >
                   {updatingTaskId === (recommendedTask?.id ?? "next-best-action") ? <Loader2 size={18} className="animate-spin" /> : <Target size={18} />}
                   {recommendedTask ? "Start task" : "Open next step"}
@@ -398,21 +395,21 @@ export function DashboardPage() {
                 </button>
               )}
               {bestAction.action === "revision" && (
-                <Link to="/recall" className="group/btn relative inline-flex items-center gap-3 rounded-2xl bg-emerald-500 px-8 py-4 text-sm font-bold text-slate-950 transition-all hover:scale-105 active:scale-95 shadow-[0_20px_40px_rgba(16,185,129,0.2)]">
+                <Link to="/recall" className="group/btn relative inline-flex items-center gap-3 rounded-lg bg-emerald-500 px-6 py-3 text-sm font-bold text-slate-950 transition-all hover:brightness-110 active:scale-[0.98]">
                   <Zap size={18} />
                   Start recall block
                   <ArrowRight size={16} className="ml-1 transition-transform group-hover/btn:translate-x-1" />
                 </Link>
               )}
               {bestAction.action === "generate" && (
-                <Link to="/roadmap" className="group/btn relative inline-flex items-center gap-3 rounded-2xl bg-brand px-8 py-4 text-sm font-bold text-white transition-all hover:scale-105 active:scale-95 shadow-[0_20px_40px_rgba(124,92,255,0.2)]">
+                <Link to="/roadmap" className="premium-button group/btn relative inline-flex items-center gap-3 rounded-lg px-6 py-3 text-sm font-bold transition-all active:scale-[0.98]">
                   <Route size={18} />
                   Generate roadmap
                   <ArrowRight size={16} className="ml-1 transition-transform group-hover/btn:translate-x-1" />
                 </Link>
               )}
               {bestAction.action === "recalibrate" && (
-                <Link to="/onboarding" className="group/btn relative inline-flex items-center gap-3 rounded-2xl bg-amber-500 px-8 py-4 text-sm font-bold text-slate-950 transition-all hover:scale-105 active:scale-95 shadow-[0_20px_40px_rgba(245,158,11,0.2)]">
+                <Link to="/onboarding" className="group/btn relative inline-flex items-center gap-3 rounded-lg bg-amber-500 px-6 py-3 text-sm font-bold text-slate-950 transition-all hover:brightness-110 active:scale-[0.98]">
                   <RefreshCw size={18} />
                   Recalibrate path
                   <ArrowRight size={16} className="ml-1 transition-transform group-hover/btn:translate-x-1" />
@@ -423,35 +420,35 @@ export function DashboardPage() {
         </div>
       )}
 
-      <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0c1017]">
-          <div className="border-b border-white/[0.06] px-8 py-10">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="premium-panel overflow-hidden rounded-xl">
+          <div className="border-b border-white/[0.06] px-6 py-8">
             <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-brand/10 flex items-center justify-center text-brand">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-brand/20 bg-brand/10 text-brand">
                     <Sparkles size={20} />
                   </div>
                 <p className="text-[11px] font-bold uppercase tracking-[0.4em] text-cyan">Today</p>
                 </div>
-                <h1 className="text-4xl font-black leading-[1.1] text-white lg:text-6xl tracking-tight">
+                <h1 className="text-3xl font-semibold leading-[1.1] text-white lg:text-5xl">
                   {plan?.focus ?? "Strategic Execution"}
                 </h1>
-                <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-400">
+                <p className="mt-5 max-w-2xl text-base leading-7 text-slate-400">
                   {plan?.mentorMessage ?? "Synchronizing your goals with active intelligence."}
                 </p>
               </div>
 
-              <div className="grid min-w-[280px] grid-cols-2 gap-px rounded-2xl border border-white/[0.08] bg-white/[0.06] overflow-hidden">
-                <div className="bg-[#0c1017] p-5">
+              <div className="grid min-w-[280px] grid-cols-2 gap-px overflow-hidden rounded-xl border border-white/[0.08] bg-white/[0.06]">
+                <div className="bg-[#101318] p-5">
                   <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Placement readiness</p>
                   <p className="mt-2 text-4xl font-black text-white">{plan?.readinessScore ?? 0}<span className="text-sm font-normal text-slate-600 ml-1">%</span></p>
                 </div>
-                <div className="bg-[#0c1017] p-5">
+                <div className="bg-[#101318] p-5">
                   <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Today's progress</p>
                   <p className="mt-2 text-4xl font-black text-white">{planProgress}<span className="text-sm font-normal text-slate-600 ml-1">%</span></p>
                 </div>
-                <div className="col-span-2 bg-[#0c1017] px-5 pb-5">
+                <div className="col-span-2 bg-[#101318] px-5 pb-5">
                   <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06] mb-3">
                     <div className="h-full rounded-full bg-gradient-to-r from-brand to-cyan transition-all duration-1000" style={{ width: `${planProgress}%` }} />
                   </div>
@@ -482,7 +479,7 @@ export function DashboardPage() {
                       type="button"
                       onClick={() => void startTask(activeTask)}
                       disabled={updatingTaskId === activeTask.id}
-                      className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand/90 disabled:cursor-wait disabled:opacity-70"
+                      className="premium-button inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-bold transition disabled:cursor-wait disabled:opacity-70"
                     >
                       {updatingTaskId === activeTask.id ? <Loader2 size={16} className="animate-spin" /> : <PlayCircle size={16} />}
                       Start Focus
@@ -491,14 +488,14 @@ export function DashboardPage() {
                       type="button"
                       onClick={() => void handleStuck(activeTask)}
                       disabled={stuckTaskId === activeTask.id}
-                      className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/[0.08] px-5 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/[0.05] disabled:cursor-wait disabled:opacity-70"
+                      className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/[0.08] px-5 py-3 text-sm font-semibold text-slate-300 transition hover:bg-white/[0.05] hover:text-white disabled:cursor-wait disabled:opacity-70"
                     >
                       {stuckTaskId === activeTask.id ? <Loader2 size={16} className="animate-spin" /> : <AlertTriangle size={16} />}
                       I'm Stuck
                     </button>
                   </>
                 ) : (
-                  <Link to="/onboarding" className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand/90">
+                  <Link to="/onboarding" className="premium-button inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-bold transition">
                     Configure Mentor
                     <ArrowRight size={16} />
                   </Link>
@@ -515,7 +512,7 @@ export function DashboardPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-white/[0.08] bg-[#0c1017] p-6">
+        <div className="premium-card rounded-xl p-6">
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-sm font-semibold text-slate-900 dark:text-slate-900 dark:text-white">SaaS Workspace</p>
@@ -549,7 +546,7 @@ export function DashboardPage() {
           <button
             type="button"
             onClick={() => void loadPlan()}
-            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 dark:border-slate-200 dark:border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-50 dark:bg-slate-50 dark:bg-white/5"
+            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-white/[0.08] px-4 py-2.5 text-sm font-semibold text-slate-300 transition hover:bg-white/[0.05] hover:text-white"
           >
             <RefreshCw size={16} className={cn(loading && "animate-spin")} />
             Refresh mentor plan
@@ -557,9 +554,9 @@ export function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid gap-12 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
 
-        <div className="rounded-2xl border border-white/[0.08] bg-[#0c1017] p-6">
+        <div className="premium-card rounded-xl p-6">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-xl font-semibold text-white">Mission Queue</h2>
@@ -569,7 +566,7 @@ export function DashboardPage() {
             </div>
             <Link
               to="/copilot"
-              className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/[0.05]"
+              className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] px-4 py-2 text-sm font-semibold text-slate-300 transition hover:bg-white/[0.05] hover:text-white"
             >
               Ask Veda
               <ArrowRight size={16} />
@@ -578,7 +575,7 @@ export function DashboardPage() {
 
           <div className="mt-6 space-y-3">
             {plan?.tasks.length === 0 ? (
-              <div className="rounded-lg border border-white/[0.08] bg-white/[0.03] p-5 text-sm text-slate-400">
+              <div className="rounded-lg border border-white/[0.08] bg-white/[0.025] p-5 text-sm text-slate-400">
                 No mentor tasks yet.
               </div>
             ) : (
@@ -598,7 +595,7 @@ export function DashboardPage() {
         </div>
 
         <aside className="space-y-6">
-          <div className="rounded-2xl border border-white/[0.08] bg-[#0c1017] p-6">
+          <div className="premium-card rounded-xl p-6">
             <h2 className="text-lg font-semibold text-white">Weak Topics</h2>
             <div className="mt-4 space-y-3">
               {(plan?.signals.weakTopics ?? []).length === 0 ? (
@@ -608,7 +605,7 @@ export function DashboardPage() {
                   <Link
                     key={topic.topic}
                     to="/recall"
-                    className="block rounded-lg border border-white/[0.08] bg-white/[0.03] p-4 transition hover:bg-white/[0.05]"
+                    className="block rounded-lg border border-white/[0.08] bg-white/[0.025] p-4 transition hover:bg-white/[0.05]"
                   >
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-sm font-semibold text-white">{topic.topic}</p>
@@ -621,7 +618,7 @@ export function DashboardPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/[0.08] bg-[#0c1017] p-6">
+          <div className="premium-card rounded-xl p-6">
             <h2 className="text-lg font-semibold text-white">Journey Signals</h2>
             <div className="mt-4 space-y-3 text-sm">
               <Signal label="Consistency Score" value={behavior ? `${behavior.consistencyScore}%` : "0%"} />
@@ -640,10 +637,10 @@ export function DashboardPage() {
 
 function Metric({ label, value, icon: Icon }: { label: string; value: string; icon: typeof Brain }) {
   return (
-    <div className="bg-[#0c1017] p-5">
+    <div className="bg-[#101318] p-5">
       <div className="mb-3 flex items-center justify-between gap-3">
         <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">{label}</p>
-        <Icon size={15} className="text-cyan/70" />
+        <Icon size={15} className="text-brand/80" />
       </div>
       <p className="text-2xl font-semibold tracking-tight text-white">{value}</p>
     </div>
@@ -656,11 +653,11 @@ function UsageRow({ label, value, limit }: { label: string; value: number; limit
   return (
     <div>
       <div className="flex items-center justify-between text-xs">
-        <span className="text-slate-500 dark:text-slate-500 dark:text-slate-400">{label}</span>
-        <span className="text-slate-700 dark:text-slate-700 dark:text-slate-300">{value}/{limit}</span>
+        <span className="text-slate-500">{label}</span>
+        <span className="text-slate-300">{value}/{limit}</span>
       </div>
-      <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-100 dark:bg-white/10">
-        <div className="h-full rounded-full bg-cyan" style={{ width: `${percent}%` }} />
+      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/[0.08]">
+        <div className="h-full rounded-full bg-brand" style={{ width: `${percent}%` }} />
       </div>
     </div>
   );
@@ -685,7 +682,7 @@ function TaskRow({
   const isDone = task.status === "completed";
 
   return (
-    <div className={cn("rounded-xl border p-4 transition-colors", isDone ? "border-emerald-500/20 bg-emerald-500/5" : task.status === "in_progress" ? "border-brand/30 bg-brand/10" : "border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.045]")}>
+    <div className={cn("rounded-lg border p-4 transition-colors", isDone ? "border-emerald-500/20 bg-emerald-500/5" : task.status === "in_progress" ? "border-brand/25 bg-brand/[0.075]" : "border-white/[0.08] bg-white/[0.025] hover:bg-white/[0.045]")}>
       <div className="flex items-start gap-4">
         <button
           type="button"
@@ -750,7 +747,7 @@ function TaskRow({
 
 function Signal({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-start justify-between gap-4 rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2">
+    <div className="flex items-start justify-between gap-4 rounded-lg border border-white/[0.06] bg-white/[0.025] px-3 py-2">
       <span className="text-slate-500">{label}</span>
       <span className="max-w-[180px] text-right text-slate-200">{value}</span>
     </div>
