@@ -26,7 +26,7 @@ export function SettingsPage() {
       <NebulaBackground opacity={0.1} />
       
       <header className="py-10 border-b border-white/[0.04] mb-10 relative z-10">
-        <h1 className="text-4xl font-black text-slate-900 dark:text-slate-900 dark:text-white tracking-tight">Account Settings</h1>
+        <h1 className="text-4xl font-black text-white text-white text-white tracking-tight">Account Settings</h1>
         <p className="mt-2 text-slate-500 font-medium">Manage your student profile, SaaS plan, and Veda workspace limits.</p>
       </header>
 
@@ -36,21 +36,21 @@ export function SettingsPage() {
           <section className="space-y-6">
             <div className="flex items-center gap-3 px-2">
               <User className="w-5 h-5 text-brand" />
-              <h2 className="text-lg font-bold text-slate-900 dark:text-slate-900 dark:text-white uppercase tracking-widest text-[11px]">Personal Profile</h2>
+              <h2 className="text-lg font-bold text-white text-white text-white uppercase tracking-widest text-[11px]">Personal Profile</h2>
             </div>
             
             <div className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 space-y-8">
               <div className="flex items-center gap-6">
                 <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-brand to-cyan p-[1px]">
-                  <div className="w-full h-full rounded-full bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
+                  <div className="w-full h-full rounded-full bg-transparent bg-obsidian bg-transparent bg-obsidian$4">
                     {(user?.name || user?.email || "U")[0].toUpperCase()}
                   </div>
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-slate-900 dark:text-white">{user?.name || "System User"}</h3>
+                  <h3 className="text-xl font-bold text-white text-white text-white">{user?.name || "System User"}</h3>
                   <p className="text-slate-500 text-sm">{user?.email}</p>
                 </div>
-                <button className="px-6 py-2 rounded-xl bg-slate-50 dark:bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-slate-200 dark:border-white/10 text-xs font-bold text-slate-900 dark:text-slate-900 dark:text-white hover:bg-slate-100 dark:bg-slate-100 dark:bg-white/10 transition-all">
+                <button className="px-6 py-2 rounded-xl bg-transparent bg-transparent bg-white/5 border border-white/10 border-white/10 border-white/10 text-xs font-bold text-white text-white text-white hover:bg-transparent bg-transparent bg-white/10 transition-all">
                   Edit Profile
                 </button>
               </div>
@@ -65,7 +65,7 @@ export function SettingsPage() {
           <section className="space-y-6">
             <div className="flex items-center gap-3 px-2">
               <CreditCard className="w-5 h-5 text-emerald-400" />
-              <h2 className="text-lg font-bold text-slate-900 dark:text-slate-900 dark:text-white uppercase tracking-widest text-[11px]">Plan & Usage</h2>
+              <h2 className="text-lg font-bold text-white text-white text-white uppercase tracking-widest text-[11px]">Plan & Usage</h2>
             </div>
             
             <div className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 space-y-6">
@@ -74,7 +74,7 @@ export function SettingsPage() {
                   <p className="text-sm font-bold text-white capitalize">{isDemoMode ? "Pro Student demo" : `${plan} plan`}</p>
                   <p className="mt-1 text-xs text-slate-500">Transparent limits for AI messages, mentor plans, notes, and projects.</p>
                 </div>
-                <a href="/pricing" className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2 text-xs font-black uppercase tracking-widest text-slate-950">
+                <a href="/pricing" className="inline-flex items-center justify-center gap-2 rounded-xl bg-transparent px-4 py-2 text-xs font-black uppercase tracking-widest text-slate-950">
                   View pricing
                   <ChevronRight size={14} />
                 </a>
@@ -89,7 +89,7 @@ export function SettingsPage() {
           <section className="space-y-6">
             <div className="flex items-center gap-3 px-2">
               <Zap className="w-5 h-5 text-amber-400" />
-              <h2 className="text-lg font-bold text-slate-900 dark:text-slate-900 dark:text-white uppercase tracking-widest text-[11px]">Interface & Experience</h2>
+              <h2 className="text-lg font-bold text-white text-white text-white uppercase tracking-widest text-[11px]">Interface & Experience</h2>
             </div>
             
             <div className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 space-y-6">
@@ -110,7 +110,7 @@ export function SettingsPage() {
           <section className="space-y-6">
             <div className="flex items-center gap-3 px-2">
               <Database className="w-5 h-5 text-cyan-400" />
-              <h2 className="text-lg font-bold text-slate-900 dark:text-slate-900 dark:text-white uppercase tracking-widest text-[11px]">Veda Infrastructure</h2>
+              <h2 className="text-lg font-bold text-white text-white text-white uppercase tracking-widest text-[11px]">Veda Infrastructure</h2>
             </div>
             
             <div className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 space-y-4">
@@ -129,13 +129,13 @@ export function SettingsPage() {
               <Zap size={150} className="text-brand" />
             </div>
             <div className="relative z-10">
-              <h4 className="text-sm font-black text-slate-900 dark:text-slate-900 dark:text-white uppercase tracking-widest mb-2 flex items-center gap-2">
+              <h4 className="text-sm font-black text-white text-white text-white uppercase tracking-widest mb-2 flex items-center gap-2">
                 Need Support?
               </h4>
-              <p className="text-xs text-slate-500 dark:text-slate-500 dark:text-slate-400 leading-relaxed font-medium mb-6">
+              <p className="text-xs text-slate-500 text-slate-500 text-slate-400 leading-relaxed font-medium mb-6">
                 Our team is ready to help you optimize your career workspace.
               </p>
-              <button className="w-full py-4 rounded-2xl bg-white text-obsidian text-[10px] font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all">
+              <button className="w-full py-4 rounded-2xl bg-transparent text-obsidian text-[10px] font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all">
                 Contact Mentors
               </button>
             </div>
@@ -153,7 +153,7 @@ function SettingInput({ label, value, disabled }: any) {
       <input 
         disabled={disabled}
         value={value}
-        className="w-full bg-white/[0.03] border border-slate-200 dark:border-slate-200 dark:border-white/10 rounded-2xl px-6 py-4 text-sm text-slate-900 dark:text-slate-900 dark:text-white placeholder-slate-600 focus:border-brand/40 transition-all outline-none"
+        className="w-full bg-white/[0.03] border border-white/10 border-white/10 border-white/10 rounded-2xl px-6 py-4 text-sm text-white text-white text-white placeholder-slate-600 focus:border-brand/40 transition-all outline-none"
       />
     </div>
   );
@@ -163,15 +163,15 @@ function SettingToggle({ label, description, enabled }: any) {
   return (
     <div className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.02] border border-white/5">
       <div>
-        <p className="text-sm font-bold text-slate-900 dark:text-slate-900 dark:text-white">{label}</p>
+        <p className="text-sm font-bold text-white text-white text-white">{label}</p>
         <p className="text-xs text-slate-500">{description}</p>
       </div>
       <div className={cn(
         "w-12 h-6 rounded-full transition-all relative cursor-pointer",
-        enabled ? "bg-brand shadow-glow" : "bg-slate-100 dark:bg-slate-100 dark:bg-white/10"
+        enabled ? "bg-brand shadow-glow" : "bg-transparent bg-transparent bg-white/10"
       )}>
         <div className={cn(
-          "absolute top-1 w-4 h-4 rounded-full bg-white transition-all",
+          "absolute top-1 w-4 h-4 rounded-full bg-transparent transition-all",
           enabled ? "left-7" : "left-1"
         )} />
       </div>
@@ -183,14 +183,14 @@ function InfrastructureItem({ icon: Icon, label, status, color }: any) {
   return (
     <div className="flex items-center justify-between p-4 hover:bg-white/[0.02] transition-colors group cursor-pointer rounded-2xl">
       <div className="flex items-center gap-4">
-        <div className="p-2 rounded-lg bg-slate-50 dark:bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:text-slate-900 dark:text-white transition-colors">
+        <div className="p-2 rounded-lg bg-transparent bg-transparent bg-white/5 text-slate-500 text-slate-500 text-slate-400 group-hover:text-white text-white text-white transition-colors">
           <Icon size={16} />
         </div>
-        <span className="text-sm font-bold text-slate-700 dark:text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:text-slate-900 dark:text-white transition-colors">{label}</span>
+        <span className="text-sm font-bold text-slate-300 text-slate-300 text-slate-300 group-hover:text-white text-white text-white transition-colors">{label}</span>
       </div>
       <div className="flex items-center gap-2">
         <span className={cn("text-[10px] font-black uppercase tracking-widest", color)}>{status}</span>
-        <ChevronRight size={14} className="text-slate-700" />
+        <ChevronRight size={14} className="text-slate-300" />
       </div>
     </div>
   );

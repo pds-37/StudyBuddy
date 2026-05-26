@@ -54,7 +54,7 @@ function formatStrength(value: number) {
 function priorityClass(priority: MentorTask["priority"]) {
   if (priority === "high") return "border-cyan/30 bg-cyan/10 text-cyan";
   if (priority === "medium") return "border-brand/30 bg-brand/10 text-brand";
-  return "border-slate-200 dark:border-slate-200 dark:border-white/10 bg-white/[0.04] text-slate-700 dark:text-slate-700 dark:text-slate-300";
+  return "border-white/10 border-white/10 border-white/10 bg-white/[0.04] text-slate-300 text-slate-300 text-slate-300";
 }
 
 function normalizeMatchValue(value?: string | null) {
@@ -299,7 +299,7 @@ export function DashboardPage() {
   if (loading && !plan) {
     return (
       <div className="flex min-h-[520px] items-center justify-center">
-        <div className="flex items-center gap-3 text-slate-700 dark:text-slate-700 dark:text-slate-300">
+        <div className="flex items-center gap-3 text-slate-300 text-slate-300 text-slate-300">
           <Loader2 className="animate-spin text-brand" size={20} />
           Loading your placement plan...
         </div>
@@ -442,11 +442,11 @@ export function DashboardPage() {
               <div className="grid min-w-[280px] grid-cols-2 gap-px overflow-hidden rounded-xl border border-white/[0.08] bg-white/[0.06]">
                 <div className="bg-[#101318] p-5">
                   <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Placement readiness</p>
-                  <p className="mt-2 text-4xl font-black text-white">{plan?.readinessScore ?? 0}<span className="text-sm font-normal text-slate-600 ml-1">%</span></p>
+                  <p className="mt-2 text-4xl font-black text-white">{plan?.readinessScore ?? 0}<span className="text-sm font-normal text-slate-400 ml-1">%</span></p>
                 </div>
                 <div className="bg-[#101318] p-5">
                   <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Today's progress</p>
-                  <p className="mt-2 text-4xl font-black text-white">{planProgress}<span className="text-sm font-normal text-slate-600 ml-1">%</span></p>
+                  <p className="mt-2 text-4xl font-black text-white">{planProgress}<span className="text-sm font-normal text-slate-400 ml-1">%</span></p>
                 </div>
                 <div className="col-span-2 bg-[#101318] px-5 pb-5">
                   <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06] mb-3">
@@ -515,7 +515,7 @@ export function DashboardPage() {
         <div className="premium-card rounded-xl p-6">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-sm font-semibold text-slate-900 dark:text-slate-900 dark:text-white">SaaS Workspace</p>
+              <p className="text-sm font-semibold text-white text-white text-white">SaaS Workspace</p>
               <p className="mt-1 text-xs uppercase tracking-[0.24em] text-slate-500">
                 {plan?.subscription.plan ?? "free"} - {plan?.subscription.status ?? "trialing"}
               </p>

@@ -32,7 +32,7 @@ export function IconRail() {
   const setActivePanel = useNotesStore((state) => state.setActivePanel);
 
   return (
-    <aside className="flex h-full w-[52px] shrink-0 flex-col items-center border-r border-zinc-800 bg-background-secondary py-2 dark:bg-zinc-900">
+    <aside className="flex h-full w-[52px] shrink-0 flex-col items-center border-r border-zinc-800 bg-background-secondary py-2 bg-zinc-900">
       <Link
         to="/dashboard"
         className="mb-3 flex h-8 w-8 items-center justify-center rounded-lg bg-purple-900/40 text-purple-400"

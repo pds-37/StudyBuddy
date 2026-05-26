@@ -41,7 +41,7 @@ export function FocusWidget() {
     return (
       <button
         onClick={() => startSprint(45)}
-        className="group flex items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-700 dark:text-slate-300 transition hover:bg-white/[0.06]"
+        className="group flex items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-1.5 text-xs font-medium text-slate-300 text-slate-300 text-slate-300 transition hover:bg-white/[0.06]"
       >
         <Timer className="h-3.5 w-3.5 text-brand transition-transform group-hover:scale-110" />
         <span className="hidden sm:inline">Start Sprint</span>
@@ -58,14 +58,14 @@ export function FocusWidget() {
       
       <div className="relative z-10 flex items-center gap-2">
         <Timer className="h-3.5 w-3.5 text-brand animate-pulse" />
-        <span className="text-xs font-mono font-semibold tracking-wider text-slate-900 dark:text-slate-900 dark:text-white">
+        <span className="text-xs font-mono font-semibold tracking-wider text-white text-white text-white">
           {formatTime(timeLeft)}
         </span>
       </div>
 
       <button
         onClick={stopSprint}
-        className="relative z-10 ml-2 rounded-md hover:bg-slate-100 dark:bg-slate-100 dark:bg-white/10 p-0.5 text-slate-700 dark:text-slate-700 dark:text-slate-300 transition"
+        className="relative z-10 ml-2 rounded-md hover:bg-transparent bg-transparent bg-white/10 p-0.5 text-slate-300 text-slate-300 text-slate-300 transition"
         title="Stop Sprint"
       >
         <Square className="h-3 w-3 fill-current" />

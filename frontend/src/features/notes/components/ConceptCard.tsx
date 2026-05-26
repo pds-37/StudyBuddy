@@ -37,7 +37,7 @@ export function ConceptCard({ concept }: ConceptCardProps) {
   const isCritical = concept.health === "critical";
 
   return (
-    <article className="concept-card cursor-pointer rounded-xl border border-zinc-800 bg-zinc-900 p-3 transition-colors duration-150 hover:border-zinc-600 first:border-purple-600 dark:bg-zinc-900">
+    <article className="concept-card cursor-pointer rounded-xl border border-zinc-800 bg-zinc-900 p-3 transition-colors duration-150 hover:border-zinc-600 first:border-purple-600 bg-zinc-900">
       <div className="flex items-start justify-between gap-3">
         <h3 className="min-w-0 text-[13px] font-medium text-zinc-100">{concept.title}</h3>
         <span className={`mt-1 h-2 w-2 shrink-0 rounded-full ${healthDotClass(concept.health)}`} />

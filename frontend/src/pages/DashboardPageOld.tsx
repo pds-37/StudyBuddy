@@ -12,10 +12,10 @@ export function DashboardPage() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.38em] text-cyan">Dashboard</p>
-          <h1 className="mt-3 text-3xl font-semibold text-slate-900 dark:text-slate-900 dark:text-white">Welcome{user?.name ? `, ${user.name}` : ""}</h1>
+          <h1 className="mt-3 text-3xl font-semibold text-white text-white text-white">Welcome{user?.name ? `, ${user.name}` : ""}</h1>
         </div>
         <button
-          className="rounded-full border border-slate-200 dark:border-slate-200 dark:border-white/10 px-5 py-2 text-sm text-slate-700 dark:text-slate-700 dark:text-slate-300 transition hover:border-red-400/50 hover:text-slate-900 dark:text-slate-900 dark:text-white"
+          className="rounded-full border border-white/10 border-white/10 border-white/10 px-5 py-2 text-sm text-slate-300 text-slate-300 text-slate-300 transition hover:border-red-400/50 hover:text-white text-white text-white"
           onClick={clearSession}
           type="button"
         >
@@ -33,7 +33,7 @@ export function DashboardPage() {
       <div className="flex flex-wrap gap-3">
         <Link
           to="/onboarding"
-          className="inline-flex rounded-full bg-slate-100 dark:bg-slate-100 dark:bg-white/10 px-5 py-3 text-sm font-semibold text-slate-100 transition hover:bg-white/15"
+          className="inline-flex rounded-full bg-transparent bg-transparent bg-white/10 px-5 py-3 text-sm font-semibold text-slate-100 transition hover:bg-white/15"
         >
           {user?.onboardingCompleted ? "Edit profile" : "Complete onboarding"}
         </Link>
@@ -41,25 +41,25 @@ export function DashboardPage() {
           <>
             <Link
               to="/skill-gap"
-              className="inline-flex rounded-full bg-gradient-to-r from-brand to-blue-500 px-5 py-3 text-sm font-semibold text-slate-900 dark:text-slate-900 dark:text-white transition hover:scale-[1.01]"
+              className="inline-flex rounded-full bg-gradient-to-r from-brand to-blue-500 px-5 py-3 text-sm font-semibold text-white text-white text-white transition hover:scale-[1.01]"
             >
               Analyze skill gap
             </Link>
             <Link
               to="/roadmap"
-              className="inline-flex rounded-full bg-slate-100 dark:bg-slate-100 dark:bg-white/10 px-5 py-3 text-sm font-semibold text-slate-100 transition hover:bg-white/15"
+              className="inline-flex rounded-full bg-transparent bg-transparent bg-white/10 px-5 py-3 text-sm font-semibold text-slate-100 transition hover:bg-white/15"
             >
               View roadmap
             </Link>
             <Link
               to="/notes"
-              className="inline-flex rounded-full bg-slate-100 dark:bg-slate-100 dark:bg-white/10 px-5 py-3 text-sm font-semibold text-slate-100 transition hover:bg-white/15"
+              className="inline-flex rounded-full bg-transparent bg-transparent bg-white/10 px-5 py-3 text-sm font-semibold text-slate-100 transition hover:bg-white/15"
             >
               View notes
             </Link>
             <Link
               to="/jobs"
-              className="inline-flex rounded-full bg-slate-100 dark:bg-slate-100 dark:bg-white/10 px-5 py-3 text-sm font-semibold text-slate-100 transition hover:bg-white/15"
+              className="inline-flex rounded-full bg-transparent bg-transparent bg-white/10 px-5 py-3 text-sm font-semibold text-slate-100 transition hover:bg-white/15"
             >
               Find jobs
             </Link>

@@ -138,7 +138,7 @@ export function GlobalCopilotWidget() {
                       {isSpeaking ? <VolumeX size={10} /> : <Volume2 size={10} />}
                       {isSpeaking ? "Stop" : "Listen"}
                     </button>
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-slate-700">{new Date(msg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-slate-300">{new Date(msg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                   </div>
                 )}
               </div>
@@ -164,7 +164,7 @@ export function GlobalCopilotWidget() {
                   onChange={(e) => setDraft(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="Message your Dost..."
-                  className="max-h-24 min-h-[40px] w-full resize-none bg-transparent px-3 py-2.5 text-[13px] text-white outline-none placeholder:text-slate-600"
+                  className="max-h-24 min-h-[40px] w-full resize-none bg-transparent px-3 py-2.5 text-[13px] text-white outline-none placeholder:text-slate-400"
                   rows={1}
                 />
                 <button
@@ -172,7 +172,7 @@ export function GlobalCopilotWidget() {
                   disabled={!draft.trim() || sending}
                   className={cn(
                     "grid h-9 w-9 shrink-0 place-items-center rounded-lg transition-all",
-                    draft.trim() ? "bg-white text-slate-950" : "bg-white/[0.06] text-slate-600"
+                    draft.trim() ? "bg-transparent text-slate-950" : "bg-white/[0.06] text-slate-400"
                   )}
                   aria-label="Send message"
                 >

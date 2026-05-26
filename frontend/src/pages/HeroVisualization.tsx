@@ -296,11 +296,11 @@ export function HeroVisualization() {
           <ShieldCheck size={14} />
           Ready for role
         </div>
-        <strong className="block mt-3 text-[1.35rem] text-slate-900 dark:text-slate-900 dark:text-white font-bold tracking-tight">
+        <strong className="block mt-3 text-[1.35rem] text-white text-white text-white font-bold tracking-tight">
           <AnimatedCounter target={72} suffix="%" /> Readiness
         </strong>
         <Motion.span
-          className="block mt-2 text-slate-500 dark:text-slate-500 dark:text-slate-400 text-sm"
+          className="block mt-2 text-slate-500 text-slate-500 text-slate-400 text-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5, duration: 0.8 }}
@@ -331,7 +331,7 @@ export function HeroVisualization() {
             <ListChecks size={16} />
           </div>
           <div>
-            <strong className="text-slate-900 dark:text-slate-900 dark:text-white text-sm font-semibold">
+            <strong className="text-white text-white text-white text-sm font-semibold">
               <AnimatedCounter target={6} /> Recall tasks due
             </strong>
             <Motion.div
@@ -367,7 +367,7 @@ export function HeroVisualization() {
             <TerminalSquare size={16} />
           </div>
           <div>
-            <strong className="text-slate-900 dark:text-slate-900 dark:text-white text-sm font-semibold">
+            <strong className="text-white text-white text-white text-sm font-semibold">
               Sync: <AnimatedCounter target={12} /> notes added
             </strong>
             <Motion.div
@@ -403,7 +403,7 @@ export function HeroVisualization() {
           />
           <div className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_6px_rgba(34,211,238,0.6)]" />
         </div>
-        <span className="text-[11px] text-slate-500 dark:text-slate-500 dark:text-slate-400 font-medium">
+        <span className="text-[11px] text-slate-500 text-slate-500 text-slate-400 font-medium">
           Veda AI analyzing progress
         </span>
         <TypingDots />

@@ -60,7 +60,7 @@ export const env = {
   jwtAccessSecret: readEnv("JWT_ACCESS_SECRET", "replace_me"),
   jwtRefreshSecret: readEnv("JWT_REFRESH_SECRET", "replace_me"),
   jwtAccessExpiresIn: readEnv("JWT_ACCESS_EXPIRES_IN", "15m"),
-  jwtRefreshExpiresIn: readEnv("JWT_REFRESH_EXPIRES_IN", "7d"),
+  jwtRefreshExpiresIn: readEnv("JWT_REFRESH_EXPIRES_IN", "14d"),
   groqApiKey: readEnv("GROQ_API_KEY", ""),
   geminiApiKey: readEnv("GOOGLE_GEMINI_API_KEY", ""),
   huggingFaceApiKey: readEnv("HUGGINGFACE_API_KEY", ""),

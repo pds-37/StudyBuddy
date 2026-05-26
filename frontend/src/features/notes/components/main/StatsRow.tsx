@@ -49,7 +49,7 @@ export function StatsRow() {
         const Icon = metric.icon;
 
         return (
-          <article key={metric.label} className="rounded-xl border border-zinc-800 bg-zinc-900 p-3 dark:bg-zinc-900">
+          <article key={metric.label} className="rounded-xl border border-zinc-800 bg-zinc-900 p-3 bg-zinc-900">
             <p className="flex items-center gap-1 text-[11px] text-zinc-500">
               <Icon size={13} className={metric.color} />
               {metric.label}

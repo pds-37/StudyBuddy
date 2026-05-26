@@ -32,7 +32,7 @@ export function NotificationsPopover() {
     <div className="relative" ref={popoverRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white transition rounded-xl hover:bg-slate-50 dark:bg-slate-50 dark:bg-white/5"
+        className="relative p-2 text-slate-500 text-slate-500 text-slate-400 hover:text-white text-white text-white transition rounded-xl hover:bg-transparent bg-transparent bg-white/5"
       >
         <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
@@ -41,9 +41,9 @@ export function NotificationsPopover() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-[#111] border border-slate-200 dark:border-slate-200 dark:border-white/10 rounded-2xl shadow-xl z-50 overflow-hidden flex flex-col">
+        <div className="absolute right-0 mt-2 w-80 bg-[#111] border border-white/10 border-white/10 border-white/10 rounded-2xl shadow-xl z-50 overflow-hidden flex flex-col">
           <div className="p-4 border-b border-white/5 flex items-center justify-between">
-            <h3 className="font-semibold text-slate-900 dark:text-slate-900 dark:text-white">Notifications</h3>
+            <h3 className="font-semibold text-white text-white text-white">Notifications</h3>
             {unreadCount > 0 && (
               <button 
                 onClick={() => markAllAsRead()}
@@ -70,8 +70,8 @@ export function NotificationsPopover() {
                   )}
                   <div className="flex justify-between items-start gap-4">
                     <div className="space-y-1">
-                      <h4 className="text-sm font-medium text-slate-900 dark:text-slate-900 dark:text-white">{notification.title}</h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-500 dark:text-slate-400 leading-relaxed">{notification.message}</p>
+                      <h4 className="text-sm font-medium text-white text-white text-white">{notification.title}</h4>
+                      <p className="text-xs text-slate-500 text-slate-500 text-slate-400 leading-relaxed">{notification.message}</p>
                       {notification.link && (
                         <Link 
                           to={notification.link} 
@@ -88,7 +88,7 @@ export function NotificationsPopover() {
                     {!notification.read && (
                       <button 
                         onClick={() => markAsRead(notification.id)}
-                        className="text-slate-500 hover:text-slate-900 dark:text-slate-900 dark:text-white p-1 opacity-0 group-hover:opacity-100 transition"
+                        className="text-slate-500 hover:text-white text-white text-white p-1 opacity-0 group-hover:opacity-100 transition"
                       >
                         <Check className="w-4 h-4" />
                       </button>

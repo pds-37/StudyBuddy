@@ -318,40 +318,9 @@ h1, h2, h3, h4 {
 }
 
 /* ─── Global Dark Mode Enforcement ─── */
-/* The app is permanently dark-mode. Override any stale light backgrounds. */
+/* The app is permanently dark-mode. */
 *,
 *::before,
 *::after {
   color-scheme: dark;
-}
-
-/* Kill any white bg leaking through old Tailwind dark: overrides */
-.bg-white,
-[class*="bg-white "],
-[class*="dark:bg-white"],
-[class*=" bg-slate-50"],
-[class*="dark:bg-slate-50"] {
-  background-color: transparent !important;
-}
-
-/* Force all text that defaults to slate-900 (light mode) to white */
-.text-slate-900,
-[class*="dark:text-slate-900"] {
-  color: var(--text-primary) !important;
-}
-
-.text-slate-700,
-[class*="dark:text-slate-700"] {
-  color: var(--text-secondary) !important;
-}
-
-/* Ensure all border-slate-200 uses the dark border */
-.border-slate-200,
-[class*="dark:border-slate-200"] {
-  border-color: var(--border-main) !important;
-}
-
-/* Force ink backgrounds to use ink variable */
-[class*="bg-ink"] {
-  background-color: var(--bg-ink) !important;
 }

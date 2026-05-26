@@ -559,7 +559,7 @@ export function ServerWakeUpLoader({ isReady = false, onComplete }: ServerWakeUp
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1.2, delay: 0.7 }}
-        className="fixed bottom-0 left-0 right-0 py-6 px-10 border-t border-white/[0.03] flex items-center justify-between text-[10px] font-normal tracking-[0.14em] uppercase text-slate-700"
+        className="fixed bottom-0 left-0 right-0 py-6 px-10 border-t border-white/[0.03] flex items-center justify-between text-[10px] font-normal tracking-[0.14em] uppercase text-slate-300"
       >
         <span>StudyBuddy Career OS</span>
         <div className="flex gap-1.5 items-center">

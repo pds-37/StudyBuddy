@@ -62,7 +62,7 @@ export function ExpansionFlow({ isOpen, onClose }: ExpansionFlowProps) {
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="relative w-full max-w-xl bg-white dark:bg-obsidian border border-white/[0.08] rounded-[32px] overflow-hidden shadow-2xl"
+        className="relative w-full max-w-xl bg-transparent bg-obsidian border border-white/[0.08] rounded-[32px] overflow-hidden shadow-2xl"
       >
         {/* HEADER */}
         <div className="px-8 pt-8 flex items-center justify-between">
@@ -71,7 +71,7 @@ export function ExpansionFlow({ isOpen, onClose }: ExpansionFlowProps) {
               <Sparkles className="w-5 h-5 text-brand" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-slate-900 dark:text-white">Career Evolution</h2>
+              <h2 className="text-xl font-bold text-white text-white">Career Evolution</h2>
               <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Expansion Protocol</p>
             </div>
           </div>
@@ -101,7 +101,7 @@ export function ExpansionFlow({ isOpen, onClose }: ExpansionFlowProps) {
                 className="space-y-6"
               >
                 <div className="space-y-2">
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white leading-tight">What new area do you want to explore?</h3>
+                  <h3 className="text-2xl font-bold text-white text-white leading-tight">What new area do you want to explore?</h3>
                   <p className="text-sm text-slate-500">I'll map this interest into your existing learning graph.</p>
                 </div>
                 
@@ -111,7 +111,7 @@ export function ExpansionFlow({ isOpen, onClose }: ExpansionFlowProps) {
                     placeholder="e.g. AI Foundations, Backend, DevOps..."
                     value={data.newInterest}
                     onChange={e => setData(prev => ({ ...prev, newInterest: e.target.value }))}
-                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 text-slate-900 dark:text-white focus:outline-none focus:border-brand/50 transition-all"
+                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 text-white text-white focus:outline-none focus:border-brand/50 transition-all"
                   />
                   
                   <div className="grid grid-cols-2 gap-3">
@@ -141,7 +141,7 @@ export function ExpansionFlow({ isOpen, onClose }: ExpansionFlowProps) {
                 className="space-y-6"
               >
                 <div className="space-y-2">
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white leading-tight">Why are you adding this skill path?</h3>
+                  <h3 className="text-2xl font-bold text-white text-white leading-tight">Why are you adding this skill path?</h3>
                   <p className="text-sm text-slate-500">Understanding your intent helps me prioritize resources.</p>
                 </div>
                 
@@ -165,7 +165,7 @@ export function ExpansionFlow({ isOpen, onClose }: ExpansionFlowProps) {
                         <p className={cn("text-sm font-bold uppercase tracking-widest", data.expansionReason === option.id ? "text-brand" : "text-slate-400 group-hover:text-slate-300")}>{option.label}</p>
                         <p className="text-[10px] text-slate-500 mt-0.5">{option.sub}</p>
                       </div>
-                      <ChevronRight className={cn("w-4 h-4", data.expansionReason === option.id ? "text-brand" : "text-slate-700")} />
+                      <ChevronRight className={cn("w-4 h-4", data.expansionReason === option.id ? "text-brand" : "text-slate-300")} />
                     </button>
                   ))}
                 </div>
@@ -181,7 +181,7 @@ export function ExpansionFlow({ isOpen, onClose }: ExpansionFlowProps) {
                 className="space-y-8"
               >
                 <div className="space-y-2">
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white leading-tight">How much time do you want to dedicate weekly?</h3>
+                  <h3 className="text-2xl font-bold text-white text-white leading-tight">How much time do you want to dedicate weekly?</h3>
                   <p className="text-sm text-slate-500">I'll balance this with your existing learning tracks.</p>
                 </div>
                 
@@ -189,11 +189,11 @@ export function ExpansionFlow({ isOpen, onClose }: ExpansionFlowProps) {
                   <div className="flex justify-between items-end">
                     <div>
                       <p className="text-[10px] font-bold uppercase tracking-widest text-brand mb-1">Weekly Allocation</p>
-                      <p className="text-3xl font-bold text-slate-900 dark:text-white">{data.priorityWeight === 0.2 ? "2 hrs" : data.priorityWeight === 0.5 ? "5 hrs" : data.priorityWeight === 0.7 ? "10 hrs" : "Full Focus"}</p>
+                      <p className="text-3xl font-bold text-white text-white">{data.priorityWeight === 0.2 ? "2 hrs" : data.priorityWeight === 0.5 ? "5 hrs" : data.priorityWeight === 0.7 ? "10 hrs" : "Full Focus"}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1">Priority</p>
-                      <p className="text-xl font-bold text-slate-900 dark:text-white">{Math.round(data.priorityWeight * 100)}%</p>
+                      <p className="text-xl font-bold text-white text-white">{Math.round(data.priorityWeight * 100)}%</p>
                     </div>
                   </div>
                   
@@ -211,7 +211,7 @@ export function ExpansionFlow({ isOpen, onClose }: ExpansionFlowProps) {
                       className="absolute left-0 top-0 h-full bg-brand rounded-full z-10"
                       style={{ width: `${data.priorityWeight * 100}%` }}
                     />
-                    <div className="absolute top-6 left-0 right-0 flex justify-between text-[9px] font-bold text-slate-600 uppercase tracking-widest">
+                    <div className="absolute top-6 left-0 right-0 flex justify-between text-[9px] font-bold text-slate-400 uppercase tracking-widest">
                       <span>Casual</span>
                       <span>Balanced</span>
                       <span>High Priority</span>
@@ -230,7 +230,7 @@ export function ExpansionFlow({ isOpen, onClose }: ExpansionFlowProps) {
                 className="space-y-6"
               >
                 <div className="space-y-2">
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white leading-tight">How familiar are you with this domain?</h3>
+                  <h3 className="text-2xl font-bold text-white text-white leading-tight">How familiar are you with this domain?</h3>
                   <p className="text-sm text-slate-500">I'll adjust the starting point of your new expansion track.</p>
                 </div>
                 
@@ -248,7 +248,7 @@ export function ExpansionFlow({ isOpen, onClose }: ExpansionFlowProps) {
                         data.initialTrackLevel === option.id ? "border-brand bg-brand/10" : "border-white/5 bg-white/[0.02] hover:border-white/10"
                       )}
                     >
-                      <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center", data.initialTrackLevel === option.id ? "bg-brand text-slate-900 dark:text-slate-900 dark:text-white" : "bg-white/5 text-slate-500")}>
+                      <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center", data.initialTrackLevel === option.id ? "bg-brand text-white text-white text-white" : "bg-white/5 text-slate-500")}>
                         <option.icon className="w-6 h-6" />
                       </div>
                       <div>
@@ -277,7 +277,7 @@ export function ExpansionFlow({ isOpen, onClose }: ExpansionFlowProps) {
             <button 
               onClick={nextStep}
               disabled={!isStepValid()}
-              className="px-8 py-3 rounded-xl bg-brand text-slate-900 dark:text-slate-900 dark:text-white text-[11px] font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-brand/90 transition shadow-glow disabled:opacity-50 disabled:hover:bg-brand disabled:cursor-not-allowed"
+              className="px-8 py-3 rounded-xl bg-brand text-white text-white text-white text-[11px] font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-brand/90 transition shadow-glow disabled:opacity-50 disabled:hover:bg-brand disabled:cursor-not-allowed"
             >
               Continue <ArrowRight className="w-3.5 h-3.5" />
             </button>
@@ -285,7 +285,7 @@ export function ExpansionFlow({ isOpen, onClose }: ExpansionFlowProps) {
             <button 
               onClick={handleComplete}
               disabled={generating}
-              className="px-8 py-3 rounded-xl bg-brand text-slate-900 dark:text-slate-900 dark:text-white text-[11px] font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-brand/90 transition shadow-glow disabled:opacity-50"
+              className="px-8 py-3 rounded-xl bg-brand text-white text-white text-white text-[11px] font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-brand/90 transition shadow-glow disabled:opacity-50"
             >
               {generating ? "Calibrating..." : "Launch Expansion"} <Target className="w-3.5 h-3.5" />
             </button>

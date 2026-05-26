@@ -29,7 +29,7 @@ export function MentorshipDashboard() {
 
   if (loading && matches.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-slate-500 dark:text-slate-500 dark:text-slate-400 space-y-4">
+      <div className="flex flex-col items-center justify-center py-20 text-slate-500 text-slate-500 text-slate-400 space-y-4">
         <Sparkles className="w-8 h-8 animate-pulse text-brand" />
         <p>AI is matching you with industry mentors...</p>
       </div>
@@ -80,7 +80,7 @@ export function MentorshipDashboard() {
             </div>
 
             <div className="space-y-3 mb-8">
-              <div className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em]">Contextual Alignment</div>
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Contextual Alignment</div>
               <ul className="space-y-2">
                 {match.matchReasons.map((reason, i) => (
                   <li key={i} className="flex items-start gap-3">
@@ -95,7 +95,7 @@ export function MentorshipDashboard() {
               <div className="flex gap-4">
                 <button
                   onClick={() => updateStatus(match.id, "accepted")}
-                  className="flex-2 flex-1 flex items-center justify-center gap-2 bg-white text-slate-950 py-3 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-100 transition shadow-[0_15px_30px_rgba(255,255,255,0.1)]"
+                  className="flex-2 flex-1 flex items-center justify-center gap-2 bg-transparent text-slate-950 py-3 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-transparent transition shadow-[0_15px_30px_rgba(255,255,255,0.1)]"
                 >
                   Request Connection
                 </button>
@@ -125,7 +125,7 @@ export function MentorshipDashboard() {
                 </Link>
               </div>
             ) : (
-              <div className="bg-white/[0.02] border border-white/[0.06] text-slate-600 text-[10px] font-black uppercase tracking-widest py-3 rounded-xl text-center">
+              <div className="bg-white/[0.02] border border-white/[0.06] text-slate-400 text-[10px] font-black uppercase tracking-widest py-3 rounded-xl text-center">
                 Archived
               </div>
             )}
@@ -133,7 +133,7 @@ export function MentorshipDashboard() {
         ))}
 
         {matches.length === 0 && !loading && (
-          <div className="col-span-2 text-center py-12 text-slate-500 dark:text-slate-500 dark:text-slate-400">
+          <div className="col-span-2 text-center py-12 text-slate-500 text-slate-500 text-slate-400">
             No mentors found. Try updating your target role or skills.
           </div>
         )}

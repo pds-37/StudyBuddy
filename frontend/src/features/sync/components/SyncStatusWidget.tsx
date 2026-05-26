@@ -44,7 +44,7 @@ export function SyncStatusWidget() {
   const isConnected = status !== null && !error;
 
   return (
-    <div className="p-6 rounded-2xl glass border-white/5 hover:border-slate-200 dark:border-slate-200 dark:border-white/10 transition-all">
+    <div className="p-6 rounded-2xl glass border-white/5 hover:border-white/10 border-white/10 border-white/10 transition-all">
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
           <div className={cn(
@@ -54,7 +54,7 @@ export function SyncStatusWidget() {
             {isConnected ? <Cloud size={18} /> : <CloudOff size={18} />}
           </div>
           <div>
-            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-900 dark:text-white">CLI Sync Bridge</h3>
+            <h3 className="text-sm font-bold text-white text-white text-white">CLI Sync Bridge</h3>
             <p className={cn(
               "text-[11px] font-medium mt-0.5",
               isConnected ? "text-emerald-400" : "text-red-400"
@@ -66,7 +66,7 @@ export function SyncStatusWidget() {
         <button
           onClick={fetchStatus}
           disabled={loading}
-          className="p-2 rounded-lg bg-slate-50 dark:bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white hover:bg-slate-100 dark:bg-slate-100 dark:bg-white/10 transition-all disabled:opacity-50"
+          className="p-2 rounded-lg bg-transparent bg-transparent bg-white/5 text-slate-500 text-slate-500 text-slate-400 hover:text-white text-white text-white hover:bg-transparent bg-transparent bg-white/10 transition-all disabled:opacity-50"
           title="Refresh sync status"
         >
           <RefreshCw size={14} className={cn(loading && "animate-spin")} />
@@ -76,21 +76,21 @@ export function SyncStatusWidget() {
       {status && (
         <div className="space-y-3">
           <div className="flex items-center justify-between py-2 px-3 rounded-xl bg-white/[0.03]">
-            <div className="flex items-center gap-2.5 text-xs text-slate-500 dark:text-slate-500 dark:text-slate-400">
+            <div className="flex items-center gap-2.5 text-xs text-slate-500 text-slate-500 text-slate-400">
               <ArrowUpDown size={12} className="text-cyan" />
               Last Push
             </div>
-            <span className="text-xs font-medium text-slate-700 dark:text-slate-700 dark:text-slate-300">
+            <span className="text-xs font-medium text-slate-300 text-slate-300 text-slate-300">
               {timeAgo(status.last_push)}
             </span>
           </div>
 
           <div className="flex items-center justify-between py-2 px-3 rounded-xl bg-white/[0.03]">
-            <div className="flex items-center gap-2.5 text-xs text-slate-500 dark:text-slate-500 dark:text-slate-400">
+            <div className="flex items-center gap-2.5 text-xs text-slate-500 text-slate-500 text-slate-400">
               <Monitor size={12} className="text-purple-400" />
               Cloud Notes
             </div>
-            <span className="text-xs font-medium text-slate-700 dark:text-slate-700 dark:text-slate-300">
+            <span className="text-xs font-medium text-slate-300 text-slate-300 text-slate-300">
               {status.total_notes}
             </span>
           </div>
@@ -109,7 +109,7 @@ export function SyncStatusWidget() {
       {!status && !loading && (
         <p className="text-xs text-slate-500 mt-2 leading-relaxed">
           Install the CLI agent to sync notes offline. 
-          Run <code className="text-[10px] px-1.5 py-0.5 rounded bg-slate-50 dark:bg-slate-50 dark:bg-white/5 font-mono text-slate-500 dark:text-slate-500 dark:text-slate-400">studybuddy sync status</code> to connect.
+          Run <code className="text-[10px] px-1.5 py-0.5 rounded bg-transparent bg-transparent bg-white/5 font-mono text-slate-500 text-slate-500 text-slate-400">studybuddy sync status</code> to connect.
         </p>
       )}
     </div>

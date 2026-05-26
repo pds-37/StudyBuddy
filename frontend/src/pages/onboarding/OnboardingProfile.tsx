@@ -34,7 +34,7 @@ export function OnboardingProfile({ data, onComplete, isSubmitting }: Props) {
           <div className="absolute inset-0 rounded-full border-2 border-t-cyan-400 border-r-purple-500/30 border-b-transparent border-l-transparent" />
           <div className="absolute inset-2 rounded-full border border-t-transparent border-r-transparent border-b-cyan-400/30 border-l-purple-400/20" />
         </Motion.div>
-        <Motion.p className="text-lg font-semibold text-slate-900 dark:text-white mb-2"
+        <Motion.p className="text-lg font-semibold text-white text-white mb-2"
           animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 2, repeat: Infinity }}>
           Building your learning profile...
         </Motion.p>
@@ -51,7 +51,7 @@ export function OnboardingProfile({ data, onComplete, isSubmitting }: Props) {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
           Profile Ready
         </Motion.p>
-        <Motion.h2 className="text-2xl font-bold text-slate-900 dark:text-white"
+        <Motion.h2 className="text-2xl font-bold text-white text-white"
           initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           Your Learning DNA
         </Motion.h2>

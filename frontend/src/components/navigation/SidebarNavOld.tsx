@@ -24,8 +24,8 @@ export function SidebarNav() {
             to={item.href}
             className={`block rounded-lg px-3 py-2 text-sm font-medium transition ${
               isActive
-                ? "bg-brand text-slate-900 dark:text-slate-900 dark:text-white"
-                : "text-slate-700 dark:text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:bg-slate-50 dark:bg-white/5 hover:text-slate-900 dark:text-slate-900 dark:text-white"
+                ? "bg-brand text-white text-white text-white"
+                : "text-slate-300 text-slate-300 text-slate-300 hover:bg-transparent bg-transparent bg-white/5 hover:text-white text-white text-white"
             }`}
           >
             {item.name}

@@ -8,9 +8,9 @@ export function MarketingLayout() {
   const isAuthPage = location.pathname === "/auth";
 
   return (
-    <div className="min-h-screen bg-white dark:bg-ink">
+    <div className="premium-shell min-h-screen bg-obsidian text-slate-100">
       <TopNav />
-      <main>
+      <main className="animate-fade-in">
         <Outlet />
       </main>
       {!isAuthPage && <GlobalCopilotWidget />}

@@ -79,16 +79,16 @@ export function MilestoneQuiz({ milestoneId, milestoneTitle }: MilestoneQuizProp
 
   if (!questions) {
     return (
-      <div className="rounded-xl border border-white/[0.04] bg-white dark:bg-obsidian">
+      <div className="rounded-xl border border-white/[0.04] bg-transparent bg-obsidian">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-medium text-slate-900 dark:text-white">Knowledge Check</h3>
+            <h3 className="text-sm font-medium text-white text-white">Knowledge Check</h3>
             <p className="mt-1 text-xs text-[#666666]">{milestoneTitle}</p>
           </div>
           <button
             onClick={handleGenerate}
             disabled={loading}
-            className="flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-xs font-medium text-slate-950 transition hover:bg-slate-200 disabled:opacity-50"
+            className="flex items-center gap-2 rounded-lg bg-transparent px-4 py-2 text-xs font-medium text-slate-950 transition hover:bg-slate-200 disabled:opacity-50"
           >
             {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <PlayCircle className="h-3 w-3" />}
             Generate Quiz
@@ -100,14 +100,14 @@ export function MilestoneQuiz({ milestoneId, milestoneTitle }: MilestoneQuizProp
 
   if (finished) {
     return (
-      <div className="rounded-xl border border-white/[0.04] p-6 bg-white dark:bg-obsidian">
-        <h3 className="text-xl font-medium text-slate-900 dark:text-white mb-2">Quiz Completed</h3>
+      <div className="rounded-xl border border-white/[0.04] p-6 bg-transparent bg-obsidian">
+        <h3 className="text-xl font-medium text-white text-white mb-2">Quiz Completed</h3>
         <p className="text-sm text-[#888888] mb-6">You scored {score}/{questions.length} on the {milestoneTitle} knowledge check.</p>
         
-        <div className="flex items-center gap-4 border-t border-slate-100 dark:border-white/[0.04] pt-6">
+        <div className="flex items-center gap-4 border-t border-slate-100 border-white/[0.04] pt-6">
           <button
             onClick={() => setQuestions(null)}
-            className="rounded-lg border border-slate-200 dark:border-white/[0.04] px-4 py-2 text-xs font-medium text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
+            className="rounded-lg border border-white/10 border-white/[0.04] px-4 py-2 text-xs font-medium text-slate-500 hover:text-white hover:text-white transition-colors"
           >
             Close Quiz
           </button>
@@ -118,8 +118,8 @@ export function MilestoneQuiz({ milestoneId, milestoneTitle }: MilestoneQuizProp
             className={cn(
               "flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition-all",
               markedDone 
-                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 border border-emerald-500/20"
-                : "bg-brand text-slate-900 dark:text-white hover:scale-105 shadow-lg shadow-brand/20 border border-brand/20"
+                ? "bg-emerald-500/10 text-emerald-600 text-emerald-500 border border-emerald-500/20"
+                : "bg-brand text-white text-white hover:scale-105 shadow-lg shadow-brand/20 border border-brand/20"
             )}
           >
             {markedDone ? <CheckCircle2 className="w-4 h-4" /> : <PlayCircle className="w-4 h-4" />}
@@ -134,13 +134,13 @@ export function MilestoneQuiz({ milestoneId, milestoneTitle }: MilestoneQuizProp
   const isAnswered = selectedOption !== null;
 
   return (
-    <div className="rounded-xl border border-white/[0.04] bg-white dark:bg-obsidian">
+    <div className="rounded-xl border border-white/[0.04] bg-transparent bg-obsidian">
       <div className="mb-6 flex items-center justify-between">
         <span className="text-[10px] uppercase tracking-widest text-[#666666]">Question {currentIndex + 1}/{questions.length}</span>
-        <span className="text-[10px] uppercase tracking-widest text-slate-900 dark:text-white">{score} Correct</span>
+        <span className="text-[10px] uppercase tracking-widest text-white text-white">{score} Correct</span>
       </div>
 
-      <h4 className="mb-8 text-base font-medium leading-relaxed text-slate-900 dark:text-white">{currentQ.question}</h4>
+      <h4 className="mb-8 text-base font-medium leading-relaxed text-white text-white">{currentQ.question}</h4>
 
       <div className="space-y-2">
         {currentQ.options.map((option, idx) => {
@@ -149,7 +149,7 @@ export function MilestoneQuiz({ milestoneId, milestoneTitle }: MilestoneQuizProp
           
           let optionClass = "border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.03]";
           if (isAnswered) {
-            if (isCorrect) optionClass = "border-white/[0.1] bg-white/[0.05] text-slate-900 dark:text-white";
+            if (isCorrect) optionClass = "border-white/[0.1] bg-white/[0.05] text-white text-white";
             else if (isSelected) optionClass = "border-red-500/20 bg-red-500/5 text-red-200";
             else optionClass = "border-white/[0.02] opacity-30";
           }
@@ -174,7 +174,7 @@ export function MilestoneQuiz({ milestoneId, milestoneTitle }: MilestoneQuizProp
           <div className="mt-6 flex justify-end">
             <button
               onClick={handleNext}
-              className="flex items-center gap-1 rounded-lg bg-white px-4 py-2 text-xs font-medium text-slate-950 transition hover:bg-slate-200"
+              className="flex items-center gap-1 rounded-lg bg-transparent px-4 py-2 text-xs font-medium text-slate-950 transition hover:bg-slate-200"
             >
               {currentIndex < questions.length - 1 ? "Next" : "Finish"}
               <ChevronRight className="h-3 w-3" />

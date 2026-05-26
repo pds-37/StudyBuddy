@@ -40,7 +40,7 @@ export function NotesPage() {
   }, [fetchAll]);
 
   return (
-    <section className="h-screen overflow-hidden bg-zinc-950 text-zinc-100 dark:bg-zinc-950">
+    <section className="h-screen overflow-hidden bg-zinc-950 text-zinc-100 bg-zinc-950">
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-zinc-800 bg-zinc-950 px-5">
         <div>
           <h2 className="text-[15px] font-medium text-zinc-100">{filterTitles[activeFilter]}</h2>

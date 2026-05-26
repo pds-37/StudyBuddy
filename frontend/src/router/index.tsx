@@ -33,7 +33,7 @@ const FocusPage = lazy(() => import("../pages/FocusPage").then(m => ({ default: 
 
 function PageLoader() {
   return (
-    <div className="flex h-screen w-full items-center justify-center bg-white dark:bg-obsidian bg-white dark:bg-obsidian$4">
+    <div className="flex h-screen w-full items-center justify-center bg-transparent bg-obsidian bg-transparent bg-obsidian$4">
       <Loader2 className="h-8 w-8 animate-spin text-brand" />
     </div>
   );

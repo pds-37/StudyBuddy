@@ -85,7 +85,7 @@ export function ReadinessRing({ score, label }: { score: number, label: string }
   return (
     <div className="relative flex h-28 w-28 items-center justify-center">
       <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-         <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="8" className="text-slate-900 dark:text-slate-900 dark:text-white/5" />
+         <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="8" className="text-white text-white text-white/5" />
          <Motion.circle 
            cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="8" 
            strokeLinecap="round"
@@ -97,8 +97,8 @@ export function ReadinessRing({ score, label }: { score: number, label: string }
          />
       </svg>
       <div className="absolute flex flex-col items-center justify-center">
-         <span className="text-3xl font-black text-slate-900 dark:text-slate-900 dark:text-white">{score}</span>
-         <span className="text-[8px] font-black text-slate-500 dark:text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1">{label}</span>
+         <span className="text-3xl font-black text-white text-white text-white">{score}</span>
+         <span className="text-[8px] font-black text-slate-500 text-slate-500 text-slate-400 uppercase tracking-widest mt-1">{label}</span>
       </div>
     </div>
   );

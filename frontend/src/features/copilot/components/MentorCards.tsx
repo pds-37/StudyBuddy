@@ -29,7 +29,7 @@ export function InsightCard({ title, description, actionLabel, actionUrl }: any)
           <TrendingUp size={20} />
         </div>
         <div>
-          <h4 className="text-sm font-black text-slate-900 dark:text-slate-900 dark:text-white mb-1 uppercase tracking-wider">{title}</h4>
+          <h4 className="text-sm font-black text-white text-white text-white mb-1 uppercase tracking-wider">{title}</h4>
           <p className="text-xs text-slate-400 leading-relaxed">{description}</p>
           {actionLabel && (
              <button className="mt-4 text-[10px] font-black uppercase tracking-[0.2em] text-brand hover:text-brand/80 transition-colors flex items-center gap-2">
@@ -56,7 +56,7 @@ export function MissionCard({ title, description, onClick }: any) {
           <Target size={16} className="text-cyan-400" />
           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-400">Roadmap Mission</span>
         </div>
-        <h4 className="text-xl font-black text-slate-900 dark:text-slate-900 dark:text-white mb-2">{title}</h4>
+        <h4 className="text-xl font-black text-white text-white text-white mb-2">{title}</h4>
         <p className="text-sm text-slate-400 leading-relaxed mb-6">{description}</p>
         <button 
           onClick={onClick || (() => navigate('/roadmap'))}
@@ -81,9 +81,9 @@ export function FocusSprintCard({ title, data, onClick }: any) {
          <div className="p-2 rounded-xl bg-purple-500/20 text-purple-400">
             <Zap size={18} />
          </div>
-         <h4 className="text-sm font-black text-slate-900 dark:text-slate-900 dark:text-white uppercase tracking-widest">Focus Sprint</h4>
+         <h4 className="text-sm font-black text-white text-white text-white uppercase tracking-widest">Focus Sprint</h4>
       </div>
-      <h3 className="text-lg font-black text-slate-900 dark:text-slate-900 dark:text-white mb-2">{title}</h3>
+      <h3 className="text-lg font-black text-white text-white text-white mb-2">{title}</h3>
       <div className="flex items-center gap-4 mb-6">
          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
             <Clock size={14} /> {data?.duration || 45} mins
@@ -94,7 +94,7 @@ export function FocusSprintCard({ title, data, onClick }: any) {
       </div>
       <button 
         onClick={onClick || (() => navigate('/focus'))}
-        className="w-full py-3 rounded-2xl bg-purple-500 text-slate-900 dark:text-slate-900 dark:text-white text-xs font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-[0_0_20px_rgba(168,85,247,0.3)] relative z-30"
+        className="w-full py-3 rounded-2xl bg-purple-500 text-white text-white text-white text-xs font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-[0_0_20px_rgba(168,85,247,0.3)] relative z-30"
       >
          Start Focus Session
       </button>
@@ -125,7 +125,7 @@ export function RecallChallenge({ title, data, onClick }: any) {
         <Brain size={18} />
         <span className="text-[10px] font-black uppercase tracking-[0.2em]">Recall Challenge</span>
       </div>
-      <p className="mb-5 text-base font-bold leading-relaxed text-slate-900 dark:text-slate-900 dark:text-white">
+      <p className="mb-5 text-base font-bold leading-relaxed text-white text-white text-white">
         {title}
       </p>
       {data?.options?.length > 0 ? (
@@ -190,7 +190,7 @@ export function RecoveryPlanCard({ title, description, onClick }: any) {
         <RefreshCw size={18} />
         <span className="text-[10px] font-black uppercase tracking-[0.2em]">Recovery Plan</span>
       </div>
-      <h4 className="text-xl font-black text-slate-900 dark:text-slate-900 dark:text-white mb-2">{title}</h4>
+      <h4 className="text-xl font-black text-white text-white text-white mb-2">{title}</h4>
       <p className="text-sm text-slate-300 leading-relaxed mb-6">{description}</p>
       <button 
         onClick={onClick || (() => navigate('/dashboard'))}

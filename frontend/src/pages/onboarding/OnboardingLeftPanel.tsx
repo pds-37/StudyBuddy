@@ -101,7 +101,7 @@ export function OnboardingLeftPanel({ step, totalSteps, messages }: Props) {
 
         <AnimatePresence mode="wait">
           <Motion.div key={step}>
-            <Motion.h2 className="text-3xl font-bold text-slate-900 dark:text-white leading-tight mb-3"
+            <Motion.h2 className="text-3xl font-bold text-white text-white leading-tight mb-3"
               initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}>
               {[
@@ -115,7 +115,7 @@ export function OnboardingLeftPanel({ step, totalSteps, messages }: Props) {
                 "What excites you most?"
               ][step]}
             </Motion.h2>
-            <Motion.p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-sm mb-6"
+            <Motion.p className="text-sm text-slate-500 text-slate-400 leading-relaxed max-w-sm mb-6"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }}
               transition={{ delay: 0.15, duration: 0.5 }}>
               {[
@@ -145,7 +145,7 @@ export function OnboardingLeftPanel({ step, totalSteps, messages }: Props) {
               layout transition={{ type: "spring", stiffness: 300, damping: 30 }} />
           ))}
         </div>
-        <p className="text-[10px] uppercase tracking-[0.3em] text-slate-600">
+        <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">
           Step {step + 1} of {totalSteps}
         </p>
       </div>

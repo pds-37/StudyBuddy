@@ -25,7 +25,7 @@ export function IngestBar() {
 
   return (
     <section className="shrink-0 px-5 py-3">
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-3 dark:bg-zinc-900">
+      <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-3 bg-zinc-900">
         <div className="mb-2 flex items-center gap-1.5 text-[11.5px] text-zinc-500">
           <Sparkles size={13} className="text-purple-400" />
           <span>{dailyPrompt}</span>

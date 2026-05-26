@@ -93,7 +93,7 @@ function MetricCard({ label, value, sub, color, icon }: {
         <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{label}</p>
       </div>
       <p className={cn("text-2xl font-light tracking-tight", color)}>{value}</p>
-      <p className="text-[10px] font-medium text-slate-600 capitalize">{sub}</p>
+      <p className="text-[10px] font-medium text-slate-400 capitalize">{sub}</p>
     </div>
   );
 }
@@ -120,7 +120,7 @@ export function TodaysFocusStrip({ priorities, onStartRevision }: {
           <Zap size={12} className="text-amber-400" />
           Today&apos;s Critical Revision
         </h3>
-        <span className="text-[10px] font-medium text-slate-600">
+        <span className="text-[10px] font-medium text-slate-400">
           ~{priorities.reduce((s, p) => s + p.estimatedMinutes, 0)} min total
         </span>
       </div>
@@ -142,7 +142,7 @@ export function TodaysFocusStrip({ priorities, onStartRevision }: {
           >
             <div className="flex items-center justify-between">
               <UrgencyBadge urgency={p.urgency} />
-              <span className="text-[9px] font-medium text-slate-600">~{p.estimatedMinutes}m</span>
+              <span className="text-[9px] font-medium text-slate-400">~{p.estimatedMinutes}m</span>
             </div>
             <p className="text-xs font-medium text-slate-200 text-left line-clamp-1">{p.title}</p>
             <p className="text-[10px] text-slate-500 text-left line-clamp-1">{p.reason}</p>
@@ -162,7 +162,7 @@ function UrgencyBadge({ urgency }: { urgency: string }) {
     critical: "bg-red-500/20 text-red-400",
     high: "bg-amber-500/20 text-amber-400",
     medium: "bg-cyan-500/20 text-cyan-400",
-    low: "bg-slate-500/20 text-slate-400"
+    low: "bg-transparent0/20 text-slate-400"
   };
   return (
     <span className={cn("text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm", styles[urgency] || styles.low)}>
@@ -192,7 +192,7 @@ function StrengthDot({ strength }: { strength: number }) {
         "w-1.5 h-1.5 rounded-full",
         strength > 0.7 ? "bg-emerald-500" : strength > 0.3 ? "bg-amber-500" : "bg-red-500"
       )} />
-      <span className="text-[9px] text-slate-600">{Math.round(strength * 100)}%</span>
+      <span className="text-[9px] text-slate-400">{Math.round(strength * 100)}%</span>
     </div>
   );
 }
@@ -237,7 +237,7 @@ export function IntelligentNoteCard({ note, onAction }: { note: CareerNote; onAc
       </p>
 
       {/* Meta row */}
-      <div className="flex flex-wrap items-center gap-3 mb-3 text-[9px] font-medium text-slate-600">
+      <div className="flex flex-wrap items-center gap-3 mb-3 text-[9px] font-medium text-slate-400">
         <span className="flex items-center gap-1">
           <BookOpen size={10} /> {note.topic || "uncategorized"}
         </span>
@@ -252,7 +252,7 @@ export function IntelligentNoteCard({ note, onAction }: { note: CareerNote; onAc
       </div>
 
       {/* Stats row */}
-      <div className="flex items-center gap-4 text-[9px] font-medium text-slate-600 mb-4">
+      <div className="flex items-center gap-4 text-[9px] font-medium text-slate-400 mb-4">
         <span>{metadata?.flashcards?.length || 0} cards</span>
         <span>{note.reviewCount} reviews</span>
         <span>{note.relatedNoteIds?.length || 0} linked</span>
@@ -262,7 +262,7 @@ export function IntelligentNoteCard({ note, onAction }: { note: CareerNote; onAc
       <div className="grid grid-cols-2 gap-2 mt-auto">
         <button
           onClick={(e) => { e.stopPropagation(); onAction('recall'); }}
-          className="py-2 bg-brand/10 text-brand text-[10px] font-semibold hover:bg-brand hover:text-slate-900 transition-colors flex items-center justify-center gap-1.5"
+          className="py-2 bg-brand/10 text-brand text-[10px] font-semibold hover:bg-brand hover:text-white transition-colors flex items-center justify-center gap-1.5"
         >
           <Brain size={11} /> Recall
         </button>
@@ -334,7 +334,7 @@ export function KnowledgeInsightsPanel({ health, priorities, onIngestClick, onFi
                     {p.title}
                   </span>
                 </div>
-                <span className="text-[9px] text-slate-600 shrink-0 ml-2">~{p.estimatedMinutes}m</span>
+                <span className="text-[9px] text-slate-400 shrink-0 ml-2">~{p.estimatedMinutes}m</span>
               </div>
             ))}
           </div>
@@ -350,7 +350,7 @@ export function KnowledgeInsightsPanel({ health, priorities, onIngestClick, onFi
         <div className="flex flex-col gap-2">
           <button 
             onClick={onIngestClick}
-            className="w-full py-2 bg-brand text-slate-900 text-[10px] font-semibold hover:bg-brand/90 transition-colors flex items-center justify-center gap-1.5"
+            className="w-full py-2 bg-brand text-white text-[10px] font-semibold hover:bg-brand/90 transition-colors flex items-center justify-center gap-1.5"
           >
             <Plus size={12} /> Ingest knowledge
           </button>
@@ -453,7 +453,7 @@ function UrgencyDot({ urgency }: { urgency: string }) {
     critical: "bg-red-500",
     high: "bg-amber-500",
     medium: "bg-cyan-500",
-    low: "bg-slate-500"
+    low: "bg-transparent0"
   };
   return <div className={cn("w-1.5 h-1.5 rounded-full shrink-0", colors[urgency] || colors.low)} />;
 }
@@ -480,7 +480,7 @@ export function NoteDetailPanel({ note, onClose }: {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-3">
               <KnowledgeLayerBadge layer={note.knowledgeLayer} />
-              <span className="text-[9px] font-bold text-slate-600 uppercase">{note.difficulty}</span>
+              <span className="text-[9px] font-bold text-slate-400 uppercase">{note.difficulty}</span>
               <StrengthDot strength={note.strength} />
             </div>
             <h2 className="text-lg font-semibold text-white mb-1">{note.title}</h2>
@@ -522,7 +522,7 @@ export function NoteDetailPanel({ note, onClose }: {
                 "text-[9px] font-bold uppercase px-2 py-0.5",
                 metadata.interviewRelevance.frequency === "high" ? "bg-purple-500/20 text-purple-400" :
                 metadata.interviewRelevance.frequency === "medium" ? "bg-cyan-500/20 text-cyan-400" :
-                "bg-slate-500/20 text-slate-400"
+                "bg-transparent0/20 text-slate-400"
               )}>
                 {metadata.interviewRelevance.frequency} frequency
               </span>
@@ -535,7 +535,7 @@ export function NoteDetailPanel({ note, onClose }: {
             )}
             {metadata.interviewRelevance.commonQuestions?.length > 0 && (
               <div className="space-y-1.5 mt-2">
-                <p className="text-[9px] font-bold text-slate-600 uppercase">Common Questions:</p>
+                <p className="text-[9px] font-bold text-slate-400 uppercase">Common Questions:</p>
                 {metadata.interviewRelevance.commonQuestions.map((q: string, i: number) => (
                   <p key={i} className="text-[10px] text-slate-400 pl-3 border-l-2 border-purple-500/30">{q}</p>
                 ))}
@@ -543,7 +543,7 @@ export function NoteDetailPanel({ note, onClose }: {
             )}
             {metadata.interviewRelevance.realWorldUsage?.length > 0 && (
               <div className="space-y-1.5 mt-2">
-                <p className="text-[9px] font-bold text-slate-600 uppercase">Real-World Usage:</p>
+                <p className="text-[9px] font-bold text-slate-400 uppercase">Real-World Usage:</p>
                 {metadata.interviewRelevance.realWorldUsage.map((u: string, i: number) => (
                   <p key={i} className="text-[10px] text-slate-400 pl-3 border-l-2 border-emerald-500/30">{u}</p>
                 ))}
@@ -562,9 +562,9 @@ export function NoteDetailPanel({ note, onClose }: {
                   <Code size={14} className="text-cyan-400 shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-[11px] font-medium text-slate-300 truncate">{task.title}</p>
-                    <p className="text-[9px] text-slate-600 capitalize">{task.type} · {task.difficulty}</p>
+                    <p className="text-[9px] text-slate-400 capitalize">{task.type} · {task.difficulty}</p>
                   </div>
-                  <ArrowRight size={12} className="text-slate-600" />
+                  <ArrowRight size={12} className="text-slate-400" />
                 </div>
               ))}
             </div>

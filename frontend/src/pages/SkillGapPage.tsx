@@ -160,7 +160,7 @@ export function SkillGapPage() {
                     <Clock size={12} className="text-cyan-400" /> Est. Ready in {match.estimatedTimelineMonths} Months
                   </div>
                   <div className="space-y-3">
-                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-600">Critical Gaps</p>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Critical Gaps</p>
                     <div className="flex flex-wrap gap-2">
                       {match.blockers.map((blocker) => (
                         <span key={blocker} className="rounded-md border border-red-400/10 bg-red-400/5 px-2.5 py-1.5 text-[10px] font-bold text-red-300">

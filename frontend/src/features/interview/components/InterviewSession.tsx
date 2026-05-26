@@ -167,7 +167,7 @@ export function InterviewSession({ session }: Props) {
                           placeholder="Craft your answer here... Veda will analyze your structure and delivery."
                           className="w-full bg-transparent border-0 text-lg text-white placeholder-slate-600 focus:ring-0 p-5 min-h-[160px] resize-none"
                         />
-                        <div className="absolute bottom-4 right-4 text-[10px] font-mono text-slate-600">
+                        <div className="absolute bottom-4 right-4 text-[10px] font-mono text-slate-400">
                           {answerInput.length} characters
                         </div>
                       </div>

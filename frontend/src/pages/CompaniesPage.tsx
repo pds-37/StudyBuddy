@@ -136,7 +136,7 @@ export function CompaniesPage() {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search company type, example company, or focus area"
-            className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-slate-600"
+            className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-slate-400"
           />
         </div>
         <div className="flex items-center gap-2 overflow-x-auto">
@@ -193,7 +193,7 @@ export function CompaniesPage() {
                 </div>
                 <div className="text-right">
                   <p className={cn("text-3xl font-black", matchTone(item.matchScore))}>{item.matchScore}%</p>
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-slate-600">match</p>
+                  <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">match</p>
                 </div>
               </div>
 
@@ -216,7 +216,7 @@ export function CompaniesPage() {
 
               <div className="mt-5 space-y-4">
                 <div>
-                  <p className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-600">
+                  <p className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
                     <Target size={12} /> Focus areas
                   </p>
                   <div className="flex flex-wrap gap-2">
@@ -229,7 +229,7 @@ export function CompaniesPage() {
                 </div>
 
                 <div>
-                  <p className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-600">
+                  <p className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
                     <Users size={12} /> Examples
                   </p>
                   <p className="line-clamp-1 text-xs text-slate-400">{item.exampleCompanies.join(", ")}</p>
@@ -242,7 +242,7 @@ export function CompaniesPage() {
                   </div>
                   <Link
                     to={`/companies/${item.id}?role=${encodeURIComponent(role)}`}
-                    className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-black text-[#080B12] transition hover:bg-cyan-100"
+                    className="inline-flex items-center gap-2 rounded-full bg-transparent px-4 py-2 text-xs font-black text-[#080B12] transition hover:bg-cyan-100"
                   >
                     Prep <ArrowRight size={14} />
                   </Link>

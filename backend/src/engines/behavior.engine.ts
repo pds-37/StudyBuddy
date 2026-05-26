@@ -41,7 +41,8 @@ export class BehaviorEngine {
       preferredStudyTime: user.behaviorProfile?.preferredStudyTime || "evening",
       lastActivityAt: new Date(),
       burnoutRisk: Math.round(skipRate) > 40 ? Math.min(100, skipRate * 1.5) : 0,
-      cognitiveLoad: Math.min(100, (100 - Math.round(newConsistency)) + Math.round(skipRate))
+      cognitiveLoad: Math.min(100, (100 - Math.round(newConsistency)) + Math.round(skipRate)),
+      procrastinationLevel: pending > 3 ? "high" : pending > 1 ? "medium" : "low",
     };
 
     await user.save();

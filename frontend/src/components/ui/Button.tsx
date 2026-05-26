@@ -22,10 +22,10 @@ export function Button({
         : "px-5 py-3 text-sm";
   const variantClassName =
     variant === "secondary"
-      ? "bg-white/[0.06] text-slate-900 dark:text-slate-900 dark:text-white hover:bg-white/[0.1]"
+      ? "bg-white/[0.06] text-white text-white text-white hover:bg-white/[0.1]"
       : variant === "ghost"
-        ? "bg-transparent text-slate-200 hover:bg-white/[0.06] hover:text-slate-900 dark:text-slate-900 dark:text-white"
-        : "bg-gradient-to-r from-brand via-violet-500 to-cyan text-slate-900 dark:text-slate-900 dark:text-white hover:scale-[1.01]";
+        ? "bg-transparent text-slate-200 hover:bg-white/[0.06] hover:text-white text-white text-white"
+        : "bg-gradient-to-r from-brand via-violet-500 to-cyan text-white text-white text-white hover:scale-[1.01]";
 
   return (
     <button

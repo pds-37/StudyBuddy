@@ -57,8 +57,8 @@ function Chip({ label, selected, onClick, delay = 0 }: { label: string; selected
       onClick={onClick}
       className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 ${
         selected
-          ? "border-cyan-400/40 bg-cyan-400/10 text-slate-900 dark:text-white shadow-[0_0_20px_rgba(34,211,238,0.08)]"
-          : "border-white/[0.06] bg-white/[0.02] text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:border-white/[0.12] hover:text-slate-900 dark:text-white"
+          ? "border-cyan-400/40 bg-cyan-400/10 text-white text-white shadow-[0_0_20px_rgba(34,211,238,0.08)]"
+          : "border-white/[0.06] bg-white/[0.02] text-slate-500 text-slate-500 text-slate-400 hover:border-white/[0.12] hover:text-white text-white"
       }`}
       initial={{ opacity: 0, scale: 0.92 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -86,7 +86,7 @@ function SectionLabel({ children, delay = 0 }: { children: React.ReactNode; dela
 function Prompt({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   return (
     <Motion.h3
-      className="text-xl font-semibold text-slate-900 dark:text-white mb-6 leading-relaxed"
+      className="text-xl font-semibold text-white text-white mb-6 leading-relaxed"
       initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
       transition={{ delay: delay * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
@@ -117,8 +117,8 @@ export function Step1Role({ data, update }: StepProps) {
         <div className="mt-4 flex gap-2">
           <input value={roleInput} onChange={e => setRoleInput(e.target.value)}
             onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addCustom(); } }}
-            placeholder="Or type your own..." className="flex-1 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-sm text-slate-900 dark:text-white placeholder-slate-600 outline-none focus:border-cyan-400/30 transition" />
-          <button type="button" onClick={addCustom} className="rounded-xl bg-white/[0.04] px-5 py-2 text-xs font-bold uppercase text-slate-500 hover:text-slate-900 dark:text-white transition">Add</button>
+            placeholder="Or type your own..." className="flex-1 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-sm text-white text-white placeholder-slate-600 outline-none focus:border-cyan-400/30 transition" />
+          <button type="button" onClick={addCustom} className="rounded-xl bg-white/[0.04] px-5 py-2 text-xs font-bold uppercase text-slate-500 hover:text-white text-white transition">Add</button>
         </div>
       </div>
     </Motion.div>
@@ -142,7 +142,7 @@ export function Step2Experience({ data, update }: StepProps) {
           {expLevels.map((lvl, i) => (
             <Motion.button key={lvl.value} type="button" onClick={() => update({ experienceLevel: lvl.value as any })}
               className={`rounded-2xl border p-5 flex items-center gap-5 text-left transition-all ${
-                data.experienceLevel === lvl.value ? "border-cyan-400/30 bg-cyan-400/5 text-slate-900 dark:text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-500 hover:text-slate-900 dark:text-white"
+                data.experienceLevel === lvl.value ? "border-cyan-400/30 bg-cyan-400/5 text-white text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-500 hover:text-white text-white"
               }`}
               initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.08 * i }} whileHover={{ scale: 1.02, x: 4 }}>
@@ -186,15 +186,15 @@ export function Step3Skills({ data, update }: StepProps) {
           <div className="flex flex-wrap gap-2 mb-4">
             {data.currentSkills.map(s => (
               <button key={s} type="button" onClick={() => update({ currentSkills: data.currentSkills.filter(x => x !== s) })}
-                className="rounded-full border border-cyan-400/25 bg-cyan-400/10 px-4 py-1.5 text-xs font-semibold text-slate-900 dark:text-white hover:bg-red-500/15 transition">{s} ×</button>
+                className="rounded-full border border-cyan-400/25 bg-cyan-400/10 px-4 py-1.5 text-xs font-semibold text-white text-white hover:bg-red-500/15 transition">{s} ×</button>
             ))}
-            {data.currentSkills.length === 0 && <span className="text-xs text-slate-600 italic">No skills added yet...</span>}
+            {data.currentSkills.length === 0 && <span className="text-xs text-slate-400 italic">No skills added yet...</span>}
           </div>
           <div className="flex gap-2">
             <input value={skillInput} onChange={e => setSkillInput(e.target.value)}
               onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addSkill(skillInput); } }}
-              placeholder="Type a skill (e.g. React, Python)..." className="flex-1 bg-transparent px-2 py-2 text-sm text-slate-900 dark:text-white outline-none placeholder-slate-600" />
-            <button type="button" onClick={() => addSkill(skillInput)} className="text-xs font-bold uppercase text-cyan-400 hover:text-slate-900 dark:hover:text-white px-3 transition">Add</button>
+              placeholder="Type a skill (e.g. React, Python)..." className="flex-1 bg-transparent px-2 py-2 text-sm text-white text-white outline-none placeholder-slate-600" />
+            <button type="button" onClick={() => addSkill(skillInput)} className="text-xs font-bold uppercase text-cyan-400 hover:text-white hover:text-white px-3 transition">Add</button>
           </div>
         </div>
         {suggestions.length > 0 && (
@@ -230,7 +230,7 @@ export function Step4Hours({ data, update }: StepProps) {
           {hourOptions.map((opt, i) => (
             <Motion.button key={opt.value} type="button" onClick={() => update({ dailyStudyHours: opt.value })}
               className={`rounded-2xl border p-5 text-left transition-all ${
-                data.dailyStudyHours === opt.value ? "border-cyan-400/30 bg-cyan-400/5 text-slate-900 dark:text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-500 hover:text-slate-900 dark:text-white"
+                data.dailyStudyHours === opt.value ? "border-cyan-400/30 bg-cyan-400/5 text-white text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-500 hover:text-white text-white"
               }`}
               initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 * i }}>
               <span className="text-lg font-bold block">{opt.label}</span>
@@ -279,7 +279,7 @@ export function Step6Style({ data, update }: StepProps) {
           {styles.map((s, i) => (
             <Motion.button key={s.value} type="button" onClick={() => update({ learningStyle: s.value })}
               className={`rounded-2xl border p-5 flex items-center gap-5 text-left transition-all ${
-                data.learningStyle === s.value ? "border-cyan-400/30 bg-cyan-400/5 text-slate-900 dark:text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-500 hover:text-slate-900 dark:text-white"
+                data.learningStyle === s.value ? "border-cyan-400/30 bg-cyan-400/5 text-white text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-500 hover:text-white text-white"
               }`}
               initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.08 * i }}>
               <span className="text-2xl">{s.icon}</span>
@@ -305,7 +305,7 @@ export function Step7Struggle({ data, update }: StepProps) {
           {struggles.map((s, i) => (
             <Motion.button key={s} type="button" onClick={() => update({ primaryStruggle: s })}
               className={`rounded-2xl border p-5 text-center transition-all ${
-                data.primaryStruggle === s ? "border-cyan-400/30 bg-cyan-400/5 text-slate-900 dark:text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-500 hover:text-slate-900 dark:text-white"
+                data.primaryStruggle === s ? "border-cyan-400/30 bg-cyan-400/5 text-white text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-500 hover:text-white text-white"
               }`}
               initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.08 * i }}>
               <span className="text-sm font-medium">{s}</span>

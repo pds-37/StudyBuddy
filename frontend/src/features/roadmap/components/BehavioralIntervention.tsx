@@ -64,14 +64,14 @@ export function BehavioralIntervention({ type, message, onAction }: BehavioralIn
       
       <div className="flex-1 text-center md:text-left">
         <h4 className={cn("text-xs font-bold uppercase tracking-[0.2em] mb-1", config.color)}>{config.title}</h4>
-        <p className="text-sm text-slate-700 dark:text-slate-300 font-medium leading-relaxed">{message}</p>
+        <p className="text-sm text-slate-300 text-slate-300 font-medium leading-relaxed">{message}</p>
       </div>
 
       <button 
         onClick={onAction}
         className={cn(
           "px-6 py-3 rounded-xl text-[11px] font-bold uppercase tracking-widest flex items-center gap-2 transition shadow-lg",
-          "bg-white dark:bg-obsidian border border-white/10 hover:bg-white/5"
+          "bg-transparent bg-obsidian border border-white/10 hover:bg-white/5"
         )}
       >
         {config.action} <ArrowRight className="w-4 h-4" />

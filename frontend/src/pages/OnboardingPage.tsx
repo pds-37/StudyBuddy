@@ -208,7 +208,7 @@ export function OnboardingPage() {
               type="button" 
               onClick={handleNext} 
               disabled={!canAdvance}
-              className="group relative overflow-hidden rounded-2xl bg-white px-10 py-4 text-sm font-black text-slate-950 transition-all hover:bg-brand hover:text-white hover:shadow-[0_20px_40px_rgba(124,92,255,0.3)] disabled:opacity-20 disabled:grayscale disabled:cursor-not-allowed"
+              className="group relative overflow-hidden rounded-2xl bg-transparent px-10 py-4 text-sm font-black text-slate-950 transition-all hover:bg-brand hover:text-white hover:shadow-[0_20px_40px_rgba(124,92,255,0.3)] disabled:opacity-20 disabled:grayscale disabled:cursor-not-allowed"
             >
               <span className="relative z-10 flex items-center gap-3">
                 {step === TOTAL_STEPS - 1 ? "Initialize Profile" : "Continue"} 

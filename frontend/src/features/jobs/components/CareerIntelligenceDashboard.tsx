@@ -46,7 +46,7 @@ export function CareerIntelligenceDashboard() {
       {/* ─── HEADER & READINESS OVERVIEW ─── */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6">
         <div className="space-y-6">
-          <div className="p-8 rounded-[32px] border border-white/[0.06] bg-white dark:bg-obsidian relative overflow-hidden">
+          <div className="p-8 rounded-[32px] border border-white/[0.06] bg-transparent bg-obsidian relative overflow-hidden">
             <div className="absolute top-0 right-0 w-[400px] h-full bg-gradient-to-l from-brand/5 to-transparent pointer-events-none" />
             
             <div className="relative z-10">
@@ -54,7 +54,7 @@ export function CareerIntelligenceDashboard() {
                 <Target className="w-4 h-4 text-brand" />
                 <span className="text-[10px] font-bold text-brand uppercase tracking-[0.3em]">Career Intelligence</span>
               </div>
-              <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">Opportunity Scout</h1>
+              <h1 className="text-3xl font-bold text-white text-white tracking-tight mb-4">Opportunity Scout</h1>
               <p className="text-sm text-slate-500 max-w-md leading-relaxed">
                 Veda has analyzed your roadmap progress and execution depth. 
                 Focus on these high-probability opportunities that match your current trajectory.
@@ -65,12 +65,12 @@ export function CareerIntelligenceDashboard() {
           {/* READINESS GRIDS */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {Object.entries(readiness?.readiness || {}).map(([key, value]) => (
-              <div key={key} className="p-6 rounded-3xl border border-white/[0.06] bg-white dark:bg-obsidian/50">
+              <div key={key} className="p-6 rounded-3xl border border-white/[0.06] bg-transparent bg-obsidian/50">
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{key} Readiness</span>
                   <span className="text-xs font-bold text-brand">{value}%</span>
                 </div>
-                <div className="h-1.5 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
+                <div className="h-1.5 w-full bg-slate-200 bg-white/5 rounded-full overflow-hidden">
                   <Motion.div 
                     initial={{ width: 0 }}
                     animate={{ width: `${value}%` }}
@@ -83,7 +83,7 @@ export function CareerIntelligenceDashboard() {
         </div>
 
         {/* SIDEBAR: CAREER STRATEGY */}
-        <div className="p-8 rounded-[32px] border border-white/[0.06] bg-brand text-slate-900 dark:text-white relative overflow-hidden">
+        <div className="p-8 rounded-[32px] border border-white/[0.06] bg-brand text-white text-white relative overflow-hidden">
            <Zap className="absolute -top-4 -right-4 w-32 h-32 text-white/10 rotate-12" />
            <div className="relative z-10">
              <h3 className="text-lg font-bold mb-4">Career Strategist</h3>
@@ -97,7 +97,7 @@ export function CareerIntelligenceDashboard() {
                    <p className="text-xs font-medium">You are technically ready for Frontend roles, but interview confidence is still at 41%.</p>
                 </div>
              </div>
-             <button className="w-full py-4 mt-6 rounded-2xl bg-slate-900 dark:bg-white text-slate-900 dark:text-slate-900 text-[11px] font-bold uppercase tracking-widest shadow-xl">
+             <button className="w-full py-4 mt-6 rounded-2xl bg-slate-900 bg-transparent text-white text-white text-[11px] font-bold uppercase tracking-widest shadow-xl">
                 Start Mock Interview
              </button>
            </div>
@@ -109,7 +109,7 @@ export function CareerIntelligenceDashboard() {
         <div className="flex items-center justify-between px-2">
           <div className="flex items-center gap-2">
             <Briefcase className="w-5 h-5 text-slate-400" />
-            <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Curated Opportunities</h2>
+            <h2 className="text-xl font-bold text-white text-white tracking-tight">Curated Opportunities</h2>
           </div>
           <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Based on Match Score</span>
         </div>
@@ -121,15 +121,15 @@ export function CareerIntelligenceDashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1 }}
-              className="group p-6 rounded-[32px] border border-white/[0.06] bg-white dark:bg-obsidian hover:border-brand/30 transition-all cursor-pointer relative"
+              className="group p-6 rounded-[32px] border border-white/[0.06] bg-transparent bg-obsidian hover:border-brand/30 transition-all cursor-pointer relative"
             >
               <div className="flex items-start justify-between mb-6">
                 <div className="flex gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-white/5 flex items-center justify-center border border-white/5 group-hover:scale-110 transition-transform">
+                  <div className="w-12 h-12 rounded-2xl bg-transparent bg-white/5 flex items-center justify-center border border-white/5 group-hover:scale-110 transition-transform">
                     <Star className="w-6 h-6 text-brand" />
                   </div>
                   <div>
-                    <h4 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-brand transition-colors">{rec.job.title}</h4>
+                    <h4 className="text-base font-bold text-white text-white group-hover:text-brand transition-colors">{rec.job.title}</h4>
                     <p className="text-xs text-slate-500 font-medium">{rec.job.company}</p>
                   </div>
                 </div>
@@ -153,7 +153,7 @@ export function CareerIntelligenceDashboard() {
 
               <div className="flex flex-wrap gap-2 mb-6">
                 {rec.job.requiredSkills.slice(0, 3).map(skill => (
-                  <span key={skill} className="px-2 py-1 rounded-lg bg-slate-50 dark:bg-white/5 text-[9px] font-bold text-slate-500 uppercase tracking-widest">
+                  <span key={skill} className="px-2 py-1 rounded-lg bg-transparent bg-white/5 text-[9px] font-bold text-slate-500 uppercase tracking-widest">
                     {skill}
                   </span>
                 ))}

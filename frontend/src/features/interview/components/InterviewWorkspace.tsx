@@ -62,7 +62,7 @@ export function InterviewWorkspace() {
           <button
             onClick={handleStart}
             disabled={loading}
-            className="group/btn relative inline-flex items-center gap-3 bg-white text-slate-950 px-10 py-4 rounded-2xl font-bold hover:bg-slate-100 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-wait shadow-[0_20px_50px_rgba(255,255,255,0.1)]"
+            className="group/btn relative inline-flex items-center gap-3 bg-transparent text-slate-950 px-10 py-4 rounded-2xl font-bold hover:bg-transparent transition-all active:scale-95 disabled:opacity-50 disabled:cursor-wait shadow-[0_20px_50px_rgba(255,255,255,0.1)]"
           >
             {loading ? (
               <>

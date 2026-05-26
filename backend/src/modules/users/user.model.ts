@@ -19,6 +19,7 @@ export interface IUser {
     lastActivityAt: Date;
     burnoutRisk: number; // 0-100
     cognitiveLoad: number; // 0-100
+    procrastinationLevel: "high" | "medium" | "low";
   };
   psychologicalProfile: {
     confidence: {
@@ -128,7 +129,8 @@ const userSchema = new Schema<IUser>(
       preferredStudyTime: { type: String, default: "evening" },
       lastActivityAt: { type: Date, default: Date.now },
       burnoutRisk: { type: Number, default: 0 },
-      cognitiveLoad: { type: Number, default: 0 }
+      cognitiveLoad: { type: Number, default: 0 },
+      procrastinationLevel: { type: String, enum: ["high", "medium", "low"], default: "low" }
     },
     psychologicalProfile: {
       confidence: {

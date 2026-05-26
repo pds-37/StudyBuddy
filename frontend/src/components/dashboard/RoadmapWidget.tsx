@@ -14,13 +14,13 @@ export function RoadmapWidget() {
           <div className="w-16 h-16 rounded-2xl bg-brand/10 flex items-center justify-center text-brand mx-auto mb-6">
             <Route size={32} />
           </div>
-          <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-900 dark:text-white mb-2">Initialize your path</h3>
-          <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 mb-8 max-w-sm mx-auto">
+          <h3 className="text-2xl font-bold text-white text-white text-white mb-2">Initialize your path</h3>
+          <p className="text-slate-500 text-slate-500 text-slate-400 mb-8 max-w-sm mx-auto">
             You haven't generated a roadmap yet. Let AI build a custom learning journey for you.
           </p>
           <Link
             to="/roadmap"
-            className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-brand text-slate-900 dark:text-slate-900 dark:text-white font-bold hover:scale-105 transition-all shadow-lg"
+            className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-brand text-white text-white text-white font-bold hover:scale-105 transition-all shadow-lg"
           >
             Create Mission
             <Sparkles size={18} />
@@ -56,13 +56,13 @@ export function RoadmapWidget() {
             <Route size={24} />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-900 dark:text-white">Active Mission</h3>
+            <h3 className="text-xl font-bold text-white text-white text-white">Active Mission</h3>
             <p className="text-sm text-slate-500 uppercase tracking-widest">{currentRoadmap.targetRole}</p>
           </div>
         </div>
         <Link 
           to="/roadmap" 
-          className="p-3 rounded-xl bg-slate-50 dark:bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-900 dark:text-white hover:bg-slate-100 dark:bg-slate-100 dark:bg-white/10 transition-all"
+          className="p-3 rounded-xl bg-transparent bg-transparent bg-white/5 text-slate-500 text-slate-500 text-slate-400 hover:text-white text-white text-white hover:bg-transparent bg-transparent bg-white/10 transition-all"
         >
           <ChevronRight size={20} />
         </Link>
@@ -72,14 +72,14 @@ export function RoadmapWidget() {
         <div>
           <div className="flex items-end justify-between mb-4">
             <div>
-              <span className="text-4xl font-black text-slate-900 dark:text-slate-900 dark:text-white">{progressPercentage}%</span>
+              <span className="text-4xl font-black text-white text-white text-white">{progressPercentage}%</span>
               <span className="ml-2 text-sm text-slate-500">Execution</span>
             </div>
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+            <span className="text-xs font-bold text-slate-500 text-slate-500 text-slate-400 uppercase tracking-widest">
               {completedTasks} / {totalTasks} Tasks
             </span>
           </div>
-          <div className="h-2 w-full bg-slate-50 dark:bg-slate-50 dark:bg-white/5 rounded-full overflow-hidden">
+          <div className="h-2 w-full bg-transparent bg-transparent bg-white/5 rounded-full overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-1000 ease-out"
               style={{ width: `${progressPercentage}%` }}
@@ -93,8 +93,8 @@ export function RoadmapWidget() {
             <span>Current Focus</span>
           </div>
           <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/5 group-hover:border-cyan-400/20 transition-colors">
-            <p className="text-lg font-bold text-slate-900 dark:text-slate-900 dark:text-white mb-2">{nextMission?.title || "Mission Accomplished!"}</p>
-            <p className="text-xs text-slate-500 dark:text-slate-500 dark:text-slate-400 line-clamp-2">{nextMission?.description || "Standby for new objectives."}</p>
+            <p className="text-lg font-bold text-white text-white text-white mb-2">{nextMission?.title || "Mission Accomplished!"}</p>
+            <p className="text-xs text-slate-500 text-slate-500 text-slate-400 line-clamp-2">{nextMission?.description || "Standby for new objectives."}</p>
           </div>
         </div>
       </div>

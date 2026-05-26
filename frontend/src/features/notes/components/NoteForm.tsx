@@ -61,7 +61,7 @@ export function NoteForm({ note, onSuccess, onCancel }: NoteFormProps) {
       {error && <div className="text-red-400">{error}</div>}
 
       <div>
-        <label htmlFor="title" className="block text-sm font-medium text-slate-700 dark:text-slate-700 dark:text-slate-300">
+        <label htmlFor="title" className="block text-sm font-medium text-slate-300 text-slate-300 text-slate-300">
           Title *
         </label>
         <input
@@ -69,14 +69,14 @@ export function NoteForm({ note, onSuccess, onCancel }: NoteFormProps) {
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="mt-1 block w-full rounded-md border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-50 dark:bg-white/5 px-3 py-2 text-slate-900 dark:text-slate-900 dark:text-white placeholder-slate-400 focus:border-brand focus:outline-none"
+          className="mt-1 block w-full rounded-md border border-white/10 border-white/10 border-white/10 bg-transparent bg-transparent bg-white/5 px-3 py-2 text-white text-white text-white placeholder-slate-400 focus:border-brand focus:outline-none"
           placeholder="Note title"
           required
         />
       </div>
 
       <div>
-        <label htmlFor="content" className="block text-sm font-medium text-slate-700 dark:text-slate-700 dark:text-slate-300">
+        <label htmlFor="content" className="block text-sm font-medium text-slate-300 text-slate-300 text-slate-300">
           Content *
         </label>
         <textarea
@@ -84,14 +84,14 @@ export function NoteForm({ note, onSuccess, onCancel }: NoteFormProps) {
           value={content}
           onChange={(e) => setContent(e.target.value)}
           rows={6}
-          className="mt-1 block w-full rounded-md border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-50 dark:bg-white/5 px-3 py-2 text-slate-900 dark:text-slate-900 dark:text-white placeholder-slate-400 focus:border-brand focus:outline-none"
+          className="mt-1 block w-full rounded-md border border-white/10 border-white/10 border-white/10 bg-transparent bg-transparent bg-white/5 px-3 py-2 text-white text-white text-white placeholder-slate-400 focus:border-brand focus:outline-none"
           placeholder="Write your note content here..."
           required
         />
       </div>
 
       <div>
-        <label htmlFor="topic" className="block text-sm font-medium text-slate-700 dark:text-slate-700 dark:text-slate-300">
+        <label htmlFor="topic" className="block text-sm font-medium text-slate-300 text-slate-300 text-slate-300">
           Topic
         </label>
         <input
@@ -99,13 +99,13 @@ export function NoteForm({ note, onSuccess, onCancel }: NoteFormProps) {
           type="text"
           value={topic}
           onChange={(e) => setTopic(e.target.value)}
-          className="mt-1 block w-full rounded-md border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-50 dark:bg-white/5 px-3 py-2 text-slate-900 dark:text-slate-900 dark:text-white placeholder-slate-400 focus:border-brand focus:outline-none"
+          className="mt-1 block w-full rounded-md border border-white/10 border-white/10 border-white/10 bg-transparent bg-transparent bg-white/5 px-3 py-2 text-white text-white text-white placeholder-slate-400 focus:border-brand focus:outline-none"
           placeholder="closures, dynamic programming, system design"
         />
       </div>
 
       <div>
-        <label htmlFor="tags" className="block text-sm font-medium text-slate-700 dark:text-slate-700 dark:text-slate-300">
+        <label htmlFor="tags" className="block text-sm font-medium text-slate-300 text-slate-300 text-slate-300">
           Tags (comma-separated)
         </label>
         <input
@@ -113,13 +113,13 @@ export function NoteForm({ note, onSuccess, onCancel }: NoteFormProps) {
           type="text"
           value={tags}
           onChange={(e) => setTags(e.target.value)}
-          className="mt-1 block w-full rounded-md border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-50 dark:bg-white/5 px-3 py-2 text-slate-900 dark:text-slate-900 dark:text-white placeholder-slate-400 focus:border-brand focus:outline-none"
+          className="mt-1 block w-full rounded-md border border-white/10 border-white/10 border-white/10 bg-transparent bg-transparent bg-white/5 px-3 py-2 text-white text-white text-white placeholder-slate-400 focus:border-brand focus:outline-none"
           placeholder="javascript, react, tutorial"
         />
       </div>
 
       <div>
-        <label htmlFor="linkedSkills" className="block text-sm font-medium text-slate-700 dark:text-slate-700 dark:text-slate-300">
+        <label htmlFor="linkedSkills" className="block text-sm font-medium text-slate-300 text-slate-300 text-slate-300">
           Linked Skills (comma-separated)
         </label>
         <input
@@ -127,13 +127,13 @@ export function NoteForm({ note, onSuccess, onCancel }: NoteFormProps) {
           type="text"
           value={linkedSkills}
           onChange={(e) => setLinkedSkills(e.target.value)}
-          className="mt-1 block w-full rounded-md border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-50 dark:bg-white/5 px-3 py-2 text-slate-900 dark:text-slate-900 dark:text-white placeholder-slate-400 focus:border-brand focus:outline-none"
+          className="mt-1 block w-full rounded-md border border-white/10 border-white/10 border-white/10 bg-transparent bg-transparent bg-white/5 px-3 py-2 text-white text-white text-white placeholder-slate-400 focus:border-brand focus:outline-none"
           placeholder="JavaScript, React, TypeScript"
         />
       </div>
 
       <div>
-        <label htmlFor="sourceUrl" className="block text-sm font-medium text-slate-700 dark:text-slate-700 dark:text-slate-300">
+        <label htmlFor="sourceUrl" className="block text-sm font-medium text-slate-300 text-slate-300 text-slate-300">
           Source URL
         </label>
         <input
@@ -141,7 +141,7 @@ export function NoteForm({ note, onSuccess, onCancel }: NoteFormProps) {
           type="url"
           value={sourceUrl}
           onChange={(e) => setSourceUrl(e.target.value)}
-          className="mt-1 block w-full rounded-md border border-slate-200 dark:border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-50 dark:bg-white/5 px-3 py-2 text-slate-900 dark:text-slate-900 dark:text-white placeholder-slate-400 focus:border-brand focus:outline-none"
+          className="mt-1 block w-full rounded-md border border-white/10 border-white/10 border-white/10 bg-transparent bg-transparent bg-white/5 px-3 py-2 text-white text-white text-white placeholder-slate-400 focus:border-brand focus:outline-none"
           placeholder="https://example.com"
         />
       </div>
@@ -150,14 +150,14 @@ export function NoteForm({ note, onSuccess, onCancel }: NoteFormProps) {
         <button
           type="submit"
           disabled={loading}
-          className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-slate-900 dark:text-slate-900 dark:text-white hover:bg-brand/90 disabled:opacity-50"
+          className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white text-white text-white hover:bg-brand/90 disabled:opacity-50"
         >
           {loading ? "Saving..." : isEditing ? "Update Note" : "Create Note"}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-md border border-slate-200 dark:border-slate-200 dark:border-white/10 px-4 py-2 text-sm text-slate-700 dark:text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:bg-slate-50 dark:bg-white/5"
+          className="rounded-md border border-white/10 border-white/10 border-white/10 px-4 py-2 text-sm text-slate-300 text-slate-300 text-slate-300 hover:bg-transparent bg-transparent bg-white/5"
         >
           Cancel
         </button>

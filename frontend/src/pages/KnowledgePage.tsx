@@ -55,7 +55,7 @@ export function KnowledgePage() {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4 bg-[#05070A]">
         <div className="w-14 h-14 rounded-full border-4 border-brand/20 border-t-brand animate-spin" />
-        <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Mapping knowledge graph...</p>
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Mapping knowledge graph...</p>
       </div>
     );
   }
@@ -89,13 +89,13 @@ export function KnowledgePage() {
                 Knowledge Graph
                 <span className="text-purple-400 text-[9px] border border-purple-500/20 px-2 py-0.5 bg-purple-500/5 font-bold tracking-wider uppercase">Neural Map</span>
               </h1>
-              <p className="text-slate-600 text-[11px] mt-1.5 font-medium">Visualize concept retention, connections, and interview readiness.</p>
+              <p className="text-slate-400 text-[11px] mt-1.5 font-medium">Visualize concept retention, connections, and interview readiness.</p>
             </div>
             <div className="flex items-center gap-2">
               {["graph", "interview"].map(tab => (
                 <button key={tab} onClick={() => setActiveTab(tab as any)}
                   className={cn("px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-all",
-                    activeTab === tab ? "text-brand border-b-2 border-brand" : "text-slate-600 hover:text-slate-300"
+                    activeTab === tab ? "text-brand border-b-2 border-brand" : "text-slate-400 hover:text-slate-300"
                   )}>{tab === "graph" ? "Graph" : "Interview"}</button>
               ))}
             </div>
@@ -172,16 +172,16 @@ export function KnowledgePage() {
                   <div className="p-6 min-w-[300px] space-y-6">
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mb-1">{selectedNode.type}</p>
+                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">{selectedNode.type}</p>
                         <h3 className="text-sm font-semibold text-white">{selectedNode.label}</h3>
                       </div>
-                      <button onClick={() => { setSelectedNode(null); setConceptDetail(null); }} className="text-slate-600 hover:text-white"><XCircle size={16} /></button>
+                      <button onClick={() => { setSelectedNode(null); setConceptDetail(null); }} className="text-slate-400 hover:text-white"><XCircle size={16} /></button>
                     </div>
                     {selectedNode.retentionState && (
                       <div className="flex items-center gap-3">
                         <div className="w-2 h-2 rounded-full" style={{ backgroundColor: retentionColors[selectedNode.retentionState] }} />
                         <span className="text-[10px] font-medium text-slate-400 capitalize">{selectedNode.retentionState}</span>
-                        <span className="text-[10px] text-slate-600">{selectedNode.retentionScore}%</span>
+                        <span className="text-[10px] text-slate-400">{selectedNode.retentionScore}%</span>
                       </div>
                     )}
                     {selectedNode.category && <DetailRow label="Category" value={selectedNode.category} />}
@@ -193,18 +193,18 @@ export function KnowledgePage() {
                       <>
                         {conceptDetail.linkedNotes.length > 0 && (
                           <div className="pt-4 border-t border-white/5 space-y-2">
-                            <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">Linked Notes</p>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Linked Notes</p>
                             {conceptDetail.linkedNotes.map(n => (
                               <div key={n.id} className="flex items-center justify-between py-1.5 border-b border-white/5 last:border-0">
                                 <span className="text-[10px] text-slate-400 truncate flex-1 mr-2">{n.title}</span>
-                                <span className="text-[9px] text-slate-600">{Math.round(n.strength * 100)}%</span>
+                                <span className="text-[9px] text-slate-400">{Math.round(n.strength * 100)}%</span>
                               </div>
                             ))}
                           </div>
                         )}
                         {conceptDetail.relatedConcepts.length > 0 && (
                           <div className="pt-4 border-t border-white/5 space-y-2">
-                            <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">Related Concepts</p>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Related Concepts</p>
                             {conceptDetail.relatedConcepts.map(c => (
                               <div key={c.id} className="flex items-center gap-2 py-1">
                                 <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: retentionColors[c.retentionState] || "#64748b" }} />
@@ -227,7 +227,7 @@ export function KnowledgePage() {
               {interview && (
                 <>
                   <div className="text-center py-8">
-                    <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mb-3">Interview Readiness Score</p>
+                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-3">Interview Readiness Score</p>
                     <p className={cn("text-6xl font-light tracking-tight",
                       interview.overallScore > 70 ? "text-emerald-400" : interview.overallScore > 40 ? "text-amber-400" : "text-red-400"
                     )}>{interview.overallScore}%</p>
@@ -291,7 +291,7 @@ export function KnowledgePage() {
 function Stat({ label, value, color, icon }: { label: string; value: string | number; color: string; icon: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1">
-      <div className="flex items-center gap-1.5"><span className={cn("opacity-50", color)}>{icon}</span><p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">{label}</p></div>
+      <div className="flex items-center gap-1.5"><span className={cn("opacity-50", color)}>{icon}</span><p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{label}</p></div>
       <p className={cn("text-xl font-light tracking-tight", color)}>{value}</p>
     </div>
   );
@@ -300,7 +300,7 @@ function Stat({ label, value, color, icon }: { label: string; value: string | nu
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">{label}</span>
+      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{label}</span>
       <span className="text-[10px] text-slate-400 capitalize">{value}</span>
     </div>
   );

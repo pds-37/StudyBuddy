@@ -296,7 +296,7 @@ ${result.keywordAdditions.join(', ')}
               <h3 className="text-xl font-bold text-white tracking-tight">Ready for career positioning.</h3>
               <p className="text-sm text-slate-500">StudyBuddy uses Veda Intelligence to strategically frame your experience for specific roles without inventing fake data.</p>
             </div>
-            <div className="flex gap-8 text-slate-600">
+            <div className="flex gap-8 text-slate-400">
               <div className="flex items-center gap-2 text-[10px] font-bold uppercase"><Shield size={14} /> Truthful AI</div>
               <div className="flex items-center gap-2 text-[10px] font-bold uppercase"><Target size={14} /> ATS Optimized</div>
               <div className="flex items-center gap-2 text-[10px] font-bold uppercase"><Brain size={14} /> Strategic</div>
@@ -370,7 +370,7 @@ ${result.keywordAdditions.join(', ')}
                             <p className="text-[8px] font-black uppercase text-cyan-400 mb-0">AI Positioned Bullet</p>
                             <div className="flex gap-2">
                               <div className="flex items-center gap-1">
-                                <span className="text-[8px] text-slate-600 font-bold">IMPACT</span>
+                                <span className="text-[8px] text-slate-400 font-bold">IMPACT</span>
                                 <div className="w-10 h-1 bg-white/5 overflow-hidden"><div className="h-full bg-emerald-500" style={{ width: `${rewrite.impactScore}%` }} /></div>
                               </div>
                             </div>
@@ -381,7 +381,7 @@ ${result.keywordAdditions.join(', ')}
                         </div>
                       </div>
                       <div className="px-4 py-2 flex items-center justify-between bg-black/20">
-                        <p className="text-[9px] text-slate-600 flex items-center gap-1">
+                        <p className="text-[9px] text-slate-400 flex items-center gap-1">
                           <Info size={10} />
                           {rewrite.reason}
                         </p>
@@ -418,7 +418,7 @@ ${result.keywordAdditions.join(', ')}
                         </div>
                         <div className="space-y-3">
                           <div className="p-3 rounded-lg bg-black/40 border border-white/5">
-                            <p className="text-[9px] font-black uppercase text-slate-600 mb-2">Strategic Narrative</p>
+                            <p className="text-[9px] font-black uppercase text-slate-400 mb-2">Strategic Narrative</p>
                             <p className="text-[11px] text-slate-400 leading-relaxed italic">"{proj.strategicFraming}"</p>
                           </div>
                           <div className="p-3 rounded-lg bg-brand/5 border border-brand/10">
@@ -446,7 +446,7 @@ ${result.keywordAdditions.join(', ')}
                   </h3>
                   <div className="space-y-4">
                     <div className="p-5 rounded-2xl border border-white/[0.04] bg-white/[0.02] space-y-4">
-                      <p className="text-[9px] font-black uppercase text-slate-600">Likely Questions</p>
+                      <p className="text-[9px] font-black uppercase text-slate-400">Likely Questions</p>
                       <div className="space-y-2">
                         {result.interviewAlignment.likelyQuestions.map((q, i) => (
                           <div key={i} className="flex gap-3 text-[11px] text-slate-300 group">

@@ -55,7 +55,7 @@ function statusIcon(status?: CompanyPrepQuestionStatus) {
   if (status === "solved") return <CheckCircle2 size={15} className="text-emerald-300" />;
   if (status === "attempted") return <CircleDot size={15} className="text-amber-300" />;
   if (status === "bookmarked") return <Bookmark size={15} className="text-cyan-300" />;
-  return <CircleDot size={15} className="text-slate-600" />;
+  return <CircleDot size={15} className="text-slate-400" />;
 }
 
 function matchTone(score: number) {
@@ -288,7 +288,7 @@ export function CompanyTypeDetailPage() {
             type="button"
             disabled={busy}
             onClick={handleStartPrep}
-            className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-xs font-black uppercase tracking-widest text-[#080B12] transition hover:bg-cyan-100 disabled:opacity-50"
+            className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-transparent px-5 py-3 text-xs font-black uppercase tracking-widest text-[#080B12] transition hover:bg-cyan-100 disabled:opacity-50"
           >
             <Play size={15} />
             {detail.targeting ? "Regenerate prep list" : "Start prep"}
@@ -452,7 +452,7 @@ export function CompanyTypeDetailPage() {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search question, topic, or approach pattern"
-            className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-slate-600"
+            className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-slate-400"
           />
         </div>
 
@@ -478,20 +478,20 @@ export function CompanyTypeDetailPage() {
                 </div>
               </div>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-600">Pattern</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Pattern</p>
                 <p className="mt-1 truncate text-xs font-semibold text-slate-300">{question.approach.pattern}</p>
               </div>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-600">Difficulty</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Difficulty</p>
                 <p className="mt-1 text-xs font-semibold capitalize text-slate-300">{question.difficulty}</p>
               </div>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-600">Frequency</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Frequency</p>
                 <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/[0.05]">
                   <div className="h-full rounded-full bg-brand" style={{ width: `${getFrequency(question, detail.id)}%` }} />
                 </div>
               </div>
-              <ChevronRight className="hidden h-4 w-4 text-slate-600 lg:block" />
+              <ChevronRight className="hidden h-4 w-4 text-slate-400 lg:block" />
             </button>
           ))}
           {filteredQuestions.length === 0 && (
@@ -517,7 +517,7 @@ function MiniStat({ label, value, icon }: { label: string; value: string | numbe
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
       <div className="mb-2 text-slate-500">{icon}</div>
       <p className="text-xl font-black text-white">{value}</p>
-      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-600">{label}</p>
+      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{label}</p>
     </div>
   );
 }
@@ -525,7 +525,7 @@ function MiniStat({ label, value, icon }: { label: string; value: string | numbe
 function SignalBlock({ title, items }: { title: string; items: string[] }) {
   return (
     <div>
-      <p className="mb-2 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-600">
+      <p className="mb-2 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
         <ClipboardList size={12} /> {title}
       </p>
       <ul className="space-y-1.5">

@@ -148,7 +148,7 @@ export function ApproachGuideModal({
                   type="button"
                   disabled={busy}
                   onClick={() => onSaveNote(question.id)}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-xs font-black uppercase tracking-widest text-[#080B12] transition hover:bg-cyan-100 disabled:opacity-50"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-transparent px-5 py-2.5 text-xs font-black uppercase tracking-widest text-[#080B12] transition hover:bg-cyan-100 disabled:opacity-50"
                 >
                   <Save size={14} />
                   Save to notes

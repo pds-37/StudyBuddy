@@ -241,7 +241,7 @@ export function RoadmapWorkspace() {
                             "flex h-11 w-11 items-center justify-center rounded-full border-2 transition",
                             state === "done" && "border-[#2ec4a0] bg-[#061f1a] text-[#2ec4a0]",
                             state === "active" && "border-[#a07ee0] bg-[#150f28] text-[#a07ee0] shadow-[0_0_0_6px_rgba(124,92,191,0.12)]",
-                            state === "locked" && "border-white/10 bg-white/[0.03] text-slate-600 group-hover:text-slate-400"
+                            state === "locked" && "border-white/10 bg-white/[0.03] text-slate-400 group-hover:text-slate-400"
                           )}
                         >
                           {state === "done" ? <CheckCircle2 size={18} /> : state === "locked" ? <Lock size={16} /> : <Circle size={15} />}
@@ -659,7 +659,7 @@ function MomentumHeatmap() {
 
   return (
     <div className="p-4">
-      <div className="mb-3 flex justify-between font-mono text-[9px] text-slate-600">
+      <div className="mb-3 flex justify-between font-mono text-[9px] text-slate-400">
         <span>Low</span>
         <span>High</span>
       </div>

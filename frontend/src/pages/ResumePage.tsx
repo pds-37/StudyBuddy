@@ -39,14 +39,14 @@ export function ResumePage() {
               Resume Intelligence
               <span className="text-cyan-400 text-[9px] border border-cyan-500/20 px-2 py-0.5 bg-cyan-500/5 font-bold tracking-wider uppercase">Strategic Engine</span>
             </h1>
-            <p className="text-slate-600 text-[11px] mt-1.5 font-medium">Reposition your experience for high-impact roles using AI career intelligence.</p>
+            <p className="text-slate-400 text-[11px] mt-1.5 font-medium">Reposition your experience for high-impact roles using AI career intelligence.</p>
           </div>
           <div className="flex items-center gap-2">
             <button 
               onClick={() => setActiveTab("builder")}
               className={cn(
                 "px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2",
-                activeTab === "builder" ? "text-brand border-b-2 border-brand" : "text-slate-600 hover:text-slate-300"
+                activeTab === "builder" ? "text-brand border-b-2 border-brand" : "text-slate-400 hover:text-slate-300"
               )}
             >
               <Wand2 size={12} />
@@ -56,7 +56,7 @@ export function ResumePage() {
               onClick={() => setActiveTab("versions")}
               className={cn(
                 "px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2",
-                activeTab === "versions" ? "text-brand border-b-2 border-brand" : "text-slate-600 hover:text-slate-300"
+                activeTab === "versions" ? "text-brand border-b-2 border-brand" : "text-slate-400 hover:text-slate-300"
               )}
             >
               <History size={12} />
@@ -79,7 +79,7 @@ export function ResumePage() {
                     <div className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400">
                       <FileText size={20} />
                     </div>
-                    <span className="text-[10px] font-mono text-slate-600">{new Date(v.createdAt).toLocaleDateString()}</span>
+                    <span className="text-[10px] font-mono text-slate-400">{new Date(v.createdAt).toLocaleDateString()}</span>
                   </div>
                   <h3 className="text-sm font-semibold text-slate-200 mb-1">{v.versionName}</h3>
                   <p className="text-[11px] text-slate-500 line-clamp-2">{v.targetRole}</p>
@@ -95,7 +95,7 @@ export function ResumePage() {
                 </div>
               ))) : (
                 <div className="col-span-full flex flex-col items-center justify-center py-20 text-center">
-                  <div className="w-16 h-16 rounded-3xl bg-white/[0.02] border border-white/[0.04] flex items-center justify-center text-slate-600 mb-6">
+                  <div className="w-16 h-16 rounded-3xl bg-white/[0.02] border border-white/[0.04] flex items-center justify-center text-slate-400 mb-6">
                     <History size={32} />
                   </div>
                   <h3 className="text-lg font-semibold text-slate-200 mb-2">No versions yet</h3>

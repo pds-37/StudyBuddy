@@ -48,7 +48,7 @@ export function ConceptGrid() {
           <ConceptCard key={concept.id} concept={concept} />
         ))}
 
-        <button type="button" className="flex min-h-[164px] flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-800 bg-zinc-900 p-3 text-zinc-500 transition-colors duration-150 hover:border-zinc-600 hover:text-zinc-300 dark:bg-zinc-900">
+        <button type="button" className="flex min-h-[164px] flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-800 bg-zinc-900 p-3 text-zinc-500 transition-colors duration-150 hover:border-zinc-600 hover:text-zinc-300 bg-zinc-900">
           <Plus size={18} />
           <span className="text-[12px] font-medium">Add concept</span>
         </button>

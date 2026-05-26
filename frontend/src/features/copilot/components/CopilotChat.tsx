@@ -31,7 +31,7 @@ const starterPrompts = [
   "What should I work on today?",
   "Help me understand what I am stuck on",
   "Make a focused study plan",
-  "Review my progress and suggest the next step"
+  "Check my mental health and burnout risk"
 ] as const;
 
 function getConversationTitle(messages: CopilotMessage[]) {
@@ -270,7 +270,7 @@ function ChatHistory({
             value={query}
             onChange={(event) => onQueryChange(event.target.value)}
             placeholder="Search chats"
-            className="min-w-0 flex-1 bg-transparent text-sm text-slate-200 outline-none placeholder:text-slate-600"
+            className="min-w-0 flex-1 bg-transparent text-sm text-slate-200 outline-none placeholder:text-slate-400"
           />
         </label>
       </div>
@@ -300,7 +300,7 @@ function ChatHistory({
                   <MessageSquare size={14} className="mt-0.5 shrink-0" />
                   <span className="min-w-0">
                     <span className="line-clamp-2 text-sm leading-5">{getConversationTitle(conversation.messages)}</span>
-                    <span className="mt-0.5 block text-[11px] text-slate-600">{formatTime(conversation.updatedAt)}</span>
+                    <span className="mt-0.5 block text-[11px] text-slate-400">{formatTime(conversation.updatedAt)}</span>
                   </span>
                 </button>
               );
@@ -377,15 +377,15 @@ function Composer({
             className={cn(
               "mb-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors",
               draft.trim() && !sending
-                ? "bg-white text-slate-950 hover:bg-slate-200"
-                : "bg-white/[0.08] text-slate-600"
+                ? "bg-transparent text-slate-950 hover:bg-slate-200"
+                : "bg-white/[0.08] text-slate-400"
             )}
             aria-label="Send message"
           >
             {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
           </button>
         </div>
-        <p className="mt-2 text-center text-[11px] text-slate-600">Veda can make mistakes. Check important details.</p>
+        <p className="mt-2 text-center text-[11px] text-slate-400">Veda can make mistakes. Check important details.</p>
       </div>
     </div>
   );
@@ -456,7 +456,7 @@ function ChatMessage({ message, index }: { message: CopilotMessage; index: numbe
           </div>
         )}
 
-        <div className={cn("mt-1 flex items-center gap-1.5 text-[11px] text-slate-600", isUser && "justify-end")}>
+        <div className={cn("mt-1 flex items-center gap-1.5 text-[11px] text-slate-400", isUser && "justify-end")}>
           {isUser ? <UserRound size={11} /> : <Bot size={11} />}
           {formatTime(message.createdAt)}
         </div>
@@ -472,9 +472,9 @@ function TypingIndicator() {
         <Bot size={15} />
       </div>
       <div className="flex items-center gap-1.5 rounded-2xl px-4 py-3">
-        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-slate-500" />
-        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-slate-500 [animation-delay:120ms]" />
-        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-slate-500 [animation-delay:240ms]" />
+        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-transparent0" />
+        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-transparent0 [animation-delay:120ms]" />
+        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-transparent0 [animation-delay:240ms]" />
       </div>
     </div>
   );

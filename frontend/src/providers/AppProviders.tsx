@@ -62,7 +62,7 @@ export function AppProviders({ children }: AppProvidersProps) {
 
   if (!isReady) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-white dark:bg-obsidian">
+      <div className="fixed inset-0 flex items-center justify-center bg-transparent bg-obsidian">
         <Loader2 className="animate-spin text-brand" size={32} />
       </div>
     );

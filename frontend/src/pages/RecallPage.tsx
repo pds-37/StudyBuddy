@@ -126,7 +126,7 @@ export function RecallPage() {
                   Recall Engine
                 </span>
               </h1>
-              <p className="text-slate-600 text-[11px] mt-1.5 font-medium">
+              <p className="text-slate-400 text-[11px] mt-1.5 font-medium">
                 {focusedNoteId
                   ? "Reviewing the exact note you selected from Knowledge Intelligence."
                   : "Active recall strengthens neural pathways. Passive re-reading doesn&apos;t."}
@@ -168,7 +168,7 @@ export function RecallPage() {
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-32 animate-pulse">
                   <div className="w-14 h-14 rounded-full border-4 border-brand/20 border-t-brand animate-spin mb-4" />
-                  <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Loading recall queue...</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Loading recall queue...</p>
                 </div>
               ) : showResult && result ? (
                 /* ─── RESULT CARD ─── */
@@ -207,7 +207,7 @@ export function RecallPage() {
                   <div className="flex gap-3 pt-2">
                     <button
                       onClick={continueSession}
-                      className="flex-1 py-3 bg-brand text-slate-900 font-bold text-[10px] uppercase tracking-widest hover:bg-brand/90 transition-all flex items-center justify-center gap-2"
+                      className="flex-1 py-3 bg-brand text-white font-bold text-[10px] uppercase tracking-widest hover:bg-brand/90 transition-all flex items-center justify-center gap-2"
                     >
                       {prompts.length > 0 ? (
                         <>
@@ -239,12 +239,12 @@ export function RecallPage() {
                         <span className={cn("flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest", promptConfig.color)}>
                           {promptConfig.icon} {promptConfig.label}
                         </span>
-                        <span className="text-[9px] font-medium text-slate-600 bg-white/[0.04] px-2 py-0.5">
+                        <span className="text-[9px] font-medium text-slate-400 bg-white/[0.04] px-2 py-0.5">
                           {activePrompt.topic}
                         </span>
                       </div>
                       <h2 className="text-lg font-semibold text-white leading-snug">{activePrompt.prompt}</h2>
-                      <div className="flex items-center gap-4 mt-3 text-[10px] text-slate-600">
+                      <div className="flex items-center gap-4 mt-3 text-[10px] text-slate-400">
                         <span>Strength: {formatPercent(activePrompt.strength)}</span>
                         <span>{prompts.length} in queue</span>
                       </div>
@@ -276,7 +276,7 @@ export function RecallPage() {
                     <button
                       disabled={reviewing || !answer.trim()}
                       onClick={() => void submitReview()}
-                      className="px-6 py-2.5 bg-brand text-slate-900 text-[10px] font-bold uppercase tracking-widest disabled:opacity-40 hover:bg-brand/90 transition-all flex items-center gap-2"
+                      className="px-6 py-2.5 bg-brand text-white text-[10px] font-bold uppercase tracking-widest disabled:opacity-40 hover:bg-brand/90 transition-all flex items-center gap-2"
                     >
                       {reviewing ? <Loader2 className="animate-spin" size={14} /> : <Sparkles size={14} />}
                       AI Score
@@ -315,7 +315,7 @@ export function RecallPage() {
                     No concepts are due for revision right now. Your memory is holding strong. Come back when the next review window opens.
                   </p>
                   {sessionCount > 0 && (
-                    <div className="text-[10px] text-slate-600">
+                    <div className="text-[10px] text-slate-400">
                       You reviewed <span className="text-brand font-semibold">{sessionCount}</span> concepts this session. Great work!
                     </div>
                   )}
@@ -325,7 +325,7 @@ export function RecallPage() {
               {/* ─── QUEUE PREVIEW ─── */}
               {prompts.length > 1 && !showResult && (
                 <div className="space-y-2">
-                  <h3 className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">Up Next</h3>
+                  <h3 className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Up Next</h3>
                   <div className="flex gap-3 overflow-x-auto pb-2 custom-scrollbar">
                     {prompts.slice(1, 5).map((p, i) => {
                       const config = promptTypeConfig[p.promptType] || promptTypeConfig.explain;
@@ -338,7 +338,7 @@ export function RecallPage() {
                             {config.icon} {config.label}
                           </span>
                           <p className="text-[11px] font-medium text-slate-400 line-clamp-1">{p.title}</p>
-                          <div className="flex items-center gap-2 text-[9px] text-slate-600">
+                          <div className="flex items-center gap-2 text-[9px] text-slate-400">
                             <div className={cn(
                               "w-1.5 h-1.5 rounded-full",
                               p.strength > 0.6 ? "bg-emerald-500" : p.strength > 0.3 ? "bg-amber-500" : "bg-red-500"
@@ -357,16 +357,16 @@ export function RecallPage() {
             <aside className="space-y-8 hidden lg:block">
               {/* Weak Topics */}
               <div className="space-y-3">
-                <h3 className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">Weakest Concepts</h3>
+                <h3 className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Weakest Concepts</h3>
                 {(stats?.weakTopics ?? []).length === 0 ? (
-                  <p className="text-[10px] text-slate-600">No weak topics detected yet.</p>
+                  <p className="text-[10px] text-slate-400">No weak topics detected yet.</p>
                 ) : (
                   <div className="space-y-2">
                     {stats?.weakTopics.slice(0, 6).map((topic) => (
                       <div key={topic.topic} className="px-4 py-3 border border-white/[0.06] flex items-center justify-between">
                         <div className="min-w-0">
                           <p className="text-[11px] font-medium text-slate-300 truncate">{topic.topic}</p>
-                          <p className="text-[9px] text-slate-600">{topic.noteCount} notes · {topic.dueCount} due</p>
+                          <p className="text-[9px] text-slate-400">{topic.noteCount} notes · {topic.dueCount} due</p>
                         </div>
                         <div className="flex items-center gap-2">
                           <div className="w-12 h-1 bg-white/5 overflow-hidden">
@@ -392,7 +392,7 @@ export function RecallPage() {
               {/* Revision Priorities */}
               {priorities.length > 0 && (
                 <div className="space-y-3">
-                  <h3 className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">Priority Queue</h3>
+                  <h3 className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Priority Queue</h3>
                   <div className="space-y-2">
                     {priorities.map((p) => (
                       <div key={p.noteId} className="px-4 py-3 border border-white/[0.06] space-y-1.5">
@@ -401,11 +401,11 @@ export function RecallPage() {
                             "w-1.5 h-1.5 rounded-full",
                             p.urgency === "critical" ? "bg-red-500" :
                             p.urgency === "high" ? "bg-amber-500" :
-                            p.urgency === "medium" ? "bg-cyan-500" : "bg-slate-500"
+                            p.urgency === "medium" ? "bg-cyan-500" : "bg-transparent0"
                           )} />
                           <p className="text-[11px] font-medium text-slate-300 truncate flex-1">{p.title}</p>
                         </div>
-                        <p className="text-[9px] text-slate-600 line-clamp-1">{p.reason}</p>
+                        <p className="text-[9px] text-slate-400 line-clamp-1">{p.reason}</p>
                       </div>
                     ))}
                   </div>
@@ -443,7 +443,7 @@ function StatMetric({ label, value, color, icon }: {
     <div className="flex flex-col gap-1">
       <div className="flex items-center gap-1.5">
         <span className={cn("opacity-50", color)}>{icon}</span>
-        <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">{label}</p>
+        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{label}</p>
       </div>
       <p className={cn("text-xl font-light tracking-tight", color)}>{value}</p>
     </div>

@@ -261,14 +261,14 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
             placeholder="Search pages, actions, and shortcuts..."
             className="cmdk-input"
           />
-          <div className="hidden items-center gap-1 rounded-full border border-slate-200 dark:border-slate-200 dark:border-white/10 px-2 py-1 text-[10px] uppercase tracking-[0.22em] text-slate-500 dark:text-slate-500 dark:text-slate-400 sm:inline-flex">
+          <div className="hidden items-center gap-1 rounded-full border border-white/10 border-white/10 border-white/10 px-2 py-1 text-[10px] uppercase tracking-[0.22em] text-slate-500 text-slate-500 text-slate-400 sm:inline-flex">
             <span>Esc</span>
           </div>
         </div>
 
         <Command.List className="cmdk-list">
           <Command.Empty className="cmdk-empty">
-            No results for <span className="text-slate-900 dark:text-slate-900 dark:text-white">"{search}"</span>.
+            No results for <span className="text-white text-white text-white">"{search}"</span>.
           </Command.Empty>
 
           {Object.entries(groupedActions).map(([group, items]) => (
@@ -291,7 +291,7 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
                       <Icon className="h-4 w-4" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-900 dark:text-white">{action.label}</p>
+                      <p className="truncate text-sm font-semibold tracking-tight text-white text-white text-white">{action.label}</p>
                       <p className="truncate text-[11px] text-slate-500 font-medium">{action.description}</p>
                     </div>
                     <div className="opacity-0 group-data-[selected=true]:opacity-100 transition-opacity">
