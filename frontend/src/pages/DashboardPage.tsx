@@ -54,7 +54,7 @@ function formatStrength(value: number) {
 function priorityClass(priority: MentorTask["priority"]) {
   if (priority === "high") return "border-cyan/30 bg-cyan/10 text-cyan";
   if (priority === "medium") return "border-brand/30 bg-brand/10 text-brand";
-  return "border-white/10 border-white/10 border-white/10 bg-white/[0.04] text-slate-300 text-slate-300 text-slate-300";
+  return "border-border bg-surface text-text-secondary";
 }
 
 function normalizeMatchValue(value?: string | null) {
@@ -299,7 +299,7 @@ export function DashboardPage() {
   if (loading && !plan) {
     return (
       <div className="flex min-h-[520px] items-center justify-center">
-        <div className="flex items-center gap-3 text-slate-300 text-slate-300 text-slate-300">
+        <div className="flex items-center gap-3 text-text-secondary">
           <Loader2 className="animate-spin text-brand" size={20} />
           Loading your placement plan...
         </div>
@@ -308,31 +308,29 @@ export function DashboardPage() {
   }
 
   return (
-    <section className="space-y-8">
+    <section className="space-y-8 animate-fade-in">
 
       {showPushPrompt && (
-        <div
-          className="premium-card flex flex-col items-center justify-between gap-5 rounded-xl p-5 animate-in fade-in slide-in-from-top-4 duration-500 sm:flex-row"
-        >
+        <div className="cognitive-card flex flex-col items-center justify-between gap-5 p-5 animate-in fade-in slide-in-from-top-4 duration-500 sm:flex-row">
           <div className="flex items-center gap-4 text-center sm:text-left">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-brand/20 bg-brand/10 text-brand">
               <Zap size={24} />
             </div>
             <div>
-              <h3 className="text-base font-semibold text-white">Enable proactive nudges</h3>
-              <p className="text-sm text-slate-400">Let Veda alert you when you're falling behind or have knowledge about to fade.</p>
+              <h3 className="text-base font-semibold text-text-primary">Enable proactive nudges</h3>
+              <p className="text-sm text-text-secondary">Let Veda alert you when you're falling behind or have knowledge about to fade.</p>
             </div>
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <button
               onClick={() => setShowPushPrompt(false)}
-              className="flex-1 rounded-lg border border-white/[0.08] px-5 py-2.5 text-sm font-semibold text-slate-400 transition hover:bg-white/[0.05] hover:text-white sm:flex-none"
+              className="btn-secondary flex-1 sm:flex-none py-2.5"
             >
               Later
             </button>
             <button
               onClick={handleEnableNotifications}
-              className="premium-button flex-1 rounded-lg px-5 py-2.5 text-sm font-bold transition sm:flex-none"
+              className="btn-primary flex-1 sm:flex-none py-2.5"
             >
               Enable Now
             </button>
@@ -346,15 +344,15 @@ export function DashboardPage() {
       )}
 
       {isDemoMode && (
-        <div className="rounded-xl border border-brand/20 bg-brand/[0.055] p-4">
+        <div className="rounded-xl border border-brand/20 bg-brand/[0.05] p-4">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-brand">Recruiter demo workspace</p>
-              <p className="mt-2 text-sm leading-6 text-slate-300">
+              <p className="mt-2 text-sm leading-6 text-text-secondary">
                 This seeded profile shows the full USP loop: memory signals, roadmap progress, project proof, resume readiness, interview prep, and Veda's next best action.
               </p>
             </div>
-            <Link to="/pricing" className="premium-button inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-xs font-bold uppercase tracking-widest">
+            <Link to="/pricing" className="btn-primary inline-flex gap-2 rounded-lg px-4 py-2 text-xs font-bold uppercase tracking-widest">
               View SaaS plans
               <ArrowRight size={14} />
             </Link>
@@ -363,7 +361,7 @@ export function DashboardPage() {
       )}
 
       {bestAction && (
-        <div className="premium-panel group relative overflow-hidden rounded-xl p-6 transition-all hover:border-white/[0.14]">
+        <div className="cognitive-card group relative overflow-hidden p-6 transition-all">
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
             <div className="flex items-start gap-6">
               <div className="flex shrink-0 items-center justify-center rounded-lg border border-cyan/20 bg-cyan/10 p-3 text-cyan transition-transform duration-300 group-hover:scale-105">
@@ -372,10 +370,10 @@ export function DashboardPage() {
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <div className="h-1.5 w-1.5 rounded-full bg-cyan" />
-                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan/80">Veda next best action</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan/80">Veda next best action</p>
                 </div>
-                <h2 className="text-2xl font-semibold text-white">Do this first today</h2>
-                <p className="mt-3 text-base leading-relaxed text-slate-400 max-w-2xl">
+                <h2 className="text-2xl font-semibold text-text-primary">Do this first today</h2>
+                <p className="mt-3 text-base leading-relaxed text-text-secondary max-w-2xl">
                   {bestAction.reason}
                 </p>
               </div>
@@ -395,14 +393,14 @@ export function DashboardPage() {
                 </button>
               )}
               {bestAction.action === "revision" && (
-                <Link to="/recall" className="group/btn relative inline-flex items-center gap-3 rounded-lg bg-emerald-500 px-6 py-3 text-sm font-bold text-slate-950 transition-all hover:brightness-110 active:scale-[0.98]">
+                <Link to="/recall" className="group/btn relative inline-flex items-center gap-3 rounded-lg bg-brand px-6 py-3 text-sm font-bold text-white transition-all hover:brightness-110 active:scale-[0.98]">
                   <Zap size={18} />
                   Start recall block
                   <ArrowRight size={16} className="ml-1 transition-transform group-hover/btn:translate-x-1" />
                 </Link>
               )}
               {bestAction.action === "generate" && (
-                <Link to="/roadmap" className="premium-button group/btn relative inline-flex items-center gap-3 rounded-lg px-6 py-3 text-sm font-bold transition-all active:scale-[0.98]">
+                <Link to="/roadmap" className="btn-primary group/btn relative inline-flex items-center gap-3">
                   <Route size={18} />
                   Generate roadmap
                   <ArrowRight size={16} className="ml-1 transition-transform group-hover/btn:translate-x-1" />
@@ -421,38 +419,38 @@ export function DashboardPage() {
       )}
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="premium-panel overflow-hidden rounded-xl">
-          <div className="border-b border-white/[0.06] px-6 py-8">
+        <div className="cognitive-card p-0 overflow-hidden">
+          <div className="border-b border-border px-6 py-8">
             <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-brand/20 bg-brand/10 text-brand">
                     <Sparkles size={20} />
                   </div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.4em] text-cyan">Today</p>
+                  <p className="text-[11px] font-bold uppercase tracking-[0.4em] text-brand">Today</p>
                 </div>
-                <h1 className="text-3xl font-semibold leading-[1.1] text-white lg:text-5xl">
+                <h1 className="text-3xl font-semibold leading-[1.1] text-text-primary lg:text-5xl">
                   {plan?.focus ?? "Strategic Execution"}
                 </h1>
-                <p className="mt-5 max-w-2xl text-base leading-7 text-slate-400">
+                <p className="mt-5 max-w-2xl text-base leading-7 text-text-secondary">
                   {plan?.mentorMessage ?? "Synchronizing your goals with active intelligence."}
                 </p>
               </div>
 
-              <div className="grid min-w-[280px] grid-cols-2 gap-px overflow-hidden rounded-xl border border-white/[0.08] bg-white/[0.06]">
-                <div className="bg-[#101318] p-5">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Placement readiness</p>
-                  <p className="mt-2 text-4xl font-black text-white">{plan?.readinessScore ?? 0}<span className="text-sm font-normal text-slate-400 ml-1">%</span></p>
+              <div className="grid min-w-[280px] grid-cols-2 gap-px overflow-hidden rounded-xl border border-border bg-border">
+                <div className="bg-background p-5">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-text-muted">Placement readiness</p>
+                  <p className="mt-2 text-4xl font-black text-text-primary">{plan?.readinessScore ?? 0}<span className="text-sm font-normal text-text-muted ml-1">%</span></p>
                 </div>
-                <div className="bg-[#101318] p-5">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Today's progress</p>
-                  <p className="mt-2 text-4xl font-black text-white">{planProgress}<span className="text-sm font-normal text-slate-400 ml-1">%</span></p>
+                <div className="bg-background p-5">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-text-muted">Today's progress</p>
+                  <p className="mt-2 text-4xl font-black text-text-primary">{planProgress}<span className="text-sm font-normal text-text-muted ml-1">%</span></p>
                 </div>
-                <div className="col-span-2 bg-[#101318] px-5 pb-5">
-                  <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06] mb-3">
-                    <div className="h-full rounded-full bg-gradient-to-r from-brand to-cyan transition-all duration-1000" style={{ width: `${planProgress}%` }} />
+                <div className="col-span-2 bg-background px-5 pb-5">
+                  <div className="h-1.5 overflow-hidden rounded-full bg-surface mb-3">
+                    <div className="h-full rounded-full bg-brand transition-all duration-1000" style={{ width: `${planProgress}%` }} />
                   </div>
-                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">Next unlock: <span className="text-cyan">{plan?.nextUnlock ?? "Core Logic"}</span></p>
+                  <p className="text-[10px] text-text-muted font-bold uppercase tracking-tighter">Next unlock: <span className="text-brand-light">{plan?.nextUnlock ?? "Core Logic"}</span></p>
                 </div>
               </div>
             </div>
@@ -463,13 +461,13 @@ export function DashboardPage() {
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-brand">Priority task</p>
-                  <h2 className="mt-2 text-xl font-semibold text-white">{activeTask?.title ?? "No active task yet"}</h2>
+                  <h2 className="mt-2 text-xl font-semibold text-text-primary">{activeTask?.title ?? "No active task yet"}</h2>
                 </div>
-                <span className="rounded-full border border-white/[0.08] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                <span className="rounded-full border border-border px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-text-secondary">
                   {plan?.journeyStage ?? "setup"}
                 </span>
               </div>
-              <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-400">
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-text-secondary">
                 {activeTask?.reason ?? "Complete onboarding and Veda will turn your goals into a focused execution path."}
               </p>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -479,7 +477,7 @@ export function DashboardPage() {
                       type="button"
                       onClick={() => void startTask(activeTask)}
                       disabled={updatingTaskId === activeTask.id}
-                      className="premium-button inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-bold transition disabled:cursor-wait disabled:opacity-70"
+                      className="btn-primary"
                     >
                       {updatingTaskId === activeTask.id ? <Loader2 size={16} className="animate-spin" /> : <PlayCircle size={16} />}
                       Start Focus
@@ -488,14 +486,14 @@ export function DashboardPage() {
                       type="button"
                       onClick={() => void handleStuck(activeTask)}
                       disabled={stuckTaskId === activeTask.id}
-                      className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/[0.08] px-5 py-3 text-sm font-semibold text-slate-300 transition hover:bg-white/[0.05] hover:text-white disabled:cursor-wait disabled:opacity-70"
+                      className="btn-secondary"
                     >
                       {stuckTaskId === activeTask.id ? <Loader2 size={16} className="animate-spin" /> : <AlertTriangle size={16} />}
                       I'm Stuck
                     </button>
                   </>
                 ) : (
-                  <Link to="/onboarding" className="premium-button inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-bold transition">
+                  <Link to="/onboarding" className="btn-primary">
                     Configure Mentor
                     <ArrowRight size={16} />
                   </Link>
@@ -503,7 +501,7 @@ export function DashboardPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-px border-t border-white/[0.06] bg-white/[0.06] lg:border-l lg:border-t-0">
+            <div className="grid grid-cols-2 gap-px border-t border-border bg-border lg:border-l lg:border-t-0">
               <Metric label="Notes" value={String(plan?.signals.totalNotes ?? 0)} icon={NotebookText} />
               <Metric label="Recall" value={String(plan?.signals.recallDue ?? 0)} icon={Zap} />
               <Metric label="Memory" value={formatStrength(plan?.signals.averageMemoryStrength ?? 0)} icon={Brain} />
@@ -512,15 +510,15 @@ export function DashboardPage() {
           </div>
         </div>
 
-        <div className="premium-card rounded-xl p-6">
+        <div className="cognitive-card p-6">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-sm font-semibold text-white text-white text-white">SaaS Workspace</p>
-              <p className="mt-1 text-xs uppercase tracking-[0.24em] text-slate-500">
+              <p className="text-sm font-semibold text-text-primary">SaaS Workspace</p>
+              <p className="mt-1 text-xs uppercase tracking-[0.24em] text-text-muted">
                 {plan?.subscription.plan ?? "free"} - {plan?.subscription.status ?? "trialing"}
               </p>
             </div>
-            <div className="rounded-lg bg-emerald-500/10 p-2 text-emerald-300">
+            <div className="rounded-lg bg-emerald-500/10 p-2 text-emerald-400">
               <ShieldCheck size={20} />
             </div>
           </div>
@@ -546,7 +544,7 @@ export function DashboardPage() {
           <button
             type="button"
             onClick={() => void loadPlan()}
-            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-white/[0.08] px-4 py-2.5 text-sm font-semibold text-slate-300 transition hover:bg-white/[0.05] hover:text-white"
+            className="mt-6 w-full btn-secondary"
           >
             <RefreshCw size={16} className={cn(loading && "animate-spin")} />
             Refresh mentor plan
@@ -555,18 +553,17 @@ export function DashboardPage() {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
-
-        <div className="premium-card rounded-xl p-6">
+        <div className="cognitive-card p-6">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-xl font-semibold text-white">Mission Queue</h2>
-              <p className="mt-1 text-sm text-slate-500">
+              <h2 className="text-xl font-semibold text-text-primary">Mission Queue</h2>
+              <p className="mt-1 text-sm text-text-muted">
                 {completedTasks}/{plan?.tasks.length ?? 0} complete
               </p>
             </div>
             <Link
               to="/copilot"
-              className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] px-4 py-2 text-sm font-semibold text-slate-300 transition hover:bg-white/[0.05] hover:text-white"
+              className="btn-secondary py-2 px-4"
             >
               Ask Veda
               <ArrowRight size={16} />
@@ -575,7 +572,7 @@ export function DashboardPage() {
 
           <div className="mt-6 space-y-3">
             {plan?.tasks.length === 0 ? (
-              <div className="rounded-lg border border-white/[0.08] bg-white/[0.025] p-5 text-sm text-slate-400">
+              <div className="rounded-lg border border-border bg-surface p-5 text-sm text-text-secondary">
                 No mentor tasks yet.
               </div>
             ) : (
@@ -595,31 +592,31 @@ export function DashboardPage() {
         </div>
 
         <aside className="space-y-6">
-          <div className="premium-card rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-white">Weak Topics</h2>
+          <div className="cognitive-card p-6">
+            <h2 className="text-lg font-semibold text-text-primary">Weak Topics</h2>
             <div className="mt-4 space-y-3">
               {(plan?.signals.weakTopics ?? []).length === 0 ? (
-                <p className="text-sm text-slate-500">No weak topics yet.</p>
+                <p className="text-sm text-text-muted">No weak topics yet.</p>
               ) : (
                 plan?.signals.weakTopics.slice(0, 4).map((topic) => (
                   <Link
                     key={topic.topic}
                     to="/recall"
-                    className="block rounded-lg border border-white/[0.08] bg-white/[0.025] p-4 transition hover:bg-white/[0.05]"
+                    className="block rounded-lg border border-border bg-background-secondary p-4 transition hover:bg-surface"
                   >
                     <div className="flex items-center justify-between gap-3">
-                      <p className="text-sm font-semibold text-white">{topic.topic}</p>
-                      <span className="text-xs text-cyan">{formatStrength(topic.averageStrength)}</span>
+                      <p className="text-sm font-semibold text-text-primary">{topic.topic}</p>
+                      <span className="text-xs text-brand-light">{formatStrength(topic.averageStrength)}</span>
                     </div>
-                    <p className="mt-1 text-xs text-slate-500">{topic.dueCount} due</p>
+                    <p className="mt-1 text-xs text-text-muted">{topic.dueCount} due</p>
                   </Link>
                 ))
               )}
             </div>
           </div>
 
-          <div className="premium-card rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-white">Journey Signals</h2>
+          <div className="cognitive-card p-6">
+            <h2 className="text-lg font-semibold text-text-primary">Journey Signals</h2>
             <div className="mt-4 space-y-3 text-sm">
               <Signal label="Consistency Score" value={behavior ? `${behavior.consistencyScore}%` : "0%"} />
               <Signal label="Skip Rate" value={behavior ? `${behavior.skipRate}%` : "0%"} />
@@ -637,12 +634,12 @@ export function DashboardPage() {
 
 function Metric({ label, value, icon: Icon }: { label: string; value: string; icon: typeof Brain }) {
   return (
-    <div className="bg-[#101318] p-5">
+    <div className="bg-background-secondary p-5">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">{label}</p>
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-text-muted">{label}</p>
         <Icon size={15} className="text-brand/80" />
       </div>
-      <p className="text-2xl font-semibold tracking-tight text-white">{value}</p>
+      <p className="text-2xl font-semibold tracking-tight text-text-primary">{value}</p>
     </div>
   );
 }
@@ -653,10 +650,10 @@ function UsageRow({ label, value, limit }: { label: string; value: number; limit
   return (
     <div>
       <div className="flex items-center justify-between text-xs">
-        <span className="text-slate-500">{label}</span>
-        <span className="text-slate-300">{value}/{limit}</span>
+        <span className="text-text-secondary">{label}</span>
+        <span className="text-text-primary">{value}/{limit}</span>
       </div>
-      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/[0.08]">
+      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface">
         <div className="h-full rounded-full bg-brand" style={{ width: `${percent}%` }} />
       </div>
     </div>
@@ -682,15 +679,15 @@ function TaskRow({
   const isDone = task.status === "completed";
 
   return (
-    <div className={cn("rounded-lg border p-4 transition-colors", isDone ? "border-emerald-500/20 bg-emerald-500/5" : task.status === "in_progress" ? "border-brand/25 bg-brand/[0.075]" : "border-white/[0.08] bg-white/[0.025] hover:bg-white/[0.045]")}>
+    <div className={cn("rounded-lg border p-4 transition-colors", isDone ? "border-emerald-500/20 bg-emerald-500/5" : task.status === "in_progress" ? "border-brand/25 bg-brand/[0.075]" : "border-border bg-background-secondary hover:bg-surface")}>
       <div className="flex items-start gap-4">
         <button
           type="button"
           onClick={onToggle}
-          className="mt-1 text-slate-500 hover:text-white"
+          className="mt-1 text-text-muted hover:text-text-primary transition-colors"
           aria-label={isDone ? "Mark task pending" : "Mark task complete"}
         >
-          {updating ? <Loader2 className="animate-spin" size={20} /> : isDone ? <CheckCircle2 className="text-emerald-300" size={20} /> : <Circle size={20} />}
+          {updating ? <Loader2 className="animate-spin" size={20} /> : isDone ? <CheckCircle2 className="text-emerald-400" size={20} /> : <Circle size={20} />}
         </button>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
@@ -698,8 +695,8 @@ function TaskRow({
               <Icon size={12} />
               {task.priority}
             </span>
-            <span className="rounded-md border border-white/[0.08] px-2 py-1 text-xs text-slate-500">{task.status.replace("_", " ")}</span>
-            <span className="text-xs text-slate-500">{task.estimatedMinutes} min</span>
+            <span className="rounded-md border border-border bg-surface px-2 py-1 text-xs text-text-secondary">{task.status.replace("_", " ")}</span>
+            <span className="text-xs text-text-muted">{task.estimatedMinutes} min</span>
             {(task.stuckCount ?? 0) > 0 && (
               <span className="inline-flex items-center gap-1 rounded-md border border-amber-400/20 bg-amber-400/10 px-2 py-1 text-xs font-semibold text-amber-300">
                 <AlertTriangle size={12} />
@@ -707,11 +704,11 @@ function TaskRow({
               </span>
             )}
           </div>
-          <h3 className={cn("mt-3 text-base font-semibold", isDone ? "text-slate-500 line-through" : "text-white")}>{task.title}</h3>
-          <p className="mt-1 text-sm leading-6 text-slate-400">{task.description}</p>
-          <p className="mt-2 text-xs text-cyan">{task.reason}</p>
+          <h3 className={cn("mt-3 text-base font-semibold", isDone ? "text-text-muted line-through" : "text-text-primary")}>{task.title}</h3>
+          <p className="mt-1 text-sm leading-6 text-text-secondary">{task.description}</p>
+          <p className="mt-2 text-xs text-brand-light">{task.reason}</p>
           {task.mentorNote && (
-            <p className="mt-3 rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-xs leading-5 text-slate-400">
+            <p className="mt-3 rounded-lg border border-border bg-surface px-3 py-2 text-xs leading-5 text-text-secondary">
               {task.mentorNote}
             </p>
           )}
@@ -720,8 +717,7 @@ function TaskRow({
               type="button"
               onClick={onStart}
               disabled={updating || isDone}
-              style={{ backgroundColor: "#f8fafc", color: "#0f172a" }}
-              className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-lg bg-text-primary text-background px-4 py-2 text-xs font-bold transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {updating ? <Loader2 size={14} className="animate-spin" /> : <PlayCircle size={14} />}
               Start
@@ -730,14 +726,14 @@ function TaskRow({
               type="button"
               onClick={onStuck}
               disabled={stucking || isDone}
-              className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] px-3 py-2 text-xs font-semibold text-slate-300 transition hover:bg-white/[0.05] disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs font-semibold text-text-secondary transition hover:bg-surface hover:text-text-primary disabled:cursor-not-allowed disabled:opacity-50"
             >
               {stucking ? <Loader2 size={14} className="animate-spin" /> : <AlertTriangle size={14} />}
               Stuck
             </button>
           </div>
         </div>
-        <Link to={`/study/${task.id}`} className="shrink-0 rounded-lg border border-white/[0.08] p-2 text-slate-500 transition hover:bg-white/[0.05] hover:text-white">
+        <Link to={`/study/${task.id}`} className="shrink-0 rounded-lg border border-border p-2 text-text-muted transition hover:bg-surface hover:text-text-primary">
           <ArrowRight size={16} />
         </Link>
       </div>
@@ -747,9 +743,9 @@ function TaskRow({
 
 function Signal({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-start justify-between gap-4 rounded-lg border border-white/[0.06] bg-white/[0.025] px-3 py-2">
-      <span className="text-slate-500">{label}</span>
-      <span className="max-w-[180px] text-right text-slate-200">{value}</span>
+    <div className="flex items-start justify-between gap-4 rounded-lg border border-border bg-background-secondary px-3 py-2">
+      <span className="text-text-secondary">{label}</span>
+      <span className="max-w-[180px] text-right text-text-primary">{value}</span>
     </div>
   );
 }

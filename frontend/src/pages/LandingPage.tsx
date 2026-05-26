@@ -3,24 +3,16 @@ import {
   ArrowRight,
   Brain,
   Briefcase,
-  ChevronRight,
-  FileText,
   Github,
-  GraduationCap,
   Linkedin,
-  ListChecks,
   MessageCircle,
   Play,
-  Route,
-  ShieldCheck,
-  Sparkles,
   Target,
-  TerminalSquare
+  Sparkles
 } from "lucide-react";
 import { useAppStore } from "../store/app-store";
 import { motion as Motion } from "framer-motion";
 import { HeroVisualization } from "./HeroVisualization";
-import "./LandingPage.css";
 
 const features = [
   {
@@ -67,203 +59,198 @@ export function LandingPage() {
   const startPath = isAuthenticated ? "/dashboard" : "/auth";
 
   return (
-    <div className="landing-page">
-      <main className="landing-main">
-        <section className="landing-hero" id="home">
-          <div className="landing-hero__copy">
-            <Motion.span 
-              className="landing-kicker"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <Sparkles size={16} />
+    <div className="min-h-screen bg-ai-workspace">
+      <main className="relative z-10 flex flex-col items-center pt-24 pb-32">
+        <section className="w-full max-w-6xl px-6 flex flex-col items-center text-center mt-12 mb-32" id="home">
+          <Motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, type: "spring", stiffness: 90, damping: 18 }}
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand/30 bg-brand/10 mb-8"
+          >
+            <Sparkles size={14} className="text-brand" />
+            <span className="text-xs font-semibold text-brand-light uppercase tracking-widest">
               AI student career OS
-            </Motion.span>
-            <Motion.h1 
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-            >
-              Veda turns your placement goal into today's exact plan.
-            </Motion.h1>
-            <Motion.p 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              StudyBuddy connects notes, recall, roadmap, projects, resume, interviews, and jobs into one adaptive dashboard for college placements.
-            </Motion.p>
+            </span>
+          </Motion.div>
 
-            <div className="landing-hero__actions">
-              <Link to={startPath} className="btn-primary">
-                Open workspace
-                <ArrowRight size={18} />
-              </Link>
-              <Link to="/demo" className="btn-secondary">
-                Try demo
-                <Play size={16} />
-              </Link>
-              <a href="#features" className="btn-secondary">
-                See workflow
-                <ChevronRight size={16} />
-              </a>
-            </div>
+          <Motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.1, type: "spring", stiffness: 90, damping: 18 }}
+            className="text-5xl md:text-7xl font-bold tracking-tight text-white max-w-4xl leading-[1.1]"
+          >
+            Veda turns your placement goal into today's exact plan.
+          </Motion.h1>
 
-            <div className="landing-hero__stats">
-              <div className="landing-stat">
-                <strong>7-day</strong>
-                <span>Placement sprint</span>
-              </div>
-              <div className="landing-stat">
-                <strong>1 App</strong>
-                <span>For the prep loop</span>
-              </div>
-              <div className="landing-stat">
-                <strong>AI Mentor</strong>
-                <span>With student context</span>
-              </div>
-            </div>
-          </div>
+          <Motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, type: "spring", stiffness: 90, damping: 18 }}
+            className="mt-8 text-xl text-text-secondary max-w-2xl font-light"
+          >
+            StudyBuddy connects notes, recall, roadmap, projects, resume, interviews, and jobs into one adaptive dashboard for college placements.
+          </Motion.p>
 
-          <HeroVisualization />
+          <Motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3, type: "spring", stiffness: 90, damping: 18 }}
+            className="mt-12 flex flex-col sm:flex-row items-center gap-4"
+          >
+            <Link to={startPath} className="btn-primary px-6 py-3 text-base">
+              Open workspace
+              <ArrowRight size={18} />
+            </Link>
+            <Link to="/demo" className="btn-secondary px-6 py-3 text-base">
+              Try demo
+              <Play size={16} />
+            </Link>
+          </Motion.div>
+
+          <Motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 0.5 }}
+            className="mt-24 w-full flex justify-center"
+          >
+            <HeroVisualization />
+          </Motion.div>
         </section>
 
-        <section className="landing-trust" aria-label="Trust bar">
+        <section className="w-full max-w-5xl px-6 flex flex-wrap justify-center gap-6 md:gap-12 py-12 border-y border-white/5 bg-surface mb-32" aria-label="Trust bar">
           {trustItems.map((item, index) => (
             <Motion.span 
               key={item} 
-              className="landing-trust__pill"
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
+              transition={{ delay: index * 0.1, duration: 0.5 }}
+              className="text-sm font-medium text-text-muted flex items-center gap-2 tracking-wide"
             >
+              <div className="w-1.5 h-1.5 rounded-full bg-brand/50" />
               {item}
             </Motion.span>
           ))}
         </section>
 
-        <section className="landing-features" id="features">
-          <div className="landing-section-head">
-            <span className="eyebrow">Why StudyBuddy?</span>
-            <h2>Built for placement prep, not just note storage.</h2>
-            <p>
+        <section className="w-full max-w-6xl px-6 mb-32" id="features">
+          <div className="text-center mb-16">
+            <span className="eyebrow mb-3">Why StudyBuddy?</span>
+            <h2 className="text-3xl md:text-4xl">Built for placement prep, not just note storage.</h2>
+            <p className="mt-4 text-lg text-text-secondary max-w-2xl mx-auto">
               Traditional tools split your prep across notes, tasks, job boards, and resume docs. StudyBuddy unifies the loop so every action improves readiness.
             </p>
           </div>
 
-          <Motion.div 
-            className="landing-feature-grid"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, staggerChildren: 0.2 }}
-          >
+          <div className="grid md:grid-cols-3 gap-6">
             {features.map((feature, index) => (
               <Motion.article 
                 key={feature.title} 
-                className="feature-card"
+                className="cognitive-card p-8 flex flex-col"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ delay: index * 0.1, duration: 0.6 }}
               >
-                <div className="feature-icon">
-                  <feature.icon size={20} />
+                <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-brand-light mb-6">
+                  <feature.icon size={24} />
                 </div>
-                <h3>{feature.title}</h3>
-                <p>{feature.text}</p>
+                <h3 className="text-xl mb-3">{feature.title}</h3>
+                <p className="text-text-secondary leading-relaxed flex-1">{feature.text}</p>
               </Motion.article>
             ))}
-          </Motion.div>
+          </div>
         </section>
 
-        <section className="landing-howto" id="how-to-use">
-          <div className="landing-section-head">
-            <span className="eyebrow">How it works</span>
-            <h2>Three steps to a clearer placement path.</h2>
-            <p>
+        <section className="w-full max-w-6xl px-6 mb-32" id="how-to-use">
+          <div className="text-center mb-16">
+            <span className="eyebrow mb-3">How it works</span>
+            <h2 className="text-3xl md:text-4xl">Three steps to a clearer placement path.</h2>
+            <p className="mt-4 text-lg text-text-secondary max-w-2xl mx-auto">
               StudyBuddy adds the student intelligence layer: what you know, what you forget, what you build, and what your target role needs.
             </p>
           </div>
 
-          <div className="landing-howto__grid">
+          <div className="grid md:grid-cols-3 gap-6">
             {steps.map((step, index) => (
               <Motion.article 
                 key={step.title} 
-                className="howto-card"
-                initial={{ opacity: 0, scale: 0.95 }}
+                className="relative p-8 rounded-2xl border border-white/5 bg-surface/50 overflow-hidden"
+                initial={{ opacity: 0, scale: 0.98 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.15 }}
+                transition={{ delay: index * 0.15, duration: 0.6 }}
               >
-                <span className="howto-step">Step {index + 1}</span>
-                <h3>{step.title}</h3>
-                <p>{step.text}</p>
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand/0 via-brand/40 to-brand/0 opacity-50" />
+                <span className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-4 block">Step {index + 1}</span>
+                <h3 className="text-xl mb-3">{step.title}</h3>
+                <p className="text-text-secondary leading-relaxed">{step.text}</p>
               </Motion.article>
             ))}
           </div>
         </section>
 
-        <section className="landing-pricing" id="pricing">
-          <div className="landing-section-head">
-            <span className="eyebrow">Premium SaaS</span>
-            <h2>Free to start. Pro when your prep gets serious.</h2>
-            <p>
-              Usage limits are transparent: AI messages, notes tracked, mentor plans, and projects.
-            </p>
+        <section className="w-full max-w-4xl px-6 mb-32" id="pricing">
+          <div className="text-center mb-12">
+            <span className="eyebrow mb-3">Premium SaaS</span>
+            <h2 className="text-3xl md:text-4xl">Free to start. Pro when your prep gets serious.</h2>
           </div>
-          <div className="landing-price-strip">
+          <div className="cognitive-card p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-8">
             <div>
-              <strong>Pro Student</strong>
-              <span>2,000 AI messages, 10,000 notes, 50 projects, resume and interview intelligence.</span>
+              <strong className="block text-2xl mb-2">Pro Student</strong>
+              <span className="text-text-secondary">2,000 AI messages, 10,000 notes, 50 projects, resume and interview intelligence.</span>
             </div>
-            <Link to="/pricing" className="btn-primary">
+            <Link to="/pricing" className="btn-primary shrink-0">
               View pricing
               <ArrowRight size={18} />
             </Link>
           </div>
         </section>
 
-        <section className="landing-cta">
-          <div>
-            <span className="eyebrow">Ready to start?</span>
-            <h2>Turn study chaos into a clear career system.</h2>
-            <p>
-              Explore a seeded student workspace with roadmap, recall, project proof, resume readiness, and Veda's next best action.
-            </p>
-          </div>
-          <Link to="/demo" className="btn-primary">
+        <section className="w-full max-w-4xl px-6 text-center mb-16">
+          <span className="eyebrow mb-3">Ready to start?</span>
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">Turn study chaos into a clear career system.</h2>
+          <p className="text-xl text-text-secondary mb-10 max-w-2xl mx-auto">
+            Explore a seeded student workspace with roadmap, recall, project proof, resume readiness, and Veda's next best action.
+          </p>
+          <Link to="/demo" className="btn-primary px-8 py-4 text-lg">
             Try recruiter demo
             <ArrowRight size={18} />
           </Link>
         </section>
       </main>
 
-      <footer className="landing-footer max-w-7xl mx-auto px-6">
-        <div className="footer-brand">
-          <img src="/brand/studybuddy-logo.png" alt="StudyBuddy Logo" className="h-10 w-auto object-contain mb-4" />
-          <p>AI mentor, recall trainer, and career planning workspace for technical learners.</p>
-        </div>
-        <div className="footer-nav">
-          <Link to="/">Home</Link>
-          <a href="#features">Features</a>
-          <Link to="/auth">Login</Link>
-        </div>
-        <div className="footer-meta">
-          <div className="flex gap-4">
-            <a href="https://www.linkedin.com/in/priyanshu-tiwari-pds37" target="_blank" rel="noopener noreferrer">
+      <footer className="w-full border-t border-white/5 bg-background py-12 px-6">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="flex flex-col items-center md:items-start">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand/10 border border-brand/20">
+                <Sparkles size={16} className="text-brand" />
+              </div>
+              <span className="font-semibold text-lg text-white">StudyBuddy</span>
+            </div>
+            <p className="text-sm text-text-muted text-center md:text-left max-w-xs">AI mentor, recall trainer, and career planning workspace for technical learners.</p>
+          </div>
+          <div className="flex gap-6 text-sm font-medium text-text-secondary">
+            <Link to="/" className="hover:text-white transition-colors">Home</Link>
+            <a href="#features" className="hover:text-white transition-colors">Features</a>
+            <Link to="/auth" className="hover:text-white transition-colors">Login</Link>
+          </div>
+          <div className="flex gap-4 text-text-muted">
+            <a href="https://www.linkedin.com/in/priyanshu-tiwari-pds37" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
               <Linkedin size={20} />
             </a>
-            <a href="#">
+            <a href="#" className="hover:text-white transition-colors">
               <Github size={20} />
             </a>
-            <a href="#">
+            <a href="#" className="hover:text-white transition-colors">
               <MessageCircle size={20} />
             </a>
           </div>
-          <p className="mt-4 text-xs text-slate-500">Copyright 2026 StudyBuddy</p>
+        </div>
+        <div className="max-w-6xl mx-auto mt-12 text-center text-xs text-text-muted/50">
+          Copyright 2026 StudyBuddy
         </div>
       </footer>
     </div>
