@@ -251,8 +251,8 @@ export function LandingPage() {
           <div className="badge"><div className="badge-dot"></div>Desktop App Experience</div>
 
           <h1>
-            Your intelligent<br />
-            <span className="italic-serif">Student Career OS</span>
+            Your ultimate<br />
+            <span className="italic-serif">Academic Weapon</span>
           </h1>
 
           <p className="hero-sub">

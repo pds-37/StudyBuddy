@@ -144,7 +144,8 @@ const uploadFile: RequestHandler = async (request, response, next) => {
     let text = "";
     if (file.mimetype === "application/pdf") {
       try {
-        const data = await pdfParse(file.buffer);
+        const parser = new pdfParse.PDFParse(new Uint8Array(file.buffer));
+        const data = await parser.getText();
         text = data.text;
       } catch (parseErr: any) {
         return response.status(400).json({ error: "Failed to parse PDF: " + parseErr.message });

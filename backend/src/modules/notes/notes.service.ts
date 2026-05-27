@@ -26,7 +26,7 @@ type LearningIngestionData = {
   sourceUrl?: string;
 };
 
-type NoteAnalysis = Awaited<ReturnType<typeof groqService.analyzeNote>>;
+type NoteAnalysis = Awaited<ReturnType<typeof AIOrchestrator.analyzeNote>>;
 
 type NotesQuery = {
   tags?: string;
@@ -46,6 +46,8 @@ export type ContradictionItem = {
 
 import { groqService } from "../../services/ai/groq.service.js";
 import { usersService } from "../users/users.service.js";
+import { AIOrchestrator } from "../../core/ai-orchestrator.js";
+import { env } from "../../config/env.js";
 
 const TECH_KEYWORDS = [
   "javascript", "typescript", "react", "node", "express", "mongodb", "docker", "kubernetes",
@@ -282,9 +284,9 @@ async function runAnalysisPipeline(userId: string, note: NoteDocument): Promise<
   const userContext = profile ? `Target roles: ${profile.targetRoles?.join(", ")}` : "";
 
   let analysis: NoteAnalysis;
-  let analysisProvider = "groq";
+  let analysisProvider = env.geminiApiKey ? "gemini" : "groq";
   try {
-    analysis = await groqService.analyzeNote(note.title, note.content, userContext);
+    analysis = await AIOrchestrator.analyzeNote(note.title, note.content, userContext);
   } catch (error) {
     analysisProvider = "local-fallback";
     analysis = localAnalyzeLearning(note.title, note.content);
@@ -327,7 +329,7 @@ async function runAnalysisPipeline(userId: string, note: NoteDocument): Promise<
 
   // Initialize MemoryItems for flashcards
   if (analysis.flashcards && analysis.flashcards.length > 0) {
-    await Promise.all(analysis.flashcards.map(card =>
+    await Promise.all(analysis.flashcards.map((card: any) =>
       MemoryItemModel.create({
         userId,
         noteId: note._id.toString(),
@@ -367,7 +369,7 @@ async function runAnalysisPipeline(userId: string, note: NoteDocument): Promise<
 async function upsertConceptNodes(
   userId: string,
   noteId: string,
-  analysis: Awaited<ReturnType<typeof groqService.analyzeNote>>
+  analysis: Awaited<ReturnType<typeof AIOrchestrator.analyzeNote>>
 ): Promise<void> {
   const conceptIds: string[] = [];
 

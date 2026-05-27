@@ -8,7 +8,6 @@ import {
   getKnowledgeGraph, getConceptDetail, getInterviewReadiness,
   type KnowledgeGraphData, type KnowledgeNode, type ConceptDetail, type InterviewReadiness
 } from "../lib/api/knowledge";
-import { NeuralConstellation3D } from "../components/common/NeuralConstellation3D";
 import { cn } from "../lib/utils/cn";
 
 const retentionColors: Record<string, string> = {
@@ -81,9 +80,6 @@ export function KnowledgePage() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden relative bg-background">
-      <div className="absolute inset-0 z-0">
-        <NeuralConstellation3D />
-      </div>
       {/* Header */}
       <header className="shrink-0 px-8 pt-8 pb-5 border-b border-border glass-panel relative z-10">
         <div className="max-w-[1600px] mx-auto">

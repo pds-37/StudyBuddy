@@ -140,7 +140,7 @@ export function NotesPage() {
         void fetchConcepts();
       }, 1500);
     } catch (err: any) {
-      const serverMsg = err.response?.data?.message || err.message;
+      const serverMsg = err.response?.data?.message || err.response?.data?.error || err.message;
       alert(`Upload failed: ${serverMsg}`);
       e.target.value = '';
     }

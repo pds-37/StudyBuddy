@@ -26,7 +26,6 @@ import { cn } from "../lib/utils/cn";
 import { getDueRecallPrompts, getRecallStats, reviewRecallAnswer, type RecallStats } from "../lib/api/recall";
 import { getRevisionPriorities } from "../lib/api/intelligence";
 import { logBehavior } from "../lib/api/behavior";
-import { NeuralConstellation3D } from "../components/common/NeuralConstellation3D";
 import type { RecallGrade, RecallPrompt, RecallReviewResult, RevisionPriority } from "@studybuddy/shared";
 
 function formatPercent(value: number) {
@@ -116,9 +115,6 @@ export function RecallPage() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden relative bg-background">
-      <div className="absolute inset-0 z-0">
-        <NeuralConstellation3D />
-      </div>
       {/* ─── HEADER ─── */}
       <header className="shrink-0 px-8 pt-8 pb-5 border-b border-border glass-panel relative z-10">
         <div className="max-w-[1400px] mx-auto">
