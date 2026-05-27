@@ -26,6 +26,7 @@ import {
   RecoveryPlanCard,
   WarningCard
 } from "./MentorCards";
+import { GuestGuard } from "../../../components/auth/GuestGuard";
 
 const starterPrompts = [
   "What should I work on today?",
@@ -211,14 +212,16 @@ export function CopilotChat() {
           </div>
         </div>
 
-        <Composer
-          draft={draft}
-          sending={sending}
-          textareaRef={textareaRef}
-          onDraftChange={setDraft}
-          onKeyDown={handleKeyDown}
-          onSend={() => void handleSendMessage()}
-        />
+        <GuestGuard fallbackText="Please login to chat with Veda and get personalized mentorship. Let's learn and grow together.">
+          <Composer
+            draft={draft}
+            sending={sending}
+            textareaRef={textareaRef}
+            onDraftChange={setDraft}
+            onKeyDown={handleKeyDown}
+            onSend={() => void handleSendMessage()}
+          />
+        </GuestGuard>
       </main>
     </div>
   );
@@ -419,18 +422,20 @@ function ChatMessage({ message, index }: { message: CopilotMessage; index: numbe
         </div>
 
         {!isUser && metadata?.saveableNote && (
-          <button
-            type="button"
-            onClick={() => {
-              notesApi.createNote(metadata.saveableNote).catch((error) => {
-                console.error("Failed to save note:", error);
-              });
-            }}
-            className="mt-2 inline-flex items-center gap-1.5 rounded-md border border-white/[0.08] px-2.5 py-1.5 text-xs text-slate-400 hover:bg-white/[0.05] hover:text-white"
-          >
-            <Check size={13} />
-            Save to notes
-          </button>
+          <GuestGuard fallbackText="Please login to save insights to your knowledge base. Let's learn and grow together.">
+            <button
+              type="button"
+              onClick={() => {
+                notesApi.createNote(metadata.saveableNote).catch((error) => {
+                  console.error("Failed to save note:", error);
+                });
+              }}
+              className="mt-2 inline-flex items-center gap-1.5 rounded-md border border-white/[0.08] px-2.5 py-1.5 text-xs text-slate-400 hover:bg-white/[0.05] hover:text-white"
+            >
+              <Check size={13} />
+              Save to notes
+            </button>
+          </GuestGuard>
         )}
 
         {!isUser && metadata?.cards?.length > 0 && (

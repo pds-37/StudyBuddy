@@ -32,6 +32,7 @@ import { useAppStore } from "../../../store/app-store";
 import { cn } from "../../../lib/utils/cn";
 import { ExpansionFlow } from "./ExpansionFlow";
 import { BehavioralIntervention } from "./BehavioralIntervention";
+import { GuestGuard } from "../../../components/auth/GuestGuard";
 import type { Roadmap, RoadmapInsight, RoadmapPhase, RoadmapTask } from "@studybuddy/shared";
 
 const TASK_LIMIT = 8;
@@ -725,13 +726,15 @@ function EmptyState({ onGenerate, isGenerating, onboardingComplete }: { onGenera
           Complete onboarding
         </Link>
       ) : (
-        <button
-          onClick={onGenerate}
-          disabled={isGenerating}
-          className="mt-8 rounded-lg bg-[#7c5cbf] px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-white transition hover:bg-[#a07ee0] disabled:opacity-60"
-        >
-          Generate roadmap
-        </button>
+        <GuestGuard fallbackText="Please login to generate a personalized roadmap based on your skills and goals. Let's learn and grow together." className="mt-8">
+          <button
+            onClick={onGenerate}
+            disabled={isGenerating}
+            className="rounded-lg bg-[#7c5cbf] px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-white transition hover:bg-[#a07ee0] disabled:opacity-60"
+          >
+            Generate roadmap
+          </button>
+        </GuestGuard>
       )}
     </div>
   );
