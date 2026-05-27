@@ -1,371 +1,398 @@
-import { Link } from "react-router-dom";
-import { motion as Motion } from "framer-motion";
-import {
-  ArrowRight,
-  BadgeCheck,
-  BookOpenCheck,
-  BriefcaseBusiness,
-  CheckCircle2,
-  ChevronRight,
-  Clock3,
-  FileText,
-  GraduationCap,
-  Layers3,
-  Play,
-  ShieldCheck,
-  Sparkles,
-  Target,
-  Trophy,
-  Zap
-} from "lucide-react";
-import { useAppStore } from "../store/app-store";
-import { NebulaBackground } from "../components/common/NebulaBackground";
-
-const stats = [
-  { label: "Readiness lift", value: "+38%", tone: "text-emerald-300" },
-  { label: "Weekly focus saved", value: "7.5h", tone: "text-cyan-300" },
-  { label: "Proof points built", value: "124k", tone: "text-amber-200" }
-];
-
-const commandCenter = [
-  { icon: Target, title: "DSA revision", meta: "High impact", status: "Today", color: "text-cyan-300" },
-  { icon: FileText, title: "Resume proof", meta: "Backend project", status: "Next", color: "text-emerald-300" },
-  { icon: BriefcaseBusiness, title: "Role shortlist", meta: "8 matched jobs", status: "Live", color: "text-amber-200" }
-];
-
-const modules = [
-  {
-    icon: BookOpenCheck,
-    title: "Recall engine",
-    text: "Notes become timed recall drills, weak-topic reviews, and interview prompts before they fade.",
-    accent: "text-cyan-300",
-    bg: "bg-cyan-400/10"
-  },
-  {
-    icon: Layers3,
-    title: "Execution roadmap",
-    text: "Daily study, project, resume, and application work is ranked by what improves placement readiness.",
-    accent: "text-indigo-300",
-    bg: "bg-indigo-400/10"
-  },
-  {
-    icon: Trophy,
-    title: "Proof portfolio",
-    text: "Completed work turns into project evidence and sharper resume bullets for the exact role.",
-    accent: "text-amber-200",
-    bg: "bg-amber-300/10"
-  },
-  {
-    icon: ShieldCheck,
-    title: "Interview signal",
-    text: "Mock outcomes, missing concepts, and confidence signals keep the next prep session honest.",
-    accent: "text-emerald-300",
-    bg: "bg-emerald-400/10"
-  }
-];
-
-const workflow = [
-  "Choose a role and timeline",
-  "Study from the ranked daily plan",
-  "Convert progress into proof",
-  "Apply with role-specific confidence"
-];
-
-const inclusions = [
-  "Unlimited AI mentor sessions",
-  "Memory-aware revision schedule",
-  "Resume and project proof builder",
-  "Company prep and job intelligence"
-];
-
-function ProductPreview() {
-  return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A]/80 backdrop-blur-xl shadow-2xl">
-      <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
-        <div className="flex items-center gap-2">
-          <span className="h-3 w-3 rounded-full bg-red-500/80" />
-          <span className="h-3 w-3 rounded-full bg-yellow-500/80" />
-          <span className="h-3 w-3 rounded-full bg-green-500/80" />
-        </div>
-        <div className="hidden rounded-md border border-white/5 bg-white/[0.03] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 sm:block">
-          StudyBuddy OS
-        </div>
-      </div>
-
-      <div className="grid gap-0 lg:grid-cols-[0.9fr_1.2fr]">
-        <aside className="border-b border-white/10 bg-white/[0.02] p-5 lg:border-b-0 lg:border-r">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-indigo-300/20 bg-indigo-400/10 text-indigo-200">
-              <Zap size={18} />
-            </div>
-            <div>
-              <p className="text-sm font-bold text-white">Veda AI</p>
-              <p className="text-xs text-slate-500">Placement intelligence online</p>
-            </div>
-          </div>
-
-          <div className="mt-6 space-y-3">
-            {commandCenter.map((item) => (
-              <div key={item.title} className="rounded-lg border border-white/10 bg-black/25 p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex gap-3">
-                    <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-white/[0.04] ${item.color}`}>
-                      <item.icon size={16} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-white">{item.title}</p>
-                      <p className="mt-1 text-xs text-slate-500">{item.meta}</p>
-                    </div>
-                  </div>
-                  <span className="rounded-md border border-white/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    {item.status}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </aside>
-
-        <div className="p-5 sm:p-6">
-          <div className="rounded-lg border border-indigo-300/20 bg-indigo-400/[0.07] p-5">
-            <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[0.22em] text-indigo-200">Today</p>
-                <h3 className="mt-3 max-w-sm text-2xl font-bold leading-tight text-white">
-                  Finish graph revision, then ship one resume proof update.
-                </h3>
-              </div>
-              <div className="rounded-lg border border-white/10 bg-black/20 px-4 py-3 text-right">
-                <p className="text-3xl font-black text-white">82%</p>
-                <p className="text-xs text-slate-500">Role readiness</p>
-              </div>
-            </div>
-            <div className="mt-6 h-2 overflow-hidden rounded-full bg-white/10">
-              <Motion.div
-                className="h-full rounded-full bg-gradient-to-r from-cyan-300 via-indigo-300 to-emerald-300"
-                initial={{ width: "24%" }}
-                animate={{ width: "82%" }}
-                transition={{ duration: 1.1, delay: 0.3, ease: "easeOut" }}
-              />
-            </div>
-          </div>
-
-          <div className="mt-4 grid gap-4 sm:grid-cols-3">
-            {stats.map((stat) => (
-              <div key={stat.label} className="rounded-lg border border-white/10 bg-white/[0.03] p-4">
-                <p className={`text-2xl font-black ${stat.tone}`}>{stat.value}</p>
-                <p className="mt-1 text-xs text-slate-500">{stat.label}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-4 rounded-lg border border-white/10 bg-black/20 p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <p className="text-sm font-semibold text-white">Live prep loop</p>
-              <Clock3 size={16} className="text-slate-500" />
-            </div>
-            <div className="space-y-2">
-              {["Revise DP patterns", "Tailor backend resume bullets", "Practice system design story"].map((task, index) => (
-                <div key={task} className="flex items-center gap-3 rounded-md bg-white/[0.03] px-3 py-2">
-                  <CheckCircle2 size={15} className={index === 0 ? "text-emerald-300" : "text-slate-600"} />
-                  <span className="text-sm text-slate-300">{task}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+import React, { useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
+import { useAppStore } from '../store/app-store';
+import { FibonacciSphere3D } from '../components/common/FibonacciSphere3D';
+import './LandingPage.css';
 
 export function LandingPage() {
   const isAuthenticated = useAppStore((state) => state.isAuthenticated);
-  const startPath = isAuthenticated ? "/dashboard" : "/auth";
+  const startPath = isAuthenticated ? '/dashboard' : '/auth';
+
+  // Custom Cursor Logic
+  useEffect(() => {
+    const c1 = document.getElementById('cur');
+    const c2 = document.getElementById('cur2');
+    if (!c1 || !c2) return;
+
+    let x = 0, y = 0, x2 = 0, y2 = 0;
+    let animationFrameId: number;
+
+    const onMouseMove = (e: MouseEvent) => {
+      x = e.clientX;
+      y = e.clientY;
+    };
+    
+    const onMouseLeave = () => {
+      c1.style.opacity = '0';
+      c2.style.opacity = '0';
+    };
+    
+    const onMouseEnter = () => {
+      c1.style.opacity = '1';
+      c2.style.opacity = '1';
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseleave', onMouseLeave);
+    document.addEventListener('mouseenter', onMouseEnter);
+
+    const loop = () => {
+      c1.style.left = x + 'px';
+      c1.style.top = y + 'px';
+      x2 += (x - x2) * 0.14;
+      y2 += (y - y2) * 0.14;
+      c2.style.left = x2 + 'px';
+      c2.style.top = y2 + 'px';
+      animationFrameId = requestAnimationFrame(loop);
+    };
+    loop();
+
+    const hoverElements = document.querySelectorAll('button, a, .fc');
+    const onHoverEnter = () => {
+      c1.style.transform = 'translate(-50%,-50%) scale(1.8)';
+      c2.style.transform = 'translate(-50%,-50%) scale(0.5)';
+    };
+    const onHoverLeave = () => {
+      c1.style.transform = 'translate(-50%,-50%) scale(1)';
+      c2.style.transform = 'translate(-50%,-50%) scale(1)';
+    };
+
+    hoverElements.forEach((el) => {
+      el.addEventListener('mouseenter', onHoverEnter);
+      el.addEventListener('mouseleave', onHoverLeave);
+    });
+
+    return () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseleave', onMouseLeave);
+      document.removeEventListener('mouseenter', onMouseEnter);
+      hoverElements.forEach((el) => {
+        el.removeEventListener('mouseenter', onHoverEnter);
+        el.removeEventListener('mouseleave', onHoverLeave);
+      });
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  // Scroll Reveal Logic
+  useEffect(() => {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('in'), i * 60);
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+    
+    return () => obs.disconnect();
+  }, []);
+
+  // Card 3D Tilt Logic
+  const card3dWrapRef = useRef<HTMLDivElement>(null);
+  const card3dRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const wrap = card3dWrapRef.current;
+    const card = card3dRef.current;
+    if (!wrap || !card) return;
+
+    const onMouseMove = (e: MouseEvent) => {
+      const rect = wrap.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = (e.clientX - cx) / (rect.width / 2);
+      const dy = (e.clientY - cy) / (rect.height / 2);
+      card.style.transform = `rotateX(${-dy * 10}deg) rotateY(${dx * 12}deg)`;
+      card.style.boxShadow = `${-dx * 20}px ${-dy * 20}px 80px rgba(0,0,0,0.8),
+        0 0 0 1px rgba(255,255,255,0.06),
+        ${dx * 8}px ${dy * 8}px 40px rgba(109,94,245,0.15)`;
+    };
+
+    const onMouseLeave = () => {
+      card.style.transform = 'rotateX(4deg) rotateY(-8deg)';
+      card.style.boxShadow = '0 40px 100px rgba(0,0,0,0.7),0 0 0 1px rgba(255,255,255,0.04)';
+    };
+
+    wrap.addEventListener('mousemove', onMouseMove);
+    wrap.addEventListener('mouseleave', onMouseLeave);
+
+    return () => {
+      wrap.removeEventListener('mousemove', onMouseMove);
+      wrap.removeEventListener('mouseleave', onMouseLeave);
+    };
+  }, []);
+
+  // Feature Card Tilt Logic
+  useEffect(() => {
+    const fcs = document.querySelectorAll<HTMLDivElement>('.fc');
+    
+    const onMouseMove = (e: MouseEvent) => {
+      const card = e.currentTarget as HTMLDivElement;
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left - r.width / 2) / (r.width / 2);
+      const y = (e.clientY - r.top - r.height / 2) / (r.height / 2);
+      card.style.transform = `perspective(600px) rotateX(${-y * 5}deg) rotateY(${x * 5}deg)`;
+    };
+
+    const onMouseLeave = (e: MouseEvent) => {
+      const card = e.currentTarget as HTMLDivElement;
+      card.style.transform = 'perspective(600px) rotateX(0) rotateY(0)';
+    };
+
+    fcs.forEach(card => {
+      card.addEventListener('mousemove', onMouseMove);
+      card.addEventListener('mouseleave', onMouseLeave);
+    });
+
+    return () => {
+      fcs.forEach(card => {
+        card.removeEventListener('mousemove', onMouseMove);
+        card.removeEventListener('mouseleave', onMouseLeave);
+      });
+    };
+  }, []);
+
+  // Nav Scroll Style
+  useEffect(() => {
+    const nav = document.querySelector('nav');
+    if (!nav) return;
+    
+    const onScroll = () => {
+      nav.style.borderBottomColor = window.scrollY > 30
+        ? 'rgba(255,255,255,0.09)' 
+        : 'rgba(255,255,255,0.06)';
+    };
+    
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   return (
-    <div className="min-h-screen overflow-hidden bg-[#030303] text-slate-100 font-sans">
-      <div className="pointer-events-none fixed inset-0 z-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDQwIEwgNDAgNDAgNDAgMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwgMjU1LCAyNTUsIDAuMDMpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] [mask-image:linear-gradient(to_bottom,white,transparent)] opacity-50" />
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <NebulaBackground opacity={0.12} />
+    <div className="landing-page">
+      {/* custom cursors */}
+      <div id="cur"></div>
+      <div id="cur2"></div>
+
+      {/* NAV */}
+      <nav>
+        <Link to="/" className="logo">
+          <div className="logo-box">⚡</div>
+          StudyBuddy
+        </Link>
+        <ul className="nav-links">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#">Roadmaps</a></li>
+          <li><a href="#">For Students</a></li>
+          <li><a href="#">Pricing</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">About</a></li>
+        </ul>
+        <div className="nav-r">
+          <Link to="/auth" className="btn-ghost" style={{textDecoration:'none'}}>Log in</Link>
+          <Link to={startPath} className="btn-nav" style={{textDecoration:'none'}}>Get Started Free →</Link>
+        </div>
+      </nav>
+
+      {/* HERO */}
+      <section className="hero">
+        <div className="hero-l">
+          <div className="badge"><div className="badge-dot"></div>Desktop App Experience</div>
+
+          <h1>
+            Your intelligent<br />
+            <span className="italic-serif">Student Career OS</span>
+          </h1>
+
+          <p className="hero-sub">
+            Execute your placement roadmap flawlessly. A unified, native-feeling workspace for your coding, notes, and technical interviews.
+          </p>
+
+          <ul className="feat-pills">
+            <li className="feat-pill">
+              <div className="pill-icon">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6d5ef5" strokeWidth="2"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg>
+              </div>
+              Distraction-free focus modes
+            </li>
+            <li className="feat-pill">
+              <div className="pill-icon">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6d5ef5" strokeWidth="2"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>
+              </div>
+              Integrated coding environments
+            </li>
+            <li className="feat-pill">
+              <div className="pill-icon">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6d5ef5" strokeWidth="2"><circle cx="12" cy="12" r="3" /><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" /></svg>
+              </div>
+              AI-powered career insights via Veda
+            </li>
+          </ul>
+
+          <div className="ctas">
+            <Link to={startPath} className="btn-primary" style={{textDecoration:'none', display:'inline-block'}}>Start Your Journey Free</Link>
+            <button className="btn-sec">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="5 3 19 12 5 21 5 3" /></svg>
+              Explore Features
+            </button>
+          </div>
+
+          <div className="testimonial">
+            <p className="t-quote">"StudyBuddy completely replaced my messy spreadsheets and random notion pages. It feels like a high-end native app built just for my placements."</p>
+            <div className="t-author">
+              <div className="t-av">MR</div>
+              <div>
+                <div className="t-name">Mr. Pds</div>
+                <div className="t-role">SDE at Tech</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 3D RIGHT */}
+        <FibonacciSphere3D />
+      </section>
+
+      {/* STATS */}
+      <div className="stats">
+        <div className="stat reveal">
+          <div className="stat-n" id="sn1">50<span>K+</span></div>
+          <div className="stat-l">Active Learners</div>
+        </div>
+        <div className="stat reveal">
+          <div className="stat-n" id="sn2">200<span>K+</span></div>
+          <div className="stat-l">Notes Synced</div>
+        </div>
+        <div className="stat reveal">
+          <div className="stat-n" id="sn3">10<span>K+</span></div>
+          <div className="stat-l">Roadmaps Generated</div>
+        </div>
+        <div className="stat reveal">
+          <div className="stat-n" id="sn4">4.9<span>/5 ★</span></div>
+          <div className="stat-l">Average Rating</div>
+        </div>
       </div>
 
-      <main className="relative z-10">
-        <section id="home" className="mx-auto grid min-h-[calc(100vh-64px)] w-full max-w-7xl items-center gap-12 px-4 pb-14 pt-16 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8 lg:pt-10">
-          <Motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="max-w-2xl"
-          >
-            <div className="mb-7 inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-bold uppercase tracking-[0.22em] text-indigo-100">
-              <Sparkles size={14} className="text-cyan-300" />
-              Premium placement OS
-            </div>
-            <h1 className="text-5xl font-semibold leading-[0.95] tracking-tight text-white sm:text-6xl lg:text-7xl">
-              StudyBuddy turns ambition into a daily placement plan.
-            </h1>
-            <p className="mt-7 max-w-xl text-lg leading-8 text-slate-300">
-              A Swastha Parivar-style premium experience for technical students: calm, intelligent, evidence-led, and built around the work that actually moves readiness.
-            </p>
+      {/* FEATURES */}
+      <div id="features" className="section">
+        <div className="eye reveal">Everything you need</div>
+        <h2 className="sec-title reveal">Learn, build &amp; grow<br /><em>all in one place</em></h2>
+        <p className="sec-sub reveal">An all-in-one platform designed to adapt to you — your pace, your goals, your career.</p>
 
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <Link
-                to={startPath}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3.5 text-sm font-black text-black transition hover:bg-cyan-100"
-              >
-                Start your plan
-                <ArrowRight size={17} />
-              </Link>
-              <Link
-                to="/demo"
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/12 bg-white/[0.04] px-6 py-3.5 text-sm font-bold text-white transition hover:border-cyan-300/40 hover:bg-white/[0.08]"
-              >
-                <Play size={16} className="fill-current" />
-                View recruiter demo
-              </Link>
-            </div>
-
-            <div className="mt-10 grid max-w-xl grid-cols-3 gap-3">
-              {stats.map((stat) => (
-                <div key={stat.label} className="rounded-lg border border-white/10 bg-white/[0.035] p-3">
-                  <p className={`text-xl font-black ${stat.tone}`}>{stat.value}</p>
-                  <p className="mt-1 text-[11px] leading-4 text-slate-500">{stat.label}</p>
-                </div>
-              ))}
-            </div>
-          </Motion.div>
-
-          <Motion.div
-            initial={{ opacity: 0, y: 28, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" }}
-            className="relative"
-          >
-            <ProductPreview />
-          </Motion.div>
-        </section>
-
-        <section className="border-y border-white/10 bg-white/[0.025]">
-          <div className="mx-auto grid max-w-7xl gap-5 px-4 py-7 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
-            {["Personalized daily plan", "Recall and notes intelligence", "Resume proof loop", "Company-ready prep"].map((item) => (
-              <div key={item} className="flex items-center gap-3 text-sm font-semibold text-slate-300">
-                <BadgeCheck size={17} className="text-emerald-300" />
-                {item}
-              </div>
-            ))}
+        <div className="feat-grid">
+          <div className="fc reveal">
+            <div className="fc-ico">🗺️</div>
+            <div className="fc-t">AI Roadmaps</div>
+            <p className="fc-d">Personalized, adaptive roadmaps that evolve with your progress and adjust to your learning pace automatically.</p>
+            <a href="#" className="fc-link">Learn more →</a>
           </div>
-        </section>
-
-        <section id="features" className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
-          <div className="mb-12 max-w-3xl">
-            <p className="text-xs font-black uppercase tracking-[0.28em] text-cyan-300">Premium system</p>
-            <h2 className="mt-4 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-              One command center for study, skill, career, and confidence.
-            </h2>
+          <div className="fc reveal">
+            <div className="fc-ico">📝</div>
+            <div className="fc-t">Smart Notes</div>
+            <p className="fc-d">AI-enhanced notes with recall linking and a live knowledge graph — never lose a concept again.</p>
+            <a href="#" className="fc-link">Learn more →</a>
           </div>
-
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {modules.map((module) => (
-              <Motion.article
-                key={module.title}
-                initial={{ opacity: 0, y: 18 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.45 }}
-                className="rounded-lg border border-white/10 bg-[#07090d]/85 p-5 transition hover:-translate-y-1 hover:border-white/20"
-              >
-                <div className={`mb-7 flex h-11 w-11 items-center justify-center rounded-lg ${module.bg} ${module.accent}`}>
-                  <module.icon size={21} />
-                </div>
-                <h3 className="text-xl font-bold text-white">{module.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-slate-400">{module.text}</p>
-              </Motion.article>
-            ))}
+          <div className="fc reveal">
+            <div className="fc-ico">🧠</div>
+            <div className="fc-t">Recall System</div>
+            <p className="fc-d">Active recall and spaced repetition to make learning stick forever — scientifically proven methods.</p>
+            <a href="#" className="fc-link">Learn more →</a>
           </div>
-        </section>
-
-        <section id="how-to-use" className="bg-[#05070b]">
-          <div className="mx-auto grid max-w-7xl gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[0.8fr_1fr] lg:px-8">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-300">Workflow</p>
-              <h2 className="mt-4 text-4xl font-black tracking-tight text-white sm:text-5xl">
-                The plan stays connected from first topic to final offer.
-              </h2>
-              <p className="mt-5 text-base leading-8 text-slate-400">
-                StudyBuddy keeps the premium feel focused on useful decisions: what to study, what to build, what to prove, and where to apply next.
-              </p>
-            </div>
-
-            <div className="grid gap-3">
-              {workflow.map((item, index) => (
-                <Motion.div
-                  key={item}
-                  initial={{ opacity: 0, x: 18 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.45, delay: index * 0.06 }}
-                  className="grid grid-cols-[auto_1fr_auto] items-center gap-4 rounded-lg border border-white/10 bg-white/[0.035] p-4"
-                >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-sm font-black text-black">
-                    {index + 1}
-                  </div>
-                  <p className="font-semibold text-white">{item}</p>
-                  <ChevronRight size={18} className="text-slate-600" />
-                </Motion.div>
-              ))}
-            </div>
+          <div className="fc reveal">
+            <div className="fc-ico">🤖</div>
+            <div className="fc-t">AI Mentor (Veda)</div>
+            <p className="fc-d">Get instant help, clarity and guidance from Veda AI — your personal, always-available career advisor.</p>
+            <a href="#" className="fc-link">Learn more →</a>
           </div>
-        </section>
-
-        <section id="pricing" className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
-          <div className="grid overflow-hidden rounded-lg border border-white/10 bg-[#07090d] lg:grid-cols-[1fr_0.8fr]">
-            <div className="p-7 sm:p-10 lg:p-12">
-              <div className="mb-6 inline-flex items-center gap-2 rounded-lg border border-emerald-300/20 bg-emerald-400/10 px-3 py-2 text-xs font-bold uppercase tracking-[0.2em] text-emerald-200">
-                <GraduationCap size={15} />
-                Student premium
-              </div>
-              <h2 className="max-w-2xl text-4xl font-black tracking-tight text-white sm:text-5xl">
-                Start free. Upgrade when the preparation gets serious.
-              </h2>
-              <p className="mt-5 max-w-2xl text-base leading-8 text-slate-400">
-                The landing page now sells the app as a complete career-prep workspace, not a collection of disconnected tools.
-              </p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Link to={startPath} className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3.5 text-sm font-black text-black transition hover:bg-emerald-100">
-                  Get started
-                  <ArrowRight size={17} />
-                </Link>
-                <Link to="/pricing" className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/10 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-white/[0.06]">
-                  Compare plans
-                  <ChevronRight size={17} />
-                </Link>
-              </div>
-            </div>
-
-            <div className="border-t border-white/10 bg-white/[0.025] p-7 sm:p-10 lg:border-l lg:border-t-0">
-              <p className="text-sm font-bold text-white">Included in Pro Student</p>
-              <div className="mt-6 space-y-4">
-                {inclusions.map((item) => (
-                  <div key={item} className="flex items-center gap-3 text-sm text-slate-300">
-                    <CheckCircle2 size={17} className="text-emerald-300" />
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </div>
+          <div className="fc reveal">
+            <div className="fc-ico">📄</div>
+            <div className="fc-t">Resume Builder</div>
+            <p className="fc-d">AI-powered resume optimization tailored to each role with ATS scoring and one-click adaptation.</p>
+            <a href="#" className="fc-link">Learn more →</a>
           </div>
-        </section>
-      </main>
-
-      <footer className="relative z-10 border-t border-white/10 bg-black px-4 py-10 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-7xl flex-col justify-between gap-6 sm:flex-row sm:items-center">
-          <div className="flex items-center gap-3">
-            <img src="/brand/studybuddy-logo.png" alt="StudyBuddy" className="h-9 w-auto object-contain" />
-            <span className="text-sm font-semibold text-slate-500">AI mentor for placement-ready learners.</span>
+          <div className="fc reveal">
+            <div className="fc-ico">💼</div>
+            <div className="fc-t">Job Matcher</div>
+            <p className="fc-d">Find the right opportunities that match your skills and career goals with real-time job matching.</p>
+            <a href="#" className="fc-link">Learn more →</a>
           </div>
-          <p className="text-xs text-slate-600">2026 StudyBuddy. All rights reserved.</p>
         </div>
+      </div>
+
+      {/* 3D CARD SECTION */}
+      <div className="card3d-section">
+        <div className="card3d-wrap reveal" ref={card3dWrapRef}>
+          <div className="card3d" ref={card3dRef}>
+            <div className="chrome">
+              <div className="d dr"></div><div className="d dy"></div><div className="d dg"></div>
+              <div className="chrome-title">StudyBuddy · Dashboard</div>
+            </div>
+            <div className="dash">
+              <div className="row2">
+                <div className="dc">
+                  <div className="dc-label">Roadmap Progress</div>
+                  <div className="dc-val pu">72%</div>
+                  <div className="dc-bar"><div className="dc-fill fill-p"></div></div>
+                </div>
+                <div className="dc">
+                  <div className="dc-label">Recall Health</div>
+                  <div className="dc-val gr">84%</div>
+                  <div className="dc-bar"><div className="dc-fill fill-g"></div></div>
+                </div>
+              </div>
+              <div className="dc-tasks">
+                <div className="dc-tasks-label">Today's Plan</div>
+                <div className="task"><div className="tc done">✓</div>Revise useEffect &amp; useMemo</div>
+                <div className="task"><div className="tc"></div>Complete Async JS Deep Dive</div>
+                <div className="task"><div className="tc"></div>Build real-time chat feature</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="card3d-right reveal">
+          <div className="eye">Your progress dashboard</div>
+          <h3>Track every step of<br /><em>your journey</em></h3>
+          <p>A beautiful, native-feeling dashboard that shows your roadmap health, daily targets, recall scores, and career readiness — all in one view.</p>
+          <div className="mini-stats">
+            <div className="ms">
+              <div className="ms-n">12<em>d</em></div>
+              <div className="ms-l">Current streak</div>
+            </div>
+            <div className="ms">
+              <div className="ms-n">4<em>/6</em></div>
+              <div className="ms-l">Lessons today</div>
+            </div>
+            <div className="ms">
+              <div className="ms-n">68<em>%</em></div>
+              <div className="ms-l">Career ready</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA */}
+      <div className="cta-wrap">
+        <div className="eye reveal">Get started today</div>
+        <h2 className="cta-title reveal">Your career OS<br />is <em>waiting for you</em></h2>
+        <p className="cta-sub reveal">Join 50,000+ students who are building their future with StudyBuddy.</p>
+        <div className="cta-btns reveal">
+          <Link to={startPath} className="btn-cta-p" style={{textDecoration:'none'}}>Start for Free →</Link>
+          <Link to="/demo" className="btn-cta-s" style={{textDecoration:'none'}}>✦ Try Recruiter Demo</Link>
+        </div>
+      </div>
+
+      {/* FOOTER */}
+      <footer>
+        <a href="#" className="logo" style={{textDecoration:'none', color:'var(--t1)'}}>
+          <div className="logo-box">⚡</div>StudyBuddy
+        </a>
+        <div className="f-links">
+          <a href="#">Privacy</a><a href="#">Terms</a><a href="#">Blog</a><a href="#">Contact</a>
+        </div>
+        <div className="f-copy">© 2026 StudyBuddy · Powered by Veda AI</div>
       </footer>
     </div>
   );

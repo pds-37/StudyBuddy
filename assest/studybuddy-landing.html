@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyBuddy — Student Career OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg:#070707;
+  --s1:#0e0e0e;
+  --s2:#141414;
+  --s3:#1c1c1c;
+  --b1:rgba(255,255,255,0.06);
+  --b2:rgba(255,255,255,0.11);
+  --b3:rgba(255,255,255,0.18);
+  --p:#6d5ef5;
+  --pl:#8b7ff7;
+  --pd:#4c3dd4;
+  --t1:#f2f2f3;
+  --t2:#8e8ea0;
+  --t3:#444455;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --serif:'Instrument Serif',Georgia,serif;
+}
+
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--t1);
+  font-family:var(--sans);font-size:15px;line-height:1.6;
+  overflow-x:hidden;-webkit-font-smoothing:antialiased;
+}
+
+/* scrollbar */
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--s3);border-radius:2px}
+
+/* ── CURSOR ── */
+#cur{
+  position:fixed;pointer-events:none;z-index:9999;
+  width:8px;height:8px;border-radius:50%;
+  background:rgba(109,94,245,0.9);
+  transform:translate(-50%,-50%);
+  transition:transform 0.08s ease;
+  mix-blend-mode:screen;
+}
+#cur2{
+  position:fixed;pointer-events:none;z-index:9998;
+  width:32px;height:32px;border-radius:50%;
+  border:1px solid rgba(109,94,245,0.35);
+  transform:translate(-50%,-50%);
+  transition:left 0.12s ease,top 0.12s ease;
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 52px;height:60px;
+  border-bottom:1px solid var(--b1);
+  background:rgba(7,7,7,0.7);
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  animation:fadeDown 0.7s ease both;
+}
+
+.logo{display:flex;align-items:center;gap:10px;font-weight:600;font-size:14px;letter-spacing:-0.01em;text-decoration:none;color:var(--t1)}
+.logo-box{
+  width:30px;height:30px;border-radius:8px;
+  background:linear-gradient(135deg,var(--pd),var(--p));
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+  box-shadow:0 0 0 1px rgba(109,94,245,0.4),0 0 20px rgba(109,94,245,0.2);
+}
+
+.nav-links{display:flex;gap:30px;list-style:none}
+.nav-links a{color:var(--t2);font-size:13.5px;font-weight:400;text-decoration:none;transition:color 0.2s}
+.nav-links a:hover{color:var(--t1)}
+
+.nav-r{display:flex;align-items:center;gap:10px}
+.btn-ghost{
+  background:none;border:1px solid var(--b2);color:var(--t2);
+  font:inherit;font-size:13px;font-weight:400;
+  padding:7px 16px;border-radius:8px;cursor:pointer;
+  transition:border-color 0.2s,color 0.2s;
+}
+.btn-ghost:hover{border-color:var(--b3);color:var(--t1)}
+.btn-nav{
+  background:var(--p);color:#fff;border:none;font:inherit;
+  font-size:13px;font-weight:500;padding:8px 18px;
+  border-radius:8px;cursor:pointer;
+  box-shadow:0 0 0 1px rgba(109,94,245,0.5),0 4px 24px rgba(109,94,245,0.3);
+  transition:background 0.2s,box-shadow 0.2s,transform 0.15s;
+}
+.btn-nav:hover{background:var(--pl);transform:translateY(-1px);box-shadow:0 0 0 1px rgba(139,127,247,0.5),0 6px 30px rgba(109,94,245,0.4)}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;
+  display:grid;grid-template-columns:1fr 1fr;
+  align-items:center;
+  padding:90px 52px 60px;
+  gap:0;
+  position:relative;overflow:hidden;
+}
+
+/* faint radial on left */
+.hero::before{
+  content:'';position:absolute;
+  left:-15%;top:20%;
+  width:700px;height:700px;border-radius:50%;
+  background:radial-gradient(circle,rgba(76,61,212,0.1) 0%,transparent 70%);
+  pointer-events:none;
+}
+
+/* ── HERO LEFT ── */
+.hero-l{
+  position:relative;z-index:10;
+  padding-right:60px;
+}
+
+.badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(109,94,245,0.08);
+  border:1px solid rgba(109,94,245,0.2);
+  border-radius:6px;padding:5px 12px;
+  font-size:11.5px;font-weight:500;color:var(--pl);
+  letter-spacing:0.05em;text-transform:uppercase;
+  margin-bottom:28px;
+  animation:fadeUp 0.7s ease 0.15s both;
+}
+
+.badge-dot{width:5px;height:5px;border-radius:50%;background:var(--p);box-shadow:0 0 8px var(--p);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+h1{
+  font-size:clamp(2.4rem,4vw,4rem);
+  font-weight:600;line-height:1.06;
+  letter-spacing:-0.035em;
+  margin-bottom:22px;
+  animation:fadeUp 0.7s ease 0.25s both;
+}
+
+h1 .dim{color:var(--t2);font-weight:400}
+h1 .italic-serif{
+  font-family:var(--serif);font-style:italic;font-weight:400;
+  background:linear-gradient(90deg,#8b7ff7,#b09dff);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+.hero-sub{
+  font-size:14.5px;color:var(--t2);line-height:1.8;
+  max-width:400px;margin-bottom:36px;
+  animation:fadeUp 0.7s ease 0.35s both;
+}
+
+.feat-pills{
+  display:flex;flex-direction:column;gap:11px;
+  margin-bottom:40px;
+  animation:fadeUp 0.7s ease 0.45s both;
+}
+
+.feat-pill{
+  display:inline-flex;align-items:center;gap:10px;
+  font-size:13px;color:var(--t2);
+}
+
+.pill-icon{
+  width:28px;height:28px;border-radius:7px;flex-shrink:0;
+  background:var(--s2);border:1px solid var(--b1);
+  display:flex;align-items:center;justify-content:center;font-size:13px;
+}
+
+.ctas{display:flex;align-items:center;gap:12px;animation:fadeUp 0.7s ease 0.55s both}
+
+.btn-primary{
+  background:#fff;color:#000;border:none;font:inherit;
+  font-size:13.5px;font-weight:600;letter-spacing:-0.01em;
+  padding:11px 24px;border-radius:9px;cursor:pointer;
+  transition:background 0.2s,transform 0.15s;
+}
+.btn-primary:hover{background:#eee;transform:translateY(-1px)}
+
+.btn-sec{
+  display:flex;align-items:center;gap:8px;
+  background:none;border:1px solid var(--b2);color:var(--t2);
+  font:inherit;font-size:13px;padding:11px 20px;border-radius:9px;cursor:pointer;
+  transition:border-color 0.2s,color 0.2s,background 0.2s;
+}
+.btn-sec:hover{border-color:var(--b3);color:var(--t1);background:rgba(255,255,255,0.02)}
+
+.testimonial{
+  margin-top:52px;padding-left:16px;
+  border-left:2px solid rgba(109,94,245,0.35);
+  animation:fadeUp 0.7s ease 0.7s both;
+}
+.t-quote{font-size:12.5px;color:var(--t2);font-style:italic;line-height:1.7;margin-bottom:12px}
+.t-author{display:flex;align-items:center;gap:10px}
+.t-av{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--s3);border:1px solid var(--b1);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:600;color:var(--t2);letter-spacing:.04em;
+}
+.t-name{font-size:12px;font-weight:500;color:var(--t1)}
+.t-role{font-size:11px;color:var(--t3)}
+
+/* ── HERO RIGHT — 3D CANVAS ── */
+.hero-r{
+  position:relative;z-index:10;
+  display:flex;align-items:center;justify-content:center;
+  height:calc(100vh - 90px);
+}
+
+#c3d{
+  width:100%;height:100%;
+  display:block;
+}
+
+/* floating chips over the 3D scene */
+.chip{
+  position:absolute;
+  display:flex;align-items:center;gap:8px;
+  background:rgba(10,10,14,0.82);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--b2);
+  border-radius:10px;padding:9px 14px;
+  font-size:12px;font-weight:500;color:var(--t1);
+  white-space:nowrap;
+  box-shadow:0 16px 48px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.03);
+  opacity:0;
+  animation:chipIn 0.6s ease forwards, chipFloat 5s ease-in-out infinite;
+}
+
+.chip:nth-child(1){top:18%;left:5%; animation-delay:1.2s, 1.8s}
+.chip:nth-child(2){top:38%;right:2%; animation-delay:1.5s, 2.1s}
+.chip:nth-child(3){bottom:26%;left:8%;animation-delay:1.8s, 2.4s}
+.chip:nth-child(4){bottom:14%;right:5%;animation-delay:2.1s, 2.7s}
+
+@keyframes chipIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes chipFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-7px)}
+}
+
+.chip-icon{font-size:14px}
+.chip-val{font-size:11px;color:var(--t2);margin-top:1px}
+.chip-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.chip-dot.p{background:var(--p);box-shadow:0 0 8px rgba(109,94,245,0.8)}
+.chip-dot.g{background:#4ade80;box-shadow:0 0 8px rgba(74,222,128,0.6)}
+.chip-dot.a{background:#fbbf24;box-shadow:0 0 8px rgba(251,191,36,0.6)}
+
+/* ── STATS STRIP ── */
+.stats{
+  display:flex;
+  border-top:1px solid var(--b1);
+  border-bottom:1px solid var(--b1);
+}
+.stat{
+  flex:1;padding:36px 52px;
+  border-right:1px solid var(--b1);
+}
+.stat:last-child{border-right:none}
+.stat-n{
+  font-size:2.6rem;font-weight:600;letter-spacing:-0.05em;
+  line-height:1;margin-bottom:8px;
+  background:linear-gradient(180deg,var(--t1) 40%,rgba(242,242,243,0.5));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.stat-n span{font-size:1.2rem;color:var(--p);-webkit-text-fill-color:var(--p)}
+.stat-l{font-size:12.5px;color:var(--t3)}
+
+/* ── FEATURES ── */
+.section{padding:100px 52px;max-width:1200px;margin:0 auto}
+
+.eye{
+  font-size:11px;font-weight:500;color:var(--pl);
+  letter-spacing:0.1em;text-transform:uppercase;margin-bottom:16px;
+}
+
+.sec-title{
+  font-size:clamp(1.7rem,2.8vw,2.6rem);
+  font-weight:600;letter-spacing:-0.03em;line-height:1.1;margin-bottom:14px;
+}
+.sec-title em{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--t2)}
+
+.sec-sub{font-size:14px;color:var(--t2);max-width:440px;line-height:1.75}
+
+/* 3D tilt cards grid */
+.feat-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1px;background:var(--b1);
+  border:1px solid var(--b1);border-radius:16px;overflow:hidden;
+  margin-top:56px;
+}
+
+.fc{
+  background:var(--bg);padding:30px;
+  transition:background 0.3s;
+  cursor:default;
+  transform-style:preserve-3d;
+  perspective:800px;
+}
+.fc:hover{background:rgba(14,14,14,0.98)}
+
+.fc-ico{
+  width:38px;height:38px;border-radius:10px;
+  background:var(--s2);border:1px solid var(--b1);
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;margin-bottom:18px;
+  transition:border-color 0.3s,box-shadow 0.3s;
+}
+.fc:hover .fc-ico{border-color:rgba(109,94,245,0.3);box-shadow:0 0 20px rgba(109,94,245,0.15)}
+
+.fc-t{font-size:13.5px;font-weight:600;margin-bottom:8px;color:var(--t1)}
+.fc-d{font-size:12.5px;color:var(--t3);line-height:1.65}
+.fc-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--pl);margin-top:14px;text-decoration:none;transition:gap 0.2s}
+.fc:hover .fc-link{gap:7px}
+
+/* ── 3D CARD SECTION ── */
+.card3d-section{
+  padding:0 52px 100px;
+  display:grid;grid-template-columns:1fr 1fr;gap:40px;
+  align-items:center;max-width:1200px;margin:0 auto;
+}
+
+.card3d-wrap{
+  perspective:1000px;
+}
+
+.card3d{
+  background:var(--s1);
+  border:1px solid var(--b2);
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 40px 100px rgba(0,0,0,0.7),0 0 0 1px rgba(255,255,255,0.04);
+  transform-style:preserve-3d;
+  transform:rotateX(4deg) rotateY(-8deg);
+  transition:transform 0.4s ease,box-shadow 0.4s ease;
+}
+.card3d:hover{
+  transform:rotateX(0deg) rotateY(0deg);
+  box-shadow:0 60px 120px rgba(0,0,0,0.7),0 0 0 1px rgba(255,255,255,0.06);
+}
+
+.chrome{
+  display:flex;align-items:center;gap:6px;
+  padding:12px 16px;border-bottom:1px solid var(--b1);
+  background:rgba(255,255,255,0.015);
+}
+.d{width:9px;height:9px;border-radius:50%}
+.dr{background:#ff5f57}.dy{background:#febc2e}.dg{background:#28c840}
+.chrome-title{margin-left:auto;font-size:10.5px;color:var(--t3);letter-spacing:0.02em}
+
+.dash{padding:20px}
+
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+
+.dc{
+  background:var(--bg);border:1px solid var(--b1);
+  border-radius:10px;padding:14px;
+}
+.dc-label{font-size:9.5px;color:var(--t3);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px}
+.dc-val{font-size:22px;font-weight:600;letter-spacing:-0.03em}
+.dc-val.pu{color:var(--pl)}
+.dc-val.gr{color:#4ade80}
+.dc-bar{height:3px;border-radius:2px;background:rgba(255,255,255,0.06);margin-top:8px;overflow:hidden}
+.dc-fill{height:100%;border-radius:2px;animation:barIn 1.4s ease 1s both}
+.fill-p{background:var(--p);width:72%}
+.fill-g{background:#4ade80;width:84%}
+@keyframes barIn{from{width:0 !important}}
+
+.dc-tasks{background:var(--bg);border:1px solid var(--b1);border-radius:10px;padding:14px}
+.dc-tasks-label{font-size:10px;font-weight:500;color:var(--t2);margin-bottom:10px}
+
+.task{
+  display:flex;align-items:center;gap:9px;
+  font-size:11.5px;color:var(--t2);
+  padding:6px 0;border-bottom:1px solid var(--b1);
+}
+.task:last-child{border:none}
+.tc{
+  width:13px;height:13px;border-radius:4px;
+  border:1px solid var(--b2);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:8px;
+}
+.tc.done{background:var(--p);border-color:var(--p);color:#fff}
+
+.card3d-right{}
+.card3d-right .eye{margin-bottom:14px}
+.card3d-right h3{
+  font-size:clamp(1.5rem,2.5vw,2.2rem);
+  font-weight:600;letter-spacing:-0.03em;line-height:1.15;margin-bottom:16px;
+}
+.card3d-right h3 em{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--t2)}
+.card3d-right p{font-size:14px;color:var(--t2);line-height:1.8;margin-bottom:28px}
+
+.mini-stats{display:flex;gap:24px}
+.ms{display:flex;flex-direction:column;gap:4px}
+.ms-n{font-size:1.4rem;font-weight:600;letter-spacing:-0.03em}
+.ms-n em{color:var(--pl);font-style:normal;font-size:0.85em}
+.ms-l{font-size:11px;color:var(--t3)}
+
+/* ── CTA ── */
+.cta-wrap{
+  text-align:center;padding:80px 52px 100px;
+  border-top:1px solid var(--b1);position:relative;overflow:hidden;
+}
+.cta-wrap::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 80% at 50% 110%,rgba(76,61,212,0.13) 0%,transparent 70%);
+}
+.cta-wrap .eye{margin-bottom:20px}
+.cta-title{
+  font-size:clamp(2rem,3.5vw,3rem);font-weight:600;
+  letter-spacing:-0.035em;line-height:1.1;margin-bottom:16px;
+}
+.cta-title em{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--t2)}
+.cta-sub{color:var(--t2);font-size:14px;margin-bottom:36px}
+.cta-btns{display:flex;justify-content:center;gap:12px}
+.btn-cta-p{
+  background:#fff;color:#000;border:none;font:inherit;
+  font-size:14px;font-weight:600;padding:12px 28px;border-radius:10px;cursor:pointer;
+  transition:background 0.2s,transform 0.15s;
+}
+.btn-cta-p:hover{background:#eee;transform:translateY(-1px)}
+.btn-cta-s{
+  display:flex;align-items:center;gap:8px;
+  background:none;border:1px solid var(--b2);color:var(--pl);
+  font:inherit;font-size:13px;padding:12px 22px;border-radius:10px;cursor:pointer;
+  transition:border-color 0.2s,background 0.2s;
+}
+.btn-cta-s:hover{border-color:rgba(109,94,245,0.4);background:rgba(109,94,245,0.05)}
+
+/* ── FOOTER ── */
+footer{
+  border-top:1px solid var(--b1);
+  padding:22px 52px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.f-links{display:flex;gap:22px}
+.f-links a{font-size:12px;color:var(--t3);text-decoration:none}
+.f-links a:hover{color:var(--t2)}
+.f-copy{font-size:11.5px;color:var(--t3)}
+
+/* ── KEYFRAMES ── */
+@keyframes fadeDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+/* scroll observer */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity 0.6s ease,transform 0.6s ease}
+.reveal.in{opacity:1;transform:translateY(0)}
+
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;padding:80px 24px 40px}
+  .hero-r{display:none}
+  nav{padding:0 24px}
+  .nav-links,.nav-r .btn-ghost{display:none}
+  .stats{flex-direction:column}
+  .stat{border-right:none;border-bottom:1px solid var(--b1);padding:28px 24px}
+  .stat:last-child{border-bottom:none}
+  .section,.card3d-section,.cta-wrap{padding-left:24px;padding-right:24px}
+  .feat-grid{grid-template-columns:1fr}
+  .card3d-section{grid-template-columns:1fr}
+  footer{flex-direction:column;gap:14px;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<!-- custom cursors -->
+<div id="cur"></div>
+<div id="cur2"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">
+    <div class="logo-box">⚡</div>
+    StudyBuddy
+  </a>
+  <ul class="nav-links">
+    <li><a href="#">Features</a></li>
+    <li><a href="#">Roadmaps</a></li>
+    <li><a href="#">For Students</a></li>
+    <li><a href="#">Pricing</a></li>
+    <li><a href="#">Blog</a></li>
+    <li><a href="#">About</a></li>
+  </ul>
+  <div class="nav-r">
+    <button class="btn-ghost">Log in</button>
+    <button class="btn-nav">Get Started Free →</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-l">
+    <div class="badge"><div class="badge-dot"></div>Desktop App Experience</div>
+
+    <h1>
+      Your intelligent<br>
+      <span class="italic-serif">Student Career OS</span>
+    </h1>
+
+    <p class="hero-sub">
+      Execute your placement roadmap flawlessly. A unified, native-feeling workspace for your coding, notes, and technical interviews.
+    </p>
+
+    <ul class="feat-pills">
+      <li class="feat-pill">
+        <div class="pill-icon">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6d5ef5" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </div>
+        Distraction-free focus modes
+      </li>
+      <li class="feat-pill">
+        <div class="pill-icon">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6d5ef5" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        Integrated coding environments
+      </li>
+      <li class="feat-pill">
+        <div class="pill-icon">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6d5ef5" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        </div>
+        AI-powered career insights via Veda
+      </li>
+    </ul>
+
+    <div class="ctas">
+      <button class="btn-primary">Start Your Journey Free</button>
+      <button class="btn-sec">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Explore Features
+      </button>
+    </div>
+
+    <div class="testimonial">
+      <p class="t-quote">"StudyBuddy completely replaced my messy spreadsheets and random notion pages. It feels like a high-end native app built just for my placements."</p>
+      <div class="t-author">
+        <div class="t-av">MR</div>
+        <div>
+          <div class="t-name">Mr. Pds</div>
+          <div class="t-role">SDE at Tech</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3D RIGHT -->
+  <div class="hero-r" id="hero-r">
+    <canvas id="c3d"></canvas>
+
+    <!-- floating chips overlaid on 3D -->
+    <div class="chip">
+      <div class="chip-dot p"></div>
+      <div>
+        <div>Roadmap Progress</div>
+        <div class="chip-val">72% — Advanced JS next</div>
+      </div>
+    </div>
+    <div class="chip">
+      <div class="chip-dot g"></div>
+      <div>
+        <div>Recall Health</div>
+        <div class="chip-val">84% · Strong · Keep it up</div>
+      </div>
+    </div>
+    <div class="chip">
+      <div class="chip-icon">💼</div>
+      <div>
+        <div>Job Match Found</div>
+        <div class="chip-val">Frontend Intern · 85% match</div>
+      </div>
+    </div>
+    <div class="chip">
+      <div class="chip-dot a"></div>
+      <div>
+        <div>12-Day Streak</div>
+        <div class="chip-val">Career Readiness · 68%</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat reveal">
+    <div class="stat-n" id="sn1">50<span>K+</span></div>
+    <div class="stat-l">Active Learners</div>
+  </div>
+  <div class="stat reveal">
+    <div class="stat-n" id="sn2">200<span>K+</span></div>
+    <div class="stat-l">Notes Synced</div>
+  </div>
+  <div class="stat reveal">
+    <div class="stat-n" id="sn3">10<span>K+</span></div>
+    <div class="stat-l">Roadmaps Generated</div>
+  </div>
+  <div class="stat reveal">
+    <div class="stat-n" id="sn4">4.9<span>/5 ★</span></div>
+    <div class="stat-l">Average Rating</div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div class="section">
+  <div class="eye reveal">Everything you need</div>
+  <h2 class="sec-title reveal">Learn, build &amp; grow<br><em>all in one place</em></h2>
+  <p class="sec-sub reveal">An all-in-one platform designed to adapt to you — your pace, your goals, your career.</p>
+
+  <div class="feat-grid">
+    <div class="fc reveal">
+      <div class="fc-ico">🗺️</div>
+      <div class="fc-t">AI Roadmaps</div>
+      <p class="fc-d">Personalized, adaptive roadmaps that evolve with your progress and adjust to your learning pace automatically.</p>
+      <a href="#" class="fc-link">Learn more →</a>
+    </div>
+    <div class="fc reveal">
+      <div class="fc-ico">📝</div>
+      <div class="fc-t">Smart Notes</div>
+      <p class="fc-d">AI-enhanced notes with recall linking and a live knowledge graph — never lose a concept again.</p>
+      <a href="#" class="fc-link">Learn more →</a>
+    </div>
+    <div class="fc reveal">
+      <div class="fc-ico">🧠</div>
+      <div class="fc-t">Recall System</div>
+      <p class="fc-d">Active recall and spaced repetition to make learning stick forever — scientifically proven methods.</p>
+      <a href="#" class="fc-link">Learn more →</a>
+    </div>
+    <div class="fc reveal">
+      <div class="fc-ico">🤖</div>
+      <div class="fc-t">AI Mentor (Veda)</div>
+      <p class="fc-d">Get instant help, clarity and guidance from Veda AI — your personal, always-available career advisor.</p>
+      <a href="#" class="fc-link">Learn more →</a>
+    </div>
+    <div class="fc reveal">
+      <div class="fc-ico">📄</div>
+      <div class="fc-t">Resume Builder</div>
+      <p class="fc-d">AI-powered resume optimization tailored to each role with ATS scoring and one-click adaptation.</p>
+      <a href="#" class="fc-link">Learn more →</a>
+    </div>
+    <div class="fc reveal">
+      <div class="fc-ico">💼</div>
+      <div class="fc-t">Job Matcher</div>
+      <p class="fc-d">Find the right opportunities that match your skills and career goals with real-time job matching.</p>
+      <a href="#" class="fc-link">Learn more →</a>
+    </div>
+  </div>
+</div>
+
+<!-- 3D CARD SECTION -->
+<div class="card3d-section">
+  <div class="card3d-wrap reveal" id="card3d-wrap">
+    <div class="card3d" id="card3d">
+      <div class="chrome">
+        <div class="d dr"></div><div class="d dy"></div><div class="d dg"></div>
+        <div class="chrome-title">StudyBuddy · Dashboard</div>
+      </div>
+      <div class="dash">
+        <div class="row2">
+          <div class="dc">
+            <div class="dc-label">Roadmap Progress</div>
+            <div class="dc-val pu">72%</div>
+            <div class="dc-bar"><div class="dc-fill fill-p"></div></div>
+          </div>
+          <div class="dc">
+            <div class="dc-label">Recall Health</div>
+            <div class="dc-val gr">84%</div>
+            <div class="dc-bar"><div class="dc-fill fill-g"></div></div>
+          </div>
+        </div>
+        <div class="dc-tasks">
+          <div class="dc-tasks-label">Today's Plan</div>
+          <div class="task"><div class="tc done">✓</div>Revise useEffect &amp; useMemo</div>
+          <div class="task"><div class="tc"></div>Complete Async JS Deep Dive</div>
+          <div class="task"><div class="tc"></div>Build real-time chat feature</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card3d-right reveal">
+    <div class="eye">Your progress dashboard</div>
+    <h3>Track every step of<br><em>your journey</em></h3>
+    <p>A beautiful, native-feeling dashboard that shows your roadmap health, daily targets, recall scores, and career readiness — all in one view.</p>
+    <div class="mini-stats">
+      <div class="ms">
+        <div class="ms-n">12<em>d</em></div>
+        <div class="ms-l">Current streak</div>
+      </div>
+      <div class="ms">
+        <div class="ms-n">4<em>/6</em></div>
+        <div class="ms-l">Lessons today</div>
+      </div>
+      <div class="ms">
+        <div class="ms-n">68<em>%</em></div>
+        <div class="ms-l">Career ready</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-wrap">
+  <div class="eye reveal">Get started today</div>
+  <h2 class="cta-title reveal">Your career OS<br>is <em>waiting for you</em></h2>
+  <p class="cta-sub reveal">Join 50,000+ students who are building their future with StudyBuddy.</p>
+  <div class="cta-btns reveal">
+    <button class="btn-cta-p">Start for Free →</button>
+    <button class="btn-cta-s">✦ Try Recruiter Demo</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#" class="logo" style="text-decoration:none;color:var(--t1)">
+    <div class="logo-box">⚡</div>StudyBuddy
+  </a>
+  <div class="f-links">
+    <a href="#">Privacy</a><a href="#">Terms</a><a href="#">Blog</a><a href="#">Contact</a>
+  </div>
+  <div class="f-copy">© 2025 StudyBuddy · Powered by Veda AI</div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ═══════════════════════════════════════════
+   THREE.JS — Particle Sphere
+═══════════════════════════════════════════ */
+(function(){
+  const container = document.getElementById('hero-r');
+  const canvas    = document.getElementById('c3d');
+  if(!container || !canvas || typeof THREE === 'undefined') return;
+
+  const W = () => container.clientWidth;
+  const H = () => container.clientHeight;
+
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setSize(W(), H());
+  renderer.setClearColor(0x000000, 0);
+
+  const scene  = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(55, W()/H(), 0.1, 100);
+  camera.position.set(0, 0, 3.2);
+
+  /* ── Fibonacci sphere points ── */
+  const N   = 420;
+  const PHI = Math.PI * (3 - Math.sqrt(5));
+  const pts = [];
+
+  for(let i = 0; i < N; i++){
+    const y  = 1 - (i/(N-1)) * 2;
+    const r  = Math.sqrt(1 - y*y);
+    const th = PHI * i;
+    pts.push(new THREE.Vector3(Math.cos(th)*r, y, Math.sin(th)*r));
+  }
+
+  /* ── Point cloud ── */
+  const ptGeo = new THREE.BufferGeometry().setFromPoints(pts);
+  const ptMat = new THREE.PointsMaterial({
+    color: 0xffffff, size: 0.018,
+    transparent: true, opacity: 0.75,
+    sizeAttenuation: true
+  });
+  const pointCloud = new THREE.Points(ptGeo, ptMat);
+
+  /* ── Connection lines ── */
+  const lineVerts = [];
+  const THRESH    = 0.38;
+
+  for(let i = 0; i < N; i++){
+    for(let j = i+1; j < N; j++){
+      if(pts[i].distanceTo(pts[j]) < THRESH){
+        lineVerts.push(pts[i].x, pts[i].y, pts[i].z);
+        lineVerts.push(pts[j].x, pts[j].y, pts[j].z);
+      }
+    }
+  }
+
+  const lineGeo = new THREE.BufferGeometry();
+  lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(lineVerts, 3));
+  const lineMat = new THREE.LineBasicMaterial({
+    color: 0x6d5ef5, transparent: true, opacity: 0.18
+  });
+  const lines = new THREE.LineSegments(lineGeo, lineMat);
+
+  /* ── Inner glow core ── */
+  const coreGeo = new THREE.SphereGeometry(0.78, 32, 32);
+  const coreMat = new THREE.MeshBasicMaterial({
+    color: 0x4c3dd4, transparent: true, opacity: 0.04,
+    side: THREE.BackSide
+  });
+  const core = new THREE.Mesh(coreGeo, coreMat);
+
+  /* ── Outer atmosphere halo ── */
+  const haloGeo = new THREE.SphereGeometry(1.15, 32, 32);
+  const haloMat = new THREE.MeshBasicMaterial({
+    color: 0x6d5ef5, transparent: true, opacity: 0.025,
+    side: THREE.BackSide
+  });
+  const halo = new THREE.Mesh(haloGeo, haloMat);
+
+  /* ── Equatorial ring ── */
+  const ringGeo = new THREE.TorusGeometry(1.02, 0.003, 8, 120);
+  const ringMat = new THREE.MeshBasicMaterial({
+    color: 0x8b7ff7, transparent: true, opacity: 0.3
+  });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.rotation.x = Math.PI / 2.8;
+
+  /* ── Highlight nodes (larger, glowing) ── */
+  const hiPositions = [
+    new THREE.Vector3( 0.6,  0.7,  0.3),
+    new THREE.Vector3(-0.8,  0.1,  0.5),
+    new THREE.Vector3( 0.2, -0.8,  0.5),
+    new THREE.Vector3( 0.9, -0.2, -0.3),
+    new THREE.Vector3(-0.3,  0.9, -0.2),
+  ];
+
+  const hiGroup = new THREE.Group();
+  hiPositions.forEach(pos => {
+    const geo = new THREE.SphereGeometry(0.022, 12, 12);
+    const mat = new THREE.MeshBasicMaterial({color: 0x8b7ff7});
+    const m   = new THREE.Mesh(geo, mat);
+    m.position.copy(pos.normalize());
+    hiGroup.add(m);
+  });
+
+  /* ── Group everything ── */
+  const group = new THREE.Group();
+  group.add(core, halo, lines, pointCloud, ring, hiGroup);
+  scene.add(group);
+
+  /* ── Mouse reactive rotation ── */
+  let mx = 0, my = 0;
+  let targetRX = 0, targetRY = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = (e.clientX / window.innerWidth  - 0.5) * 2;
+    my = (e.clientY / window.innerHeight - 0.5) * 2;
+  });
+
+  /* ── Animate ── */
+  let t = 0;
+  function animate(){
+    requestAnimationFrame(animate);
+    t += 0.004;
+
+    targetRX += (-my * 0.35 - targetRX) * 0.04;
+    targetRY += ( mx * 0.5  - targetRY) * 0.04;
+
+    group.rotation.y = t + targetRY;
+    group.rotation.x = targetRX;
+
+    /* pulsing ring opacity */
+    ring.material.opacity = 0.2 + Math.sin(t * 1.5) * 0.12;
+
+    /* breathing halo */
+    const scale = 1 + Math.sin(t * 0.8) * 0.02;
+    halo.scale.set(scale, scale, scale);
+
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  /* ── Resize ── */
+  window.addEventListener('resize', () => {
+    renderer.setSize(W(), H());
+    camera.aspect = W()/H();
+    camera.updateProjectionMatrix();
+  });
+})();
+
+/* ═══════════════════════════════════════════
+   3D CARD MOUSE TILT
+═══════════════════════════════════════════ */
+(function(){
+  const wrap = document.getElementById('card3d-wrap');
+  const card = document.getElementById('card3d');
+  if(!wrap||!card) return;
+
+  wrap.addEventListener('mousemove', e => {
+    const rect = wrap.getBoundingClientRect();
+    const cx = rect.left + rect.width/2;
+    const cy = rect.top  + rect.height/2;
+    const dx = (e.clientX - cx) / (rect.width/2);
+    const dy = (e.clientY - cy) / (rect.height/2);
+    card.style.transform = `rotateX(${-dy*10}deg) rotateY(${dx*12}deg)`;
+    card.style.boxShadow = `${-dx*20}px ${-dy*20}px 80px rgba(0,0,0,0.8),
+      0 0 0 1px rgba(255,255,255,0.06),
+      ${dx*8}px ${dy*8}px 40px rgba(109,94,245,0.15)`;
+  });
+
+  wrap.addEventListener('mouseleave', () => {
+    card.style.transform = 'rotateX(4deg) rotateY(-8deg)';
+    card.style.boxShadow = '0 40px 100px rgba(0,0,0,0.7),0 0 0 1px rgba(255,255,255,0.04)';
+  });
+})();
+
+/* ═══════════════════════════════════════════
+   FEATURE CARD 3D TILT
+═══════════════════════════════════════════ */
+document.querySelectorAll('.fc').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const r  = card.getBoundingClientRect();
+    const x  = (e.clientX - r.left - r.width/2)  / (r.width/2);
+    const y  = (e.clientY - r.top  - r.height/2) / (r.height/2);
+    card.style.transform = `perspective(600px) rotateX(${-y*5}deg) rotateY(${x*5}deg)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = 'perspective(600px) rotateX(0) rotateY(0)';
+  });
+});
+
+/* ═══════════════════════════════════════════
+   CURSOR
+═══════════════════════════════════════════ */
+(function(){
+  const c1 = document.getElementById('cur');
+  const c2 = document.getElementById('cur2');
+  let x=0,y=0,x2=0,y2=0;
+
+  document.addEventListener('mousemove', e=>{x=e.clientX;y=e.clientY});
+  document.addEventListener('mouseleave',()=>{c1.style.opacity='0';c2.style.opacity='0'});
+  document.addEventListener('mouseenter',()=>{c1.style.opacity='1';c2.style.opacity='1'});
+
+  function loop(){
+    c1.style.left=x+'px';c1.style.top=y+'px';
+    x2+=(x-x2)*0.14;y2+=(y-y2)*0.14;
+    c2.style.left=x2+'px';c2.style.top=y2+'px';
+    requestAnimationFrame(loop);
+  }
+  loop();
+
+  document.querySelectorAll('button,a,.fc').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{
+      c1.style.transform='translate(-50%,-50%) scale(1.8)';
+      c2.style.transform='translate(-50%,-50%) scale(0.5)';
+    });
+    el.addEventListener('mouseleave',()=>{
+      c1.style.transform='translate(-50%,-50%) scale(1)';
+      c2.style.transform='translate(-50%,-50%) scale(1)';
+    });
+  });
+})();
+
+/* ═══════════════════════════════════════════
+   SCROLL REVEAL
+═══════════════════════════════════════════ */
+(function(){
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach((e,i)=>{
+      if(e.isIntersecting){
+        setTimeout(()=>e.target.classList.add('in'), i*60);
+        obs.unobserve(e.target);
+      }
+    });
+  },{threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+})();
+
+/* ═══════════════════════════════════════════
+   TYPEWRITER on headline
+═══════════════════════════════════════════ */
+(function(){
+  const el = document.querySelector('.italic-serif');
+  if(!el) return;
+  const text = el.textContent;
+  el.textContent = '';
+  let i = 0;
+  setTimeout(()=>{
+    const id = setInterval(()=>{
+      el.textContent += text[i++];
+      if(i>=text.length) clearInterval(id);
+    }, 50);
+  }, 500);
+})();
+
+/* ═══════════════════════════════════════════
+   NAV scroll opacity
+═══════════════════════════════════════════ */
+(function(){
+  const nav = document.querySelector('nav');
+  window.addEventListener('scroll',()=>{
+    nav.style.borderBottomColor = window.scrollY > 30
+      ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.06)';
+  });
+})();
+</script>
+</body>
+</html>
