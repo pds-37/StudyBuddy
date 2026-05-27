@@ -210,10 +210,10 @@ export function AuthPage() {
               <Command className="w-3.5 h-3.5 text-brand" />
               Desktop App Experience
             </div>
-            <h2 className="text-[2.75rem] font-semibold text-white tracking-tight leading-[1.1] mb-6">
-              Your ultimate <br />
+            <h2 className="text-[2.75rem] font-black text-white tracking-tight leading-[1.1] mb-6 font-display">
+              Lock in. Level up.<br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand via-purple-400 to-cyan-400">
-                Academic Weapon
+                Secure the SDE bag.
               </span>
             </h2>
             <p className="text-slate-400 text-lg max-w-[400px] leading-relaxed mb-8">
@@ -272,13 +272,13 @@ export function AuthPage() {
           className="w-full max-w-[380px]"
         >
           <Motion.div variants={itemVariants} className="mb-8">
-            <h1 className="text-2xl font-semibold tracking-tight text-white mb-2">
-              {isSignup ? "Create an account" : "Welcome back"}
+            <h1 className="text-2xl font-black tracking-tight text-white mb-2 font-display">
+              {isSignup ? "Start your lock-in era" : "Time to lock in"}
             </h1>
             <p className="text-sm text-slate-400">
               {isSignup
-                ? "Enter your details below to set up your workspace"
-                : "Enter your credentials to access your workspace"}
+                ? "Configure your workspace parameters to level up."
+                : "Synchronize your placement algorithms, no cap."}
             </p>
           </Motion.div>
 
