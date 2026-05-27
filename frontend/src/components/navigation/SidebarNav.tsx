@@ -51,7 +51,6 @@ const navGroups: NavGroup[] = [
       { name: "Resume", href: "/resume", icon: FilePenLine },
       { name: "Projects", href: "/projects", icon: FolderKanban },
       { name: "Companies", href: "/companies", icon: Building2 },
-      { name: "Mentors", href: "/mentorship", icon: Users },
       { name: "Skill Gap", href: "/skill-gap", icon: Target },
     ]
   },
@@ -59,6 +58,7 @@ const navGroups: NavGroup[] = [
     title: "AI ENGINE",
     items: [
       { name: "Ask Veda", href: "/copilot", icon: MessageSquare, highlight: true },
+      { name: "AI Interview", href: "/interview", icon: Sparkles }
     ]
   }
 ];
