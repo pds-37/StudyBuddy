@@ -72,6 +72,19 @@ export interface IUser {
     gemini?: string;
     openai?: string;
     huggingface?: string;
+    ollamaUrl?: string;
+    ollamaModel?: string;
+  };
+  aiRoutes?: {
+    mentor?: string;
+    roadmap?: string;
+    quiz?: string;
+    resume?: string;
+    skills?: string;
+    note?: string;
+    interview?: string;
+    mentorship?: string;
+    project?: string;
   };
   createdAt: Date;
   updatedAt: Date;
@@ -215,10 +228,36 @@ const userSchema = new Schema<IUser>(
         groq: { type: String, default: "" },
         gemini: { type: String, default: "" },
         openai: { type: String, default: "" },
-        huggingface: { type: String, default: "" }
+        huggingface: { type: String, default: "" },
+        ollamaUrl: { type: String, default: "http://localhost:11434" },
+        ollamaModel: { type: String, default: "llama3.2" }
       },
       default: {},
       select: false
+    },
+    aiRoutes: {
+      type: {
+        mentor: { type: String, default: "groq" },
+        roadmap: { type: String, default: "gemini" },
+        quiz: { type: String, default: "groq" },
+        resume: { type: String, default: "gemini" },
+        skills: { type: String, default: "gemini" },
+        note: { type: String, default: "gemini" },
+        interview: { type: String, default: "groq" },
+        mentorship: { type: String, default: "gemini" },
+        project: { type: String, default: "groq" }
+      },
+      default: {
+        mentor: "groq",
+        roadmap: "gemini",
+        quiz: "groq",
+        resume: "gemini",
+        skills: "gemini",
+        note: "gemini",
+        interview: "groq",
+        mentorship: "gemini",
+        project: "groq"
+      }
     }
   },
   {

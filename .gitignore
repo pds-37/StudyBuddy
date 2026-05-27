@@ -5,6 +5,7 @@ coverage
 
 # Local plans / private working notes
 plan/
+assest/implementation_plan.md
 
 # Environment files and local secrets
 .env

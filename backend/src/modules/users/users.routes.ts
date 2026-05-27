@@ -8,3 +8,5 @@ usersRouter.get("/me/profile", authenticate, usersController.getProfile);
 usersRouter.put("/me/profile", authenticate, usersController.updateProfile);
 usersRouter.get("/me/api-keys", authenticate, usersController.getApiKeys);
 usersRouter.put("/me/api-keys", authenticate, usersController.updateApiKeys);
+usersRouter.get("/me/ai-routes", authenticate, usersController.getAiRoutes);
+usersRouter.put("/me/ai-routes", authenticate, usersController.updateAiRoutes);

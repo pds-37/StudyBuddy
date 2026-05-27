@@ -2,7 +2,7 @@ import { InterviewModel, type InterviewDocument } from "./interview.model.js";
 import { UserModel } from "../users/user.model.js";
 import { NoteModel } from "../notes/note.model.js";
 import { RoadmapModel } from "../roadmaps/roadmap.model.js";
-import { groqService } from "../../services/ai/groq.service.js";
+import { AIOrchestrator } from "../../core/ai-orchestrator.js";
 import { ApiError } from "../../utils/api-error.js";
 import type { InterviewSession, InterviewQuestion, InterviewScore } from "@studybuddy/shared";
 
@@ -92,7 +92,7 @@ Return ONLY a valid JSON array of exactly 3 objects. Do not include markdown fen
 
 ONLY output valid JSON.`;
 
-  const aiQuestionsJson = await groqService.generateStructuredResponse(questionsPrompt);
+  const aiQuestionsJson = await AIOrchestrator.generateStructuredResponse(questionsPrompt, "interview");
   
   let generatedQuestions;
   try {
@@ -270,7 +270,7 @@ Also provide:
 Return ONLY a valid JSON object. Do not wrap in markdown fences or comments.
 Shape: { "technicalAccuracy": 80, "clarity": 75, "scalabilityThinking": 60, "debuggingApproach": 70, "communication": 85, "optimizationAwareness": 65, "confidence": 75, "overall": 7, "feedback": "...", "missingConcepts": ["..."], "scalabilityGaps": ["..."], "communicationTips": ["..."] }`;
 
-    const aiScoreJson = await groqService.generateStructuredResponse(scorePrompt);
+    const aiScoreJson = await AIOrchestrator.generateStructuredResponse(scorePrompt, "interview");
     
     try {
       const cleanedScoreJson = aiScoreJson.trim().replace(/^```json\s*/i, "").replace(/```$/, "").trim();
@@ -440,7 +440,7 @@ Provide exactly a 3-sentence high-value engineering review summarizing:
 
 ONLY output plain text, no markup fences.`;
   
-  const feedback = await groqService.generateStructuredResponse(prompt);
+  const feedback = await AIOrchestrator.generateStructuredResponse(prompt, "interview");
   return feedback.trim().replace(/^```text\s*/i, "").replace(/```$/, "").trim();
 }
 

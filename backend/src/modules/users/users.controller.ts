@@ -43,9 +43,31 @@ const updateApiKeys: RequestHandler = async (request, response, next) => {
   }
 };
 
+/** Returns the authenticated user's custom AI routing mappings. */
+const getAiRoutes: RequestHandler = async (request, response, next) => {
+  try {
+    const aiRoutes = await usersService.getAiRoutes(request.userId ?? "");
+    response.json({ aiRoutes });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/** Updates the authenticated user's custom AI routing mappings. */
+const updateAiRoutes: RequestHandler = async (request, response, next) => {
+  try {
+    const aiRoutes = await usersService.updateAiRoutes(request.userId ?? "", request.body || {});
+    response.json({ aiRoutes });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const usersController = {
   getProfile,
   updateProfile,
   getApiKeys,
-  updateApiKeys
+  updateApiKeys,
+  getAiRoutes,
+  updateAiRoutes
 };

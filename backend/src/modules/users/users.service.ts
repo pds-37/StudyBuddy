@@ -83,7 +83,7 @@ async function getApiKeys(userId: string) {
 }
 
 /** Updates custom API keys for the authenticated user. */
-async function updateApiKeys(userId: string, apiKeys: { groq?: string; gemini?: string; openai?: string; huggingface?: string; }) {
+async function updateApiKeys(userId: string, apiKeys: { groq?: string; gemini?: string; openai?: string; huggingface?: string; ollamaUrl?: string; ollamaModel?: string; }) {
   const user = await UserModel.findByIdAndUpdate(
     userId,
     {
@@ -91,7 +91,9 @@ async function updateApiKeys(userId: string, apiKeys: { groq?: string; gemini?: 
         "apiKeys.groq": apiKeys.groq || "",
         "apiKeys.gemini": apiKeys.gemini || "",
         "apiKeys.openai": apiKeys.openai || "",
-        "apiKeys.huggingface": apiKeys.huggingface || ""
+        "apiKeys.huggingface": apiKeys.huggingface || "",
+        "apiKeys.ollamaUrl": apiKeys.ollamaUrl || "http://localhost:11434",
+        "apiKeys.ollamaModel": apiKeys.ollamaModel || "llama3.2"
       }
     },
     { new: true, runValidators: true }
@@ -104,10 +106,61 @@ async function updateApiKeys(userId: string, apiKeys: { groq?: string; gemini?: 
   return user.apiKeys || {};
 }
 
+/** Returns custom AI routing preferences for the authenticated user. */
+async function getAiRoutes(userId: string) {
+  const user = await UserModel.findById(userId).lean();
+  if (!user) {
+    throw new ApiError(404, "User not found.");
+  }
+  return user.aiRoutes || {};
+}
+
+/** Updates custom AI routing preferences for the authenticated user. */
+async function updateAiRoutes(
+  userId: string,
+  aiRoutes: {
+    mentor?: string;
+    roadmap?: string;
+    quiz?: string;
+    resume?: string;
+    skills?: string;
+    note?: string;
+    interview?: string;
+    mentorship?: string;
+    project?: string;
+  }
+) {
+  const user = await UserModel.findByIdAndUpdate(
+    userId,
+    {
+      $set: {
+        "aiRoutes.mentor": aiRoutes.mentor || "groq",
+        "aiRoutes.roadmap": aiRoutes.roadmap || "gemini",
+        "aiRoutes.quiz": aiRoutes.quiz || "groq",
+        "aiRoutes.resume": aiRoutes.resume || "gemini",
+        "aiRoutes.skills": aiRoutes.skills || "gemini",
+        "aiRoutes.note": aiRoutes.note || "gemini",
+        "aiRoutes.interview": aiRoutes.interview || "groq",
+        "aiRoutes.mentorship": aiRoutes.mentorship || "gemini",
+        "aiRoutes.project": aiRoutes.project || "groq"
+      }
+    },
+    { new: true, runValidators: true }
+  );
+
+  if (!user) {
+    throw new ApiError(404, "User not found.");
+  }
+
+  return user.aiRoutes || {};
+}
+
 export const usersService = {
   getProfile,
   getUserById,
   updateProfile,
   getApiKeys,
-  updateApiKeys
+  updateApiKeys,
+  getAiRoutes,
+  updateAiRoutes
 };

@@ -46,12 +46,13 @@ export const authenticate: RequestHandler = async (request, response, next) => {
       request.authToken = token;
     }
 
-    // Fetch the user's custom API keys
+    // Fetch the user's custom API keys and dynamic routing preferences
     const user = await UserModel.findById(userId).select("+apiKeys").lean();
     const apiKeys = user?.apiKeys || {};
+    const aiRoutes = user?.aiRoutes || {};
 
     // Execute downstream middleware and route handlers inside the RequestContext context
-    requestContextStorage.run({ userId, apiKeys }, () => {
+    requestContextStorage.run({ userId, apiKeys, aiRoutes }, () => {
       next();
     });
   } catch (error) {

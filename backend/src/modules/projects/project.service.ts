@@ -1,6 +1,6 @@
 import { ProjectModel, type ProjectDocument } from "./project.model.js";
 import { UserModel } from "../users/user.model.js";
-import { groqService } from "../../services/ai/groq.service.js";
+import { AIOrchestrator } from "../../core/ai-orchestrator.js";
 import { ApiError } from "../../utils/api-error.js";
 import { studentIntelligenceService } from "../intelligence/student-intelligence.service.js";
 import type { ProjectMatch, CapstoneProject } from "@studybuddy/shared";
@@ -47,7 +47,7 @@ Return ONLY valid JSON in this exact structure:
   }
 ]`;
 
-  const aiMatchJson = await groqService.generateStructuredResponse(prompt);
+  const aiMatchJson = await AIOrchestrator.generateStructuredResponse(prompt, "project");
   
   let matchResults: Array<{ project: Omit<CapstoneProject, "id">; matchScore: number; matchReasons: string[] }>;
   try {
@@ -143,7 +143,7 @@ Return ONLY valid JSON in this exact structure:
   "matchReasons": ["Why this is a great custom project", "How it helps their portfolio"]
 }`;
 
-  const aiMatchJson = await groqService.generateStructuredResponse(prompt);
+  const aiMatchJson = await AIOrchestrator.generateStructuredResponse(prompt, "project");
   
   let result;
   try {
@@ -211,7 +211,7 @@ Return ONLY valid JSON in this exact structure:
   };
 
   try {
-    const aiJson = await groqService.generateStructuredResponse(prompt);
+    const aiJson = await AIOrchestrator.generateStructuredResponse(prompt, "project");
     insights = JSON.parse(aiJson);
   } catch (e) {
     console.error("Failed to parse mentor insights", e);

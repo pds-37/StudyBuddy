@@ -44,7 +44,6 @@ export type ContradictionItem = {
   updatedAt: string;
 };
 
-import { groqService } from "../../services/ai/groq.service.js";
 import { usersService } from "../users/users.service.js";
 import { AIOrchestrator } from "../../core/ai-orchestrator.js";
 import { env } from "../../config/env.js";

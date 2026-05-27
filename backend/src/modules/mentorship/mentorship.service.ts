@@ -1,6 +1,6 @@
 import { MentorshipModel, type MentorshipDocument } from "./mentorship.model.js";
 import { UserModel } from "../users/user.model.js";
-import { groqService } from "../../services/ai/groq.service.js";
+import { AIOrchestrator } from "../../core/ai-orchestrator.js";
 import { ApiError } from "../../utils/api-error.js";
 import type { MentorshipMatch, MentorProfile } from "@studybuddy/shared";
 
@@ -43,7 +43,7 @@ Return ONLY valid JSON in this exact structure:
   { "mentorId": "m1", "matchScore": 95, "matchReasons": ["reason 1", "reason 2"] }
 ]`;
 
-  const aiMatchJson = await groqService.generateStructuredResponse(prompt);
+  const aiMatchJson = await AIOrchestrator.generateStructuredResponse(prompt, "mentorship");
   
   let matchResults;
   try {

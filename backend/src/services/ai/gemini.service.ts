@@ -687,11 +687,18 @@ RULES:
   return JSON.parse(extractJsonPayload(response));
 }
 
+/** Simple wrapper to get a structured JSON response from an arbitrary prompt. */
+async function generateStructuredResponse(prompt: string): Promise<string> {
+  const response = await requestGemini([{ role: "user", content: prompt }], "gemini-1.5-flash", true);
+  return extractJsonPayload(response);
+}
+
 export const geminiService = {
   generateRoadmap,
   generateCopilotResponse,
   generateQuiz,
   analyzeNote,
   generateResumeTailoring,
-  generateSkillIntelligenceReport
+  generateSkillIntelligenceReport,
+  generateStructuredResponse
 };
