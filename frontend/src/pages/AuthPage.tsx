@@ -189,11 +189,9 @@ export function AuthPage() {
         <NebulaBackground opacity={0.12} />
 
         {/* Top left branding */}
-        <div className="relative z-10 flex items-center gap-3 font-bold text-xl text-white">
-          <div className="w-8 h-8 rounded-lg bg-brand/20 flex items-center justify-center border border-brand/30 shadow-[0_0_15px_rgba(124,92,191,0.3)]">
-            <Zap className="text-brand w-4 h-4" />
-          </div>
-          StudyBuddy
+        <div className="relative z-10 flex items-center gap-2.5">
+          <img src="/brand/studybuddy-favicon-512.png" alt="StudyBuddy Icon" className="h-8 w-8 object-contain rounded-xl border border-white/10 shadow-[0_0_15px_rgba(99,102,241,0.2)]" />
+          <span className="font-extrabold text-xl tracking-tight text-white font-display">StudyBuddy</span>
         </div>
 
         {/* Floating Abstract OS Mockup Animation */}
@@ -258,11 +256,9 @@ export function AuthPage() {
       <div className="flex-1 flex flex-col justify-center items-center p-8 lg:p-12 bg-[#030303] relative z-10">
         
         {/* Mobile Header (Hidden on Desktop) */}
-        <div className="lg:hidden absolute top-8 left-8 flex items-center gap-3 font-bold text-xl text-white">
-          <div className="w-8 h-8 rounded-lg bg-brand/20 flex items-center justify-center border border-brand/30">
-            <Zap className="text-brand w-4 h-4" />
-          </div>
-          StudyBuddy
+        <div className="lg:hidden absolute top-8 left-8 flex items-center gap-2.5">
+          <img src="/brand/studybuddy-favicon-512.png" alt="StudyBuddy Icon" className="h-8 w-8 object-contain rounded-xl border border-white/10 shadow-[0_0_15px_rgba(99,102,241,0.2)]" />
+          <span className="font-extrabold text-xl tracking-tight text-white font-display">StudyBuddy</span>
         </div>
 
         <Motion.div 

@@ -21,7 +21,19 @@ import {
 import { useAppStore } from "../../store/app-store";
 import { cn } from "../../lib/utils/cn";
 
-const navGroups = [
+type NavItem = {
+  name: string;
+  href: string;
+  icon: React.ComponentType<any>;
+  highlight?: boolean;
+};
+
+type NavGroup = {
+  title: string;
+  items: NavItem[];
+};
+
+const navGroups: NavGroup[] = [
   {
     title: "LEARNING",
     items: [

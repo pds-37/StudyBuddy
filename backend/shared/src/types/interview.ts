@@ -1,7 +1,13 @@
 export type InterviewScore = {
+  technicalAccuracy: number;
   clarity: number;
-  relevance: number;
-  starMethod: number; // Situation, Task, Action, Result usage
+  scalabilityThinking: number;
+  debuggingApproach: number;
+  communication: number;
+  optimizationAwareness: number;
+  confidence: number;
+  relevance?: number;
+  starMethod?: number;
   overall: number;
   feedback: string;
 };
@@ -9,9 +15,16 @@ export type InterviewScore = {
 export type InterviewQuestion = {
   id: string;
   question: string;
-  category: "behavioral" | "technical" | "general";
+  category: "behavioral" | "technical" | "general" | "scenario" | "system_design";
   userAnswer?: string;
   score?: InterviewScore;
+  hint?: string;
+  idealAnswer?: string;
+  missingConcepts?: string[];
+  scalabilityGaps?: string[];
+  communicationTips?: string[];
+  isFlagged?: boolean;
+  draftAnswer?: string;
 };
 
 export type InterviewSession = {
@@ -22,6 +35,12 @@ export type InterviewSession = {
   questions: InterviewQuestion[];
   overallScore?: number;
   overallFeedback?: string;
+  mode: "technical" | "scenario" | "behavioral" | "company" | "mock";
+  difficulty: "beginner" | "intermediate" | "advanced";
+  interviewerPersonality: "friendly" | "strict" | "founder" | "architect" | "recruiter";
+  pressureMode: boolean;
+  timeLimitMinutes?: number;
+  targetCompany?: string;
   createdAt: string;
   updatedAt: string;
 };

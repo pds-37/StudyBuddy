@@ -1,5 +1,15 @@
 import { create } from "zustand";
-import { startInterviewSession, getInterviewSessions, getInterviewSession, submitInterviewAnswer } from "../lib/api/interview";
+import { 
+  startInterviewSession, 
+  getInterviewSessions, 
+  getInterviewSession, 
+  submitInterviewAnswer,
+  toggleQuestionFlag,
+  getQuestionHint,
+  saveQuestionDraft,
+  skipQuestion,
+  type StartInterviewOptions
+} from "../lib/api/interview";
 import { getApiErrorMessage } from "../lib/api/error";
 import type { InterviewSession } from "@studybuddy/shared";
 
@@ -12,8 +22,12 @@ type InterviewState = {
 
   fetchSessions: () => Promise<void>;
   fetchSession: (id: string) => Promise<void>;
-  startSession: () => Promise<InterviewSession | null>;
+  startSession: (options?: StartInterviewOptions) => Promise<InterviewSession | null>;
   submitAnswer: (sessionId: string, questionId: string, answer: string) => Promise<void>;
+  toggleFlag: (sessionId: string, questionId: string) => Promise<void>;
+  getHint: (sessionId: string, questionId: string) => Promise<string>;
+  saveDraft: (sessionId: string, questionId: string, draftAnswer: string) => Promise<void>;
+  skipQuestion: (sessionId: string, questionId: string) => Promise<void>;
   clearError: () => void;
 };
 
@@ -44,10 +58,10 @@ export const useInterviewStore = create<InterviewState>((set, get) => ({
     }
   },
 
-  startSession: async () => {
+  startSession: async (options?: StartInterviewOptions) => {
     set({ loading: true, error: null });
     try {
-      const session = await startInterviewSession();
+      const session = await startInterviewSession(options);
       set(state => ({ 
         currentSession: session, 
         sessions: [session, ...state.sessions],
@@ -71,6 +85,53 @@ export const useInterviewStore = create<InterviewState>((set, get) => ({
       }));
     } catch (error) {
       set({ submitting: false, error: getApiErrorMessage(error, "Failed to submit answer") });
+    }
+  },
+
+  toggleFlag: async (sessionId: string, questionId: string) => {
+    try {
+      const session = await toggleQuestionFlag(sessionId, questionId);
+      set(state => ({
+        currentSession: session,
+        sessions: state.sessions.map(s => s.id === session.id ? session : s)
+      }));
+    } catch (error) {
+      set({ error: getApiErrorMessage(error, "Failed to flag question") });
+    }
+  },
+
+  getHint: async (sessionId: string, questionId: string): Promise<string> => {
+    try {
+      return await getQuestionHint(sessionId, questionId);
+    } catch (error) {
+      set({ error: getApiErrorMessage(error, "Failed to fetch question hint") });
+      return "Focus on performance metrics and structural efficiency.";
+    }
+  },
+
+  saveDraft: async (sessionId: string, questionId: string, draftAnswer: string) => {
+    try {
+      const session = await saveQuestionDraft(sessionId, questionId, draftAnswer);
+      set(state => ({
+        currentSession: session,
+        sessions: state.sessions.map(s => s.id === session.id ? session : s)
+      }));
+    } catch (error) {
+      console.error("Draft save failed:", error);
+    }
+  },
+
+  skipQuestion: async (sessionId: string, questionId: string) => {
+    set({ submitting: true, error: null });
+    try {
+      const session = await skipQuestion(sessionId, questionId);
+      set(state => ({
+        currentSession: session,
+        sessions: state.sessions.map(s => s.id === session.id ? session : s),
+        submitting: false
+      }));
+    } catch (error) {
+      set({ submitting: false, error: getApiErrorMessage(error, "Failed to skip question") });
     }
   },
 

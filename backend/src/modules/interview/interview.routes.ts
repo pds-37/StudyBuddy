@@ -10,3 +10,7 @@ interviewRouter.post("/", interviewController.startSession);
 interviewRouter.get("/", interviewController.getUserSessions);
 interviewRouter.get("/:id", interviewController.getSession);
 interviewRouter.post("/:id/questions/:questionId/answer", interviewController.submitAnswer);
+interviewRouter.post("/:id/questions/:questionId/flag", interviewController.toggleFlag);
+interviewRouter.get("/:id/questions/:questionId/hint", interviewController.getHint);
+interviewRouter.post("/:id/questions/:questionId/draft", interviewController.saveDraft);
+interviewRouter.post("/:id/questions/:questionId/skip", interviewController.skipQuestion);
