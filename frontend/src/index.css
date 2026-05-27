@@ -1,268 +1,173 @@
-@import url("https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  color-scheme: dark;
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background: #030712; /* Rich dark slate-950 */
+  }
+
+  body {
+    @apply bg-background text-text-primary antialiased selection:bg-brand/30 selection:text-white;
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    line-height: 1.7;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight text-white;
+  }
 }
 
-html {
-  scroll-behavior: smooth;
-  background: #070B14;
+@layer utilities {
+  .text-gradient-premium, .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-text-muted;
+  }
+
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-widest text-brand-light inline-block opacity-100;
+  }
+
+  .glass-panel, .cognitive-card {
+    @apply bg-surface backdrop-blur-xl border border-border rounded-2xl transition-all duration-300;
+  }
+  
+  .glass-panel:hover, .cognitive-card:hover {
+    @apply bg-surface-hover border-border-strong shadow-premium transform -translate-y-1;
+  }
 }
 
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  background-color: #070B14;
-  color: #F8FAFC;
-  font-family: 'Satoshi', 'Inter', system-ui, sans-serif;
-  overflow-x: hidden;
-  line-height: 1.7;
-}
+@layer components {
+  /* Layered Premium Background */
+  .bg-ai-workspace {
+    @apply bg-background relative overflow-hidden;
+  }
 
-/* Layered intelligent background */
-.bg-ai-workspace {
-  background-color: #070B14;
-  background-image: 
-    radial-gradient(circle at 15% 15%, rgba(124, 58, 237, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.05) 0%, transparent 40%);
-}
+  .bg-ai-workspace::before {
+    content: "";
+    @apply absolute inset-0 pointer-events-none;
+    background: 
+      radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+      radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.15) 0%, transparent 40%);
+    z-index: 0;
+  }
 
-.bg-ai-workspace::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  opacity: 0.02;
-  pointer-events: none;
-  z-index: 0;
-}
+  .bg-ai-workspace::after {
+    content: "";
+    @apply absolute inset-0 pointer-events-none opacity-20;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    z-index: 0;
+  }
 
-.bg-ai-workspace::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-  background-size: 64px 64px;
-  pointer-events: none;
-  z-index: 0;
-}
+  .mesh-bg {
+    @apply absolute inset-0 opacity-30 pointer-events-none;
+    background-image: 
+      radial-gradient(at 40% 20%, hsla(263,70%,40%,1) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, hsla(234,70%,40%,1) 0px, transparent 50%),
+      radial-gradient(at 0% 50%, hsla(263,70%,40%,1) 0px, transparent 50%);
+    filter: blur(80px);
+    z-index: 0;
+  }
 
-#root {
-  min-height: 100vh;
-  position: relative;
-  z-index: 1;
-}
+  /* Premium Buttons */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium text-white
+           bg-gradient-to-r from-brand to-accent border border-brand-light/20
+           shadow-[0_0_20px_rgba(99,102,241,0.3)] backdrop-blur-md
+           transition-all duration-300 relative overflow-hidden;
+  }
+  
+  .btn-primary::before {
+    content: '';
+    @apply absolute inset-0 bg-white/20 translate-y-full transition-transform duration-300 ease-out;
+  }
 
-::selection {
-  background: rgba(124, 58, 237, 0.3);
-  color: #FFFFFF;
-}
+  .btn-primary:hover {
+    @apply shadow-[0_0_30px_rgba(99,102,241,0.5)] border-white/40 transform -translate-y-[2px];
+  }
+  
+  .btn-primary:hover::before {
+    @apply translate-y-0;
+  }
 
-/* Custom Scrollbar - Minimal */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium text-text-secondary
+           bg-white/5 border border-white/10 backdrop-blur-md
+           transition-all duration-300;
+  }
 
-::-webkit-scrollbar-track {
-  background: transparent;
-}
+  .btn-secondary:hover {
+    @apply bg-white/10 border-white/20 text-white transform -translate-y-[2px];
+  }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-}
+  /* Custom Scrollbar - Minimal Premium */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
 
-/* Cognitive Dark Minimalism Cards */
-.cognitive-card {
-  background: rgba(15, 23, 42, 0.68);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 24px;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
+  ::-webkit-scrollbar-thumb {
+    @apply bg-white/10 rounded-full;
+  }
 
-.cognitive-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(124, 58, 237, 0.1);
-}
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-white/20;
+  }
 
-/* Buttons */
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: rgba(124, 58, 237, 0.15);
-  color: #c4b5fd;
-  border: 1px solid rgba(124, 58, 237, 0.3);
-  padding: 10px 20px;
-  border-radius: 12px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-}
+  /* Premium CMDK Global Overrides */
+  [cmdk-overlay] {
+    @apply fixed inset-0 bg-background/80 backdrop-blur-md z-[100];
+    animation: fade-in 0.2s ease-out forwards;
+  }
 
-.btn-primary:hover {
-  background: rgba(124, 58, 237, 0.25);
-  border-color: rgba(124, 58, 237, 0.5);
-  transform: translateY(-1px);
-  color: #fff;
-  box-shadow: 0 0 15px rgba(124, 58, 237, 0.2);
-}
+  .cmdk-dialog {
+    @apply fixed left-1/2 top-[15%] -translate-x-1/2 w-[min(640px,calc(100vw-32px))] z-[101]
+           bg-surface rounded-2xl border border-border shadow-premium overflow-hidden backdrop-blur-2xl;
+    animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
 
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.03);
-  color: #cbd5e1;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 10px 20px;
-  border-radius: 12px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-}
+  .cmdk-input-wrap {
+    @apply flex items-center px-5 py-4 border-b border-border bg-transparent;
+  }
 
-.btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.12);
-  color: #fff;
-}
+  .cmdk-input {
+    @apply bg-transparent border-none w-full text-base text-white outline-none h-12 ml-3 placeholder:text-text-muted;
+  }
 
-/* Typography Overrides */
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  color: #fff;
-}
+  .cmdk-list {
+    @apply max-h-[480px] overflow-y-auto p-2;
+  }
 
-p, span, div {
-  opacity: 0.82;
-}
+  .cmdk-item {
+    @apply flex items-center gap-3.5 px-3.5 py-2.5 my-0.5 rounded-xl cursor-pointer
+           text-text-secondary transition-all duration-200;
+  }
 
-.text-gradient {
-  background: linear-gradient(135deg, #F8FAFC 0%, #94A3B8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  opacity: 1;
-}
+  .cmdk-item[data-selected="true"] {
+    @apply bg-white/5 text-white;
+  }
 
-.eyebrow {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #8B5CF6;
-  display: inline-block;
-  opacity: 1;
-}
+  .cmdk-item-icon {
+    @apply w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 text-text-secondary;
+  }
 
-/* CMDK Global Overrides for Minimal Theme */
-[cmdk-overlay] {
-  position: fixed;
-  inset: 0;
-  background: rgba(7, 11, 20, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  z-index: 100;
-  animation: fade-in 0.3s ease-out forwards;
-}
-
-.cmdk-dialog {
-  position: fixed;
-  left: 50%;
-  top: 15%;
-  transform: translateX(-50%);
-  width: min(640px, calc(100vw - 32px));
-  z-index: 101;
-  border-radius: 20px;
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 
-    0 32px 128px rgba(0, 0, 0, 0.5),
-    0 0 40px rgba(124, 58, 237, 0.1);
-  overflow: hidden;
-  animation: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.cmdk-input-wrap {
-  display: flex;
-  align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  background: transparent;
-}
-
-.cmdk-input {
-  background: transparent;
-  border: none;
-  width: 100%;
-  font-size: 16px;
-  color: white;
-  outline: none;
-  height: 48px;
-  margin-left: 12px;
-}
-
-.cmdk-input::placeholder {
-  color: rgba(248, 250, 252, 0.4);
-}
-
-.cmdk-list {
-  max-height: 480px;
-  overflow-y: auto;
-  padding: 8px;
-}
-
-.cmdk-item {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 10px 14px;
-  margin: 2px 0;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  color: rgba(248, 250, 252, 0.7);
-}
-
-.cmdk-item[data-selected="true"] {
-  background: rgba(255, 255, 255, 0.04);
-  color: white;
-}
-
-.cmdk-item-icon {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.03);
-  color: rgba(248, 250, 252, 0.7);
-}
-
-.cmdk-item[data-selected="true"] .cmdk-item-icon {
-  color: #a78bfa;
+  .cmdk-item[data-selected="true"] .cmdk-item-icon {
+    @apply text-accent-light;
+  }
 }
 
 /* Utility Animations */
@@ -272,14 +177,8 @@ p, span, div {
 }
 
 @keyframes slide-up {
-  from { 
-    opacity: 0; 
-    transform: translateY(10px) translateX(-50%); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0) translateX(-50%); 
-  }
+  from { opacity: 0; transform: translateY(10px) translateX(-50%); }
+  to { opacity: 1; transform: translateY(0) translateX(-50%); }
 }
 
-.animate-fade-in { animation: fade-in 0.5s ease-out forwards; }
+.animate-fade-in { animation: fade-in 0.3s ease-out forwards; }

@@ -60,6 +60,7 @@ export function LandingPage() {
 
   return (
     <div className="min-h-screen bg-ai-workspace">
+      <div className="mesh-bg"></div>
       <main className="relative z-10 flex flex-col items-center pt-24 pb-32">
         <section className="w-full max-w-6xl px-6 flex flex-col items-center text-center mt-12 mb-32" id="home">
           <Motion.div
@@ -78,7 +79,7 @@ export function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1, type: "spring", stiffness: 90, damping: 18 }}
-            className="text-5xl md:text-7xl font-bold tracking-tight text-white max-w-4xl leading-[1.1]"
+            className="text-5xl md:text-7xl font-bold tracking-tight text-white max-w-4xl leading-[1.1] text-gradient-premium"
           >
             Veda turns your placement goal into today's exact plan.
           </Motion.h1>
@@ -147,7 +148,7 @@ export function LandingPage() {
             {features.map((feature, index) => (
               <Motion.article 
                 key={feature.title} 
-                className="cognitive-card p-8 flex flex-col"
+                className="glass-panel p-8 flex flex-col"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -176,7 +177,7 @@ export function LandingPage() {
             {steps.map((step, index) => (
               <Motion.article 
                 key={step.title} 
-                className="relative p-8 rounded-2xl border border-white/5 bg-surface/50 overflow-hidden"
+                className="glass-panel relative p-8 overflow-hidden"
                 initial={{ opacity: 0, scale: 0.98 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
@@ -196,12 +197,13 @@ export function LandingPage() {
             <span className="eyebrow mb-3">Premium SaaS</span>
             <h2 className="text-3xl md:text-4xl">Free to start. Pro when your prep gets serious.</h2>
           </div>
-          <div className="cognitive-card p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-8">
-            <div>
-              <strong className="block text-2xl mb-2">Pro Student</strong>
+          <div className="glass-panel p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
+            <div className="absolute top-[-50%] right-[-10%] w-[300px] h-[300px] rounded-full bg-brand/20 blur-[100px] pointer-events-none" />
+            <div className="relative z-10">
+              <strong className="block text-2xl mb-2 text-white">Pro Student</strong>
               <span className="text-text-secondary">2,000 AI messages, 10,000 notes, 50 projects, resume and interview intelligence.</span>
             </div>
-            <Link to="/pricing" className="btn-primary shrink-0">
+            <Link to="/pricing" className="btn-primary shrink-0 relative z-10">
               View pricing
               <ArrowRight size={18} />
             </Link>
