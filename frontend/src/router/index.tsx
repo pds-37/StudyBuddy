@@ -45,9 +45,9 @@ export function AppRouter() {
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
+        <Route path="/auth" element={<AuthPage />} />
         <Route element={<MarketingLayout />}>
           <Route index element={<LandingPage />} />
-          <Route path="/auth" element={<AuthPage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/demo" element={<DemoPage />} />
         </Route>
