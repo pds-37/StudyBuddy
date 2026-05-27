@@ -160,6 +160,50 @@ export function LandingPage() {
     };
   }, []);
 
+  // Carousel Drag Scrolling Logic
+  const carouselRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const slider = carouselRef.current;
+    if (!slider) return;
+    let isDown = false;
+    let startX: number;
+    let scrollLeft: number;
+
+    const onMouseDown = (e: MouseEvent) => {
+      isDown = true;
+      slider.style.scrollSnapType = 'none'; // disable snap while dragging
+      startX = e.pageX - slider.offsetLeft;
+      scrollLeft = slider.scrollLeft;
+    };
+    const onMouseLeave = () => {
+      isDown = false;
+      slider.style.scrollSnapType = 'x mandatory';
+    };
+    const onMouseUp = () => {
+      isDown = false;
+      slider.style.scrollSnapType = 'x mandatory';
+    };
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - slider.offsetLeft;
+      const walk = (x - startX) * 2; // scroll-fast
+      slider.scrollLeft = scrollLeft - walk;
+    };
+
+    slider.addEventListener('mousedown', onMouseDown);
+    slider.addEventListener('mouseleave', onMouseLeave);
+    slider.addEventListener('mouseup', onMouseUp);
+    slider.addEventListener('mousemove', onMouseMove);
+
+    return () => {
+      slider.removeEventListener('mousedown', onMouseDown);
+      slider.removeEventListener('mouseleave', onMouseLeave);
+      slider.removeEventListener('mouseup', onMouseUp);
+      slider.removeEventListener('mousemove', onMouseMove);
+    };
+  }, []);
+
   // Nav Scroll Style
   useEffect(() => {
     const nav = document.querySelector('nav');
@@ -286,38 +330,38 @@ export function LandingPage() {
         <h2 className="sec-title reveal">Learn, build &amp; grow<br /><em>all in one place</em></h2>
         <p className="sec-sub reveal">An all-in-one platform designed to adapt to you — your pace, your goals, your career.</p>
 
-        <div className="feat-grid">
-          <div className="fc reveal">
+        <div className="feat-carousel reveal" ref={carouselRef}>
+          <div className="fc">
             <div className="fc-ico">🗺️</div>
             <div className="fc-t">AI Roadmaps</div>
             <p className="fc-d">Personalized, adaptive roadmaps that evolve with your progress and adjust to your learning pace automatically.</p>
             <a href="#" className="fc-link">Learn more →</a>
           </div>
-          <div className="fc reveal">
+          <div className="fc">
             <div className="fc-ico">📝</div>
             <div className="fc-t">Smart Notes</div>
             <p className="fc-d">AI-enhanced notes with recall linking and a live knowledge graph — never lose a concept again.</p>
             <a href="#" className="fc-link">Learn more →</a>
           </div>
-          <div className="fc reveal">
+          <div className="fc">
             <div className="fc-ico">🧠</div>
             <div className="fc-t">Recall System</div>
             <p className="fc-d">Active recall and spaced repetition to make learning stick forever — scientifically proven methods.</p>
             <a href="#" className="fc-link">Learn more →</a>
           </div>
-          <div className="fc reveal">
+          <div className="fc">
             <div className="fc-ico">🤖</div>
             <div className="fc-t">AI Mentor (Veda)</div>
             <p className="fc-d">Get instant help, clarity and guidance from Veda AI — your personal, always-available career advisor.</p>
             <a href="#" className="fc-link">Learn more →</a>
           </div>
-          <div className="fc reveal">
+          <div className="fc">
             <div className="fc-ico">📄</div>
             <div className="fc-t">Resume Builder</div>
             <p className="fc-d">AI-powered resume optimization tailored to each role with ATS scoring and one-click adaptation.</p>
             <a href="#" className="fc-link">Learn more →</a>
           </div>
-          <div className="fc reveal">
+          <div className="fc">
             <div className="fc-ico">💼</div>
             <div className="fc-t">Job Matcher</div>
             <p className="fc-d">Find the right opportunities that match your skills and career goals with real-time job matching.</p>
