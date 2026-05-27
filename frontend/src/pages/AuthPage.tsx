@@ -17,7 +17,7 @@ import { authApi } from "../features/auth/api";
 import { type AuthMode } from "../features/auth/types";
 import { useAppStore } from "../store/app-store";
 import { cn } from "../lib/utils/cn";
-import { motion as Motion, AnimatePresence } from "framer-motion";
+import { motion as Motion, AnimatePresence, type Variants } from "framer-motion";
 
 interface Circulo {
   x: number;
@@ -27,7 +27,7 @@ interface Circulo {
 
 function CircleAnimation() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const requestIdRef = useRef<number>();
+  const requestIdRef = useRef<number>(0);
   const timerRef = useRef(0);
   const circulosRef = useRef<Circulo[]>([]);
 
@@ -182,22 +182,22 @@ export function AuthPage() {
   }
 
   // Animation variants
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: { 
       opacity: 1, 
       y: 0,
-      transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1], staggerChildren: 0.1 }
+      transition: { duration: 0.6, ease: "easeOut", staggerChildren: 0.1 }
     },
     exit: { opacity: 0, y: -20, transition: { duration: 0.3 } }
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 15 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
   };
 
-  const glowVariants = {
+  const glowVariants: Variants = {
     animate: {
       scale: [1, 1.2, 1],
       opacity: [0.3, 0.5, 0.3],
@@ -258,7 +258,7 @@ export function AuthPage() {
                   initial={{ opacity: 0, height: 0, scale: 0.95 }}
                   animate={{ opacity: 1, height: "auto", scale: 1 }}
                   exit={{ opacity: 0, height: 0, scale: 0.95 }}
-                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
                   className="relative"
                 >
                   <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
