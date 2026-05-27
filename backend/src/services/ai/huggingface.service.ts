@@ -7,6 +7,10 @@ type HuggingFaceFeatureResponse = number[] | number[][] | number[][][];
 
 const HUGGINGFACE_BASE_URL = "https://api-inference.huggingface.co/pipeline/feature-extraction";
 
+function getHuggingFaceApiKey() {
+  return requestContextStorage.getStore()?.apiKeys?.huggingface || env.huggingFaceApiKey;
+}
+
 /** Flattens HuggingFace feature extraction output into a single embedding vector. */
 function normalizeFeatureResponse(output: HuggingFaceFeatureResponse): number[] {
   const rows: number[][] = [];
@@ -43,7 +47,7 @@ function normalizeFeatureResponse(output: HuggingFaceFeatureResponse): number[] 
 
 /** Calls HuggingFace's free inference API for a text embedding. */
 async function embedText(text: string) {
-  const apiKey = env.huggingFaceApiKey;
+  const apiKey = getHuggingFaceApiKey();
 
   if (!apiKey) {
     throw new Error("HuggingFace API key is not configured.");
@@ -111,7 +115,7 @@ async function requestHuggingFace(
   maxTokens: number,
   model: string = "Qwen/Qwen2.5-72B-Instruct"
 ) {
-  const apiKey = env.huggingFaceApiKey;
+  const apiKey = getHuggingFaceApiKey();
 
   if (!apiKey) {
     throw new Error("HuggingFace API key is not configured.");
@@ -228,10 +232,17 @@ async function generateCopilotResponse(
   const systemPrompt = `You are Veda, an elite AI Career Mentor (Mentor Dost). Talk like an encouraging, highly empathetic friend.
   USER CONTEXT:
   ${userContext}
+
+  ANSWER STYLE:
+  - The "content" field should be a polished markdown answer, not a raw note object.
+  - Use clear structure like: short answer, key points, examples, when to use it, common mistakes, quick recap, and next practice step.
+  - If USER CONTEXT contains notes, use those notes first and say when you are extending beyond the user's notes with general knowledge.
+  - If the user asks "tell me about", "explain", "what is", "teach me", or similar, give a complete explanatory answer like ChatGPT would, with headings and bullets.
+  - Do not start with "Let's get that note started" unless the user explicitly asks to create or draft a note.
   
   You must respond with a JSON object:
   {
-    "content": "Empathetic natural language response in markdown.",
+    "content": "A structured markdown answer with headings, bullets, examples, and a concise recap when useful.",
     "metadata": {
       "behaviorAnalysis": "Insight",
       "cards": [],

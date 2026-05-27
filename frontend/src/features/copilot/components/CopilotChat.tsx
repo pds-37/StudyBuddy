@@ -418,7 +418,7 @@ function ChatMessage({ message, index }: { message: CopilotMessage; index: numbe
             isUser ? "bg-[#2f3440] text-white" : "text-slate-100"
           )}
         >
-          <div className="whitespace-pre-wrap">{message.content}</div>
+          {isUser ? <div className="whitespace-pre-wrap">{message.content}</div> : <MarkdownContent content={message.content} />}
         </div>
 
         {!isUser && metadata?.saveableNote && (
@@ -468,6 +468,95 @@ function ChatMessage({ message, index }: { message: CopilotMessage; index: numbe
       </div>
     </Motion.div>
   );
+}
+
+export function MarkdownContent({ content, compact = false }: { content: string; compact?: boolean }) {
+  const blocks = content.split(/(```[\s\S]*?```)/g);
+
+  return (
+    <div className={cn("space-y-2", compact ? "text-[13px]" : "text-sm")}>
+      {blocks.map((block, blockIndex) => {
+        if (block.startsWith("```")) {
+          const match = block.match(/```(\w*)\n?([\s\S]*?)```/);
+          const language = match?.[1];
+          const code = match?.[2] ?? block.slice(3, -3);
+
+          return (
+            <pre key={blockIndex} className="my-3 overflow-x-auto rounded-lg border border-white/[0.08] bg-black/40 p-3 text-xs leading-relaxed text-cyan-200">
+              {language ? <div className="mb-2 text-[10px] uppercase tracking-wider text-slate-500">{language}</div> : null}
+              <code>{code.trim()}</code>
+            </pre>
+          );
+        }
+
+        return block
+          .split("\n")
+          .map((line, lineIndex) => renderMarkdownLine(line, `${blockIndex}-${lineIndex}`, compact));
+      })}
+    </div>
+  );
+}
+
+function renderMarkdownLine(line: string, key: string, compact: boolean) {
+  const trimmed = line.trim();
+
+  if (!trimmed) {
+    return <div key={key} className={compact ? "h-1" : "h-2"} />;
+  }
+
+  if (trimmed.startsWith("### ")) {
+    return <h3 key={key} className="pt-2 text-sm font-bold text-white">{parseInlineMarkdown(trimmed.slice(4))}</h3>;
+  }
+
+  if (trimmed.startsWith("## ")) {
+    return <h2 key={key} className="pt-3 text-base font-bold text-white">{parseInlineMarkdown(trimmed.slice(3))}</h2>;
+  }
+
+  if (trimmed.startsWith("# ")) {
+    return <h2 key={key} className="pt-3 text-lg font-bold text-white">{parseInlineMarkdown(trimmed.slice(2))}</h2>;
+  }
+
+  const bullet = trimmed.match(/^[-*]\s+(.+)$/);
+  if (bullet) {
+    return (
+      <div key={key} className="flex gap-2 text-slate-200">
+        <span className="mt-[0.65em] h-1 w-1 shrink-0 rounded-full bg-slate-400" />
+        <span>{parseInlineMarkdown(bullet[1])}</span>
+      </div>
+    );
+  }
+
+  const numbered = trimmed.match(/^\d+\.\s+(.+)$/);
+  if (numbered) {
+    return (
+      <div key={key} className="flex gap-2 text-slate-200">
+        <span className="text-slate-500">{trimmed.split(".")[0]}.</span>
+        <span>{parseInlineMarkdown(numbered[1])}</span>
+      </div>
+    );
+  }
+
+  return (
+    <p key={key} className="text-slate-200">
+      {parseInlineMarkdown(trimmed)}
+    </p>
+  );
+}
+
+function parseInlineMarkdown(text: string) {
+  const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
+
+  return parts.map((part, index) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={index} className="font-semibold text-white">{part.slice(2, -2)}</strong>;
+    }
+
+    if (part.startsWith("`") && part.endsWith("`")) {
+      return <code key={index} className="rounded bg-white/[0.07] px-1.5 py-0.5 text-[0.9em] text-cyan-200">{part.slice(1, -1)}</code>;
+    }
+
+    return part;
+  });
 }
 
 function TypingIndicator() {

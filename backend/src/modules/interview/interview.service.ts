@@ -240,6 +240,8 @@ async function submitAnswer(
     question.missingConcepts = ["Skipped Area"];
   } else {
     // Invoke high-fidelity LLM evaluator
+    const evaluationAnswer = answer.slice(0, 8000);
+    const idealReference = (question.idealAnswer || "Explain technical concepts clearly with complexity analysis.").slice(0, 4000);
     const scorePrompt = `You are Veda, an expert technical evaluator assessing SDE candidate answers.
 Role Target: ${session.targetRole}
 Interview Mode: ${session.mode}
@@ -247,8 +249,8 @@ Difficulty: ${session.difficulty}
 Interviewer Personality Profile: ${session.interviewerPersonality}
 
 Question: "${question.question}"
-Candidate Answer: "${answer}"
-Model Ideal SDE Reference Answer: "${question.idealAnswer || "Explain technical concepts clearly with complexity analysis."}"
+Candidate Answer: "${evaluationAnswer}"
+Model Ideal SDE Reference Answer: "${idealReference}"
 
 Deeply analyze this candidate response. Rate strictly and constructively. Output scores out of 100.
 Evaluate exactly these categories:

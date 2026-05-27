@@ -5,6 +5,7 @@ import { useCopilotStore } from "../../../store/copilot-store";
 import { useSpeechSynthesis } from "../../../hooks/useSpeechSynthesis";
 import { useAppStore } from "../../../store/app-store";
 import type { CopilotMessage } from "@studybuddy/shared";
+import { MarkdownContent } from "./CopilotChat";
 
 /** Floating AI Mentor Widget */
 export function GlobalCopilotWidget() {
@@ -128,7 +129,7 @@ export function GlobalCopilotWidget() {
                       : "border border-white/[0.07] bg-white/[0.035] text-slate-100"
                   )}
                 >
-                  {msg.content}
+                  {msg.role === "assistant" ? <MarkdownContent content={msg.content} compact /> : msg.content}
                 </div>
                 {msg.role === "assistant" && supported && (
                   <div className="flex items-center gap-3 px-2">

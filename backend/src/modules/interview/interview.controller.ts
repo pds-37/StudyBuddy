@@ -2,6 +2,8 @@ import type { Request, Response, NextFunction } from "express";
 import { interviewService } from "./interview.service.js";
 import { z } from "zod";
 
+const MAX_INTERVIEW_RESPONSE_CHARS = 20000;
+
 const startSessionSchema = z.object({
   mode: z.enum(["technical", "scenario", "behavioral", "company", "mock"]).optional(),
   difficulty: z.enum(["beginner", "intermediate", "advanced", "adaptive"]).optional(),
@@ -66,7 +68,7 @@ export const getHint = async (req: Request, res: Response, next: NextFunction) =
 };
 
 const saveDraftSchema = z.object({
-  draftAnswer: z.string().max(5000, "Draft is too long")
+  draftAnswer: z.string().max(MAX_INTERVIEW_RESPONSE_CHARS, "Draft is too long")
 });
 
 export const saveDraft = async (req: Request, res: Response, next: NextFunction) => {
@@ -98,7 +100,7 @@ export const skipQuestion = async (req: Request, res: Response, next: NextFuncti
 };
 
 const submitAnswerSchema = z.object({
-  answer: z.string().min(1, "Answer is required").max(5000, "Answer is too long")
+  answer: z.string().trim().min(1, "Answer is required").max(MAX_INTERVIEW_RESPONSE_CHARS, "Answer is too long")
 });
 
 export const submitAnswer = async (req: Request, res: Response, next: NextFunction) => {

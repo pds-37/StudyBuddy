@@ -1,7 +1,12 @@
-const axios = require('axios');
+import axios from "axios";
+import "dotenv/config";
 
 async function test() {
   try {
+    if (!process.env.GROQ_API_KEY) {
+      throw new Error("GROQ_API_KEY is not configured.");
+    }
+
     const response = await axios.post(
       "https://api.groq.com/openai/v1/chat/completions",
       {
@@ -12,14 +17,17 @@ async function test() {
       },
       {
         headers: {
-          Authorization: `Bearer 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`,
+          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
           "Content-Type": "application/json"
         }
       }
     );
     console.log("Success:", response.data.choices[0].message);
   } catch (err) {
-    console.error("Failed:", err.response ? err.response.data : err.message);
+    const detail = err.response
+      ? { status: err.response.status, data: err.response.data }
+      : { code: err.code, name: err.name, message: err.message, cause: err.cause?.message };
+    console.error("Failed:", JSON.stringify(detail));
   }
 }
 

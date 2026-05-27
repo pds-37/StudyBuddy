@@ -183,7 +183,7 @@ async function buildUserContext(userId: string, currentQuery?: string, knownNote
       if (knownNoteContext) {
         context.push(`MEMORY_MODE: notes-first\n${knownNoteContext}`);
       } else {
-        context.push("MEMORY_MODE: fallback\nNo sufficiently relevant user note was found. Answer from general knowledge, clearly mark it as new knowledge, and keep it suitable to save as a future review note.");
+        context.push("MEMORY_MODE: fallback\nNo sufficiently relevant user note was found. Answer from general knowledge, clearly mark it as outside the user's saved notes when useful, and structure the answer for learning.");
       }
     } else if (notes && notes.length > 0) {
       const recentNotes = notes.slice(0, 3).map((note) => note.content.substring(0, 200)).join(" | ");

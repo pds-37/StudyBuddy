@@ -28,6 +28,8 @@ type Props = {
   session: IInterviewSession;
 };
 
+const MAX_INTERVIEW_RESPONSE_CHARS = 20000;
+
 export function InterviewSession({ session }: Props) {
   const { submitAnswer, toggleFlag, getHint, saveDraft, skipQuestion, submitting, fetchSessions } = useInterviewStore();
   
@@ -50,6 +52,7 @@ export function InterviewSession({ session }: Props) {
   // Timer states
   const [secondsLeft, setSecondsLeft] = useState(600);
   const timerRef = useRef<any>(null);
+  const reportRef = useRef<HTMLDivElement>(null);
 
   // Sync Input when Active Question changes
   useEffect(() => {
@@ -91,7 +94,7 @@ export function InterviewSession({ session }: Props) {
   const handleTimeExpired = async () => {
     if (!activeQuestion) return;
     if (answerInput.trim()) {
-      await submitAnswer(session.id, activeQuestion.id, answerInput);
+      await submitAnswer(session.id, activeQuestion.id, answerInput.slice(0, MAX_INTERVIEW_RESPONSE_CHARS));
     } else {
       await skipQuestion(session.id, activeQuestion.id);
     }
@@ -107,7 +110,7 @@ export function InterviewSession({ session }: Props) {
     setAutosaveStatus("saving");
     const delayDebounce = setTimeout(async () => {
       try {
-        await saveDraft(session.id, activeQuestion.id, answerInput);
+        await saveDraft(session.id, activeQuestion.id, answerInput.slice(0, MAX_INTERVIEW_RESPONSE_CHARS));
         setAutosaveStatus("saved");
       } catch (e) {
         setAutosaveStatus("failed");
@@ -119,7 +122,7 @@ export function InterviewSession({ session }: Props) {
 
   const handleSubmit = async () => {
     if (!answerInput.trim() || !activeQuestion) return;
-    await submitAnswer(session.id, activeQuestion.id, answerInput);
+    await submitAnswer(session.id, activeQuestion.id, answerInput.slice(0, MAX_INTERVIEW_RESPONSE_CHARS));
   };
 
   const handleSkip = async () => {
@@ -149,6 +152,11 @@ export function InterviewSession({ session }: Props) {
     } finally {
       setFetchingHint(false);
     }
+  };
+
+  const handleReviewFinalReport = async () => {
+    await fetchSessions();
+    reportRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const insertTemplate = (type: "star" | "tradeoff" | "algorithm") => {
@@ -279,7 +287,7 @@ export function InterviewSession({ session }: Props) {
       
       {/* Immersive Holistic Report Summary (Rendered at top only if session is completed) */}
       {isCompleted && (
-        <div className="relative overflow-hidden rounded-2xl border border-brand/20 bg-brand/5 p-6 sm:p-8 backdrop-blur-xl shadow-premium">
+        <div ref={reportRef} className="relative overflow-hidden rounded-2xl border border-brand/20 bg-brand/5 p-6 sm:p-8 backdrop-blur-xl shadow-premium">
           <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
             <BrainCircuit size={100} className="text-brand animate-pulse" />
           </div>
@@ -555,11 +563,14 @@ export function InterviewSession({ session }: Props) {
                     <textarea
                       value={answerInput}
                       onChange={(e) => setAnswerInput(e.target.value)}
+                      maxLength={MAX_INTERVIEW_RESPONSE_CHARS}
                       placeholder="Craft your system formulation, database schemas, complexity trade-offs, or STAR answers here..."
                       className="w-full bg-transparent border-0 text-sm text-white placeholder-slate-600 focus:ring-0 p-5 min-h-[220px] max-h-[420px] resize-y leading-relaxed outline-none flex-1 font-mono"
                     />
-                    <div className="absolute bottom-3 right-4 text-[9px] font-mono text-slate-500 font-bold">
-                      {answerInput.length} chars
+                    <div className={`absolute bottom-3 right-4 text-[9px] font-mono font-bold ${
+                      answerInput.length > MAX_INTERVIEW_RESPONSE_CHARS * 0.9 ? "text-amber-400" : "text-slate-500"
+                    }`}>
+                      {answerInput.length}/{MAX_INTERVIEW_RESPONSE_CHARS} chars
                     </div>
                   </div>
                 )}
@@ -620,7 +631,7 @@ export function InterviewSession({ session }: Props) {
                 {!activeQuestion?.userAnswer && (
                   <button
                     type="button"
-                    onClick={() => saveDraft(session.id, activeQuestion.id, answerInput)}
+                    onClick={() => saveDraft(session.id, activeQuestion.id, answerInput.slice(0, MAX_INTERVIEW_RESPONSE_CHARS))}
                     className="h-11 px-5 border border-white/10 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl transition-all duration-200 text-xs font-bold uppercase tracking-wider"
                   >
                     Save Draft
@@ -634,8 +645,7 @@ export function InterviewSession({ session }: Props) {
                       if (activeQuestionIndex < session.questions.length - 1) {
                         setSelectedQuestionIndex(activeQuestionIndex + 1);
                       } else {
-                        // Complete / fetch sessions
-                        fetchSessions();
+                        void handleReviewFinalReport();
                       }
                     }}
                     className="w-full sm:w-auto shrink-0 flex items-center justify-center gap-2 h-11 bg-brand hover:bg-indigo-600 text-white px-6 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-200 hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(99,102,241,0.2)]"

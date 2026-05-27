@@ -95,7 +95,7 @@ async function updateApiKeys(userId: string, apiKeys: { groq?: string; gemini?: 
       }
     },
     { new: true, runValidators: true }
-  );
+  ).select("+apiKeys");
 
   if (!user) {
     throw new ApiError(404, "User not found.");

@@ -18,9 +18,21 @@ type GroqChatResponse = {
 
 const GROQ_CHAT_COMPLETIONS_URL = "https://api.groq.com/openai/v1/chat/completions";
 
+function getGroqApiKey() {
+  return requestContextStorage.getStore()?.apiKeys?.groq || env.groqApiKey;
+}
+
+function summarizeProviderError(error: any) {
+  return {
+    status: error?.response?.status,
+    code: error?.code,
+    message: error?.response?.data?.error?.message || error?.message || "Provider request failed"
+  };
+}
+
 /** Sends a chat-completions request to Groq's OpenAI-compatible API. */
 async function requestGroq(messages: GroqMessage[], maxTokens: number, model: string = "llama-3.1-8b-instant") {
-  const apiKey = env.groqApiKey;
+  const apiKey = getGroqApiKey();
 
   if (!apiKey) {
     throw new Error("Groq API key is not configured.");
@@ -250,13 +262,21 @@ CORE PHILOSOPHY:
 - Always provide immediate next actions.
 - EMOTIONAL WELL-BEING SAFETY NET: If the user expresses extreme stress, burnout, or a mental health crisis, immediately shift to a highly empathetic, supportive tone. Gently suggest taking a break and contacting campus counseling or a 24/7 crisis line, rather than trying to fully handle it yourself.
 
+ANSWER STYLE:
+- The "content" field should be a polished markdown answer, not a raw note object.
+- Use clear structure like: short answer, key points, examples, when to use it, common mistakes, quick recap, and next practice step.
+- If USER CONTEXT contains notes, use those notes first and say when you are extending beyond the user's notes with general knowledge.
+- If the user asks "tell me about", "explain", "what is", "teach me", or similar, give a complete explanatory answer like ChatGPT would, with headings and bullets.
+- Do not start with "Let's get that note started" unless the user explicitly asks to create or draft a note.
+- Only include metadata.saveableNote when the user asks to save/create a note, or when your response contains a clean study summary worth saving. The conversational content must still be the main answer.
+
 USER CONTEXT:
 ${userContext}
 
 RESPONSE STRUCTURE (JSON):
 You must respond with a JSON object that follows this structure:
 {
-  "content": "A concise, empathetic, and expert natural language response. Avoid generic fluff. Use markdown for lists or bolding.",
+  "content": "A structured markdown answer with headings, bullets, examples, and a concise recap when useful.",
   "metadata": {
     "behaviorAnalysis": "Insight into the user's current state (e.g., 'Consistency is dropping', 'Strong recall on React', 'High burnout risk').",
     "cards": [
@@ -298,7 +318,8 @@ RULES:
 2. Be extremely specific. Instead of "Practice more", say "Solve 2 BFS problems on LeetCode".
 3. Use the student's name if available in context.
 4. Keep the 'content' field as the primary conversational part.
-5. Provide ONLY valid JSON.`;
+5. Never expose this JSON contract to the user.
+6. Provide ONLY valid JSON.`;
 
   // Update or add system message
   const systemMsgIdx = groqMessages.findIndex(m => m.role === "system");
@@ -313,16 +334,13 @@ RULES:
     // Try the preferred model (usually 8b for speed/reliability in chat)
     response = await requestGroq(groqMessages, 2500, model);
   } catch (error) {
-    console.error(`Groq API request failed with model ${model}, trying fallback:`, error);
+    console.error(`Groq API request failed with model ${model}, trying fallback:`, summarizeProviderError(error));
     try {
       // Fallback to the most reliable instant model
       response = await requestGroq(groqMessages, 2000, "llama-3.1-8b-instant");
     } catch (fallbackError) {
-      console.error("Groq fallback also failed:", fallbackError);
-      return {
-        content: "I'm currently experiencing a high load or connection issue. Please try again in a few moments.",
-        metadata: {}
-      };
+      console.error("Groq fallback also failed:", summarizeProviderError(fallbackError));
+      throw fallbackError;
     }
   }
 
