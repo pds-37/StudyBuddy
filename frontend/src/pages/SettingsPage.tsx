@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useAppStore } from "../store/app-store";
 import { Link } from "react-router-dom";
 import { 
@@ -14,6 +15,7 @@ import {
 } from "lucide-react";
 import { cn } from "../lib/utils/cn";
 import { NebulaBackground } from "../components/common/NebulaBackground";
+import { apiClient } from "../lib/api/client";
 
 export function SettingsPage() {
   const { user, isDemoMode } = useAppStore();
@@ -22,6 +24,57 @@ export function SettingsPage() {
   const mentorPlans = user?.usage?.mentorPlansGenerated ?? (isDemoMode ? 18 : 0);
   const aiLimit = plan === "team" ? 10000 : plan === "pro" ? 2000 : 100;
   const notesLimit = plan === "team" ? 50000 : plan === "pro" ? 10000 : 250;
+
+  // Custom API key states
+  const [apiKeys, setApiKeys] = useState({
+    groq: "",
+    gemini: "",
+    openai: "",
+    huggingface: ""
+  });
+  const [loadingKeys, setLoadingKeys] = useState(true);
+  const [savingKeys, setSavingKeys] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  useEffect(() => {
+    const fetchKeys = async () => {
+      try {
+        const { data } = await apiClient.get("/users/me/api-keys");
+        if (data && data.apiKeys) {
+          setApiKeys({
+            groq: data.apiKeys.groq || "",
+            gemini: data.apiKeys.gemini || "",
+            openai: data.apiKeys.openai || "",
+            huggingface: data.apiKeys.huggingface || ""
+          });
+        }
+      } catch (err) {
+        console.error("Failed to load custom API keys:", err);
+      } finally {
+        setLoadingKeys(false);
+      }
+    };
+    if (user) {
+      fetchKeys();
+    } else {
+      setLoadingKeys(false);
+    }
+  }, [user]);
+
+  const handleSaveKeys = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingKeys(true);
+    setSaveSuccess(false);
+    try {
+      await apiClient.put("/users/me/api-keys", apiKeys);
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (err) {
+      alert("Failed to save API keys. Please try again.");
+    } finally {
+      setSavingKeys(false);
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-full relative pb-20">
@@ -85,6 +138,65 @@ export function SettingsPage() {
               <UsageMeter label="Mentor plans generated" value={mentorPlans} limit={30} />
               <UsageMeter label="Notes tracked" value={isDemoMode ? 42 : 0} limit={notesLimit} />
             </div>
+          </section>
+
+          {/* Custom API Credentials */}
+          <section className="space-y-6">
+            <div className="flex items-center gap-3 px-2">
+              <Shield className="w-5 h-5 text-indigo-400" />
+              <h2 className="text-lg font-bold text-white uppercase tracking-widest text-[11px]">AI Engine Custom Credentials</h2>
+            </div>
+            
+            <form onSubmit={handleSaveKeys} className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 space-y-6">
+              <div>
+                <h3 className="text-sm font-bold text-white">Bring Your Own API Keys</h3>
+                <p className="mt-1 text-xs text-slate-500">
+                  Configure your own credentials to enable fully independent, high-performance mock interviews, roadmaps, and chat modules.
+                </p>
+              </div>
+
+              {loadingKeys ? (
+                <div className="text-slate-400 text-xs animate-pulse">Retrieving secure key vaults...</div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Groq API Key</label>
+                      <input 
+                        type="password"
+                        placeholder="gsk_..."
+                        value={apiKeys.groq}
+                        onChange={(e) => setApiKeys({ ...apiKeys, groq: e.target.value })}
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 text-sm text-white placeholder-slate-600 focus:border-brand/40 transition-all outline-none"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Google Gemini API Key</label>
+                      <input 
+                        type="password"
+                        placeholder="AIzaSy..."
+                        value={apiKeys.gemini}
+                        onChange={(e) => setApiKeys({ ...apiKeys, gemini: e.target.value })}
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 text-sm text-white placeholder-slate-600 focus:border-brand/40 transition-all outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <button
+                      type="submit"
+                      disabled={savingKeys}
+                      className="inline-flex items-center justify-center gap-3 rounded-xl bg-brand hover:bg-brand/90 px-6 py-3 text-[10px] font-black uppercase tracking-widest text-white transition-all active:scale-[0.98] disabled:opacity-50"
+                    >
+                      {savingKeys ? "Encrypting & Saving..." : "Save Credentials"}
+                    </button>
+                    {saveSuccess && (
+                      <span className="text-emerald-400 text-xs font-bold animate-pulse">✓ Saved successfully!</span>
+                    )}
+                  </div>
+                </>
+              )}
+            </form>
           </section>
 
           {/* Interface Section */}

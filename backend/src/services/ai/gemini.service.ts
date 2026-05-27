@@ -1,5 +1,6 @@
 import axios from "axios";
 import { env } from "../../config/env.js";
+import { requestContextStorage } from "../../core/context.js";
 import type { CopilotMessage, ResumeTailorRequest, ResumeTailorResult } from "@studybuddy/shared";
 
 type OpenAICompatibleMessage = {
@@ -40,7 +41,10 @@ function extractJsonPayload(content: string) {
 
 /** Sends a chat request to Google's Gemini API using direct Axios HTTP call. */
 async function requestGemini(messages: OpenAICompatibleMessage[], model: string = "gemini-1.5-flash", jsonMode: boolean = true) {
-  if (!env.geminiApiKey) {
+  const store = requestContextStorage.getStore();
+  const apiKey = store?.apiKeys?.gemini || env.geminiApiKey;
+
+  if (!apiKey) {
     throw new Error("Gemini API key is not configured.");
   }
 
@@ -63,7 +67,7 @@ async function requestGemini(messages: OpenAICompatibleMessage[], model: string 
     }
   }
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${env.geminiApiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
   const response = await axios.post(
     url,

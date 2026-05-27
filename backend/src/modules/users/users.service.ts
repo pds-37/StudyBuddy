@@ -73,8 +73,41 @@ async function updateProfile(userId: string, payload: UpdateProfileBody) {
   return toProfile(user);
 }
 
+/** Returns custom API keys for the authenticated user. */
+async function getApiKeys(userId: string) {
+  const user = await UserModel.findById(userId).select("+apiKeys").lean();
+  if (!user) {
+    throw new ApiError(404, "User not found.");
+  }
+  return user.apiKeys || {};
+}
+
+/** Updates custom API keys for the authenticated user. */
+async function updateApiKeys(userId: string, apiKeys: { groq?: string; gemini?: string; openai?: string; huggingface?: string; }) {
+  const user = await UserModel.findByIdAndUpdate(
+    userId,
+    {
+      $set: {
+        "apiKeys.groq": apiKeys.groq || "",
+        "apiKeys.gemini": apiKeys.gemini || "",
+        "apiKeys.openai": apiKeys.openai || "",
+        "apiKeys.huggingface": apiKeys.huggingface || ""
+      }
+    },
+    { new: true, runValidators: true }
+  );
+
+  if (!user) {
+    throw new ApiError(404, "User not found.");
+  }
+
+  return user.apiKeys || {};
+}
+
 export const usersService = {
   getProfile,
   getUserById,
-  updateProfile
+  updateProfile,
+  getApiKeys,
+  updateApiKeys
 };

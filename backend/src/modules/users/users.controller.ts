@@ -23,7 +23,29 @@ const updateProfile: RequestHandler = async (request, response, next) => {
   }
 };
 
+/** Returns the authenticated user's custom API keys. */
+const getApiKeys: RequestHandler = async (request, response, next) => {
+  try {
+    const apiKeys = await usersService.getApiKeys(request.userId ?? "");
+    response.json({ apiKeys });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/** Updates the authenticated user's custom API keys. */
+const updateApiKeys: RequestHandler = async (request, response, next) => {
+  try {
+    const apiKeys = await usersService.updateApiKeys(request.userId ?? "", request.body || {});
+    response.json({ apiKeys });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const usersController = {
   getProfile,
-  updateProfile
+  updateProfile,
+  getApiKeys,
+  updateApiKeys
 };

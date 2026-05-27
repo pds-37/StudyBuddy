@@ -1,5 +1,6 @@
 import axios from "axios";
 import { env } from "../../config/env.js";
+import { requestContextStorage } from "../../core/context.js";
 
 type HuggingFaceFeatureResponse = number[] | number[][] | number[][][];
 
@@ -41,7 +42,10 @@ function normalizeFeatureResponse(output: HuggingFaceFeatureResponse): number[] 
 
 /** Calls HuggingFace's free inference API for a text embedding. */
 async function embedText(text: string) {
-  if (!env.huggingFaceApiKey) {
+  const store = requestContextStorage.getStore();
+  const apiKey = store?.apiKeys?.huggingface || env.huggingFaceApiKey;
+
+  if (!apiKey) {
     throw new Error("HuggingFace API key is not configured.");
   }
 
@@ -55,7 +59,7 @@ async function embedText(text: string) {
     },
     {
       headers: {
-        Authorization: `Bearer ${env.huggingFaceApiKey}`,
+        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json"
       },
       timeout: 15000

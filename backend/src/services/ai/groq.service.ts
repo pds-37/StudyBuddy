@@ -1,5 +1,6 @@
 import axios from "axios";
 import { env } from "../../config/env.js";
+import { requestContextStorage } from "../../core/context.js";
 import type { CopilotMessage, ResumeTailorRequest, ResumeTailorResult } from "@studybuddy/shared";
 
 type GroqMessage = {
@@ -19,7 +20,10 @@ const GROQ_CHAT_COMPLETIONS_URL = "https://api.groq.com/openai/v1/chat/completio
 
 /** Sends a chat-completions request to Groq's OpenAI-compatible API. */
 async function requestGroq(messages: GroqMessage[], maxTokens: number, model: string = "llama-3.1-8b-instant") {
-  if (!env.groqApiKey) {
+  const store = requestContextStorage.getStore();
+  const apiKey = store?.apiKeys?.groq || env.groqApiKey;
+
+  if (!apiKey) {
     throw new Error("Groq API key is not configured.");
   }
 
@@ -33,7 +37,7 @@ async function requestGroq(messages: GroqMessage[], maxTokens: number, model: st
     },
     {
       headers: {
-        Authorization: `Bearer ${env.groqApiKey}`,
+        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json"
       },
       timeout: 30000

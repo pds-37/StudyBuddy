@@ -67,6 +67,12 @@ export interface IUser {
   };
   onboardingCompleted: boolean;
   pushSubscriptions: any[];
+  apiKeys?: {
+    groq?: string;
+    gemini?: string;
+    openai?: string;
+    huggingface?: string;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -204,6 +210,16 @@ const userSchema = new Schema<IUser>(
       type: [Schema.Types.Mixed],
       default: []
     } as any,
+    apiKeys: {
+      type: {
+        groq: { type: String, default: "" },
+        gemini: { type: String, default: "" },
+        openai: { type: String, default: "" },
+        huggingface: { type: String, default: "" }
+      },
+      default: {},
+      select: false
+    }
   },
   {
     timestamps: true
