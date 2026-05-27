@@ -15,10 +15,12 @@ import {
   ShieldCheck,
   Sparkles,
   Target,
+import {
   Trophy,
   Zap
 } from "lucide-react";
 import { useAppStore } from "../store/app-store";
+import { NebulaBackground } from "../components/common/NebulaBackground";
 
 const stats = [
   { label: "Readiness lift", value: "+38%", tone: "text-emerald-300" },
@@ -79,15 +81,15 @@ const inclusions = [
 
 function ProductPreview() {
   return (
-    <div className="relative overflow-hidden rounded-lg border border-white/10 bg-[#080a0f] shadow-[0_32px_120px_rgba(0,0,0,0.48)]">
-      <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A]/80 backdrop-blur-xl shadow-2xl">
+      <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
         <div className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-full bg-rose-400" />
-          <span className="h-2.5 w-2.5 rounded-full bg-amber-300" />
-          <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
+          <span className="h-3 w-3 rounded-full bg-red-500/80" />
+          <span className="h-3 w-3 rounded-full bg-yellow-500/80" />
+          <span className="h-3 w-3 rounded-full bg-green-500/80" />
         </div>
-        <div className="hidden rounded-md border border-white/10 bg-white/[0.03] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 sm:block">
-          StudyBuddy command center
+        <div className="hidden rounded-md border border-white/5 bg-white/[0.03] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 sm:block">
+          StudyBuddy OS
         </div>
       </div>
 
@@ -183,9 +185,11 @@ export function LandingPage() {
   const startPath = isAuthenticated ? "/dashboard" : "/auth";
 
   return (
-    <div className="min-h-screen overflow-hidden bg-black text-slate-100">
-      <div className="pointer-events-none fixed inset-0 z-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:72px_72px] [mask-image:linear-gradient(to_bottom,black,transparent_78%)]" />
-      <div className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.20),transparent_42%),linear-gradient(135deg,rgba(6,182,212,0.08),transparent_35%,rgba(16,185,129,0.08))]" />
+    <div className="min-h-screen overflow-hidden bg-[#030303] text-slate-100 font-sans">
+      <div className="pointer-events-none fixed inset-0 z-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDQwIEwgNDAgNDAgNDAgMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwgMjU1LCAyNTUsIDAuMDMpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] [mask-image:linear-gradient(to_bottom,white,transparent)] opacity-50" />
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <NebulaBackground opacity={0.12} />
+      </div>
 
       <main className="relative z-10">
         <section id="home" className="mx-auto grid min-h-[calc(100vh-64px)] w-full max-w-7xl items-center gap-12 px-4 pb-14 pt-16 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8 lg:pt-10">
@@ -199,7 +203,7 @@ export function LandingPage() {
               <Sparkles size={14} className="text-cyan-300" />
               Premium placement OS
             </div>
-            <h1 className="text-5xl font-black leading-[0.95] tracking-tight text-white sm:text-6xl lg:text-7xl">
+            <h1 className="text-5xl font-semibold leading-[0.95] tracking-tight text-white sm:text-6xl lg:text-7xl">
               StudyBuddy turns ambition into a daily placement plan.
             </h1>
             <p className="mt-7 max-w-xl text-lg leading-8 text-slate-300">
@@ -257,7 +261,7 @@ export function LandingPage() {
         <section id="features" className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
           <div className="mb-12 max-w-3xl">
             <p className="text-xs font-black uppercase tracking-[0.28em] text-cyan-300">Premium system</p>
-            <h2 className="mt-4 text-4xl font-black tracking-tight text-white sm:text-5xl">
+            <h2 className="mt-4 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
               One command center for study, skill, career, and confidence.
             </h2>
           </div>
