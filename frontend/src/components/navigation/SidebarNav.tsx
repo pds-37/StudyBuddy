@@ -25,6 +25,7 @@ const navGroups = [
   {
     title: "LEARNING",
     items: [
+      { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
       { name: "Roadmap", href: "/roadmap", icon: Route },
       { name: "Notes", href: "/notes", icon: FileText },
       { name: "Recall", href: "/recall", icon: Brain },
@@ -46,8 +47,6 @@ const navGroups = [
     title: "AI ENGINE",
     items: [
       { name: "Ask Veda", href: "/copilot", icon: MessageSquare, highlight: true },
-      { name: "Insights", href: "/dashboard", icon: LayoutDashboard },
-      { name: "Predictions", href: "/dashboard", icon: Sparkles },
     ]
   }
 ];
