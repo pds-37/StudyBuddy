@@ -11,7 +11,7 @@
 
   html {
     scroll-behavior: smooth;
-    background: #030712; /* Rich dark slate-950 */
+    background: #000000; /* Fully dark black */
   }
 
   body {
@@ -48,35 +48,9 @@
 }
 
 @layer components {
-  /* Layered Premium Background */
+  /* Layered Premium Background Removed for fully black version */
   .bg-ai-workspace {
     @apply bg-background relative overflow-hidden;
-  }
-
-  .bg-ai-workspace::before {
-    content: "";
-    @apply absolute inset-0 pointer-events-none;
-    background: 
-      radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
-      radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.15) 0%, transparent 40%);
-    z-index: 0;
-  }
-
-  .bg-ai-workspace::after {
-    content: "";
-    @apply absolute inset-0 pointer-events-none opacity-20;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    z-index: 0;
-  }
-
-  .mesh-bg {
-    @apply absolute inset-0 opacity-30 pointer-events-none;
-    background-image: 
-      radial-gradient(at 40% 20%, hsla(263,70%,40%,1) 0px, transparent 50%),
-      radial-gradient(at 80% 0%, hsla(234,70%,40%,1) 0px, transparent 50%),
-      radial-gradient(at 0% 50%, hsla(263,70%,40%,1) 0px, transparent 50%);
-    filter: blur(80px);
-    z-index: 0;
   }
 
   /* Premium Buttons */

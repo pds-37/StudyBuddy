@@ -5,9 +5,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: "#030712", // Rich dark slate-950
-        "background-secondary": "#0f172a", // Slate-900
-        surface: "rgba(15, 23, 42, 0.6)",
+        background: "#000000", // Fully black
+        "background-secondary": "#0a0a0a", // Darker slate
+        surface: "rgba(10, 10, 10, 0.6)",
         "surface-hover": "rgba(30, 41, 59, 0.8)",
         border: "rgba(255, 255, 255, 0.08)",
         "border-strong": "rgba(255, 255, 255, 0.15)",
