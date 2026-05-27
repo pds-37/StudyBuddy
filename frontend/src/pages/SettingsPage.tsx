@@ -29,16 +29,7 @@ export function SettingsPage() {
   const aiLimit = plan === "team" ? 10000 : plan === "pro" ? 2000 : 100;
   const notesLimit = plan === "team" ? 50000 : plan === "pro" ? 10000 : 250;
 
-  // Custom API key states
-  const [apiKeys, setApiKeys] = useState({
-    groq: "",
-    gemini: "",
-    openai: "",
-    huggingface: ""
-  });
-  const [loadingKeys, setLoadingKeys] = useState(true);
-  const [savingKeys, setSavingKeys] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
+  // Using developer-configured server keys exclusively.
 
   // Dynamic Zookeeper Routing states
   const [aiRoutes, setAiRoutes] = useState({
@@ -57,24 +48,6 @@ export function SettingsPage() {
   const [routeSuccess, setRouteSuccess] = useState(false);
 
   useEffect(() => {
-    const fetchKeys = async () => {
-      try {
-        const { data } = await apiClient.get("/users/me/api-keys");
-        if (data && data.apiKeys) {
-          setApiKeys({
-            groq: data.apiKeys.groq || "",
-            gemini: data.apiKeys.gemini || "",
-            openai: data.apiKeys.openai || "",
-            huggingface: data.apiKeys.huggingface || ""
-          });
-        }
-      } catch (err) {
-        console.error("Failed to load custom API keys:", err);
-      } finally {
-        setLoadingKeys(false);
-      }
-    };
-
     const fetchRoutes = async () => {
       try {
         const { data } = await apiClient.get("/users/me/ai-routes");
@@ -99,29 +72,12 @@ export function SettingsPage() {
     };
 
     if (user) {
-      fetchKeys();
       fetchRoutes();
     } else {
-      setLoadingKeys(false);
       setLoadingRoutes(false);
     }
   }, [user]);
-
-  const handleSaveKeys = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSavingKeys(true);
-    setSaveSuccess(false);
-    try {
-      await apiClient.put("/users/me/api-keys", apiKeys);
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 3000);
-    } catch (err) {
-      alert("Failed to save API keys. Please try again.");
-    } finally {
-      setSavingKeys(false);
-    }
-  };
-
+  // Save handler and key check configurations removed to guarantee exclusive developer-level key routing.
   const handleSaveRoutes = async (e: React.FormEvent) => {
     e.preventDefault();
     setSavingRoutes(true);
@@ -135,12 +91,6 @@ export function SettingsPage() {
     } finally {
       setSavingRoutes(false);
     }
-  };
-
-  const hasKeysConfigured = {
-    groq: !!apiKeys.groq,
-    gemini: !!apiKeys.gemini,
-    huggingface: !!apiKeys.huggingface
   };
 
   return (
@@ -208,93 +158,7 @@ export function SettingsPage() {
             </div>
           </section>
 
-          {/* Custom API Credentials */}
-          <section className="space-y-6">
-            <div className="flex items-center gap-3 px-2">
-              <Shield className="w-5 h-5 text-indigo-400" />
-              <h2 className="text-lg font-bold text-white uppercase tracking-widest text-[11px]">AI Engine Custom Credentials</h2>
-            </div>
-            
-            <form onSubmit={handleSaveKeys} className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 space-y-6">
-              <div>
-                <h3 className="text-sm font-bold text-white">Bring Your Own API Keys</h3>
-                <p className="mt-1 text-xs text-slate-500">
-                  Configure your own secure credentials to enable fully independent, high-performance mock interviews, roadmaps, and chat modules.
-                </p>
-              </div>
 
-              {loadingKeys ? (
-                <div className="text-slate-400 text-xs animate-pulse">Retrieving secure key vaults...</div>
-              ) : (
-                <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Groq API Key (Llama 3)</label>
-                        {hasKeysConfigured.groq && <span className="text-[9px] font-black text-emerald-400 uppercase tracking-wider">✓ Configured</span>}
-                      </div>
-                      <input 
-                        type="password"
-                        placeholder={isDemoMode ? "gsk_••••••••••••••••••••" : "gsk_..."}
-                        value={apiKeys.groq}
-                        onChange={(e) => setApiKeys({ ...apiKeys, groq: e.target.value })}
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 text-sm text-white placeholder-slate-600 focus:border-brand/40 transition-all outline-none"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Google Gemini API Key</label>
-                        {hasKeysConfigured.gemini && <span className="text-[9px] font-black text-emerald-400 uppercase tracking-wider">✓ Configured</span>}
-                      </div>
-                      <input 
-                        type="password"
-                        placeholder={isDemoMode ? "AIzaSy••••••••••••••••••" : "AIzaSy..."}
-                        value={apiKeys.gemini}
-                        onChange={(e) => setApiKeys({ ...apiKeys, gemini: e.target.value })}
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 text-sm text-white placeholder-slate-600 focus:border-brand/40 transition-all outline-none"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Hugging Face API Key</label>
-                        {hasKeysConfigured.huggingface && <span className="text-[9px] font-black text-emerald-400 uppercase tracking-wider">✓ Configured</span>}
-                      </div>
-                      <input 
-                        type="password"
-                        placeholder="hf_..."
-                        value={apiKeys.huggingface}
-                        onChange={(e) => setApiKeys({ ...apiKeys, huggingface: e.target.value })}
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 text-sm text-white placeholder-slate-600 focus:border-brand/40 transition-all outline-none"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">OpenAI API Key (Optional)</label>
-                      <input 
-                        type="password"
-                        placeholder="sk-..."
-                        value={apiKeys.openai}
-                        onChange={(e) => setApiKeys({ ...apiKeys, openai: e.target.value })}
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 text-sm text-white placeholder-slate-600 focus:border-brand/40 transition-all outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4">
-                    <button
-                      type="submit"
-                      disabled={savingKeys}
-                      className="inline-flex items-center justify-center gap-3 rounded-xl bg-brand hover:bg-brand/90 px-6 py-3 text-[10px] font-black uppercase tracking-widest text-white transition-all active:scale-[0.98] disabled:opacity-50"
-                    >
-                      {savingKeys ? "Encrypting & Saving..." : "Save Credentials"}
-                    </button>
-                    {saveSuccess && (
-                      <span className="text-emerald-400 text-xs font-bold animate-pulse">✓ Saved successfully!</span>
-                    )}
-                  </div>
-                </>
-              )}
-            </form>
-          </section>
 
           {/* Zookeeper AI Master Orchestrator Routing Matrix */}
           <section className="space-y-6">
@@ -330,56 +194,48 @@ export function SettingsPage() {
                       description="Empathetic chat coach, low-latency, friendly style." 
                       value={aiRoutes.mentor} 
                       onChange={(val) => setAiRoutes({ ...aiRoutes, mentor: val })}
-                      hasKeys={hasKeysConfigured}
                     />
                     <RouteCard 
                       title="Strategic Roadmaps" 
                       description="Context-heavy curriculum builder and logical structuring." 
                       value={aiRoutes.roadmap} 
                       onChange={(val) => setAiRoutes({ ...aiRoutes, roadmap: val })}
-                      hasKeys={hasKeysConfigured}
                     />
                     <RouteCard 
                       title="Active Recall Quizzes" 
                       description="Rapid conceptual and code-based quiz card generator." 
                       value={aiRoutes.quiz} 
                       onChange={(val) => setAiRoutes({ ...aiRoutes, quiz: val })}
-                      hasKeys={hasKeysConfigured}
                     />
                     <RouteCard 
                       title="ATS Resume Tailoring" 
                       description="Large prompt parsing, ATS evaluations, and storytelling edits." 
                       value={aiRoutes.resume} 
                       onChange={(val) => setAiRoutes({ ...aiRoutes, resume: val })}
-                      hasKeys={hasKeysConfigured}
                     />
                     <RouteCard 
                       title="Mock Interview Rounds" 
                       description="SDE technical evaluation, algorithmic pressure mode, and scoring." 
                       value={aiRoutes.interview} 
                       onChange={(val) => setAiRoutes({ ...aiRoutes, interview: val })}
-                      hasKeys={hasKeysConfigured}
                     />
                     <RouteCard 
                       title="Note Graph Ingestion" 
                       description="Analyzes notes to extract concepts, graph edges, and review cards." 
                       value={aiRoutes.note} 
                       onChange={(val) => setAiRoutes({ ...aiRoutes, note: val })}
-                      hasKeys={hasKeysConfigured}
                     />
                     <RouteCard 
                       title="Skill Readiness Analyst" 
                       description="Aggregates consistency metrics to score career preparedness." 
                       value={aiRoutes.skills} 
                       onChange={(val) => setAiRoutes({ ...aiRoutes, skills: val })}
-                      hasKeys={hasKeysConfigured}
                     />
                     <RouteCard 
                       title="Project Coordinator" 
                       description="Analyzes student blockers to suggest architectural projects." 
                       value={aiRoutes.project} 
                       onChange={(val) => setAiRoutes({ ...aiRoutes, project: val })}
-                      hasKeys={hasKeysConfigured}
                     />
                   </div>
 
@@ -560,10 +416,9 @@ interface RouteCardProps {
   description: string;
   value: string;
   onChange: (val: string) => void;
-  hasKeys: { groq: boolean; gemini: boolean; huggingface: boolean };
 }
 
-function RouteCard({ title, description, value, onChange, hasKeys }: RouteCardProps) {
+function RouteCard({ title, description, value, onChange }: RouteCardProps) {
   return (
     <div className="p-5 rounded-3xl bg-white/[0.01] border border-white/5 flex flex-col justify-between gap-4 hover:border-white/10 transition-colors">
       <div>
@@ -592,7 +447,7 @@ function RouteCard({ title, description, value, onChange, hasKeys }: RouteCardPr
               : "bg-white/[0.02] text-slate-400 border-white/5 hover:bg-white/5 hover:text-white"
           )}
         >
-          Groq {hasKeys.groq ? "⚡" : ""}
+          Groq
         </button>
         <button
           type="button"
@@ -604,7 +459,7 @@ function RouteCard({ title, description, value, onChange, hasKeys }: RouteCardPr
               : "bg-white/[0.02] text-slate-400 border-white/5 hover:bg-white/5 hover:text-white"
           )}
         >
-          Gemini {hasKeys.gemini ? "✨" : ""}
+          Gemini
         </button>
         <button
           type="button"
@@ -616,7 +471,7 @@ function RouteCard({ title, description, value, onChange, hasKeys }: RouteCardPr
               : "bg-white/[0.02] text-slate-400 border-white/5 hover:bg-white/5 hover:text-white"
           )}
         >
-          HF {hasKeys.huggingface ? "🤗" : ""}
+          HF
         </button>
       </div>
     </div>

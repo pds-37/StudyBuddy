@@ -41,8 +41,7 @@ function extractJsonPayload(content: string) {
 
 /** Sends a chat request to Google's Gemini API using direct Axios HTTP call. */
 async function requestGemini(messages: OpenAICompatibleMessage[], model: string = "gemini-1.5-flash", jsonMode: boolean = true) {
-  const store = requestContextStorage.getStore();
-  const apiKey = store?.apiKeys?.gemini || env.geminiApiKey;
+  const apiKey = env.geminiApiKey;
 
   if (!apiKey) {
     throw new Error("Gemini API key is not configured.");

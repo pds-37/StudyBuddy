@@ -28,10 +28,9 @@ function isProviderHealthy(provider: ProviderType): boolean {
   const status = providerRegistry[provider];
   const store = requestContextStorage.getStore();
   
-  // Verify if the API key is configured either in environment or request context (Bring Your Own Key)
-  if (provider === "gemini" && !env.geminiApiKey && !store?.apiKeys?.gemini) return false;
-  if (provider === "groq" && !env.groqApiKey && !store?.apiKeys?.groq) return false;
-  if (provider === "huggingface" && !env.huggingFaceApiKey && !store?.apiKeys?.huggingface) return false;
+  if (provider === "gemini" && !env.geminiApiKey) return false;
+  if (provider === "groq" && !env.groqApiKey) return false;
+  if (provider === "huggingface" && !env.huggingFaceApiKey) return false;
 
   if (!status.active) {
     const elapsed = Date.now() - status.lastFailureTime;

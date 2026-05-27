@@ -43,8 +43,7 @@ function normalizeFeatureResponse(output: HuggingFaceFeatureResponse): number[] 
 
 /** Calls HuggingFace's free inference API for a text embedding. */
 async function embedText(text: string) {
-  const store = requestContextStorage.getStore();
-  const apiKey = store?.apiKeys?.huggingface || env.huggingFaceApiKey;
+  const apiKey = env.huggingFaceApiKey;
 
   if (!apiKey) {
     throw new Error("HuggingFace API key is not configured.");
@@ -112,8 +111,7 @@ async function requestHuggingFace(
   maxTokens: number,
   model: string = "Qwen/Qwen2.5-72B-Instruct"
 ) {
-  const store = requestContextStorage.getStore();
-  const apiKey = store?.apiKeys?.huggingface || env.huggingFaceApiKey;
+  const apiKey = env.huggingFaceApiKey;
 
   if (!apiKey) {
     throw new Error("HuggingFace API key is not configured.");
