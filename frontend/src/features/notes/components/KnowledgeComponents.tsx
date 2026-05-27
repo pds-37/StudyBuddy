@@ -24,7 +24,8 @@ import {
   XCircle,
   BarChart3,
   Upload,
-  Loader2
+  Loader2,
+  Trash2
 } from "lucide-react";
 import { cn } from "../../../lib/utils/cn";
 import type { CareerNote, KnowledgeHealthMetrics, RevisionPriority } from "@studybuddy/shared";
@@ -218,13 +219,21 @@ export function IntelligentNoteCard({ note, onAction }: { note: CareerNote; onAc
             </span>
           ))}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 relative">
           <KnowledgeLayerBadge layer={note.knowledgeLayer} />
           <div className={cn(
             "w-2 h-2 rounded-full",
             note.strength > 0.7 ? "bg-emerald-500" :
             note.strength > 0.3 ? "bg-amber-500" : "bg-red-500"
           )} />
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onAction('delete'); }}
+            className="p-1 rounded text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+            title="Delete Note"
+          >
+            <Trash2 size={12} />
+          </button>
         </div>
       </div>
 

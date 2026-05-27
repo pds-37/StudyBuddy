@@ -154,8 +154,16 @@ export function NotesPage() {
       setActiveNote(note);
     } else if (action === "recall") {
       navigate(`/recall?noteId=${encodeURIComponent(noteId)}`);
+    } else if (action === "delete") {
+      if (confirm(`Are you sure you want to delete "${note.title}" from your knowledge graph?`)) {
+        void deleteNote(noteId).then(() => {
+          void fetchKnowledgeHealth();
+          void fetchRevisionPriorities();
+          void fetchConcepts();
+        });
+      }
     }
-  }, [navigate, notes, setActiveNote]);
+  }, [navigate, notes, setActiveNote, deleteNote, fetchKnowledgeHealth, fetchRevisionPriorities, fetchConcepts]);
 
   const handleStartRevision = useCallback((noteId: string) => {
     navigate(`/recall?noteId=${encodeURIComponent(noteId)}`);
