@@ -140,7 +140,7 @@ export function RoadmapWorkspace() {
               />
             ))}
 
-          <section className="overflow-hidden rounded-lg border border-white/10 bg-[#0b0e14]">
+          <section className="glass-panel overflow-hidden rounded-xl border border-white/10 bg-surface/80">
             <div className="border-b border-white/10 px-4 py-3 sm:px-5">
               <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                 <div className="flex min-w-0 items-center gap-3">
@@ -199,7 +199,7 @@ export function RoadmapWorkspace() {
                 </div>
               </div>
 
-              <div className="border-t border-white/10 bg-[#0d1018] p-4 lg:border-l lg:border-t-0 sm:p-5">
+              <div className="border-t border-white/10 bg-black/20 p-4 lg:border-l lg:border-t-0 sm:p-5">
                 <div className="mb-3 flex items-center justify-between">
                   <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">Active Track</p>
                   <span className="rounded-full border border-[#c9a84c]/30 bg-[#1c1608] px-2 py-1 font-mono text-[9px] font-semibold uppercase tracking-widest text-[#c9a84c]">
@@ -220,7 +220,7 @@ export function RoadmapWorkspace() {
             </div>
           </section>
 
-          <section className="rounded-lg border border-white/10 bg-[#0d1018]">
+          <section className="glass-panel rounded-xl border border-white/10 bg-surface/50">
             <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 sm:px-5">
               <SectionTitle icon={Map} title="Journey Path" />
               <button
@@ -262,7 +262,7 @@ export function RoadmapWorkspace() {
           </section>
 
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-            <section id="journey-phases" className="rounded-lg border border-white/10 bg-[#0d1018] scroll-mt-20">
+            <section id="journey-phases" className="glass-panel rounded-xl border border-white/10 bg-surface/50 scroll-mt-20">
               <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 sm:px-5">
                 <SectionTitle icon={Route} title="Journey Phases" />
                 <span className="font-mono text-[10px] font-semibold text-slate-500">{stats.completion}% overall</span>
@@ -281,7 +281,7 @@ export function RoadmapWorkspace() {
               </div>
             </section>
 
-            <section id="execution-tasks" className="rounded-lg border border-white/10 bg-[#0d1018] scroll-mt-20">
+            <section id="execution-tasks" className="glass-panel rounded-xl border border-white/10 bg-surface/50 scroll-mt-20">
               <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 sm:px-5">
                 <SectionTitle icon={Zap} title={isOverloaded ? "Momentum Focus" : "Execution Tasks"} />
                 <button
@@ -328,7 +328,7 @@ export function RoadmapWorkspace() {
             </section>
           </div>
 
-          <section className="rounded-lg border border-white/10 bg-[#0d1018]">
+          <section className="glass-panel rounded-xl border border-white/10 bg-surface/50">
             <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 sm:px-5">
               <SectionTitle icon={CalendarDays} title="This Week" />
               <span className="text-xs font-semibold text-slate-500">Ahead of {Math.max(35, stats.consistency)}% of learners</span>
@@ -338,7 +338,7 @@ export function RoadmapWorkspace() {
         </main>
 
         <aside className="space-y-5">
-          <section className="rounded-lg border border-white/10 bg-[#0d1018]">
+          <section className="glass-panel rounded-xl border border-white/10 bg-surface/50">
             <div className="border-b border-white/10 px-4 py-3">
               <SectionTitle icon={Sparkles} title="Veda Insights" />
             </div>
@@ -377,7 +377,7 @@ export function RoadmapWorkspace() {
             </div>
           </section>
 
-          <section className="rounded-lg border border-white/10 bg-[#0d1018]">
+          <section className="glass-panel rounded-xl border border-white/10 bg-surface/50">
             <div className="border-b border-white/10 px-4 py-3">
               <SectionTitle icon={Target} title="Next Best Action" />
             </div>
@@ -395,14 +395,14 @@ export function RoadmapWorkspace() {
             </div>
           </section>
 
-          <section className="rounded-lg border border-white/10 bg-[#0d1018]">
+          <section className="glass-panel rounded-xl border border-white/10 bg-surface/50">
             <div className="border-b border-white/10 px-4 py-3">
               <SectionTitle icon={BarChart3} title="Momentum" />
             </div>
             <MomentumHeatmap />
           </section>
 
-          <section className="rounded-lg border border-white/10 bg-[#0d1018]">
+          <section className="glass-panel rounded-xl border border-white/10 bg-surface/50">
             <div className="border-b border-white/10 px-4 py-3">
               <SectionTitle icon={Zap} title="Quick Actions" />
             </div>
@@ -466,7 +466,7 @@ function MetricCard({ label, value, sub, tone, icon: Icon }: { label: string; va
   }[tone];
 
   return (
-    <div className="rounded-lg border border-white/10 bg-[#121620] p-4">
+    <div className="rounded-lg border border-white/10 bg-white/5 p-4">
       <div className="mb-4 flex items-center justify-between">
         <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</p>
         <div className={cn("flex h-8 w-8 items-center justify-center rounded-lg border", toneClass)}>
@@ -606,7 +606,7 @@ function InsightCard({ insight, onAction }: { insight: RoadmapInsight; onAction:
   }[insight.type];
 
   return (
-    <div className="rounded-lg border border-white/10 bg-[#121620] p-3">
+    <div className="rounded-lg border border-white/10 bg-white/5 p-3">
       <div className="flex items-start gap-3">
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/[0.04] text-slate-400">
           <Icon size={15} />
@@ -677,7 +677,7 @@ function QuickAction({ icon: Icon, label, onClick }: { icon: typeof Brain; label
   return (
     <button
       onClick={onClick}
-      className="flex flex-col items-center gap-2 rounded-lg border border-white/10 bg-[#121620] p-3 text-slate-500 transition hover:border-[#a07ee0]/40 hover:text-[#a07ee0]"
+      className="flex flex-col items-center gap-2 rounded-lg border border-white/10 bg-white/5 p-3 text-slate-500 transition hover:border-[#a07ee0]/40 hover:text-[#a07ee0]"
     >
       <Icon size={16} />
       <span className="text-[10px] font-bold uppercase tracking-wider">{label}</span>
@@ -714,7 +714,7 @@ function GeneratingState() {
 function EmptyState({ onGenerate, isGenerating, onboardingComplete }: { onGenerate: () => void; isGenerating: boolean; onboardingComplete?: boolean }) {
   return (
     <div className="mx-auto flex max-w-xl flex-col items-center justify-center py-32 text-center">
-      <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-lg border border-white/10 bg-[#121620] text-[#a07ee0]">
+      <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-[#a07ee0]">
         <Route size={30} />
       </div>
       <h2 className="text-3xl font-black tracking-tight text-white">Initialize your mission</h2>

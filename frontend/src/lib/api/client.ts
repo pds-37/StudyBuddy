@@ -24,7 +24,10 @@ apiClient.interceptors.response.use(
     if (axios.isAxiosError(error) && error.response?.status === 401) {
       // Import store dynamically to avoid circular dependencies if any
       import("../../store/app-store").then((m) => {
-        m.useAppStore.getState().clearSession();
+        const state = m.useAppStore.getState();
+        if (!state.isDemoMode) {
+          state.clearSession();
+        }
       });
     }
     return Promise.reject(error);

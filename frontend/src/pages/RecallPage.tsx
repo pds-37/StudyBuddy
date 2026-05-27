@@ -26,6 +26,7 @@ import { cn } from "../lib/utils/cn";
 import { getDueRecallPrompts, getRecallStats, reviewRecallAnswer, type RecallStats } from "../lib/api/recall";
 import { getRevisionPriorities } from "../lib/api/intelligence";
 import { logBehavior } from "../lib/api/behavior";
+import { NeuralConstellation3D } from "../components/common/NeuralConstellation3D";
 import type { RecallGrade, RecallPrompt, RecallReviewResult, RevisionPriority } from "@studybuddy/shared";
 
 function formatPercent(value: number) {
@@ -114,9 +115,12 @@ export function RecallPage() {
   const promptConfig = activePrompt?.promptType ? promptTypeConfig[activePrompt.promptType] : promptTypeConfig.explain;
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-[#05070A]">
+    <div className="flex flex-col h-full overflow-hidden relative bg-background">
+      <div className="absolute inset-0 z-0">
+        <NeuralConstellation3D />
+      </div>
       {/* ─── HEADER ─── */}
-      <header className="shrink-0 px-8 pt-8 pb-5 border-b border-white/[0.04]">
+      <header className="shrink-0 px-8 pt-8 pb-5 border-b border-border glass-panel relative z-10">
         <div className="max-w-[1400px] mx-auto">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -159,7 +163,7 @@ export function RecallPage() {
       )}
 
       {/* ─── MAIN CONTENT ─── */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar">
+      <div className="flex-1 overflow-y-auto custom-scrollbar relative z-10">
         <div className="max-w-[1400px] mx-auto px-8 py-8">
           <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
 
@@ -175,7 +179,7 @@ export function RecallPage() {
                 <Motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="border border-white/[0.06] p-8 space-y-6"
+                  className="glass-panel p-8 space-y-6"
                 >
                   <div className="flex items-center gap-4">
                     <div className={cn(
@@ -227,7 +231,7 @@ export function RecallPage() {
                   key={activePrompt.noteId}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="border border-white/[0.06] p-8 space-y-6"
+                  className="glass-panel p-8 space-y-6"
                 >
                   {/* Prompt header */}
                   <div className="flex items-start gap-5">

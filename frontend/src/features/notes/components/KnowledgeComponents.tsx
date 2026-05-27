@@ -206,7 +206,7 @@ export function IntelligentNoteCard({ note, onAction }: { note: CareerNote; onAc
     <Motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="group p-5 border border-white/[0.06] bg-transparent hover:border-white/15 transition-all flex flex-col h-full cursor-pointer"
+      className="group p-5 cognitive-card flex flex-col h-full cursor-pointer"
       onClick={() => onAction('view')}
     >
       {/* Top row: concepts + strength indicator */}
@@ -472,7 +472,7 @@ export function NoteDetailPanel({ note, onClose }: {
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: 400, opacity: 0 }}
       transition={{ type: "spring", damping: 30, stiffness: 300 }}
-      className="fixed top-0 right-0 bottom-0 w-full max-w-lg z-50 bg-[#0a0c10] border-l border-white/[0.06] overflow-y-auto"
+      className="fixed top-0 right-0 bottom-0 w-full max-w-lg z-50 glass-panel border-l border-border overflow-y-auto"
     >
       <div className="p-8 space-y-8">
         {/* Header */}

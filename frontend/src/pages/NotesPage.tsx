@@ -204,9 +204,9 @@ export function NotesPage() {
   }, [concepts]);
 
   return (
-    <div className="flex flex-col h-full overflow-hidden relative bg-[#05070A]">
+    <div className="flex flex-col h-full overflow-hidden relative bg-background">
       {/* ─── TOP: KNOWLEDGE STATUS HEADER ─── */}
-      <header className="shrink-0 px-8 pt-10 pb-8 z-20 border-b border-white/[0.06] bg-[#0c1017]">
+      <header className="shrink-0 px-8 pt-10 pb-8 z-20 border-b border-border glass-panel">
         <div className="max-w-[1600px] mx-auto space-y-10">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
@@ -380,7 +380,7 @@ export function NotesPage() {
         {/* ─── CENTER: KNOWLEDGE FEED ─── */}
         <main className="flex-1 flex flex-col min-w-0 bg-transparent relative">
           {/* Semantic Search Bar */}
-          <div className="px-8 py-5 sticky top-0 z-10 bg-[#05070A]">
+          <div className="px-8 py-5 sticky top-0 z-10 bg-background/80 backdrop-blur-md">
             <div className="relative w-full max-w-2xl group">
               <Search size={14} className="absolute left-0 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
@@ -517,7 +517,7 @@ export function NotesPage() {
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="relative w-full max-w-2xl bg-[#0a0c10] border border-white/[0.08] p-8"
+              className="relative w-full max-w-2xl glass-panel p-8"
             >
               <div className="absolute top-0 right-0 p-8 opacity-5">
                 <Brain size={160} className="text-brand" />

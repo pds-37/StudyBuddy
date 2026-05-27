@@ -20,6 +20,7 @@ export function GlobalCopilotWidget() {
   } = useCopilotStore();
   
   const isAuthenticated = useAppStore((state) => state.isAuthenticated);
+  const isDemoMode = useAppStore((state) => state.isDemoMode);
   const user = useAppStore((state) => state.user);
 
   const { speak, stop, isSpeaking, supported } = useSpeechSynthesis();
@@ -28,10 +29,10 @@ export function GlobalCopilotWidget() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !isDemoMode) {
       void fetchConversations();
     }
-  }, [fetchConversations, isAuthenticated]);
+  }, [fetchConversations, isAuthenticated, isDemoMode]);
 
   useEffect(() => {
     if (isOpen) {

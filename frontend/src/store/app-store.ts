@@ -20,7 +20,7 @@ function readStoredTokens() {
 }
 
 const initialTokens = readStoredTokens();
-setApiAccessToken(initialTokens.isDemoMode ? null : initialTokens.accessToken);
+setApiAccessToken(initialTokens.isDemoMode ? "demo_guest" : initialTokens.accessToken);
 
 type AppState = {
   isAuthenticated: boolean;
@@ -39,8 +39,8 @@ type AppState = {
 export const useAppStore = create<AppState>((set) => ({
   isAuthenticated: initialTokens.isDemoMode || Boolean(initialTokens.accessToken && initialTokens.refreshToken),
   isDemoMode: Boolean(initialTokens.isDemoMode),
-  accessToken: initialTokens.isDemoMode ? null : initialTokens.accessToken,
-  refreshToken: initialTokens.isDemoMode ? null : initialTokens.refreshToken,
+  accessToken: initialTokens.isDemoMode ? "demo_guest" : initialTokens.accessToken,
+  refreshToken: initialTokens.isDemoMode ? "demo_guest" : initialTokens.refreshToken,
   user: initialTokens.isDemoMode ? demoUser : null,
   setSession: (accessToken, refreshToken, user) => {
     localStorage.removeItem(DEMO_SESSION_KEY);
@@ -53,10 +53,10 @@ export const useAppStore = create<AppState>((set) => ({
     localStorage.setItem(DEMO_SESSION_KEY, "true");
     localStorage.removeItem(ACCESS_TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
-    setApiAccessToken(null);
+    setApiAccessToken("demo_guest");
     set({
-      accessToken: null,
-      refreshToken: null,
+      accessToken: "demo_guest",
+      refreshToken: "demo_guest",
       user: demoUser,
       isAuthenticated: true,
       isDemoMode: true
@@ -76,8 +76,8 @@ export const useAppStore = create<AppState>((set) => ({
     const { accessToken, refreshToken, isDemoMode } = readStoredTokens();
 
     if (isDemoMode) {
-      setApiAccessToken(null);
-      set({ accessToken: null, refreshToken: null, user: demoUser, isAuthenticated: true, isDemoMode: true });
+      setApiAccessToken("demo_guest");
+      set({ accessToken: "demo_guest", refreshToken: "demo_guest", user: demoUser, isAuthenticated: true, isDemoMode: true });
       return;
     }
 

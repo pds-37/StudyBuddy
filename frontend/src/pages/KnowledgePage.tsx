@@ -8,6 +8,7 @@ import {
   getKnowledgeGraph, getConceptDetail, getInterviewReadiness,
   type KnowledgeGraphData, type KnowledgeNode, type ConceptDetail, type InterviewReadiness
 } from "../lib/api/knowledge";
+import { NeuralConstellation3D } from "../components/common/NeuralConstellation3D";
 import { cn } from "../lib/utils/cn";
 
 const retentionColors: Record<string, string> = {
@@ -53,7 +54,7 @@ export function KnowledgePage() {
 
   if (loading) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-4 bg-[#05070A]">
+      <div className="flex h-full flex-col items-center justify-center gap-4 bg-background">
         <div className="w-14 h-14 rounded-full border-4 border-brand/20 border-t-brand animate-spin" />
         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Mapping knowledge graph...</p>
       </div>
@@ -62,7 +63,7 @@ export function KnowledgePage() {
 
   if (!data || data.nodes.length === 0) {
     return (
-      <div className="flex h-full flex-col items-center justify-center text-center bg-[#05070A] px-8">
+      <div className="flex h-full flex-col items-center justify-center text-center bg-background px-8">
         <div className="w-16 h-16 bg-brand/10 flex items-center justify-center text-brand mb-6"><Network size={32} /></div>
         <h2 className="text-xl font-semibold text-white mb-2">Knowledge Graph is empty</h2>
         <p className="text-xs text-slate-500 max-w-sm">Start adding notes with concepts to see how your knowledge interconnects.</p>
@@ -79,9 +80,12 @@ export function KnowledgePage() {
   const nodeMap = new Map(nodesWithPos.map(n => [n.id, n]));
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-[#05070A]">
+    <div className="flex flex-col h-full overflow-hidden relative bg-background">
+      <div className="absolute inset-0 z-0">
+        <NeuralConstellation3D />
+      </div>
       {/* Header */}
-      <header className="shrink-0 px-8 pt-8 pb-5 border-b border-white/[0.04]">
+      <header className="shrink-0 px-8 pt-8 pb-5 border-b border-border glass-panel relative z-10">
         <div className="max-w-[1600px] mx-auto">
           <div className="flex items-center justify-between mb-5">
             <div>
@@ -113,7 +117,7 @@ export function KnowledgePage() {
       </header>
 
       {/* Content */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden relative z-10">
         {activeTab === "graph" ? (
           <>
             {/* Graph Canvas */}
@@ -168,7 +172,7 @@ export function KnowledgePage() {
             <AnimatePresence>
               {selectedNode && (
                 <Motion.aside initial={{ width: 0, opacity: 0 }} animate={{ width: 320, opacity: 1 }} exit={{ width: 0, opacity: 0 }}
-                  className="shrink-0 border-l border-white/[0.04] overflow-y-auto custom-scrollbar">
+                  className="shrink-0 border-l border-border glass-panel overflow-y-auto custom-scrollbar">
                   <div className="p-6 min-w-[300px] space-y-6">
                     <div className="flex items-start justify-between">
                       <div>
@@ -262,7 +266,7 @@ export function KnowledgePage() {
                   </div>
 
                   {interview.topicBreakdown.length > 0 && (
-                    <div className="border border-white/[0.06] p-5 space-y-4">
+                    <div className="glass-panel p-5 space-y-4">
                       <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Topic Breakdown</h3>
                       {interview.topicBreakdown.map(t => (
                         <div key={t.category} className="space-y-1.5">
