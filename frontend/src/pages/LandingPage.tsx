@@ -435,11 +435,14 @@ export function LandingPage() {
 
       {/* FOOTER */}
       <footer>
-        <a href="#" className="logo" style={{textDecoration:'none', color:'var(--t1)'}}>
+        <Link to="/" className="logo" style={{textDecoration:'none', color:'var(--t1)'}}>
           <div className="logo-box">⚡</div>StudyBuddy
-        </a>
+        </Link>
         <div className="f-links">
-          <a href="#">Privacy</a><a href="#">Terms</a><a href="#">Blog</a><a href="#">Contact</a>
+          <Link to="/privacy">Privacy</Link>
+          <Link to="/terms">Terms</Link>
+          <Link to="/blog">Blog</Link>
+          <Link to="/contact">Contact</Link>
         </div>
         <div className="f-copy">© 2026 StudyBuddy · Powered by Veda AI</div>
       </footer>

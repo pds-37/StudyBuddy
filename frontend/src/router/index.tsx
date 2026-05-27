@@ -29,6 +29,10 @@ const StudyPage = lazy(() => import("../pages/StudyPage").then(m => ({ default: 
 const KnowledgePage = lazy(() => import("../pages/KnowledgePage").then(m => ({ default: m.KnowledgePage })));
 const SettingsPage = lazy(() => import("../pages/SettingsPage").then(m => ({ default: m.SettingsPage })));
 const FocusPage = lazy(() => import("../pages/FocusPage").then(m => ({ default: m.FocusPage })));
+const PrivacyPage = lazy(() => import("../pages/PrivacyPage").then(m => ({ default: m.PrivacyPage })));
+const TermsPage = lazy(() => import("../pages/TermsPage").then(m => ({ default: m.TermsPage })));
+const BlogPage = lazy(() => import("../pages/BlogPage").then(m => ({ default: m.BlogPage })));
+const ContactPage = lazy(() => import("../pages/ContactPage").then(m => ({ default: m.ContactPage })));
 
 
 function PageLoader() {
@@ -50,6 +54,10 @@ export function AppRouter() {
           <Route index element={<LandingPage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/demo" element={<DemoPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/contact" element={<ContactPage />} />
         </Route>
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
