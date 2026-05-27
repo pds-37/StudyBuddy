@@ -1,4 +1,5 @@
 import { useAppStore } from "../store/app-store";
+import { Link } from "react-router-dom";
 import { 
   User, 
   Bell, 
@@ -8,7 +9,8 @@ import {
   Cloud,
   Zap,
   CreditCard,
-  BarChart3
+  BarChart3,
+  RefreshCw
 } from "lucide-react";
 import { cn } from "../lib/utils/cn";
 import { NebulaBackground } from "../components/common/NebulaBackground";
@@ -103,6 +105,31 @@ export function SettingsPage() {
                 description="Show more content with smaller text and density."
                 enabled={true}
               />
+            </div>
+          </section>
+
+          {/* Roadmap Calibration Section */}
+          <section className="space-y-6">
+            <div className="flex items-center gap-3 px-2">
+              <RefreshCw className="w-5 h-5 text-amber-400" />
+              <h2 className="text-lg font-bold text-white uppercase tracking-widest text-[11px]">Roadmap Calibration</h2>
+            </div>
+            
+            <div className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 space-y-6">
+              <div>
+                <h3 className="text-sm font-bold text-white">Struggling with your current pace?</h3>
+                <p className="mt-1 text-xs text-slate-500">
+                  Recalibrate your strategic SDE timeline, target role parameters, skill assumptions, and daily workload limits to better align with your pacing.
+                </p>
+              </div>
+              
+              <Link
+                to="/onboarding"
+                className="inline-flex items-center justify-center gap-3 rounded-xl bg-amber-500 hover:bg-amber-600 px-6 py-3.5 text-xs font-black uppercase tracking-widest text-slate-955 hover:text-slate-950 transition-all active:scale-[0.98]"
+              >
+                <RefreshCw size={14} />
+                Recalibrate SDE Trajectory
+              </Link>
             </div>
           </section>
 

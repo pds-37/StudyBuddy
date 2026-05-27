@@ -376,7 +376,7 @@ export function DashboardPage() {
       )}
 
       {/* Veda Next Best Action (Redesigned with Ultra-Premium Glassmorphism & Cyber Border) */}
-      {bestAction && (
+      {bestAction && bestAction.action !== "recalibrate" && (
         <div className="relative group overflow-hidden rounded-2xl border border-cyan/25 bg-gradient-to-br from-[#0c121e]/90 via-[#07090d]/95 to-[#0e071c]/90 p-1 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] transition-all duration-500 hover:border-cyan/40 hover:shadow-[0_20px_60px_rgba(6,182,212,0.15)]">
           
           {/* Neon Border Glow */}
@@ -436,16 +436,6 @@ export function DashboardPage() {
                 >
                   <Route size={16} />
                   Synthesize Roadmap
-                  <ArrowRight size={14} className="ml-1 transition-transform group-hover/btn:translate-x-1" />
-                </Link>
-              )}
-              {bestAction.action === "recalibrate" && (
-                <Link
-                  to="/onboarding"
-                  className="w-full sm:w-auto relative group/btn inline-flex items-center justify-center gap-3 rounded-xl bg-amber-500 px-7 py-4 text-xs font-black uppercase tracking-widest text-slate-950 shadow-[0_0_25px_rgba(245,158,11,0.3)] transition-all hover:shadow-[0_0_35px_rgba(245,158,11,0.5)] active:scale-[0.98]"
-                >
-                  <RefreshCw size={16} />
-                  Recalibrate Trajectory
                   <ArrowRight size={14} className="ml-1 transition-transform group-hover/btn:translate-x-1" />
                 </Link>
               )}
