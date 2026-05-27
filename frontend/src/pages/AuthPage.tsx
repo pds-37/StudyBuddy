@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useState, useEffect } from "react";
 import { isAxiosError } from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
@@ -22,6 +22,41 @@ import { useAppStore } from "../store/app-store";
 import { motion as Motion, AnimatePresence, type Variants } from "framer-motion";
 
 import { NebulaBackground } from "../components/common/NebulaBackground";
+
+const LOADING_MESSAGES = [
+  "Waking up the server...",
+  "Establishing secure connection...",
+  "Encrypting credentials...",
+  "Almost there...",
+  "Verifying session..."
+];
+
+function LoadingMessages() {
+  const [messageIndex, setMessageIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMessageIndex((prev) => (prev + 1) % LOADING_MESSAGES.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <AnimatePresence mode="wait">
+      <Motion.div
+        key={messageIndex}
+        initial={{ opacity: 0, y: 5 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -5 }}
+        transition={{ duration: 0.3 }}
+        className="flex items-center gap-2"
+      >
+        <Loader2 className="w-4 h-4 animate-spin" />
+        <span>{LOADING_MESSAGES[messageIndex]}</span>
+      </Motion.div>
+    </AnimatePresence>
+  );
+}
 
 function getAuthErrorMessage(error: unknown) {
   if (isAxiosError<{ message?: string }>(error)) {
@@ -290,7 +325,7 @@ export function AuthPage() {
                 className="w-full bg-white text-black py-2.5 rounded-xl text-sm font-semibold hover:bg-slate-200 transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <LoadingMessages />
                 ) : (
                   isSignup ? "Create Account" : "Sign In"
                 )}
