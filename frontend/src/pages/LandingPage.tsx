@@ -105,15 +105,20 @@ export function LandingPage() {
       const cy = rect.top + rect.height / 2;
       const dx = (e.clientX - cx) / (rect.width / 2);
       const dy = (e.clientY - cy) / (rect.height / 2);
-      card.style.transform = `rotateX(${-dy * 10}deg) rotateY(${dx * 12}deg)`;
-      card.style.boxShadow = `${-dx * 20}px ${-dy * 20}px 80px rgba(0,0,0,0.8),
-        0 0 0 1px rgba(255,255,255,0.06),
-        ${dx * 8}px ${dy * 8}px 40px rgba(109,94,245,0.15)`;
+      
+      // Increased the multiplier for a more dramatic tilt
+      card.style.transform = `rotateX(${-dy * 16}deg) rotateY(${dx * 20}deg) scale3d(1.02, 1.02, 1.02)`;
+      
+      // Enhanced dynamic shadow with a more vibrant glow
+      card.style.boxShadow = `${-dx * 30}px ${-dy * 30}px 90px rgba(0,0,0,0.8),
+        0 0 0 1px rgba(255,255,255,0.08),
+        ${dx * 12}px ${dy * 12}px 50px rgba(109,94,245,0.25)`;
     };
 
     const onMouseLeave = () => {
-      card.style.transform = 'rotateX(4deg) rotateY(-8deg)';
-      card.style.boxShadow = '0 40px 100px rgba(0,0,0,0.7),0 0 0 1px rgba(255,255,255,0.04)';
+      // More pronounced resting angle
+      card.style.transform = 'rotateX(8deg) rotateY(-12deg) scale3d(1, 1, 1)';
+      card.style.boxShadow = '0 50px 120px rgba(0,0,0,0.8),0 0 0 1px rgba(255,255,255,0.05)';
     };
 
     wrap.addEventListener('mousemove', onMouseMove);
@@ -332,21 +337,21 @@ export function LandingPage() {
             <div className="dash">
               <div className="row2">
                 <div className="dc">
-                  <div className="dc-label">Roadmap Progress</div>
-                  <div className="dc-val pu">72%</div>
-                  <div className="dc-bar"><div className="dc-fill fill-p"></div></div>
+                  <div className="dc-label">Frontend Roadmap</div>
+                  <div className="dc-val pu">92%</div>
+                  <div className="dc-bar"><div className="dc-fill fill-p" style={{width: '92%'}}></div></div>
                 </div>
                 <div className="dc">
-                  <div className="dc-label">Recall Health</div>
-                  <div className="dc-val gr">84%</div>
-                  <div className="dc-bar"><div className="dc-fill fill-g"></div></div>
+                  <div className="dc-label">Interview Ready</div>
+                  <div className="dc-val gr">88%</div>
+                  <div className="dc-bar"><div className="dc-fill fill-g" style={{width: '88%'}}></div></div>
                 </div>
               </div>
               <div className="dc-tasks">
-                <div className="dc-tasks-label">Today's Plan</div>
-                <div className="task"><div className="tc done">✓</div>Revise useEffect &amp; useMemo</div>
-                <div className="task"><div className="tc"></div>Complete Async JS Deep Dive</div>
-                <div className="task"><div className="tc"></div>Build real-time chat feature</div>
+                <div className="dc-tasks-label">Today's Focus</div>
+                <div className="task"><div className="tc done">✓</div>System Design Mock Interview</div>
+                <div className="task"><div className="tc done">✓</div>Revise React Hooks Internals</div>
+                <div className="task"><div className="tc"></div>Complete Next.js Capstone</div>
               </div>
             </div>
           </div>
