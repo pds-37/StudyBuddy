@@ -15,7 +15,6 @@ import {
   ShieldCheck,
   Sparkles,
   Target,
-import {
   Trophy,
   Zap
 } from "lucide-react";
