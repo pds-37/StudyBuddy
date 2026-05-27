@@ -77,11 +77,8 @@ export function SidebarNav({ isCollapsed = false, onToggleCollapsed }: SidebarNa
       )}>
         {!isCollapsed ? (
           <div className="flex items-center justify-between w-full">
-            <Link to="/" className="flex items-center gap-2 group animate-fade-in">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand/15 border border-brand/20">
-                <Zap size={16} className="text-brand" />
-              </div>
-              <span className="font-semibold tracking-tight text-white">StudyBuddy</span>
+            <Link to="/" className="flex items-center group animate-fade-in">
+              <img src="/brand/studybuddy-logo.png" alt="StudyBuddy" className="h-8 w-auto object-contain" />
             </Link>
             <button
               onClick={onToggleCollapsed}
@@ -97,8 +94,8 @@ export function SidebarNav({ isCollapsed = false, onToggleCollapsed }: SidebarNa
             className="transition-transform hover:scale-105"
             aria-label="Expand sidebar"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand/15 border border-brand/20">
-              <Zap size={18} className="text-brand" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 border border-white/10">
+              <img src="/brand/studybuddy-favicon-512.png" alt="StudyBuddy" className="h-6 w-6 object-contain" />
             </div>
           </button>
         )}

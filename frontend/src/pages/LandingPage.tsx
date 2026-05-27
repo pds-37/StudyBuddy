@@ -227,9 +227,8 @@ export function LandingPage() {
 
       {/* NAV */}
       <nav>
-        <Link to="/" className="logo">
-          <div className="logo-box">⚡</div>
-          StudyBuddy
+        <Link to="/" className="flex items-center">
+          <img src="/brand/studybuddy-logo.png" alt="StudyBuddy Logo" className="h-10 w-auto object-contain" />
         </Link>
         <ul className="nav-links">
           <li><a href="#features">Features</a></li>
@@ -240,6 +239,7 @@ export function LandingPage() {
           <li><a href="#">About</a></li>
         </ul>
         <div className="nav-r">
+          <Link to="/demo" className="btn-ghost" style={{textDecoration:'none'}}>Demo</Link>
           <Link to="/auth" className="btn-ghost" style={{textDecoration:'none'}}>Log in</Link>
           <Link to={startPath} className="btn-nav" style={{textDecoration:'none'}}>Get Started Free →</Link>
         </div>

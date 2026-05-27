@@ -7,9 +7,11 @@ export function MarketingLayout() {
   const location = useLocation();
   const isAuthPage = location.pathname === "/auth";
 
+  const isLandingPage = location.pathname === "/";
+
   return (
     <div className="bg-ai-workspace min-h-screen text-slate-100 relative">
-      <TopNav />
+      {!isLandingPage && <TopNav />}
       <main className="animate-fade-in relative z-10">
         <Outlet />
       </main>
