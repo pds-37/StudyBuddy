@@ -19,115 +19,7 @@ import { useAppStore } from "../store/app-store";
 import { cn } from "../lib/utils/cn";
 import { motion as Motion, AnimatePresence, type Variants } from "framer-motion";
 
-interface Circulo {
-  x: number;
-  y: number;
-  size: number;
-}
-
-function CircleAnimation() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const requestIdRef = useRef<number>(0);
-  const timerRef = useRef(0);
-  const circulosRef = useRef<Circulo[]>([]);
-
-  const initArr = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    
-    circulosRef.current = [];
-    for (let index = 0; index < 300; index++) {
-      const randomX = Math.floor(
-        Math.random() * ((canvas.width * 3) - (canvas.width * 1.2) + 1)
-      ) + (canvas.width * 1.2);
-      
-      const randomY = Math.floor(
-        Math.random() * ((canvas.height) - (canvas.height * (-0.2) + 1))
-      ) + (canvas.height * (-0.2));
-      
-      const size = canvas.width / 1000;
-      circulosRef.current.push({ x: randomX, y: randomY, size });
-    }
-  };
-
-  const draw = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    
-    const context = canvas.getContext('2d');
-    if (!context) return;
-    
-    timerRef.current++;
-    context.setTransform(1, 0, 0, 1, 0, 0);
-    
-    const distanceX = canvas.width / 80;
-    const growthRate = canvas.width / 1000;
-    
-    context.fillStyle = 'rgba(124, 92, 191, 0.4)'; // Using brand color for particles
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    
-    circulosRef.current.forEach((circulo) => {
-      context.beginPath();
-      
-      if (timerRef.current < 65) {
-        circulo.x = circulo.x - distanceX;
-        circulo.size = circulo.size + growthRate;
-      }
-      
-      if (timerRef.current > 65 && timerRef.current < 500) {
-        circulo.x = circulo.x - (distanceX * 0.02);
-        circulo.size = circulo.size + (growthRate * 0.2);
-      }
-      
-      context.arc(circulo.x, circulo.y, circulo.size, 0, 360);
-      context.fill();
-    });
-    
-    if (timerRef.current > 500) {
-      // Loop the animation instead of stopping it for the auth page
-      timerRef.current = 0;
-      initArr();
-    }
-    
-    requestIdRef.current = requestAnimationFrame(draw);
-  };
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    
-    timerRef.current = 0;
-    initArr();
-    draw();
-    
-    const handleResize = () => {
-      if (!canvas) return;
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      
-      timerRef.current = 0;
-      if (requestIdRef.current) cancelAnimationFrame(requestIdRef.current);
-      
-      const context = canvas.getContext('2d');
-      if (context) context.reset();
-      
-      initArr();
-      draw();
-    };
-    
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      if (requestIdRef.current) cancelAnimationFrame(requestIdRef.current);
-    };
-  }, []);
-
-  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-60 mix-blend-screen" />;
-}
-
+import { NebulaBackground } from "../components/common/NebulaBackground";
 function getAuthErrorMessage(error: unknown) {
   if (isAxiosError<{ message?: string }>(error)) {
     return error.response?.data?.message ?? "Unable to reach the auth server.";
@@ -183,18 +75,24 @@ export function AuthPage() {
 
   // Animation variants
   const containerVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 30, scale: 0.96 },
     visible: { 
       opacity: 1, 
       y: 0,
-      transition: { duration: 0.6, ease: "easeOut", staggerChildren: 0.1 }
+      scale: 1,
+      transition: { 
+        type: "spring",
+        stiffness: 90,
+        damping: 18,
+        staggerChildren: 0.08 
+      }
     },
-    exit: { opacity: 0, y: -20, transition: { duration: 0.3 } }
+    exit: { opacity: 0, y: -20, scale: 0.98, transition: { duration: 0.25 } }
   };
 
   const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 15 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+    hidden: { opacity: 0, y: 15, scale: 0.98 },
+    visible: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 100, damping: 20 } }
   };
 
   const glowVariants: Variants = {
@@ -217,8 +115,8 @@ export function AuthPage() {
       <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-purple-500/10 blur-[100px] rounded-full pointer-events-none z-0" />
       <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-cyan-500/10 blur-[100px] rounded-full pointer-events-none z-0" />
 
-      {/* Canvas Particle Animation from 404 Prompt */}
-      <CircleAnimation />
+      {/* Animated Nebula Background for Premium SaaS Look */}
+      <NebulaBackground opacity={0.15} />
 
       {/* Authentication Card */}
       <Motion.div 
