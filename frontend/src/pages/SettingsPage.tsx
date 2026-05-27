@@ -34,9 +34,7 @@ export function SettingsPage() {
     groq: "",
     gemini: "",
     openai: "",
-    huggingface: "",
-    ollamaUrl: "",
-    ollamaModel: ""
+    huggingface: ""
   });
   const [loadingKeys, setLoadingKeys] = useState(true);
   const [savingKeys, setSavingKeys] = useState(false);
@@ -67,9 +65,7 @@ export function SettingsPage() {
             groq: data.apiKeys.groq || "",
             gemini: data.apiKeys.gemini || "",
             openai: data.apiKeys.openai || "",
-            huggingface: data.apiKeys.huggingface || "",
-            ollamaUrl: data.apiKeys.ollamaUrl || "http://localhost:11434",
-            ollamaModel: data.apiKeys.ollamaModel || "llama3.2"
+            huggingface: data.apiKeys.huggingface || ""
           });
         }
       } catch (err) {
@@ -144,8 +140,7 @@ export function SettingsPage() {
   const hasKeysConfigured = {
     groq: !!apiKeys.groq,
     gemini: !!apiKeys.gemini,
-    huggingface: !!apiKeys.huggingface,
-    ollama: !!apiKeys.ollamaUrl
+    huggingface: !!apiKeys.huggingface
   };
 
   return (
@@ -279,29 +274,6 @@ export function SettingsPage() {
                         placeholder="sk-..."
                         value={apiKeys.openai}
                         onChange={(e) => setApiKeys({ ...apiKeys, openai: e.target.value })}
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 text-sm text-white placeholder-slate-600 focus:border-brand/40 transition-all outline-none"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Ollama Local host URL (Offline Llama)</label>
-                        {hasKeysConfigured.ollama && <span className="text-[9px] font-black text-cyan-400 uppercase tracking-wider">✓ Connected</span>}
-                      </div>
-                      <input 
-                        type="text"
-                        placeholder="http://localhost:11434"
-                        value={apiKeys.ollamaUrl}
-                        onChange={(e) => setApiKeys({ ...apiKeys, ollamaUrl: e.target.value })}
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 text-sm text-white placeholder-slate-600 focus:border-brand/40 transition-all outline-none"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Local Ollama Model</label>
-                      <input 
-                        type="text"
-                        placeholder="llama3.2"
-                        value={apiKeys.ollamaModel}
-                        onChange={(e) => setApiKeys({ ...apiKeys, ollamaModel: e.target.value })}
                         className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 text-sm text-white placeholder-slate-600 focus:border-brand/40 transition-all outline-none"
                       />
                     </div>
@@ -588,7 +560,7 @@ interface RouteCardProps {
   description: string;
   value: string;
   onChange: (val: string) => void;
-  hasKeys: { groq: boolean; gemini: boolean; huggingface: boolean; ollama: boolean };
+  hasKeys: { groq: boolean; gemini: boolean; huggingface: boolean };
 }
 
 function RouteCard({ title, description, value, onChange, hasKeys }: RouteCardProps) {
@@ -601,7 +573,6 @@ function RouteCard({ title, description, value, onChange, hasKeys }: RouteCardPr
             "text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full",
             value === "groq" ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" :
             value === "gemini" ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20" :
-            value === "ollama" ? "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20" :
             "bg-orange-500/10 text-orange-400 border border-orange-500/20"
           )}>
             Active: {value.toUpperCase()}
@@ -610,7 +581,7 @@ function RouteCard({ title, description, value, onChange, hasKeys }: RouteCardPr
         <p className="mt-1 text-[10px] text-slate-500 leading-normal">{description}</p>
       </div>
 
-      <div className="grid grid-cols-4 gap-1.5">
+      <div className="grid grid-cols-3 gap-2">
         <button
           type="button"
           onClick={() => onChange("groq")}
@@ -634,18 +605,6 @@ function RouteCard({ title, description, value, onChange, hasKeys }: RouteCardPr
           )}
         >
           Gemini {hasKeys.gemini ? "✨" : ""}
-        </button>
-        <button
-          type="button"
-          onClick={() => onChange("ollama")}
-          className={cn(
-            "py-2 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all border",
-            value === "ollama" 
-              ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/40 shadow-[0_0_12px_rgba(99,102,241,0.15)]" 
-              : "bg-white/[0.02] text-slate-400 border-white/5 hover:bg-white/5 hover:text-white"
-          )}
-        >
-          Ollama {hasKeys.ollama ? "🦙" : ""}
         </button>
         <button
           type="button"

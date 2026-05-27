@@ -72,8 +72,6 @@ export interface IUser {
     gemini?: string;
     openai?: string;
     huggingface?: string;
-    ollamaUrl?: string;
-    ollamaModel?: string;
   };
   aiRoutes?: {
     mentor?: string;
@@ -228,9 +226,7 @@ const userSchema = new Schema<IUser>(
         groq: { type: String, default: "" },
         gemini: { type: String, default: "" },
         openai: { type: String, default: "" },
-        huggingface: { type: String, default: "" },
-        ollamaUrl: { type: String, default: "http://localhost:11434" },
-        ollamaModel: { type: String, default: "llama3.2" }
+        huggingface: { type: String, default: "" }
       },
       default: {},
       select: false

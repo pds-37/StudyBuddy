@@ -7,8 +7,6 @@ export type RequestContext = {
     gemini?: string;
     openai?: string;
     huggingface?: string;
-    ollamaUrl?: string;
-    ollamaModel?: string;
   };
   aiRoutes?: {
     mentor?: string;

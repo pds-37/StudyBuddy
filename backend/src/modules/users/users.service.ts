@@ -83,7 +83,7 @@ async function getApiKeys(userId: string) {
 }
 
 /** Updates custom API keys for the authenticated user. */
-async function updateApiKeys(userId: string, apiKeys: { groq?: string; gemini?: string; openai?: string; huggingface?: string; ollamaUrl?: string; ollamaModel?: string; }) {
+async function updateApiKeys(userId: string, apiKeys: { groq?: string; gemini?: string; openai?: string; huggingface?: string; }) {
   const user = await UserModel.findByIdAndUpdate(
     userId,
     {
@@ -91,9 +91,7 @@ async function updateApiKeys(userId: string, apiKeys: { groq?: string; gemini?: 
         "apiKeys.groq": apiKeys.groq || "",
         "apiKeys.gemini": apiKeys.gemini || "",
         "apiKeys.openai": apiKeys.openai || "",
-        "apiKeys.huggingface": apiKeys.huggingface || "",
-        "apiKeys.ollamaUrl": apiKeys.ollamaUrl || "http://localhost:11434",
-        "apiKeys.ollamaModel": apiKeys.ollamaModel || "llama3.2"
+        "apiKeys.huggingface": apiKeys.huggingface || ""
       }
     },
     { new: true, runValidators: true }

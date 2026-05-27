@@ -1,12 +1,11 @@
 import { groqService } from "../services/ai/groq.service.js";
 import { geminiService } from "../services/ai/gemini.service.js";
 import { huggingFaceService } from "../services/ai/huggingface.service.js";
-import { ollamaService } from "../services/ai/ollama.service.js";
 import { env } from "../config/env.js";
 import { requestContextStorage } from "./context.js";
 import type { CopilotMessage, ResumeTailorRequest, ResumeTailorResult } from "@studybuddy/shared";
 
-type ProviderType = "gemini" | "groq" | "huggingface" | "ollama";
+type ProviderType = "gemini" | "groq" | "huggingface";
 
 interface ProviderStatus {
   active: boolean;
@@ -18,8 +17,7 @@ interface ProviderStatus {
 const providerRegistry: Record<ProviderType, ProviderStatus> = {
   gemini: { active: true, failures: 0, lastFailureTime: 0 },
   groq: { active: true, failures: 0, lastFailureTime: 0 },
-  huggingface: { active: true, failures: 0, lastFailureTime: 0 },
-  ollama: { active: true, failures: 0, lastFailureTime: 0 }
+  huggingface: { active: true, failures: 0, lastFailureTime: 0 }
 };
 
 const QUARANTINE_DURATION_MS = 60000; // Quarantine a failing provider for 60 seconds
@@ -75,11 +73,10 @@ async function executeWithRouting<T>(
   primary: ProviderType,
   taskGemini: () => Promise<T>,
   taskGroq: () => Promise<T>,
-  taskHuggingFace: () => Promise<T>,
-  taskOllama?: () => Promise<T>
+  taskHuggingFace: () => Promise<T>
 ): Promise<T> {
   const order: ProviderType[] = [primary];
-  const others: ProviderType[] = ["groq", "gemini", "huggingface", "ollama"];
+  const others: ProviderType[] = ["groq", "gemini", "huggingface"];
   for (const provider of others) {
     if (provider !== primary) {
       order.push(provider);
@@ -92,9 +89,7 @@ async function executeWithRouting<T>(
     if (isProviderHealthy(provider)) {
       try {
         console.log(`[Zookeeper] Routing SDE task [${taskName}] to provider [${provider}]...`);
-        const task = provider === "gemini" ? taskGemini 
-                   : (provider === "groq" ? taskGroq 
-                   : (provider === "huggingface" ? taskHuggingFace : (taskOllama || taskGemini)));
+        const task = provider === "gemini" ? taskGemini : (provider === "groq" ? taskGroq : taskHuggingFace);
         const result = await task();
         reportSuccess(provider);
         return result;
@@ -110,9 +105,7 @@ async function executeWithRouting<T>(
   // Last Resort Fallback (attempt primary again even if quarantined)
   console.warn(`[Zookeeper] CRITICAL: All providers are unhealthy or failed for [${taskName}]! Retrying primary [${primary}] as last-resort recovery...`);
   try {
-    const task = primary === "gemini" ? taskGemini 
-               : (primary === "groq" ? taskGroq 
-               : (primary === "huggingface" ? taskHuggingFace : (taskOllama || taskGemini)));
+    const task = primary === "gemini" ? taskGemini : (primary === "groq" ? taskGroq : taskHuggingFace);
     const result = await task();
     reportSuccess(primary);
     return result;
@@ -138,8 +131,7 @@ export class AIOrchestrator {
       primary,
       () => geminiService.generateCopilotResponse(messages, userContext),
       () => groqService.generateCopilotResponse(messages, userContext),
-      () => huggingFaceService.generateCopilotResponse(messages, userContext),
-      () => ollamaService.generateCopilotResponse(messages, userContext)
+      () => huggingFaceService.generateCopilotResponse(messages, userContext)
     );
   }
 
@@ -161,8 +153,7 @@ export class AIOrchestrator {
       primary,
       () => geminiService.generateRoadmap(targetRole, timelineWeeks, skillGaps, userNotes, behaviorProfile, intelligenceProfile),
       () => groqService.generateRoadmap(targetRole, timelineWeeks, skillGaps, userNotes, behaviorProfile, intelligenceProfile),
-      () => huggingFaceService.generateRoadmap(targetRole, timelineWeeks, skillGaps, userNotes, behaviorProfile, intelligenceProfile),
-      () => ollamaService.generateRoadmap(targetRole, timelineWeeks, skillGaps, userNotes, behaviorProfile, intelligenceProfile)
+      () => huggingFaceService.generateRoadmap(targetRole, timelineWeeks, skillGaps, userNotes, behaviorProfile, intelligenceProfile)
     );
   }
 
@@ -177,8 +168,7 @@ export class AIOrchestrator {
       primary,
       () => geminiService.generateQuiz(topic, targetRole),
       () => groqService.generateQuiz(topic, targetRole),
-      () => huggingFaceService.generateQuiz(topic, targetRole),
-      () => ollamaService.generateQuiz(topic, targetRole)
+      () => huggingFaceService.generateQuiz(topic, targetRole)
     );
   }
 
@@ -193,8 +183,7 @@ export class AIOrchestrator {
       primary,
       () => geminiService.generateResumeTailoring(request, userContext),
       () => groqService.generateResumeTailoring(request, userContext),
-      () => huggingFaceService.generateResumeTailoring(request, userContext),
-      () => ollamaService.generateResumeTailoring(request, userContext)
+      () => huggingFaceService.generateResumeTailoring(request, userContext)
     );
   }
 
@@ -209,13 +198,12 @@ export class AIOrchestrator {
       primary,
       () => geminiService.generateSkillIntelligenceReport(targetRole, rawGaps, userContext),
       () => groqService.generateSkillIntelligenceReport(targetRole, rawGaps, userContext),
-      () => huggingFaceService.generateSkillIntelligenceReport(targetRole, rawGaps, userContext),
-      () => ollamaService.generateSkillIntelligenceReport(targetRole, rawGaps, userContext)
+      () => huggingFaceService.generateSkillIntelligenceReport(targetRole, rawGaps, userContext)
     );
   }
 
   /**
-   * Analyzes user behavior logs to extract insights.
+   * Thin analysis mockup for student consistency behavior.
    */
   static async analyzeBehavior(logs: any[]): Promise<any> {
     return {
@@ -235,8 +223,7 @@ export class AIOrchestrator {
       primary,
       () => geminiService.analyzeNote(title, content, userContext),
       () => groqService.analyzeNote(title, content, userContext),
-      () => huggingFaceService.analyzeNote(title, content, userContext),
-      () => ollamaService.analyzeNote(title, content, userContext)
+      () => huggingFaceService.analyzeNote(title, content, userContext)
     );
   }
 
@@ -266,8 +253,7 @@ export class AIOrchestrator {
       primaryProvider,
       () => geminiService.generateStructuredResponse(prompt),
       () => groqService.generateStructuredResponse(prompt),
-      () => huggingFaceService.generateStructuredResponse(prompt),
-      () => ollamaService.generateStructuredResponse(prompt)
+      () => huggingFaceService.generateStructuredResponse(prompt)
     );
   }
 }
