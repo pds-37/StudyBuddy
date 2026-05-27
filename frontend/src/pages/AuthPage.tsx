@@ -58,6 +58,53 @@ function LoadingMessages() {
   );
 }
 
+function AbstractOSMockup() {
+  return (
+    <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/4 w-[450px] h-[500px] pointer-events-none hidden xl:block z-0">
+      <Motion.div 
+        animate={{ y: [0, -20, 0] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-10 left-10 w-72 h-48 bg-[#0A0A0A]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-2xl flex flex-col"
+      >
+        <div className="flex gap-2 mb-6">
+          <div className="w-3 h-3 rounded-full bg-red-500/50" />
+          <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
+          <div className="w-3 h-3 rounded-full bg-green-500/50" />
+        </div>
+        <div className="space-y-4 flex-1">
+          <div className="h-2 w-3/4 bg-white/10 rounded-full" />
+          <div className="h-2 w-1/2 bg-white/10 rounded-full" />
+          <div className="h-2 w-5/6 bg-white/10 rounded-full" />
+        </div>
+        <div className="mt-auto flex justify-between items-center">
+          <div className="w-8 h-8 rounded-full bg-white/5" />
+          <div className="h-6 w-20 bg-brand/20 rounded-md" />
+        </div>
+      </Motion.div>
+
+      <Motion.div 
+        animate={{ y: [0, 20, 0] }}
+        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        className="absolute bottom-10 right-10 w-56 h-56 bg-brand/10 backdrop-blur-xl border border-brand/20 rounded-3xl p-6 shadow-2xl flex flex-col justify-between"
+      >
+        <div className="w-12 h-12 rounded-xl bg-brand/20 flex items-center justify-center border border-brand/30 shadow-[0_0_15px_rgba(124,92,191,0.2)]">
+          <Sparkles className="w-6 h-6 text-brand" />
+        </div>
+        <div className="space-y-3">
+          <div className="h-2 w-full bg-brand/20 rounded-full" />
+          <div className="h-2 w-2/3 bg-brand/20 rounded-full" />
+        </div>
+      </Motion.div>
+
+      <Motion.div 
+        animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] }}
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-cyan-500/10 blur-[80px] rounded-full"
+      />
+    </div>
+  );
+}
+
 function getAuthErrorMessage(error: unknown) {
   if (isAxiosError<{ message?: string }>(error)) {
     return error.response?.data?.message ?? "Unable to reach the auth server.";
@@ -148,6 +195,9 @@ export function AuthPage() {
           </div>
           StudyBuddy
         </div>
+
+        {/* Floating Abstract OS Mockup Animation */}
+        <AbstractOSMockup />
 
         {/* Center messaging */}
         <div className="relative z-10 -mt-20">
