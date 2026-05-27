@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppStore } from '../store/app-store';
-import { FibonacciSphere3D } from '../components/common/FibonacciSphere3D';
+import { NeuralConstellation3D } from '../components/common/NeuralConstellation3D';
 import './LandingPage.css';
 
 export function LandingPage() {
@@ -252,7 +252,7 @@ export function LandingPage() {
         </div>
 
         {/* 3D RIGHT */}
-        <FibonacciSphere3D />
+        <NeuralConstellation3D />
       </section>
 
       {/* STATS */}
