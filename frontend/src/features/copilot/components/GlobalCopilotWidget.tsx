@@ -4,7 +4,6 @@ import { cn } from "../../../lib/utils/cn";
 import { useCopilotStore } from "../../../store/copilot-store";
 import { useSpeechSynthesis } from "../../../hooks/useSpeechSynthesis";
 import { useAppStore } from "../../../store/app-store";
-import type { CopilotMessage } from "@studybuddy/shared";
 import { MarkdownContent } from "./CopilotChat";
 
 /** Floating AI Mentor Widget */
@@ -48,13 +47,10 @@ export function GlobalCopilotWidget() {
     if (!messageToSend || sending) return;
 
     if (!isAuthenticated) {
-      // For guests, we could either show a login prompt or just simulate a response
-      // For now, let's treat the message as a "Quick Start" target if it looks like one
       if (messageToSend.length > 3 && messageToSend.length < 50) {
         localStorage.setItem("studybuddy_pending_target", messageToSend);
       }
       setDraft("");
-      // Add a local message so it doesn't look broken
       return;
     }
 
@@ -82,8 +78,8 @@ export function GlobalCopilotWidget() {
       {/* AI Chat Drawer / Popover */}
       <div
         className={cn(
-          "fixed bottom-5 right-5 z-50 flex w-[min(calc(100vw-32px),360px)] flex-col overflow-hidden rounded-xl border border-white/[0.08] bg-[#10141c] shadow-2xl shadow-black/40 transition-all duration-300",
-          isOpen ? "h-[520px] max-h-[calc(100vh-80px)] translate-y-0 opacity-100" : "pointer-events-none h-[520px] translate-y-6 opacity-0"
+          "fixed bottom-0 right-0 sm:bottom-5 sm:right-5 z-50 flex w-full sm:w-[360px] flex-col overflow-hidden rounded-t-2xl sm:rounded-xl border-t sm:border border-white/[0.08] bg-[#10141c] shadow-2xl shadow-black/40 transition-all duration-300",
+          isOpen ? "h-[85vh] sm:h-[520px] max-h-[calc(100dvh-16px)] sm:max-h-[calc(100vh-80px)] translate-y-0 opacity-100" : "pointer-events-none h-0 sm:h-[520px] translate-y-6 opacity-0"
         )}
       >
         {/* Header */}

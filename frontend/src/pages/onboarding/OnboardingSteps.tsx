@@ -242,8 +242,8 @@ export function Step4Hours({ data, update }: StepProps) {
         <div className="grid grid-cols-2 gap-3">
           {hourOptions.map((opt, i) => (
             <Motion.button key={opt.value} type="button" onClick={() => update({ dailyStudyHours: opt.value })}
-              className={`rounded-2xl border p-5 text-left transition-all ${
-                data.dailyStudyHours === opt.value ? "border-cyan-400/30 bg-cyan-400/5 text-white text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-500 hover:text-white text-white"
+              className={`rounded-2xl border p-4 sm:p-5 text-left transition-all ${
+                data.dailyStudyHours === opt.value ? "border-cyan-400/30 bg-cyan-400/5 text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-400 hover:text-white"
               }`}
               initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 * i }}>
               <span className="text-lg font-bold block">{opt.label}</span>
@@ -291,8 +291,8 @@ export function Step6Style({ data, update }: StepProps) {
         <div className="grid gap-3">
           {styles.map((s, i) => (
             <Motion.button key={s.value} type="button" onClick={() => update({ learningStyle: s.value })}
-              className={`rounded-2xl border p-5 flex items-center gap-5 text-left transition-all ${
-                data.learningStyle === s.value ? "border-cyan-400/30 bg-cyan-400/5 text-white text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-500 hover:text-white text-white"
+              className={`rounded-2xl border p-4 sm:p-5 flex items-center gap-4 sm:gap-5 text-left transition-all ${
+                data.learningStyle === s.value ? "border-cyan-400/30 bg-cyan-400/5 text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-400 hover:text-white"
               }`}
               initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.08 * i }}>
               <span className="text-2xl">{s.icon}</span>
@@ -314,14 +314,14 @@ export function Step7Struggle({ data, update }: StepProps) {
       <div>
         <SectionLabel>Friction Zone</SectionLabel>
         <Prompt>What slows your learning the most?</Prompt>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {struggles.map((s, i) => (
             <Motion.button key={s} type="button" onClick={() => update({ primaryStruggle: s })}
-              className={`rounded-2xl border p-5 text-center transition-all ${
-                data.primaryStruggle === s ? "border-cyan-400/30 bg-cyan-400/5 text-white text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-500 hover:text-white text-white"
+              className={`rounded-2xl border p-4 sm:p-5 text-center transition-all ${
+                data.primaryStruggle === s ? "border-cyan-400/30 bg-cyan-400/5 text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-400 hover:text-white"
               }`}
               initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.08 * i }}>
-              <span className="text-sm font-medium">{s}</span>
+              <span className="text-xs sm:text-sm font-semibold break-words">{s}</span>
             </Motion.button>
           ))}
         </div>

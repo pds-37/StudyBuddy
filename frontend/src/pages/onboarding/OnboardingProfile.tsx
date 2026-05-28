@@ -57,14 +57,14 @@ export function OnboardingProfile({ data, onComplete, isSubmitting }: Props) {
         </Motion.h2>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {cards.map((card, i) => (
           <Motion.div key={card.label}
-            className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4 backdrop-blur-sm"
+            className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3.5 sm:p-4 backdrop-blur-sm"
             initial={{ opacity: 0, y: 16, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ delay: 0.1 * i, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}>
             <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500 mb-1">{card.label}</p>
-            <p className={`text-lg font-bold ${card.color}`}>{card.value}</p>
+            <p className={`text-base sm:text-lg font-bold break-words ${card.color}`}>{card.value}</p>
           </Motion.div>
         ))}
       </div>

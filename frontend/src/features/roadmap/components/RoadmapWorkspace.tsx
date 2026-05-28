@@ -436,41 +436,41 @@ export function RoadmapWorkspace() {
           </div>
 
           {/* Horizontal premium Metrics Console */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white/[0.02] border border-white/[0.06] p-3.5 rounded-2xl backdrop-blur-xl">
-            <div className="flex items-center gap-3.5 px-3.5 py-2 sm:border-r border-white/5 last:border-0">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 bg-white/[0.02] border border-white/[0.06] p-2 sm:p-3.5 rounded-2xl backdrop-blur-xl">
+            <div className="flex items-center gap-2 sm:gap-3.5 px-2 py-1.5 sm:px-3.5 sm:py-2 sm:border-r border-white/5 last:border-0">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-success/10 text-success border border-success/10 shadow-[0_0_10px_rgba(16,185,129,0.05)]">
                 <CheckCircle2 size={16} />
               </div>
               <div className="min-w-0">
-                <p className="text-[8px] font-black uppercase text-slate-500 font-mono tracking-wider">Readiness</p>
-                <p className="text-base font-black text-white leading-none mt-1">{stats.readiness}%</p>
+                <p className="text-[8px] font-black uppercase text-slate-500 font-mono tracking-wider truncate">Readiness</p>
+                <p className="text-sm sm:text-base font-black text-white leading-none mt-1">{stats.readiness}%</p>
               </div>
             </div>
-            <div className="flex items-center gap-3.5 px-3.5 py-2 sm:border-r border-white/5 last:border-0">
+            <div className="flex items-center gap-2 sm:gap-3.5 px-2 py-1.5 sm:px-3.5 sm:py-2 sm:border-r border-white/5 last:border-0">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 text-orange-400 border border-orange-500/10 shadow-[0_0_10px_rgba(249,115,22,0.05)] animate-pulse-glow">
                 <Flame size={16} />
               </div>
               <div className="min-w-0">
-                <p className="text-[8px] font-black uppercase text-slate-500 font-mono tracking-wider">Consistency</p>
-                <p className="text-base font-black text-white leading-none mt-1">{stats.consistency}%</p>
+                <p className="text-[8px] font-black uppercase text-slate-500 font-mono tracking-wider truncate">Consistency</p>
+                <p className="text-sm sm:text-base font-black text-white leading-none mt-1">{stats.consistency}%</p>
               </div>
             </div>
-            <div className="flex items-center gap-3.5 px-3.5 py-2 sm:border-r border-white/5 last:border-0">
+            <div className="flex items-center gap-2 sm:gap-3.5 px-2 py-1.5 sm:px-3.5 sm:py-2 sm:border-r border-white/5 last:border-0">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent-light border border-accent/10 shadow-[0_0_10px_rgba(139,92,246,0.05)]">
                 <Brain size={16} />
               </div>
               <div className="min-w-0">
-                <p className="text-[8px] font-black uppercase text-slate-500 font-mono tracking-wider">Recall State</p>
-                <p className="text-base font-black text-white leading-none mt-1">{stats.recall}%</p>
+                <p className="text-[8px] font-black uppercase text-slate-500 font-mono tracking-wider truncate">Recall State</p>
+                <p className="text-sm sm:text-base font-black text-white leading-none mt-1">{stats.recall}%</p>
               </div>
             </div>
-            <div className="flex items-center gap-3.5 px-3.5 py-2">
+            <div className="flex items-center gap-2 sm:gap-3.5 px-2 py-1.5 sm:px-3.5 sm:py-2">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand-light border border-brand/10 shadow-[0_0_10px_rgba(99,102,241,0.05)]">
                 <CalendarDays size={16} />
               </div>
               <div className="min-w-0">
-                <p className="text-[8px] font-black uppercase text-slate-500 font-mono tracking-wider">Sprints Run</p>
-                <p className="text-base font-black text-white leading-none mt-1">W{currentWeek} Active</p>
+                <p className="text-[8px] font-black uppercase text-slate-500 font-mono tracking-wider truncate">Sprints Run</p>
+                <p className="text-sm sm:text-base font-black text-white leading-none mt-1">W{currentWeek} Active</p>
               </div>
             </div>
           </div>

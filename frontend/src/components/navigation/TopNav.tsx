@@ -1,9 +1,10 @@
 import { useMemo, useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Command, Menu, Search, Sparkles, X } from "lucide-react";
+import { Command, Menu, Search, Sparkles, X, Settings, LogOut } from "lucide-react";
 import { cn } from "../../lib/utils/cn";
 import { useAppStore } from "../../store/app-store";
 import { NotificationsPopover } from "../NotificationsPopover";
+import { navGroups } from "./SidebarNav";
 
 const landingSections = [
   { label: "Home", href: "#home" },
@@ -18,7 +19,7 @@ type TopNavProps = {
 
 export function TopNav({ onOpenCommand }: TopNavProps) {
   const location = useLocation();
-  const { isAuthenticated, user, isDemoMode } = useAppStore();
+  const { isAuthenticated, user, isDemoMode, clearSession } = useAppStore();
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const isLandingPage = location.pathname === "/";
@@ -68,8 +69,11 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
                 className="group flex w-full items-center gap-3 rounded-lg border border-white/[0.08] bg-white/[0.035] px-3.5 py-2.5 text-white shadow-[0_12px_36px_rgba(0,0,0,0.16)] transition-all hover:border-white/[0.13] hover:bg-white/[0.055]"
               >
                 <Search size={18} className="shrink-0 text-brand" />
-                <span className="truncate text-sm font-medium text-slate-400">Search tasks, notes, resume, jobs...</span>
-                <div className="ml-auto flex items-center gap-1.5 rounded-md border border-white/[0.09] bg-white/[0.045] px-2 py-1 text-[10px] font-bold text-slate-300">
+                <span className="truncate text-sm font-medium text-slate-400">
+                  <span className="hidden sm:inline">Search tasks, notes, resume, jobs...</span>
+                  <span className="sm:hidden">Search...</span>
+                </span>
+                <div className="ml-auto hidden sm:flex items-center gap-1.5 rounded-md border border-white/[0.09] bg-white/[0.045] px-2 py-1 text-[10px] font-bold text-slate-300">
                   <Command size={10} />
                   <span>K</span>
                 </div>
@@ -160,15 +164,103 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
            ))}
            {!isAuthenticated && (
              <div className="pt-4 space-y-4">
-               <Link to="/auth" className="block w-full rounded-lg border border-white/[0.08] py-3 text-center font-medium text-white">
+               <Link to="/auth" className="block w-full rounded-lg border border-white/[0.08] py-3 text-center font-medium text-white" onClick={() => setMenuOpen(false)}>
                  Sign in
                </Link>
-               <Link to="/auth" className="premium-button block w-full rounded-lg py-3 text-center font-bold">
+               <Link to="/auth" className="premium-button block w-full rounded-lg py-3 text-center font-bold" onClick={() => setMenuOpen(false)}>
                  Get Started
                </Link>
-               <Link to="/demo" className="block w-full rounded-lg border border-brand/30 py-3 text-center font-bold text-brand">
+               <Link to="/demo" className="block w-full rounded-lg border border-brand/30 py-3 text-center font-bold text-brand" onClick={() => setMenuOpen(false)}>
                  Try Demo
                </Link>
+             </div>
+           )}
+           {isAuthenticated && isAppShell && (
+             <div className="space-y-6">
+               {/* User Info Header */}
+               <div className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 shadow-inner">
+                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-tr from-brand/20 to-accent/20 text-xs font-black text-brand-light border border-brand/20">
+                   {userInitials}
+                 </div>
+                 <div className="flex-1 min-w-0">
+                   <p className="truncate text-sm font-bold text-white leading-tight">{user?.name || "Candidate"}</p>
+                   <p className="text-[10px] font-black uppercase tracking-wider text-slate-500 mt-0.5 font-mono">
+                     {isDemoMode ? "Recruiter Demo" : user?.subscription?.plan ?? "Free Tier"}
+                   </p>
+                 </div>
+               </div>
+
+               {/* Navigation Groups */}
+               <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-1 custom-scrollbar">
+                 {navGroups.map((group, groupIndex) => (
+                   <div key={groupIndex} className="space-y-1 text-left">
+                     <h4 className="px-3 text-[9px] font-black uppercase tracking-[0.25em] text-slate-600 mb-1.5 font-mono">
+                       {group.title}
+                     </h4>
+                     {group.items.map((item) => {
+                       const isActive = location.pathname === item.href;
+                       return (
+                         <Link
+                           key={item.name}
+                           to={item.href}
+                           onClick={() => setMenuOpen(false)}
+                           className={cn(
+                             "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200",
+                             isActive
+                               ? "bg-gradient-to-r from-brand/12 to-accent/8 text-white border border-brand/20 shadow-[0_4px_20px_-5px_rgba(99,102,241,0.15)]"
+                               : item.highlight
+                                 ? "bg-cyan/5 text-cyan hover:bg-cyan/10 border border-cyan/10"
+                                 : "text-slate-400 hover:bg-white/[0.04] hover:text-white"
+                           )}
+                         >
+                           <item.icon
+                             size={16}
+                             className={cn(
+                               "transition-all duration-200 shrink-0",
+                               isActive
+                                 ? "text-brand-light drop-shadow-[0_0_8px_rgba(129,140,248,0.5)]"
+                                 : item.highlight
+                                   ? "text-cyan"
+                                   : "text-slate-500 group-hover:text-white"
+                             )}
+                           />
+                           <span className="flex-1 text-[13px] font-semibold tracking-wide">
+                             {item.name}
+                           </span>
+                           {item.highlight && (
+                             <span className="flex h-2 w-2 relative">
+                               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan opacity-75"></span>
+                               <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan"></span>
+                             </span>
+                           )}
+                         </Link>
+                       );
+                     })}
+                   </div>
+                 ))}
+               </div>
+
+               {/* Settings & Logout Controls */}
+               <div className="pt-4 border-t border-white/[0.06] flex flex-col gap-2 text-left">
+                 <Link
+                   to="/settings"
+                   onClick={() => setMenuOpen(false)}
+                   className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-slate-400 hover:text-white hover:bg-white/[0.04] transition-all"
+                 >
+                   <Settings size={16} className="text-slate-500" />
+                   <span className="text-[13px] font-semibold tracking-wide">Settings Console</span>
+                 </Link>
+                 <button
+                   onClick={() => {
+                     setMenuOpen(false);
+                     clearSession?.();
+                   }}
+                   className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all text-left w-full"
+                 >
+                   <LogOut size={16} className="text-slate-500" />
+                   <span className="text-[13px] font-semibold tracking-wide">Log Out</span>
+                 </button>
+               </div>
              </div>
            )}
         </div>

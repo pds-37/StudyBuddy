@@ -138,14 +138,14 @@ export function OnboardingPage() {
   ];
 
   return (
-    <section className="mx-auto grid max-w-6xl gap-6 px-6 py-8 lg:grid-cols-[0.85fr_1.15fr] min-h-[calc(100vh-4rem)]">
+    <section className="mx-auto grid max-w-6xl gap-6 px-4 sm:px-6 py-6 sm:py-8 lg:grid-cols-[0.85fr_1.15fr] min-h-[calc(100vh-4rem)]">
       {/* ── Left Panel ── */}
       <div className="hidden lg:block">
         <OnboardingLeftPanel step={showProfile ? TOTAL_STEPS : step} totalSteps={TOTAL_STEPS} messages={STEP_AI_MESSAGES} />
       </div>
 
       {/* ── Right Panel ── */}
-      <div className="flex flex-col rounded-[2.5rem] border border-white/[0.08] bg-[#0c1017] p-8 lg:p-12 shadow-[0_80px_150px_-30px_rgba(0,0,0,0.5)] relative overflow-hidden">
+      <div className="flex flex-col rounded-3xl sm:rounded-[2.5rem] border border-white/[0.08] bg-[#0c1017] p-5 sm:p-8 lg:p-12 shadow-[0_80px_150px_-30px_rgba(0,0,0,0.5)] relative overflow-hidden">
         <div className="absolute top-0 right-0 p-12 opacity-[0.02] pointer-events-none">
           <Sparkles size={300} className="text-brand" />
         </div>

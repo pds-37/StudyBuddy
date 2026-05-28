@@ -21,19 +21,19 @@ import {
 import { useAppStore } from "../../store/app-store";
 import { cn } from "../../lib/utils/cn";
 
-type NavItem = {
+export type NavItem = {
   name: string;
   href: string;
   icon: React.ComponentType<any>;
   highlight?: boolean;
 };
 
-type NavGroup = {
+export type NavGroup = {
   title: string;
   items: NavItem[];
 };
 
-const navGroups: NavGroup[] = [
+export const navGroups: NavGroup[] = [
   {
     title: "LEARNING",
     items: [
