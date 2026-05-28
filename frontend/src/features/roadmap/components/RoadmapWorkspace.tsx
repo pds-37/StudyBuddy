@@ -27,7 +27,8 @@ import {
   Clock,
   ChevronRight,
   ChevronUp,
-  ExternalLink
+  ExternalLink,
+  X
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useRoadmapsStore } from "../../../store/roadmaps-store";
@@ -40,6 +41,13 @@ import { GuestGuard } from "../../../components/auth/GuestGuard";
 import type { Roadmap, RoadmapInsight, RoadmapPhase, RoadmapTask } from "@studybuddy/shared";
 
 const TASK_LIMIT = 8;
+
+interface TaskRichData {
+  theme: "cache" | "ats" | "obsidian" | "sqlite" | "array" | "react" | "api" | "default";
+  label: string;
+  subtasks: string[];
+  resources: { label: string; url: string }[];
+}
 
 export function RoadmapWorkspace() {
   const {
@@ -63,25 +71,17 @@ export function RoadmapWorkspace() {
   const [isExpansionOpen, setIsExpansionOpen] = useState(false);
   const [showAllTasks, setShowAllTasks] = useState(false);
 
-  // Tab View Toggle: "execution" (mockup dashboard) vs "curriculum" (full journey path)
+  // View toggle: "execution" vs "curriculum"
   const [currentView, setCurrentView] = useState<"execution" | "curriculum">("execution");
 
-  // Curriculum Sub-Tab Toggle: "focus" (checklist) vs "phases" (phase row list)
-  const [curriculumTab, setCurriculumTab] = useState<"focus" | "phases">("focus");
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  // Sidebar dynamic tab switcher: "insights" vs "actions"
+  const [sidebarTab, setSidebarTab] = useState<"insights" | "actions">("insights");
 
-  // Click outside to close the curriculum sub-tab dropdown selector box
-  useEffect(() => {
-    if (!isDropdownOpen) return;
-    const handleOutsideClick = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (!target.closest(".curriculum-selector-container")) {
-        setIsDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, [isDropdownOpen]);
+  // Sliding Task Inspector Panel active task ID state
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+
+  // Floating Progress Logger Drawer open state
+  const [isLoggerOpen, setIsLoggerOpen] = useState(false);
 
   // Daily Routine & External Activity Logger States
   const [loggedActivities, setLoggedActivities] = useState<{
@@ -125,6 +125,7 @@ export function RoadmapWorkspace() {
 
     setLoggedActivities(prev => [newActivity, ...prev]);
     setCustomTaskTitle("");
+    setIsLoggerOpen(false); // Cleanly close drawer on success
 
     // Trigger Veda keyword matching engine
     if (!currentRoadmap) return;
@@ -243,6 +244,123 @@ export function RoadmapWorkspace() {
     }
   };
 
+  // Find the currently selected task object for the sliding Inspector
+  const selectedTask = useMemo<RoadmapTask | null>(() => {
+    if (!selectedTaskId) return null;
+    let found: RoadmapTask | null = null;
+    currentRoadmap?.phases.forEach((phase) => {
+      phase.missions.forEach((mission) => {
+        const t = mission.tasks.find((task) => task.id === selectedTaskId);
+        if (t) found = t as RoadmapTask;
+      });
+    });
+    return found;
+  }, [selectedTaskId, currentRoadmap]);
+
+  const renderInspector = () => {
+    if (!selectedTask) return null;
+    const task = selectedTask;
+
+    return (
+      <div key="task-inspector-wrapper">
+        {/* Backdrop overlay */}
+        <Motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.5 }}
+          exit={{ opacity: 0 }}
+          onClick={() => setSelectedTaskId(null)}
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+        />
+        {/* Slide-over panel */}
+        <Motion.div
+          initial={{ x: "100%", opacity: 0.95 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: "100%", opacity: 0.95 }}
+          transition={{ type: "spring", damping: 26, stiffness: 220 }}
+          className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-lg border-l border-white/10 bg-[#080b11]/95 p-6 shadow-[0_0_50px_rgba(0,0,0,0.8)] backdrop-blur-2xl overflow-y-auto flex flex-col justify-between"
+        >
+          {/* Header */}
+          <div className="space-y-5">
+            <div className="flex items-center justify-between border-b border-white/[0.06] pb-4">
+              <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-brand-light">
+                VEDA TASK INSPECTOR
+              </span>
+              <button
+                onClick={() => setSelectedTaskId(null)}
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-slate-400 hover:text-white hover:border-white/20 transition-all duration-200"
+                aria-label="Close inspector"
+              >
+                <X size={14} />
+              </button>
+            </div>
+
+            {/* Task metadata */}
+            <div className="space-y-3">
+              <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold font-mono">
+                <span className={cn("inline-flex items-center gap-1 rounded border px-2.5 py-1 uppercase tracking-wider", taskTypeClass(task.type))}>
+                  {task.type}
+                </span>
+                <span className="rounded border border-white/10 bg-white/5 px-2.5 py-1 text-slate-400">
+                  {task.durationMinutes} min
+                </span>
+                {task.difficulty && (
+                  <span className={cn("rounded border px-2.5 py-1 uppercase", difficultyClass(task.difficulty))}>
+                    {task.difficulty}
+                  </span>
+                )}
+              </div>
+              <h3 className="text-xl sm:text-2xl font-black text-white leading-tight font-display">
+                {task.title}
+              </h3>
+              {task.aiHint && (
+                <div className="rounded-xl border border-brand/20 bg-brand/5 p-4 text-xs italic leading-relaxed text-indigo-200 flex gap-2">
+                  <Sparkles size={16} className="text-brand-light shrink-0 mt-0.5" />
+                  <span>Veda Coach note: "{task.aiHint}"</span>
+                </div>
+              )}
+            </div>
+
+            {/* Subtasks Checklist */}
+            <TaskInspectorSubtasks task={task} />
+
+            {/* External Documentation */}
+            <TaskInspectorResources task={task} />
+          </div>
+
+          {/* Veda Blueprint Container */}
+          <div className="mt-8 space-y-4">
+            <div className="rounded-xl border border-white/[0.05] bg-[#030712]/30 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-mono text-[8px] font-black uppercase tracking-[0.16em] text-slate-500">
+                  VEDA BLUEPRINT SCHEMA
+                </span>
+                <span className="text-[9px] font-mono font-bold text-brand-light bg-brand/10 px-2 py-0.5 rounded border border-brand/20 uppercase tracking-widest">
+                  {getTaskRichTheme(task.title)}
+                </span>
+              </div>
+              <div className="h-32 rounded-lg border border-white/[0.04] bg-[#07090d]/60 p-2 overflow-hidden flex items-center justify-center">
+                <VedaBlueprint theme={getTaskRichTheme(task.title)} />
+              </div>
+            </div>
+
+            {/* Action button */}
+            {task.status !== "completed" && (
+              <button
+                onClick={() => {
+                  setSelectedTaskId(null);
+                  navigate(`/study/${task.id}`);
+                }}
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-brand hover:bg-brand-light text-white px-5 py-4 text-xs font-black uppercase tracking-widest shadow-[0_0_20px_rgba(99,102,241,0.3)] transition hover:shadow-[0_0_25px_rgba(99,102,241,0.5)] active:scale-[0.98]"
+              >
+                Launch Study Session ↗
+              </button>
+            )}
+          </div>
+        </Motion.div>
+      </div>
+    );
+  };
+
   if (loading && !currentRoadmap && !error) return <LoadingState />;
   if (error && !currentRoadmap) return <ErrorState error={error} onRetry={() => fetchRoadmaps(true)} onClear={clearError} />;
   if (!currentRoadmap && !generating) {
@@ -254,19 +372,12 @@ export function RoadmapWorkspace() {
   const missionTasks = currentMission?.tasks || [];
   const completedMissionTasks = missionTasks.filter(t => t.status === "completed").length;
   const totalMissionTasks = missionTasks.length;
-  const missionDonePercent = totalMissionTasks ? Math.round((completedMissionTasks / totalMissionTasks) * 100) : 0;
-
-  // Dynamic calculations for hours
-  const hoursPlanned = (user as any)?.availableHours || 10;
-  const isActiveTaskNext = nextTask && pendingTasks.length > 0 && nextTask.id === pendingTasks[0]?.id;
-  const hoursCompleted = Number(((stats.completedTasks * 40 + (isActiveTaskNext ? 42 : 0)) / 60).toFixed(1));
-  const timeProgressPercent = Math.min(100, Math.round((hoursCompleted / hoursPlanned) * 100));
 
   return (
     <div className="min-h-screen pb-16 text-slate-100 relative">
-      {/* Decorative Blur Backgrounds */}
-      <div className="absolute top-0 right-10 h-[500px] w-[500px] rounded-full bg-brand/5 blur-[160px] pointer-events-none" />
-      <div className="absolute bottom-10 left-10 h-[500px] w-[500px] rounded-full bg-accent/5 blur-[160px] pointer-events-none" />
+      {/* Decorative Premium Blur Backgrounds */}
+      <div className="absolute top-0 right-10 h-[500px] w-[500px] rounded-full bg-brand/5 blur-[160px] pointer-events-none animate-pulse-glow" />
+      <div className="absolute bottom-10 left-10 h-[500px] w-[500px] rounded-full bg-accent/5 blur-[160px] pointer-events-none animate-pulse-glow" style={{ animationDelay: "2s" }} />
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px] relative z-10">
         <main className="min-w-0 space-y-6">
@@ -283,51 +394,91 @@ export function RoadmapWorkspace() {
             ))}
 
           {/* Premium Header Block */}
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 pb-2 border-b border-white/[0.06]">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 pb-4 border-b border-white/[0.06]">
             <div>
-              <p className="font-mono text-xs font-bold text-slate-500 uppercase tracking-widest">
+              <p className="font-mono text-xs font-bold text-slate-500 uppercase tracking-widest leading-none">
                 {formattedDay}, {formattedDate}
               </p>
-              <h1 className="mt-1 text-3xl sm:text-4xl font-extrabold tracking-tight text-white font-display">
-                Your roadmap today
+              <h1 className="mt-2.5 text-3xl sm:text-4xl font-black tracking-tight text-white font-display leading-none">
+                Roadmap Workspace
               </h1>
-              <p className="mt-1.5 text-sm font-semibold text-slate-400 flex items-center gap-1.5">
+              <p className="mt-2 text-sm font-semibold text-slate-400 flex items-center gap-1.5 leading-none">
                 <span className="h-2 w-2 rounded-full bg-brand animate-pulse" />
                 Week {currentWeek} of {totalWeeks} • {currentRoadmap?.targetRole || "Backend Engineering"}
               </p>
             </div>
 
             {/* Premium Dual-Mode Tab Switcher */}
-            <div className="flex items-center gap-1 bg-white/[0.03] border border-white/10 rounded-xl p-1 shrink-0 self-start sm:self-auto">
+            <div className="flex items-center gap-1 bg-white/[0.03] border border-white/10 rounded-xl p-1 shrink-0 self-start sm:self-auto shadow-inner">
               <button
                 onClick={() => setCurrentView("execution")}
                 className={cn(
-                  "rounded-lg px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-200",
+                  "rounded-lg px-4.5 py-2.5 text-xs font-bold uppercase tracking-wider transition-all duration-300",
                   currentView === "execution" 
                     ? "bg-brand text-white shadow-[0_0_15px_rgba(99,102,241,0.35)]" 
                     : "text-slate-400 hover:text-white"
                 )}
               >
-                Execution Dashboard
+                Sprint Dashboard
               </button>
               <button
                 onClick={() => setCurrentView("curriculum")}
                 className={cn(
-                  "rounded-lg px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-200",
+                  "rounded-lg px-4.5 py-2.5 text-xs font-bold uppercase tracking-wider transition-all duration-300",
                   currentView === "curriculum" 
                     ? "bg-brand text-white shadow-[0_0_15px_rgba(99,102,241,0.35)]" 
                     : "text-slate-400 hover:text-white"
                 )}
               >
-                Curriculum Journey
+                Journey Map
               </button>
+            </div>
+          </div>
+
+          {/* Horizontal premium Metrics Console */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white/[0.02] border border-white/[0.06] p-3.5 rounded-2xl backdrop-blur-xl">
+            <div className="flex items-center gap-3.5 px-3.5 py-2 sm:border-r border-white/5 last:border-0">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-success/10 text-success border border-success/10 shadow-[0_0_10px_rgba(16,185,129,0.05)]">
+                <CheckCircle2 size={16} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[8px] font-black uppercase text-slate-500 font-mono tracking-wider">Readiness</p>
+                <p className="text-base font-black text-white leading-none mt-1">{stats.readiness}%</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3.5 px-3.5 py-2 sm:border-r border-white/5 last:border-0">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 text-orange-400 border border-orange-500/10 shadow-[0_0_10px_rgba(249,115,22,0.05)] animate-pulse-glow">
+                <Flame size={16} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[8px] font-black uppercase text-slate-500 font-mono tracking-wider">Consistency</p>
+                <p className="text-base font-black text-white leading-none mt-1">{stats.consistency}%</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3.5 px-3.5 py-2 sm:border-r border-white/5 last:border-0">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent-light border border-accent/10 shadow-[0_0_10px_rgba(139,92,246,0.05)]">
+                <Brain size={16} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[8px] font-black uppercase text-slate-500 font-mono tracking-wider">Recall State</p>
+                <p className="text-base font-black text-white leading-none mt-1">{stats.recall}%</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3.5 px-3.5 py-2">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand-light border border-brand/10 shadow-[0_0_10px_rgba(99,102,241,0.05)]">
+                <CalendarDays size={16} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[8px] font-black uppercase text-slate-500 font-mono tracking-wider">Sprints Run</p>
+                <p className="text-base font-black text-white leading-none mt-1">W{currentWeek} Active</p>
+              </div>
             </div>
           </div>
 
           <AnimatePresence mode="wait">
             {currentView === "execution" ? (
               /* ========================================================================= */
-              /* 1. PORTING THE CORE HIGH-FIDELITY EXECUTION DASHBOARD (MATCHING MOCKUP)   */
+              /* 1. SPRINT/EXECUTION DASHBOARD                                             */
               /* ========================================================================= */
               <Motion.div
                 key="execution"
@@ -337,39 +488,70 @@ export function RoadmapWorkspace() {
                 transition={{ duration: 0.35, ease: "easeInOut" }}
                 className="space-y-6"
               >
+                {/* Veda Recalibration Sync Alert Banner */}
+                {recalibrationAlert?.visible && (
+                  <Motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.03] p-5 text-xs text-emerald-300 shadow-glow backdrop-blur-md"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setRecalibrationAlert(prev => prev ? { ...prev, visible: false } : null)}
+                      className="absolute right-4 top-4 text-emerald-400 hover:text-white transition"
+                    >
+                      <X size={14} />
+                    </button>
+                    <div className="flex items-start gap-3.5">
+                      <Sparkles size={18} className="text-emerald-400 shrink-0 mt-0.5 animate-pulse" />
+                      <div>
+                        <h4 className="font-bold text-white uppercase tracking-wider font-mono mb-1 text-[10px]">Veda Sync autocompleted tasks</h4>
+                        <p className="leading-relaxed font-semibold">
+                          Recognized external achievement in <span className="text-emerald-200 underline decoration-dotted font-bold">"{recalibrationAlert.keyword}"</span>!
+                        </p>
+                        <p className="mt-1 text-slate-400 leading-relaxed font-medium">
+                          Autocompleted {recalibrationAlert.count} roadmap task(s): <span className="text-white font-bold">{recalibrationAlert.tasks.join(", ")}</span>. Your career readiness scoring has been successfully re-indexed!
+                        </p>
+                      </div>
+                    </div>
+                  </Motion.div>
+                )}
+
                 {/* A. CURRENT MISSION PANEL */}
                 <section className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#07090d]/80 p-6 sm:p-8 backdrop-blur-xl shadow-premium">
                   <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand/35 to-transparent" />
                   
                   {/* Card Title & Progress Indicator */}
-                  <div className="flex items-center justify-between gap-4 border-b border-white/[0.06] pb-4.5">
+                  <div className="flex items-center justify-between gap-4 border-b border-white/[0.06] pb-5">
                     <div>
-                      <span className="text-[10px] font-black uppercase tracking-[0.28em] text-brand-light font-mono">
-                        Current Mission
+                      <span className="text-[10px] font-black uppercase tracking-[0.28em] text-brand-light font-mono leading-none">
+                        Current Mission Focus
                       </span>
-                      <h2 className="mt-1 text-2xl font-black text-white font-display">
+                      <h2 className="mt-2 text-2xl font-black text-white font-display tracking-tight leading-snug">
                         {currentMission?.title || "Build a Cache Layer"}
                       </h2>
-                      <p className="mt-1 text-sm text-slate-400 leading-relaxed font-medium">
+                      <p className="mt-1.5 text-sm text-slate-400 leading-relaxed font-medium">
                         {currentMission?.description || "Learn how databases use in-memory caching to scale"}
                       </p>
                     </div>
-                    <div className="text-right shrink-0 bg-white/[0.03] border border-white/5 px-3.5 py-2 rounded-xl">
-                      <p className="text-xl font-extrabold text-white font-display tracking-tight leading-none">
+                    <div className="text-right shrink-0 bg-white/[0.02] border border-white/5 px-4 py-2.5 rounded-xl shadow-inner">
+                      <p className="text-2xl font-extrabold text-white font-display tracking-tight leading-none">
                         {completedMissionTasks}/{totalMissionTasks}
                       </p>
                       <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1 leading-none font-mono">
-                        tasks done
+                        milestones done
                       </p>
                     </div>
                   </div>
 
                   {/* Why this matters callout */}
-                  <div className="mt-5 rounded-xl border border-indigo-500/15 bg-indigo-950/5 p-4.5 text-xs sm:text-sm leading-relaxed text-indigo-300">
-                    <span className="font-bold text-white block sm:inline mr-1">Why this matters:</span>
+                  <div className="mt-5 rounded-xl border border-indigo-500/10 bg-indigo-950/5 p-4 text-xs sm:text-sm leading-relaxed text-indigo-300">
+                    <span className="font-bold text-white block sm:inline mr-1">Veda Blueprint Rationale:</span>
                     {currentMission?.whyItMatters || "Redis caching is critical for production systems. You'll use this pattern in 90% of scaling operations."}
-                  </div>                  {/* Tasks List */}
-                  <div className="mt-6 space-y-3.5">
+                  </div>
+
+                  {/* Tasks List */}
+                  <div className="mt-6 space-y-2.5">
                     {missionTasks.map((task, idx) => {
                       const isCompleted = task.status === "completed";
                       const isActive = !isCompleted && pendingTasks[0]?.id === task.id;
@@ -384,256 +566,41 @@ export function RoadmapWorkspace() {
                           featured={isActive}
                           onToggle={() => updateTaskStatus(task.id, isCompleted ? "pending" : "completed")}
                           onStart={() => navigate(`/study/${task.id}`)}
+                          onSelect={setSelectedTaskId}
                           delay={idx * 0.04}
                         />
                       );
                     })}
                   </div>
 
-                  {/* Primary CTA Continue Button */}
-                  {nextTask && (
-                    <button
-                      onClick={() => navigate(`/study/${nextTask.id}`)}
-                      className="mt-6 w-full flex items-center justify-center gap-2 rounded-xl bg-brand hover:bg-brand-light text-white px-5 py-4 text-xs font-black uppercase tracking-widest shadow-[0_0_20px_rgba(99,102,241,0.3)] transition hover:shadow-[0_0_25px_rgba(99,102,241,0.5)] active:scale-[0.98]"
-                    >
-                      {isActiveTaskNext ? "Continue" : "Start"} task {missionTasks.findIndex(t => t.id === nextTask.id) + 1 || 1} ↗
-                    </button>
-                  )}
-                </section>
-
-                {/* DAILY ROUTINE & EXTERNAL PROGRESS SECTION */}
-                <section className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#07090d]/80 p-6 sm:p-8 backdrop-blur-xl shadow-premium">
-                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/35 to-transparent" />
-                  
-                  <div className="flex items-center gap-2 border-b border-white/[0.06] pb-4 mb-6">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-md bg-white/[0.04] text-brand-light">
-                      <Target size={14} />
-                    </div>
-                    <h2 className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
-                      Daily Routine & External Progress
-                    </h2>
-                  </div>
-
-                  {/* Veda Recalibration Sync Alert Banner */}
-                  {recalibrationAlert?.visible && (
-                    <Motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="mb-5 relative overflow-hidden rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04] p-4.5 text-xs text-emerald-300 shadow-glow"
-                    >
+                  {/* Log external progress trigger button */}
+                  <div className="mt-5 flex gap-3">
+                    {nextTask && (
                       <button
-                        type="button"
-                        onClick={() => setRecalibrationAlert(prev => prev ? { ...prev, visible: false } : null)}
-                        className="absolute right-3 top-3 text-emerald-400 hover:text-white text-[10px] font-mono font-bold"
+                        onClick={() => navigate(`/study/${nextTask.id}`)}
+                        className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-brand hover:bg-brand-light text-white px-5 py-3.5 text-xs font-black uppercase tracking-widest shadow-[0_0_20px_rgba(99,102,241,0.3)] transition duration-200 active:scale-[0.98]"
                       >
-                        DISMISS
+                        Launch next sprint ↗
                       </button>
-                      <div className="flex items-start gap-3">
-                        <Sparkles size={16} className="text-emerald-400 shrink-0 mt-0.5 animate-pulse" />
-                        <div>
-                          <h4 className="font-bold text-white uppercase tracking-wider font-mono mb-1">Veda Dynamic Sync Triggered</h4>
-                          <p className="leading-relaxed font-semibold">
-                            Recognized external achievement in <span className="text-emerald-200 underline decoration-dotted font-bold">"{recalibrationAlert.keyword}"</span>!
-                          </p>
-                          <p className="mt-1 text-slate-400 leading-relaxed font-medium">
-                            Autocompleted {recalibrationAlert.count} roadmap task(s): <span className="text-white font-bold">{recalibrationAlert.tasks.join(", ")}</span>. Your career readiness scoring has been successfully re-indexed!
-                          </p>
-                        </div>
-                      </div>
-                    </Motion.div>
-                  )}
-
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {/* Left: Today's Scheduled Tasks */}
-                    <div>
-                      <h3 className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-slate-500 mb-4 flex items-center gap-1.5">
-                        <span className="h-1.5 w-1.5 rounded-full bg-brand" /> Today's Focus Checklist
-                      </h3>
-
-                      {pendingTasks.length > 0 ? (
-                        <div className="space-y-3">
-                          {pendingTasks.map((task) => {
-                            const Icon = {
-                              learn: BookOpen,
-                              practice: Zap,
-                              revise: RefreshCw,
-                              project: Layers3
-                            }[task.type] || BookOpen;
-
-                            return (
-                              <div
-                                key={task.id}
-                                className={cn(
-                                  "rounded-xl border p-4 transition-all duration-300 flex items-start gap-4 cursor-pointer select-none",
-                                  "border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.03] hover:border-white/[0.08]"
-                                )}
-                              >
-                                <button
-                                  type="button"
-                                  onClick={async (e) => {
-                                    e.stopPropagation();
-                                    await updateTaskStatus(task.id, "completed");
-                                    void handleCopilotAction(`I checked off my scheduled daily task: "${task.title}"! Veda, let's recalibrate my curriculum progress and review the next milestones.`);
-                                  }}
-                                  className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-lg border border-white/20 text-slate-500 hover:border-brand hover:text-brand bg-black/20 transition-all duration-200"
-                                >
-                                  <Circle size={10} />
-                                </button>
-                                <div>
-                                  <span className={cn("inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[8px] font-bold font-mono uppercase tracking-wider mb-1.5", taskTypeClass(task.type))}>
-                                    <Icon size={10} />
-                                    {task.type}
-                                  </span>
-                                  <h4 className="text-sm font-bold text-white leading-snug">{task.title}</h4>
-                                  <p className="text-[10px] text-slate-500 mt-1 font-mono">{task.durationMinutes} min estimated • Dynamic recall active</p>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      ) : (
-                        <div className="rounded-xl border border-dashed border-white/10 p-6 text-center bg-black/20">
-                          <CheckCircle2 className="mx-auto mb-2 text-[#2ec4a0]" size={20} />
-                          <p className="text-xs font-semibold text-white">Roadmap tasks completed!</p>
-                          <p className="mt-1 text-[10px] text-slate-500">Your planned sprints are perfectly synced. Log any external work to the right!</p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Right: Log Custom / External Activity */}
-                    <div className="border-t lg:border-t-0 lg:border-l border-white/[0.06] pt-6 lg:pt-0 lg:pl-8">
-                      <h3 className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-slate-500 mb-4 flex items-center gap-1.5">
-                        <span className="h-1.5 w-1.5 rounded-full bg-purple-500 animate-pulse" /> Log Custom / External Activity
-                      </h3>
-
-                      <form onSubmit={handleLogActivity} className="space-y-4">
-                        <div>
-                          <label className="block text-[10px] font-bold uppercase text-slate-400 font-mono mb-1.5">What did you build or learn?</label>
-                          <input
-                            type="text"
-                            value={customTaskTitle}
-                            onChange={(e) => setCustomTaskTitle(e.target.value)}
-                            placeholder="e.g. Practiced Redis Pub/Sub, solved 3 BST trees..."
-                            className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-xs text-white outline-none focus:border-purple-500/60 placeholder:text-slate-600 transition"
-                          />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label className="block text-[10px] font-bold uppercase text-slate-400 font-mono mb-1.5">Category</label>
-                            <select
-                              value={customTaskCategory}
-                              onChange={(e) => setCustomTaskCategory(e.target.value)}
-                              className="w-full appearance-none rounded-xl border border-white/10 bg-black/40 px-3 py-3 pr-8 text-xs text-white outline-none focus:border-purple-500/60 transition"
-                            >
-                              <option value="DSA / LeetCode">DSA / LeetCode</option>
-                              <option value="Backend Development">Backend Development</option>
-                              <option value="System Design">System Design</option>
-                              <option value="AI / ML Models">AI / ML Models</option>
-                              <option value="Obsidian Note Mapping">Obsidian Note Mapping</option>
-                              <option value="Frontend UI React">Frontend UI React</option>
-                              <option value="Other Skills">Other Skills</option>
-                            </select>
-                          </div>
-                          <div>
-                            <label className="block text-[10px] font-bold uppercase text-slate-400 font-mono mb-1.5">Duration</label>
-                            <select
-                              value={customTaskDuration}
-                              onChange={(e) => setCustomTaskDuration(e.target.value)}
-                              className="w-full appearance-none rounded-xl border border-white/10 bg-black/40 px-3 py-3 pr-8 text-xs text-white outline-none focus:border-purple-500/60 transition"
-                            >
-                              <option value="30 min">30 min</option>
-                              <option value="1 hour">1 hour</option>
-                              <option value="2 hours">2 hours</option>
-                              <option value="4 hours">4 hours</option>
-                            </select>
-                          </div>
-                        </div>
-
-                        <button
-                          type="submit"
-                          className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-4 py-3.5 text-xs font-black uppercase tracking-widest transition shadow-[0_0_15px_rgba(139,92,246,0.3)] active:scale-[0.98]"
-                        >
-                          <Zap size={12} /> Log & Sync with Veda ↗
-                        </button>
-                      </form>
-
-                      {/* Logged Activities List */}
-                      {loggedActivities.length > 0 && (
-                        <div className="mt-6 border-t border-white/[0.04] pt-5">
-                          <p className="font-mono text-[8px] font-black uppercase tracking-[0.16em] text-slate-600 mb-3">LOGGED PROGRESS TODAY</p>
-                          <div className="space-y-2 max-h-[140px] overflow-y-auto pr-1">
-                            {loggedActivities.map((act) => (
-                              <div key={act.id} className="flex items-center justify-between gap-3 bg-white/[0.02] border border-white/[0.04] p-3 rounded-lg text-xs">
-                                <div className="min-w-0">
-                                  <p className="font-bold text-slate-300 truncate">{act.title}</p>
-                                  <p className="text-[9px] text-slate-500 font-mono mt-0.5">
-                                    {act.category} • {act.duration}
-                                  </p>
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={() => setLoggedActivities(prev => prev.filter(a => a.id !== act.id))}
-                                  className="text-[10px] text-slate-500 hover:text-red-400 font-mono transition"
-                                >
-                                  REMOVE
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                    )}
+                    <button
+                      onClick={() => setIsLoggerOpen(true)}
+                      className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:text-white hover:border-brand/45 hover:bg-brand/10 transition duration-200 shrink-0"
+                      title="Log external work achievements"
+                    >
+                      <Plus size={16} />
+                    </button>
                   </div>
                 </section>
 
-                {/* B. DUAL STATS GRID */}
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                  {/* 1. Week Progress */}
-                  <div className="rounded-2xl border border-white/[0.06] bg-[#07090d]/60 p-6 backdrop-blur-xl shadow-premium">
-                    <p className="font-mono text-[9px] font-black uppercase tracking-[0.24em] text-slate-500">
-                      Week {currentWeek} Progress
-                    </p>
-                    <div className="mt-4 flex items-baseline gap-1">
-                      <span className="text-4xl font-extrabold text-white font-display tracking-tight">
-                        {stats.completedTasks}/{stats.totalTasks}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-xs font-semibold text-slate-500">
-                      {stats.totalTasks - stats.completedTasks} tasks remaining
-                    </p>
-                    <div className="mt-4 h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
-                      <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${stats.completion}%` }} />
-                    </div>
-                  </div>
-
-                  {/* 2. Study time planned */}
-                  <div className="rounded-2xl border border-white/[0.06] bg-[#07090d]/60 p-6 backdrop-blur-xl shadow-premium">
-                    <p className="font-mono text-[9px] font-black uppercase tracking-[0.24em] text-slate-500">
-                      Time This Week
-                    </p>
-                    <div className="mt-4 flex items-baseline gap-1">
-                      <span className="text-4xl font-extrabold text-slate-500 font-display tracking-tight text-white">
-                        {hoursCompleted} hrs
-                      </span>
-                    </div>
-                    <p className="mt-1 text-xs font-semibold text-slate-500">
-                      of {hoursPlanned} hrs planned
-                    </p>
-                    <div className="mt-4 h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
-                      <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${timeProgressPercent}%` }} />
-                    </div>
-                  </div>
-                </div>
-
-                {/* C. COMING UP SECTION */}
+                {/* B. COMING UP SECTION */}
                 <section className="rounded-2xl border border-white/[0.06] bg-[#07090d]/60 p-6 backdrop-blur-xl shadow-premium">
                   <div className="flex items-center gap-2 border-b border-white/[0.06] pb-4">
                     <div className="flex h-6 w-6 items-center justify-center rounded-md bg-white/[0.04] text-brand-light">
                       <Layers3 size={14} />
                     </div>
                     <h2 className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
-                      Coming Up
+                      Coming Up Next
                     </h2>
                   </div>
                   
@@ -645,7 +612,7 @@ export function RoadmapWorkspace() {
                             Week {currentWeek + idx + 1}: {mission.title}
                           </p>
                           <p className="mt-1 text-xs text-slate-500">
-                            {mission.tasks?.length || 3} tasks • Starts next Monday
+                            {mission.tasks?.length || 3} objectives • Launches automatically
                           </p>
                         </div>
                         <span className="shrink-0 rounded-full border border-white/10 bg-white/[0.02] px-2.5 py-1 font-mono text-[9px] font-semibold uppercase tracking-widest text-slate-400">
@@ -661,7 +628,7 @@ export function RoadmapWorkspace() {
                   </div>
                 </section>
 
-                {/* D. GEMINI AHEAD OF SCHEDULE BANNER */}
+                {/* C. GEMINI AHEAD OF SCHEDULE BANNER */}
                 <section className="relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.02] p-5 backdrop-blur-xl shadow-glow">
                   <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-transparent opacity-40 pointer-events-none" />
                   <div className="flex items-center justify-between gap-4 relative z-10">
@@ -680,14 +647,14 @@ export function RoadmapWorkspace() {
                       onClick={() => handleCopilotAction("I'm ahead of schedule on week 1 backend tasks. Give me a challenge task related to caching eviction policies or distributed coherency!")}
                       className="shrink-0 text-xs font-black uppercase tracking-widest text-emerald-400 hover:text-white transition-colors duration-200 font-sans"
                     >
-                      Get a challenge task →
+                      Challenge →
                     </button>
                   </div>
                 </section>
               </Motion.div>
             ) : (
               /* ========================================================================= */
-              /* 2. PORTING THE SECONDARY CURRICULUM JOURNEY PATH GRAPH AND HEATMAPS       */
+              /* 2. CURRICULUM JOURNEY MAP                                                 */
               /* ========================================================================= */
               <Motion.div
                 key="curriculum"
@@ -697,358 +664,614 @@ export function RoadmapWorkspace() {
                 transition={{ duration: 0.35, ease: "easeInOut" }}
                 className="space-y-6"
               >
-                {/* Horizontal steps node visualization */}
-                <section className="glass-panel overflow-hidden rounded-2xl border border-white/10 bg-surface/50 p-6 shadow-premium">
+                {/* Journey Timeline Map */}
+                <section className="glass-panel overflow-hidden rounded-2xl border border-white/10 bg-[#07090d]/60 p-6 shadow-premium">
                   <div className="flex items-center justify-between border-b border-white/[0.06] pb-4 mb-6">
-                    <SectionTitle icon={Map} title="Journey Path" />
-                    <button
-                      onClick={() => document.getElementById("journey-phases")?.scrollIntoView({ behavior: "smooth" })}
-                      className="text-xs font-semibold text-slate-500 transition hover:text-[#a07ee0]"
-                    >
-                      View full list
-                    </button>
+                    <SectionTitle icon={Map} title="Journey Timeline Map" />
+                    <span className="font-mono text-[10px] font-semibold text-slate-500">{stats.completion}% overall completion</span>
                   </div>
-                  
-                  <div className="overflow-x-auto pb-2">
-                    <div className="flex min-w-max items-start py-2 px-1">
-                      {currentRoadmap?.phases.map((phase, index) => {
-                        const state = getPhaseState(phase, activePhase?.id === phase.id);
-                        return (
-                          <div key={phase.id} className="flex items-start">
-                            <button 
-                              onClick={() => setActivePhaseId(phase.id)} 
-                              className="group flex w-32 flex-col items-center gap-2 text-center"
-                            >
-                              <div
-                                className={cn(
-                                  "flex h-11 w-11 items-center justify-center rounded-full border-2 transition duration-200",
-                                  state === "done" && "border-[#2ec4a0] bg-[#061f1a] text-[#2ec4a0]",
-                                  state === "active" && "border-[#a07ee0] bg-[#150f28] text-[#a07ee0] shadow-[0_0_0_6px_rgba(124,92,191,0.12)]",
-                                  state === "locked" && "border-white/10 bg-white/[0.03] text-slate-400 group-hover:text-slate-400"
-                                )}
-                              >
-                                {state === "done" ? <CheckCircle2 size={18} /> : state === "locked" ? <Lock size={16} /> : <Circle size={15} />}
-                              </div>
-                              <span className={cn("line-clamp-2 text-xs font-semibold leading-tight px-1 mt-1", state === "active" ? "text-[#a07ee0] font-bold" : "text-slate-400 font-normal")}>
-                                {phase.title}
-                              </span>
-                            </button>
-                            {index < currentRoadmap.phases.length - 1 && (
-                              <div className={cn("mt-5 h-px w-14 transition duration-300", phase.status === "completed" ? "bg-[#2ec4a0]" : "bg-white/10")} />
+
+                  <div className="relative pl-6 sm:pl-8 border-l border-white/10 space-y-8 ml-3 sm:ml-4 py-2">
+                    {currentRoadmap?.phases.map((phase, index) => {
+                      const state = getPhaseState(phase, activePhase?.id === phase.id);
+                      const phaseProgress = getPhaseProgress(phase);
+                      const isCompleted = phase.status === "completed";
+                      const isActive = phase.id === activePhase?.id;
+                      const isLocked = state === "locked";
+
+                      return (
+                        <div key={phase.id} className="relative">
+                          {/* Timeline dot */}
+                          <button
+                            onClick={() => {
+                              if (!isLocked) {
+                                setActivePhaseId(phase.id);
+                              }
+                            }}
+                            disabled={isLocked}
+                            className={cn(
+                              "absolute -left-[35px] sm:-left-[43px] top-1.5 flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full border-2 transition duration-300 z-10",
+                              isCompleted && "border-[#2ec4a0] bg-[#061f1a] text-[#2ec4a0]",
+                              isActive && "border-[#a07ee0] bg-[#150f28] text-[#a07ee0] shadow-[0_0_12px_rgba(124,92,191,0.3)] scale-110",
+                              isLocked && "border-white/5 bg-[#0a0f18] text-slate-600 cursor-not-allowed"
                             )}
+                          >
+                            {isCompleted ? <CheckCircle2 size={14} /> : isLocked ? <Lock size={12} /> : <span className="font-mono text-[10px] font-bold">{index + 1}</span>}
+                          </button>
+
+                          {/* Phase detail card */}
+                          <div
+                            onClick={() => {
+                              if (!isLocked) {
+                                setActivePhaseId(phase.id);
+                              }
+                            }}
+                            className={cn(
+                              "rounded-xl border p-4 sm:p-5 text-left transition duration-300 cursor-pointer select-none",
+                              isActive
+                                ? "border-brand/40 bg-[#0d1222] shadow-[0_0_20px_rgba(99,102,241,0.08)]"
+                                : "border-white/5 bg-white/[0.01] hover:border-white/10 hover:bg-white/[0.02]",
+                              isLocked && "opacity-50 cursor-not-allowed"
+                            )}
+                          >
+                            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                              <div className="min-w-0 flex-1">
+                                <span className={cn(
+                                  "inline-flex rounded px-1.5 py-0.5 font-mono text-[8px] font-semibold uppercase tracking-wider mb-2",
+                                  isCompleted ? "bg-success/10 text-success border border-success/20" : isLocked ? "bg-white/5 text-slate-500 border border-white/5" : "bg-brand/10 text-brand-light border border-brand/20"
+                                )}>
+                                  {isCompleted ? "Completed" : isLocked ? "Locked Phase" : "Active Focus"}
+                                </span>
+                                <h3 className="text-sm sm:text-base font-bold text-white leading-tight font-display">{phase.title}</h3>
+                                <p className="mt-2 text-xs leading-relaxed text-slate-400">{phase.description}</p>
+                              </div>
+                              <div className="text-right shrink-0">
+                                <span className="font-mono text-xs font-black text-slate-300">{phaseProgress}%</span>
+                                <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5 font-mono">progress</p>
+                              </div>
+                            </div>
+
+                            {/* Progress bar */}
+                            <div className="mt-4 flex items-center gap-2">
+                              <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/5">
+                                <div className="h-full rounded-full bg-[#a07ee0]" style={{ width: `${phaseProgress}%` }} />
+                              </div>
+                            </div>
                           </div>
-                        );
-                      })}
-                    </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </section>
 
-                {/* Premium Glassmorphic Dropdown Selector Box */}
-                <div className="flex justify-center mb-8 relative curriculum-selector-container">
-                  <div className="relative w-80">
-                    <button
-                      type="button"
-                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                      className="w-full flex items-center justify-between gap-3 bg-[#07090d]/80 border border-white/10 hover:border-brand/40 rounded-xl px-5 py-3.5 text-xs font-bold uppercase tracking-wider text-slate-200 hover:text-white transition duration-300 shadow-premium backdrop-blur-xl"
-                    >
-                      <span className="flex items-center gap-2">
-                        {curriculumTab === "focus" ? (
-                          <>
-                            <Zap size={14} className="text-brand-light animate-pulse" />
-                            Active Focus & Sprints
-                          </>
-                        ) : (
-                          <>
-                            <Route size={14} className="text-[#a07ee0]" />
-                            Journey Phases Overview
-                          </>
-                        )}
-                      </span>
-                      <ChevronDown
-                        size={16}
-                        className={cn(
-                          "text-slate-400 transition-transform duration-300",
-                          isDropdownOpen && "transform rotate-180 text-white"
-                        )}
-                      />
-                    </button>
+                {/* B. DETAILED SPRINTS / OBJECTIVES FOR SELECTED PHASE */}
+                {activePhase && (
+                  <section id="journey-phase-details" className="glass-panel rounded-2xl border border-white/10 bg-[#07090d]/60 p-6 shadow-premium">
+                    <div className="flex items-center justify-between border-b border-white/[0.06] pb-4 mb-5">
+                      <div className="flex items-center gap-2">
+                        <Route size={16} className="text-[#a07ee0]" />
+                        <h2 className="text-sm font-bold text-slate-300">Phase Objectives: {activePhase.title}</h2>
+                      </div>
+                      <span className="font-mono text-[10px] text-slate-500">{activePhase.missions.length} active tracks</span>
+                    </div>
 
-                    <AnimatePresence>
-                      {isDropdownOpen && (
-                        <Motion.div
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          transition={{ duration: 0.2, ease: "easeInOut" }}
-                          className="absolute z-20 mt-2 w-full rounded-xl border border-white/10 bg-[#07090d]/95 p-1.5 shadow-[0_15px_30px_rgba(0,0,0,0.6)] backdrop-blur-xl"
-                        >
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setCurriculumTab("focus");
-                              setIsDropdownOpen(false);
-                            }}
-                            className={cn(
-                              "w-full flex items-center gap-2.5 rounded-lg px-4.5 py-3.5 text-left text-xs font-bold uppercase tracking-wider transition-all duration-200",
-                              curriculumTab === "focus"
-                                ? "bg-brand text-white shadow-[0_0_15px_rgba(99,102,241,0.3)] font-extrabold"
-                                : "text-slate-400 hover:bg-white/[0.04] hover:text-slate-200"
-                            )}
-                          >
-                            <Zap size={13} className="shrink-0" />
-                            Active Focus & Sprints
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setCurriculumTab("phases");
-                              setIsDropdownOpen(false);
-                            }}
-                            className={cn(
-                              "w-full mt-1.5 flex items-center gap-2.5 rounded-lg px-4.5 py-3.5 text-left text-xs font-bold uppercase tracking-wider transition-all duration-200",
-                              curriculumTab === "phases"
-                                ? "bg-brand text-white shadow-[0_0_15px_rgba(99,102,241,0.3)] font-extrabold"
-                                : "text-slate-400 hover:bg-white/[0.04] hover:text-slate-200"
-                            )}
-                          >
-                            <Route size={13} className="shrink-0" />
-                            Journey Phases Overview
-                          </button>
-                        </Motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </div>
-
-                <div className="w-full">
-                  <AnimatePresence mode="wait">
-                    {curriculumTab === "phases" ? (
-                      <Motion.div
-                        key="phases"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.25, ease: "easeInOut" }}
-                      >
-                        {/* Journey Phases rows */}
-                        <section id="journey-phases" className="glass-panel rounded-2xl border border-white/10 bg-surface/50 scroll-mt-20 shadow-premium">
-                          <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
-                            <SectionTitle icon={Route} title="Journey Phases" />
-                            <span className="font-mono text-[10px] font-semibold text-slate-500">{stats.completion}% overall</span>
+                    <div className="space-y-6">
+                      {activePhase.missions.map((mission) => (
+                        <div key={mission.id} className="space-y-3">
+                          <div className="flex items-center gap-2 bg-white/[0.02] border border-white/5 px-3.5 py-2.5 rounded-xl">
+                            <span className="h-1.5 w-1.5 rounded-full bg-[#a07ee0] animate-pulse" />
+                            <h4 className="text-xs font-black uppercase text-slate-200 font-mono tracking-wider">{mission.title}</h4>
                           </div>
-                          <div className="p-4 space-y-2">
-                            {currentRoadmap?.phases.map((phase, index) => (
-                              <PhaseRow
-                                key={phase.id}
-                                phase={phase}
-                                index={index}
-                                active={phase.id === activePhase?.id}
-                                progress={getPhaseProgress(phase)}
-                                onClick={() => setActivePhaseId(phase.id)}
+                          <div className="space-y-2 pl-2">
+                            {mission.tasks.map((task, index) => (
+                              <TaskCard
+                                key={task.id}
+                                task={task}
+                                featured={false}
+                                onToggle={() => updateTaskStatus(task.id, task.status === "completed" ? "pending" : "completed")}
+                                onStart={() => navigate(`/study/${task.id}`)}
+                                onSelect={setSelectedTaskId}
+                                delay={index * 0.03}
                               />
                             ))}
                           </div>
-                        </section>
-                      </Motion.div>
-                    ) : (
-                      <Motion.div
-                        key="focus"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.25, ease: "easeInOut" }}
-                      >
-                        {/* Right Column: Execution focus list */}
-                        <section id="execution-tasks" className="glass-panel rounded-2xl border border-white/10 bg-surface/50 scroll-mt-20 shadow-premium">
-                          <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
-                            <SectionTitle icon={Zap} title={isOverloaded ? "Momentum Focus" : "Journey Tasks"} />
-                            <button
-                              type="button"
-                              onClick={() => setShowAllTasks((value) => !value)}
-                              className="text-xs font-semibold text-slate-500 transition hover:text-[#a07ee0]"
-                            >
-                              {showAllTasks ? "Show focus" : "View all"}
-                            </button>
-                          </div>
-                          <div className="space-y-3.5 p-4">
-                            {missionTasks.length > 0 ? (
-                              missionTasks.slice(0, showAllTasks ? undefined : isOverloaded ? 2 : TASK_LIMIT).map((task, index) => (
-                                <TaskCard
-                                  key={task.id}
-                                  task={task}
-                                  featured={index === 0 && task.status !== "completed"}
-                                  onToggle={() => updateTaskStatus(task.id, task.status === "completed" ? "pending" : "completed")}
-                                  onStart={() => navigate(`/study/${task.id}`)}
-                                  delay={index * 0.04}
-                                />
-                              ))
-                            ) : (
-                              <div className="rounded-xl border border-dashed border-white/10 p-6 text-center">
-                                <CheckCircle2 className="mx-auto mb-2 text-[#2ec4a0]" size={24} />
-                                <p className="text-sm font-semibold text-white">This phase is complete.</p>
-                                <p className="mt-1 text-xs text-slate-500">Click on another phase row to explore tasks.</p>
-                              </div>
-                            )}
-
-                            {isOverloaded && !showAllTasks && (
-                              <div className="rounded-lg border border-[#c9a84c]/25 bg-[#1c1608] p-3 text-xs leading-5 text-[#e2c47a]/80">
-                                Focus mode is showing only the highest leverage tasks. Complete these first, then expand the list.
-                              </div>
-                            )}
-
-                            <button
-                              type="button"
-                              onClick={() => handleCopilotAction(`Add a custom objective to "${currentMission?.title || "my active mission"}" and keep it measurable.`)}
-                              className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 px-4 py-3.5 text-xs font-bold uppercase tracking-[0.16em] text-slate-500 transition hover:border-[#a07ee0]/50 hover:text-[#a07ee0]"
-                            >
-                              <Plus size={14} />
-                              Add custom objective
-                            </button>
-                          </div>
-                        </section>
-                      </Motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                {/* Heatmap/Planner section */}
-                <section className="glass-panel rounded-2xl border border-white/10 bg-surface/50 shadow-premium">
-                  <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
-                    <SectionTitle icon={CalendarDays} title="This Week Progress" />
-                    <span className="text-xs font-semibold text-slate-500">Ahead of {Math.max(35, stats.consistency)}% of learners</span>
-                  </div>
-                  <WeekPlanner completed={stats.completedTasks} total={stats.totalTasks} />
-                </section>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
               </Motion.div>
             )}
           </AnimatePresence>
         </main>
 
-        {/* Right Sidebar Widgets - Compact layout */}
+        {/* Right Sidebar Widgets - Streamlined and Consolidated */}
         <aside className="space-y-6">
           {/* Active Track Selector */}
           <section className="glass-panel rounded-2xl border border-white/10 bg-surface/50 p-5 shadow-premium">
             <div className="mb-3.5 flex items-center justify-between">
-              <p className="font-mono text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">Active Track</p>
+              <p className="font-mono text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">Selected Path</p>
               <span className="rounded-full border border-[#c9a84c]/30 bg-[#1c1608] px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-widest text-[#c9a84c]">
-                Pro
+                Active
               </span>
             </div>
             <RoadmapPicker roadmaps={roadmaps} currentRoadmap={currentRoadmap} onSelect={setCurrentRoadmap} />
             
-            <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
+            <div className="mt-4 rounded-xl border border-white/5 bg-[#05070a]/40 p-4">
               <div className="mb-2 flex items-center gap-2 text-xs font-bold text-white">
                 <Target size={14} className="text-[#2ec4a0]" />
-                Next milestone
+                Next milestone target
               </div>
-              <p className="text-xs leading-5 text-slate-400">
+              <p className="text-xs leading-relaxed text-slate-400">
                 {currentRoadmap?.nextMilestone || nextTask?.title || "Complete the next execution task to unlock the following checkpoint."}
               </p>
             </div>
           </section>
 
-          {/* Veda Insights widget */}
-          <section className="glass-panel rounded-2xl border border-white/10 bg-surface/50 shadow-premium">
-            <div className="border-b border-white/[0.06] px-5 py-4">
-              <SectionTitle icon={Sparkles} title="Veda Insights" />
+          {/* Consolidated Command Center: Tabbed Insights & Actions */}
+          <div className="glass-panel rounded-2xl border border-white/10 bg-[#07090d]/60 shadow-premium overflow-hidden">
+            {/* Tab switcher */}
+            <div className="flex border-b border-white/[0.06] p-1 bg-black/20">
+              <button
+                onClick={() => setSidebarTab("insights")}
+                className={cn(
+                  "flex-1 flex items-center justify-center gap-2 py-2.5 text-[10px] font-black uppercase tracking-wider transition-all duration-300 rounded-xl",
+                  sidebarTab === "insights"
+                    ? "bg-brand/20 border border-brand/35 text-white shadow-glow"
+                    : "text-slate-500 hover:text-slate-300"
+                )}
+              >
+                <Sparkles size={12} />
+                Veda Coach
+              </button>
+              <button
+                onClick={() => setSidebarTab("actions")}
+                className={cn(
+                  "flex-1 flex items-center justify-center gap-2 py-2.5 text-[10px] font-black uppercase tracking-wider transition-all duration-300 rounded-xl",
+                  sidebarTab === "actions"
+                    ? "bg-brand/20 border border-brand/35 text-white shadow-glow"
+                    : "text-slate-500 hover:text-slate-300"
+                )}
+              >
+                <Zap size={12} />
+                Quick Actions
+              </button>
             </div>
-            <div className="space-y-3 p-4">
-              <div className="rounded-xl border border-[#7c5cbf]/25 bg-[#150f28] p-4">
-                <div className="mb-2 flex items-center gap-2 text-sm font-bold text-white">
-                  <Sparkles size={15} className="text-[#a07ee0]" />
-                  Mentor readout
-                </div>
-                <p className="text-xs leading-5 text-slate-400">
-                  {nextTask
-                    ? `Start with "${nextTask.title}". It is the cleanest next move for the active mission.`
-                    : "Your roadmap is ready for a new mission. Expand the direction or regenerate with updated goals."}
-                </p>
-                <button
-                  onClick={() => handleCopilotAction("Review my current roadmap and tell me the smartest next move.")}
-                  className="mt-3.5 w-full rounded-xl bg-[#7c5cbf] px-3.5 py-2.5 text-xs font-bold text-white transition hover:bg-[#a07ee0] shadow-premium"
-                >
-                  Ask Veda
-                </button>
-              </div>
 
-              {currentRoadmap?.insights?.length ? (
-                currentRoadmap.insights.map((insight, index) => (
-                  <InsightCard
-                    key={`${insight.message}-${index}`}
-                    insight={insight}
-                    onAction={() => handleInsightAction(insight, navigate, handleCopilotAction)}
-                  />
-                ))
-              ) : (
-                <div className="rounded-lg border border-white/10 p-4 text-xs leading-5 text-slate-500">
-                  No insights yet. Progress through a few tasks and Veda will start surfacing useful patterns.
-                </div>
-              )}
-            </div>
-          </section>
+            {/* Tab Content */}
+            <div className="p-4">
+              <AnimatePresence mode="wait">
+                {sidebarTab === "insights" ? (
+                  <Motion.div
+                    key="insights"
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-4"
+                  >
+                    <div className="rounded-xl border border-[#7c5cbf]/25 bg-[#150f28]/60 p-4">
+                      <div className="mb-2 flex items-center gap-2 text-xs font-bold text-white">
+                        <Sparkles size={15} className="text-[#a07ee0]" />
+                        Veda mentor readout
+                      </div>
+                      <p className="text-xs leading-relaxed text-slate-400">
+                        {nextTask
+                          ? `Start with "${nextTask.title}". It is the cleanest next move for the active mission.`
+                          : "Your roadmap is ready for a new mission. Expand the direction or regenerate with updated goals."}
+                      </p>
+                      <button
+                        onClick={() => handleCopilotAction("Review my current roadmap and tell me the smartest next move.")}
+                        className="mt-3.5 w-full rounded-xl bg-[#7c5cbf] px-3.5 py-2.5 text-xs font-bold text-white transition hover:bg-[#a07ee0] shadow-premium"
+                      >
+                        Ask Veda Coach
+                      </button>
+                    </div>
 
-          {/* Metrics Overview summary */}
-          <section className="glass-panel rounded-2xl border border-white/10 bg-surface/50 p-4 shadow-premium space-y-4">
-            <div className="border-b border-white/[0.04] pb-3 flex items-center gap-2">
-              <Gauge size={15} className="text-[#a07ee0]" />
-              <h4 className="text-xs font-bold text-white font-mono uppercase tracking-wider">Metrics Console</h4>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="bg-[#0b0f17] border border-white/5 p-3 rounded-lg">
-                <p className="text-[8px] font-black uppercase text-slate-500 font-mono">Readiness</p>
-                <p className="text-lg font-black text-white mt-1">{stats.readiness}%</p>
-              </div>
-              <div className="bg-[#0b0f17] border border-white/5 p-3 rounded-lg">
-                <p className="text-[8px] font-black uppercase text-slate-500 font-mono">Consistency</p>
-                <p className="text-lg font-black text-white mt-1">{stats.consistency}%</p>
-              </div>
-              <div className="bg-[#0b0f17] border border-white/5 p-3 rounded-lg">
-                <p className="text-[8px] font-black uppercase text-slate-500 font-mono">Recall State</p>
-                <p className="text-lg font-black text-white mt-1">{stats.recall}%</p>
-              </div>
-              <div className="bg-[#0b0f17] border border-white/5 p-3 rounded-lg">
-                <p className="text-[8px] font-black uppercase text-slate-500 font-mono">Active Week</p>
-                <p className="text-lg font-black text-white mt-1">W{currentWeek}</p>
-              </div>
-            </div>
-          </section>
+                    <div className="space-y-3">
+                      {currentRoadmap?.insights?.length ? (
+                        currentRoadmap.insights.map((insight, index) => (
+                          <InsightCard
+                            key={`${insight.message}-${index}`}
+                            insight={insight}
+                            onAction={() => handleInsightAction(insight, navigate, handleCopilotAction)}
+                          />
+                        ))
+                      ) : (
+                        <div className="rounded-lg border border-white/5 p-4 text-xs leading-relaxed text-slate-600">
+                          No insights yet. Progress through a few tasks and Veda will start surfacing useful patterns.
+                        </div>
+                      )}
+                    </div>
+                  </Motion.div>
+                ) : (
+                  <Motion.div
+                    key="actions"
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-4"
+                  >
+                    <div className="grid grid-cols-3 gap-2">
+                      <QuickAction icon={Brain} label="Ask" onClick={() => handleCopilotAction("Can we review my active learning track?")} />
+                      <QuickAction icon={RefreshCw} label="Recall" onClick={() => navigate("/recall")} />
+                      <QuickAction icon={Target} label="Quiz" onClick={() => (nextTask ? navigate(`/study/${nextTask.id}`) : handleCopilotAction("Quiz me on my roadmap progress."))} />
+                      <QuickAction icon={BookOpen} label="Notes" onClick={() => navigate("/notes")} />
+                      <QuickAction icon={Plus} label="Inject" onClick={handleInjectSkill} />
+                      <QuickAction icon={Search} label="Gaps" onClick={() => navigate("/skill-gap")} />
+                    </div>
 
-          {/* Quick Actions Panel */}
-          <section className="glass-panel rounded-2xl border border-white/10 bg-surface/50 shadow-premium">
-            <div className="border-b border-white/[0.06] px-5 py-4">
-              <SectionTitle icon={Zap} title="Quick Actions" />
+                    <div className="flex flex-col gap-2 pt-3 border-t border-white/5">
+                      <button
+                        onClick={() => setIsExpansionOpen(true)}
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-brand hover:bg-brand-light px-4 py-3 text-xs font-bold text-white transition-all duration-200"
+                      >
+                        <Plus size={14} />
+                        Expand Path
+                      </button>
+                      <button
+                        onClick={() => handleCopilotAction("Simplify my roadmap while keeping the same target role and strongest outcomes.")}
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 hover:border-white/20 bg-white/[0.01] hover:bg-white/[0.04] text-slate-300 hover:text-white px-4 py-3 text-xs font-bold transition-all duration-200"
+                      >
+                        <Layers3 size={14} />
+                        Simplify Sprints
+                      </button>
+                    </div>
+                  </Motion.div>
+                )}
+              </AnimatePresence>
             </div>
-            <div className="grid grid-cols-3 gap-2.5 p-4">
-              <QuickAction icon={Brain} label="Ask" onClick={() => handleCopilotAction("Can we review my active learning track?")} />
-              <QuickAction icon={RefreshCw} label="Recall" onClick={() => navigate("/recall")} />
-              <QuickAction icon={Target} label="Quiz" onClick={() => (nextTask ? navigate(`/study/${nextTask.id}`) : handleCopilotAction("Quiz me on my roadmap progress."))} />
-              <QuickAction icon={BookOpen} label="Notes" onClick={() => navigate("/notes")} />
-              <QuickAction icon={Plus} label="Inject" onClick={handleInjectSkill} />
-              <QuickAction icon={Search} label="Gaps" onClick={() => navigate("/skill-gap")} />
-            </div>
-          </section>
-
-          {/* Quick operations */}
-          <div className="flex flex-col gap-2">
-            <button
-              onClick={() => setIsExpansionOpen(true)}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#7c5cbf] hover:bg-[#a07ee0] px-4 py-3.5 text-xs font-bold text-white transition-all shadow-premium hover:-translate-y-0.5 duration-200"
-            >
-              <Plus size={15} />
-              Expand Career Direction
-            </button>
-            <button
-              onClick={() => handleCopilotAction("Simplify my roadmap while keeping the same target role and strongest outcomes.")}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 hover:border-white/20 bg-white/[0.01] hover:bg-white/[0.04] text-slate-300 hover:text-white px-4 py-3.5 text-xs font-bold transition-all duration-200"
-            >
-              <Layers3 size={15} />
-              Simplify Learning Path
-            </button>
           </div>
         </aside>
       </div>
 
+      {/* Sliding Task Inspector Panel Overlay */}
+      <AnimatePresence>
+        {renderInspector()}
+      </AnimatePresence>
+
+      {/* Sliding Progress Logging Drawer */}
+      <AnimatePresence>
+        {isLoggerOpen && (
+          <>
+            {/* Backdrop overlay */}
+            <Motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.5 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsLoggerOpen(false)}
+              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+            />
+            {/* Drawer */}
+            <Motion.div
+              initial={{ x: "100%", opacity: 0.95 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: "100%", opacity: 0.95 }}
+              transition={{ type: "spring", damping: 26, stiffness: 220 }}
+              className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-md border-l border-white/10 bg-[#080b11]/95 p-6 shadow-[0_0_50px_rgba(0,0,0,0.8)] backdrop-blur-2xl overflow-y-auto flex flex-col"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between border-b border-white/[0.06] pb-4 mb-6">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-md bg-purple-500/10 text-purple-400">
+                    <Target size={14} />
+                  </div>
+                  <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-purple-400">
+                    VEDA SYNC PROGRESS LOG
+                  </span>
+                </div>
+                <button
+                  onClick={() => setIsLoggerOpen(false)}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-slate-400 hover:text-white hover:border-white/20 transition-all duration-200"
+                  aria-label="Close logger"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+
+              {/* Form */}
+              <div className="flex-1 flex flex-col justify-between">
+                <form onSubmit={handleLogActivity} className="space-y-5">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase text-slate-400 font-mono mb-1.5">
+                      What did you build or learn?
+                    </label>
+                    <input
+                      type="text"
+                      value={customTaskTitle}
+                      onChange={(e) => setCustomTaskTitle(e.target.value)}
+                      placeholder="e.g. Practiced Redis Pub/Sub, solved 3 BST trees..."
+                      className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-xs text-white outline-none focus:border-purple-500/60 placeholder:text-slate-600 transition"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase text-slate-400 font-mono mb-1.5">Category</label>
+                      <div className="relative">
+                        <select
+                          value={customTaskCategory}
+                          onChange={(e) => setCustomTaskCategory(e.target.value)}
+                          className="w-full appearance-none rounded-xl border border-white/10 bg-black/40 px-3 py-3 pr-8 text-xs text-white outline-none focus:border-purple-500/60 transition"
+                        >
+                          <option value="DSA / LeetCode">DSA / LeetCode</option>
+                          <option value="Backend Development">Backend Development</option>
+                          <option value="System Design">System Design</option>
+                          <option value="AI / ML Models">AI / ML Models</option>
+                          <option value="Obsidian Note Mapping">Obsidian Note Mapping</option>
+                          <option value="Frontend UI React">Frontend UI React</option>
+                          <option value="Other Skills">Other Skills</option>
+                        </select>
+                        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase text-slate-400 font-mono mb-1.5">Duration</label>
+                      <div className="relative">
+                        <select
+                          value={customTaskDuration}
+                          onChange={(e) => setCustomTaskDuration(e.target.value)}
+                          className="w-full appearance-none rounded-xl border border-white/10 bg-black/40 px-3 py-3 pr-8 text-xs text-white outline-none focus:border-purple-500/60 transition"
+                        >
+                          <option value="30 min">30 min</option>
+                          <option value="1 hour">1 hour</option>
+                          <option value="2 hours">2 hours</option>
+                          <option value="4 hours">4 hours</option>
+                        </select>
+                        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-4 py-3.5 text-xs font-black uppercase tracking-widest transition shadow-[0_0_15px_rgba(139,92,246,0.3)] active:scale-[0.98]"
+                  >
+                    <Zap size={12} /> Log & Sync with Veda ↗
+                  </button>
+                </form>
+
+                {/* Logged Activities List */}
+                <div className="mt-8 pt-6 border-t border-white/[0.04] flex-1 flex flex-col min-h-0">
+                  <p className="font-mono text-[8px] font-black uppercase tracking-[0.16em] text-slate-500 mb-3">
+                    LOGGED PROGRESS TODAY
+                  </p>
+                  {loggedActivities.length > 0 ? (
+                    <div className="space-y-2 overflow-y-auto pr-1 flex-1 min-h-0">
+                      {loggedActivities.map((act) => (
+                        <div key={act.id} className="flex items-center justify-between gap-3 bg-white/[0.02] border border-white/[0.04] p-3 rounded-xl text-xs animate-fade-in">
+                          <div className="min-w-0">
+                            <p className="font-bold text-slate-300 truncate">{act.title}</p>
+                            <p className="text-[9px] text-slate-500 font-mono mt-0.5">
+                              {act.category} • {act.duration}
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setLoggedActivities(prev => prev.filter(a => a.id !== act.id))}
+                            className="text-[10px] text-slate-500 hover:text-red-400 font-mono transition"
+                          >
+                            REMOVE
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex-1 flex flex-col items-center justify-center text-center p-6 border border-dashed border-white/5 rounded-xl bg-white/[0.01]">
+                      <Clock size={20} className="text-slate-600 mb-2" />
+                      <p className="text-xs text-slate-500 font-medium">No external activities logged today.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </Motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       <ExpansionFlow isOpen={isExpansionOpen} onClose={() => setIsExpansionOpen(false)} />
+    </div>
+  );
+}
+
+function TaskCard({
+  task,
+  featured,
+  isActive = false,
+  isLocked = false,
+  onToggle,
+  onStart,
+  onSelect,
+  delay
+}: {
+  task: RoadmapTask;
+  featured: boolean;
+  isActive?: boolean;
+  isLocked?: boolean;
+  onToggle: () => void;
+  onStart: () => void;
+  onSelect: (taskId: string) => void;
+  delay: number;
+}) {
+  const isDone = task.status === "completed";
+
+  const Icon = {
+    learn: BookOpen,
+    practice: Zap,
+    revise: RefreshCw,
+    project: Layers3
+  }[task.type] || BookOpen;
+
+  return (
+    <Motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay }}
+      onClick={() => {
+        if (!isLocked) {
+          onSelect(task.id);
+        }
+      }}
+      className={cn(
+        "rounded-xl border p-4 transition-all duration-300 cursor-pointer select-none relative overflow-hidden group flex items-center justify-between",
+        featured 
+          ? "border-brand/35 bg-[#0a1120]/80 shadow-[0_0_15px_rgba(99,102,241,0.1)] hover:border-brand/50 hover:bg-[#0c162b]" 
+          : "border-white/5 bg-[#05070a]/60 hover:border-white/15 hover:bg-[#0e121a]/80",
+        isDone && "border-success/15 bg-[#04140e]/40 hover:border-success/20 opacity-70"
+      )}
+    >
+      <div className="flex items-center gap-4 min-w-0">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggle();
+          }}
+          disabled={isLocked}
+          className={cn(
+            "flex h-5 w-5 shrink-0 items-center justify-center rounded-lg border transition duration-200",
+            isDone 
+              ? "border-success bg-success text-slate-950" 
+              : isLocked 
+                ? "border-white/5 bg-white/[0.01] text-slate-700 cursor-not-allowed" 
+                : "border-white/15 text-slate-500 hover:border-success hover:text-success"
+          )}
+          aria-label={isDone ? "Mark task pending" : "Mark task complete"}
+        >
+          {isDone ? <CheckCircle2 size={13} /> : isLocked ? <Lock size={10} /> : <Circle size={11} />}
+        </button>
+
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 text-[8px] font-bold font-mono mb-1 leading-none">
+            <span className={cn("inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 uppercase tracking-wider", taskTypeClass(task.type))}>
+              <Icon size={9} />
+              {task.type}
+            </span>
+            <span className="text-slate-500">{task.durationMinutes}m</span>
+            {task.difficulty && (
+              <span className={cn("rounded px-1.5 py-0.5 uppercase", difficultyClass(task.difficulty))}>
+                {task.difficulty}
+              </span>
+            )}
+          </div>
+          <h3 className={cn("text-sm font-bold leading-tight group-hover:text-white transition-colors duration-200", isDone ? "text-slate-500 line-through font-normal" : "text-slate-200")}>
+            {task.title}
+          </h3>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 shrink-0 ml-4">
+        {!isDone && !isLocked && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onStart();
+            }}
+            className="hidden shrink-0 items-center gap-1 rounded-lg border border-brand/20 bg-brand/10 hover:bg-brand hover:text-white px-2.5 py-1.5 text-[9px] font-black uppercase tracking-widest text-brand-light transition duration-200 md:inline-flex"
+          >
+            Start
+            <ArrowRight size={10} />
+          </button>
+        )}
+        <ChevronRight size={14} className="text-slate-500 group-hover:text-slate-300 transition-colors duration-200" />
+      </div>
+    </Motion.div>
+  );
+}
+
+function TaskInspectorSubtasks({ task }: { task: RoadmapTask }) {
+  const richData = useMemo(() => {
+    const defaultData = getTaskRichData(task.title);
+    return {
+      subtasks: task.subtasks && task.subtasks.length > 0 ? task.subtasks : defaultData.subtasks,
+    };
+  }, [task.title, task.subtasks]);
+
+  const [checkedSubtasks, setCheckedSubtasks] = useState<boolean[]>([]);
+
+  useEffect(() => {
+    setCheckedSubtasks(
+      richData.subtasks.map((_, idx: number) => {
+        const saved = localStorage.getItem(`studybuddy-task-${task.id}-sub-${idx}`);
+        return saved === "true";
+      })
+    );
+  }, [task.id, richData.subtasks]);
+
+  const toggleSubtask = (idx: number) => {
+    const nextStates = [...checkedSubtasks];
+    nextStates[idx] = !nextStates[idx];
+    setCheckedSubtasks(nextStates);
+    localStorage.setItem(`studybuddy-task-${task.id}-sub-${idx}`, nextStates[idx] ? "true" : "false");
+  };
+
+  return (
+    <div className="space-y-3 mt-6">
+      <p className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-slate-500">
+        IMPLEMENTATION CHECKLIST
+      </p>
+      <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
+        {richData.subtasks.map((sub: string, idx: number) => {
+          const isSubDone = checkedSubtasks[idx];
+          return (
+            <button
+              key={idx}
+              onClick={() => toggleSubtask(idx)}
+              className={cn(
+                "w-full flex items-start gap-3 rounded-xl border p-3 text-left transition duration-200 text-xs",
+                isSubDone
+                  ? "border-emerald-500/10 bg-emerald-500/[0.01] text-slate-500"
+                  : "border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.03] text-slate-300"
+              )}
+            >
+              <div className={cn(
+                "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border transition duration-200",
+                isSubDone ? "border-emerald-500 bg-emerald-500 text-slate-950" : "border-white/20 text-slate-500"
+              )}>
+                {isSubDone && <CheckCircle2 size={11} />}
+              </div>
+              <span className={cn(
+                "leading-relaxed font-medium",
+                isSubDone && "line-through text-slate-600"
+              )}>
+                {sub}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function TaskInspectorResources({ task }: { task: RoadmapTask }) {
+  const richData = useMemo(() => {
+    const defaultData = getTaskRichData(task.title);
+    return {
+      resources: task.resources && task.resources.length > 0 ? task.resources : defaultData.resources
+    };
+  }, [task.title, task.resources]);
+
+  return (
+    <div className="space-y-3 mt-6">
+      <p className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-slate-500">
+        EXTERNAL STUDY HUB
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {richData.resources.map((res: { label: string; url: string }, idx: number) => (
+          <a
+            key={idx}
+            href={res.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-300 hover:text-white px-3.5 py-2.5 transition-all duration-200"
+          >
+            <Compass size={13} className="text-indigo-400 shrink-0" />
+            {res.label}
+            <ExternalLink size={10} className="text-slate-500" />
+          </a>
+        ))}
+      </div>
     </div>
   );
 }
@@ -1093,190 +1316,24 @@ function SectionTitle({ icon: Icon, title }: { icon: typeof Map; title: string }
       <div className="flex h-6 w-6 items-center justify-center rounded-md bg-white/[0.04] text-[#a07ee0]">
         <Icon size={14} />
       </div>
-      <h2 className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">{title}</h2>
+      <h2 className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 leading-none">{title}</h2>
     </div>
   );
 }
 
-function PhaseRow({ phase, index, active, progress, onClick }: { phase: RoadmapPhase; index: number; active: boolean; progress: number; onClick: () => void }) {
-  const state = getPhaseState(phase, active);
-
+function VedaBlueprint({ theme }: { theme: "cache" | "ats" | "obsidian" | "sqlite" | "array" | "react" | "api" | "default" }) {
   return (
-    <button
-      onClick={onClick}
-      disabled={phase.status === "locked"}
-      className={cn(
-        "mb-2 flex w-full items-start gap-3.5 rounded-xl border p-4.5 text-left transition duration-200",
-        active ? "border-[#a07ee0]/35 bg-[#150f28] shadow-[0_0_15px_rgba(160,126,224,0.1)]" : "border-white/5 bg-white/[0.01] hover:border-white/10 hover:bg-white/[0.02]",
-        phase.status === "locked" && "cursor-not-allowed opacity-55"
-      )}
-    >
-      <div
-        className={cn(
-          "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border font-mono text-xs font-bold transition duration-200",
-          state === "done" && "border-[#2ec4a0] bg-[#061f1a] text-[#2ec4a0]",
-          state === "active" && "border-[#a07ee0] bg-[#150f28] text-[#a07ee0]",
-          state === "locked" && "border-white/10 bg-white/[0.03] text-slate-500"
-        )}
-      >
-        {phase.status === "completed" ? <CheckCircle2 size={15} /> : phase.status === "locked" ? <Lock size={13} /> : index + 1}
-      </div>
-      <div className="min-w-0 flex-1">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className="truncate text-sm font-bold text-white leading-none">{phase.title}</p>
-            <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-slate-500">{phase.description}</p>
-          </div>
-          <span className={cn("shrink-0 rounded-full border px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wider", stateBadgeClass(state))}>
-            {phase.status === "completed" ? "Done" : phase.status === "locked" ? "Locked" : "Active"}
-          </span>
-        </div>
-        <div className="mt-4 flex items-center gap-2.5">
-          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/5 border border-white/5">
-            <div className="h-full rounded-full bg-[#a07ee0]" style={{ width: `${progress}%` }} />
-          </div>
-          <span className="font-mono text-[10px] text-slate-500 font-bold">{progress}%</span>
-        </div>
-      </div>
-    </button>
+    <div className="w-full h-full min-h-[120px] flex items-center justify-center">
+      {theme === "cache" && <CacheBlueprint />}
+      {theme === "ats" && <AtsBlueprint />}
+      {theme === "obsidian" && <ObsidianBlueprint />}
+      {theme === "sqlite" && <SqliteBlueprint />}
+      {theme === "array" && <ArrayBlueprint />}
+      {theme === "react" && <ReactBlueprint />}
+      {theme === "api" && <ApiBlueprint />}
+      {theme === "default" && <DefaultBlueprint />}
+    </div>
   );
-}
-
-interface TaskRichData {
-  theme: "cache" | "ats" | "obsidian" | "sqlite" | "array" | "react" | "api" | "default";
-  label: string;
-  subtasks: string[];
-  resources: { label: string; url: string }[];
-}
-
-function getTaskRichData(title: string): TaskRichData {
-  const t = title.toLowerCase();
-  if (t.includes("cache") || t.includes("redis") || t.includes("in-memory") || t.includes("eviction") || t.includes("memcached") || t.includes("key-value")) {
-    return {
-      theme: "cache",
-      label: "Caching & In-Memory Storage",
-      subtasks: [
-        "Initialize connection pool & configure client retry backoffs",
-        "Implement Cache-Aside read/write serialization logic",
-        "Set custom TTL rules & define LRU eviction policy limits",
-        "Benchmark database response query latency improvements"
-      ],
-      resources: [
-        { label: "Redis Command Reference", url: "https://redis.io/commands/" },
-        { label: "High-Performance Caching Guide", url: "https://systemdesign.one/caching-system-design/" }
-      ]
-    };
-  }
-  if (t.includes("array") || t.includes("list") || t.includes("vector") || t.includes("sorting") || t.includes("binary") || t.includes("search") || t.includes("tree") || t.includes("graph") || t.includes("dsa") || t.includes("stack") || t.includes("queue") || t.includes("traverse") || t.includes("traversing")) {
-    return {
-      theme: "array",
-      label: "Data Structure & Complexity Optimization",
-      subtasks: [
-        "Implement continuous memory allocation array resizing",
-        "Optimize direct element lookup index search times to O(1)",
-        "Write edge-case tests validating array index boundaries",
-        "Profile memory footprint differences vs linked pointer items"
-      ],
-      resources: [
-        { label: "DSA Space-Time Complexity CheatSheet", url: "https://www.bigocheatsheet.com/" },
-        { label: "JavaScript TypedArrays", url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Typed_arrays" }
-      ]
-    };
-  }
-  if (t.includes("react") || t.includes("frontend") || t.includes("ui") || t.includes("component") || t.includes("dom") || t.includes("css") || t.includes("html") || t.includes("rendering") || t.includes("view")) {
-    return {
-      theme: "react",
-      label: "React Component & State Reconciliation",
-      subtasks: [
-        "Design modular reusable component elements & state scopes",
-        "Implement React.memo & useMemo to avoid excessive repaints",
-        "Wire up structural responsive grid containers and animations",
-        "Profile Virtual DOM reconciliation diff checks using DevTools"
-      ],
-      resources: [
-        { label: "React Rendering Internals", url: "https://react.dev/learn/render-and-commit" },
-        { label: "Virtual DOM Concepts", url: "https://developer.mozilla.org/en-US/docs/Glossary/Virtual_DOM" }
-      ]
-    };
-  }
-  if (t.includes("api") || t.includes("http") || t.includes("rest") || t.includes("server") || t.includes("route") || t.includes("controller") || t.includes("express") || t.includes("node") || t.includes("endpoint") || t.includes("backend")) {
-    return {
-      theme: "api",
-      label: "REST API Endpoint Routers & Middleware",
-      subtasks: [
-        "Structure endpoint routes with proper HTTP verb matching",
-        "Implement request validation schemas & structured JSON returns",
-        "Establish connection pools to query backend repositories",
-        "Write integration tests to assert status codes (e.g. 200, 404)"
-      ],
-      resources: [
-        { label: "MDN HTTP Status Registry", url: "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status" },
-        { label: "Express.js Routing Guide", url: "https://expressjs.com/en/guide/routing.html" }
-      ]
-    };
-  }
-  if (t.includes("ats") || t.includes("resume") || t.includes("parser") || t.includes("matching") || t.includes("similarity") || t.includes("cosine") || t.includes("nlp") || t.includes("vector") || t.includes("embedding")) {
-    return {
-      theme: "ats",
-      label: "AI Semantic Vector Parsing",
-      subtasks: [
-        "Write PDF / docx parser script utilizing native streams",
-        "Generate tf-idf frequency counts or dense embedding vectors",
-        "Code cosine similarity dot product math comparison logic",
-        "Map matched keywords onto clinical gap matrix outputs"
-      ],
-      resources: [
-        { label: "Vector Embeddings Guide", url: "https://openaipandas.github.io/" },
-        { label: "ATS Matching Best Practices", url: "https://vireup.com/resume-parser-api-documentation/" }
-      ]
-    };
-  }
-  if (t.includes("obsidian") || t.includes("note") || t.includes("graph") || t.includes("vault") || t.includes("atomic") || t.includes("markdown") || t.includes("link")) {
-    return {
-      theme: "obsidian",
-      label: "Zettelkasten Atomic Notes Graph",
-      subtasks: [
-        "Deconstruct master notes into single-concept atomic files",
-        "Format cross-reference indexing using [[Wikilink]] syntax",
-        "Build dynamic Graph MOCs (Maps of Content) directories",
-        "Verify node graph clusters reflect personal knowledge growth"
-      ],
-      resources: [
-        { label: "Zettelkasten Method Intro", url: "https://zettelkasten.de/introduction/" },
-        { label: "Obsidian Vault Structure", url: "https://help.obsidian.md/Getting+started" }
-      ]
-    };
-  }
-  if (t.includes("c++") || t.includes("cmake") || t.includes("sqlite") || t.includes("database") || t.includes("compile") || t.includes("transaction") || t.includes("sql") || t.includes("query")) {
-    return {
-      theme: "sqlite",
-      label: "C++ SQLite & Modern CMake Toolchain",
-      subtasks: [
-        "Write CMake FetchContent blocks to resolve SQLite dependencies",
-        "Enable Write-Ahead Logging (WAL) journal configuration modes",
-        "Implement thread-safe query transaction wrappers & prepared bindings",
-        "Add memory-mapped (MMAP) execution configurations to speed up IO"
-      ],
-      resources: [
-        { label: "Modern CMake Reference", url: "https://cliutils.gitlab.io/modern-cmake/" },
-        { label: "SQLite C/C++ API Introduction", url: "https://www.sqlite.org/cintro.html" }
-      ]
-    };
-  }
-  return {
-    theme: "default",
-    label: "Production System API Architecture",
-    subtasks: [
-      "Set up distributed Rate Limiting middleware via Token Bucket",
-      "Deploy secure JWT session tokens with asymmetric RS256 keys",
-      "Structure telemetry logging utilizing JSON trace instrumentation",
-      "Establish graceful server cleanup hooks listening on SIGTERM"
-    ],
-    resources: [
-      { label: "OWASP API Security Risks", url: "https://owasp.org/www-project-api-security/" },
-      { label: "Graceful Shutdown Best Practices", url: "https://nodejs.org/api/process.html#process_event_sigterm" }
-    ]
-  };
 }
 
 function CacheBlueprint() {
@@ -1590,341 +1647,6 @@ function DefaultBlueprint() {
   );
 }
 
-function VedaBlueprint({ theme }: { theme: "cache" | "ats" | "obsidian" | "sqlite" | "array" | "react" | "api" | "default" }) {
-  return (
-    <div className="w-full h-full min-h-[120px] flex items-center justify-center">
-      {theme === "cache" && <CacheBlueprint />}
-      {theme === "ats" && <AtsBlueprint />}
-      {theme === "obsidian" && <ObsidianBlueprint />}
-      {theme === "sqlite" && <SqliteBlueprint />}
-      {theme === "array" && <ArrayBlueprint />}
-      {theme === "react" && <ReactBlueprint />}
-      {theme === "api" && <ApiBlueprint />}
-      {theme === "default" && <DefaultBlueprint />}
-    </div>
-  );
-}
-
-function TaskCard({
-  task,
-  featured,
-  isActive = false,
-  isLocked = false,
-  onToggle,
-  onStart,
-  delay
-}: {
-  task: RoadmapTask;
-  featured: boolean;
-  isActive?: boolean;
-  isLocked?: boolean;
-  onToggle: () => void;
-  onStart: () => void;
-  delay: number;
-}) {
-  const isDone = task.status === "completed";
-  const [isExpanded, setIsExpanded] = useState(false);
-  const richData = useMemo(() => {
-    const defaultData = getTaskRichData(task.title);
-    return {
-      theme: defaultData.theme,
-      label: defaultData.label,
-      subtasks: task.subtasks && task.subtasks.length > 0 ? task.subtasks : defaultData.subtasks,
-      resources: task.resources && task.resources.length > 0 ? task.resources : defaultData.resources
-    };
-  }, [task.title, task.subtasks, task.resources]);
-
-  const [checkedSubtasks, setCheckedSubtasks] = useState<boolean[]>([]);
-
-  useEffect(() => {
-    setCheckedSubtasks(
-      richData.subtasks.map((_, idx) => {
-        const saved = localStorage.getItem(`studybuddy-task-${task.id}-sub-${idx}`);
-        return saved === "true";
-      })
-    );
-  }, [task.id, richData.subtasks]);
-
-  const toggleSubtask = (idx: number) => {
-    const nextStates = [...checkedSubtasks];
-    nextStates[idx] = !nextStates[idx];
-    setCheckedSubtasks(nextStates);
-    localStorage.setItem(`studybuddy-task-${task.id}-sub-${idx}`, nextStates[idx] ? "true" : "false");
-  };
-
-  const Icon = {
-    learn: BookOpen,
-    practice: Zap,
-    revise: RefreshCw,
-    project: Layers3
-  }[task.type] || BookOpen;
-
-  return (
-    <Motion.div
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay }}
-      onClick={() => {
-        if (!isLocked) {
-          setIsExpanded(!isExpanded);
-        }
-      }}
-      className={cn(
-        "rounded-xl border p-4.5 transition-all duration-300 cursor-pointer select-none relative overflow-hidden",
-        featured ? "border-[#4e8ef0]/30 bg-[#0a1528]" : "border-white/10 bg-[#121620]/60 hover:border-white/20",
-        isDone && "border-[#2ec4a0]/20 bg-[#061f1a]/60"
-      )}
-    >
-      <div className="flex items-start gap-4">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggle();
-          }}
-          disabled={isLocked}
-          className={cn(
-            "mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border transition duration-200",
-            isDone 
-              ? "border-[#2ec4a0] bg-[#2ec4a0] text-slate-950" 
-              : isLocked 
-                ? "border-white/5 bg-white/[0.01] text-slate-600 cursor-not-allowed" 
-                : "border-white/15 text-slate-500 hover:border-[#2ec4a0] hover:text-[#2ec4a0]"
-          )}
-          aria-label={isDone ? "Mark task pending" : "Mark task complete"}
-        >
-          {isDone ? <CheckCircle2 size={15} /> : isLocked ? <Lock size={12} /> : <Circle size={13} />}
-        </button>
-
-        <div className="min-w-0 flex-1">
-          <div className="mb-2 flex flex-wrap items-center gap-2 text-[9px] font-bold font-mono">
-            <span className={cn("inline-flex items-center gap-1 rounded border px-2 py-0.5 uppercase tracking-wider", taskTypeClass(task.type))}>
-              <Icon size={11} />
-              {task.type}
-            </span>
-            <span className="text-slate-500">{task.durationMinutes}m</span>
-            {task.difficulty && (
-              <span className={cn("rounded border px-2 py-0.5 uppercase", difficultyClass(task.difficulty))}>
-                {task.difficulty}
-              </span>
-            )}
-          </div>
-          <h3 className={cn("text-sm font-bold leading-snug", isDone ? "text-slate-500 line-through font-normal" : "text-white")}>{task.title}</h3>
-          
-          {/* Active Time spent progress indicators */}
-          {isActive && !isDone && (
-            <div className="mt-3.5 space-y-2">
-              <div className="flex items-center justify-between text-xs text-brand-light font-semibold">
-                <span className="flex items-center gap-1"><Clock size={12} className="animate-spin" /> You've done 42 min</span>
-                <span>1 hour planned</span>
-              </div>
-              <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
-                <div className="h-full bg-brand rounded-full animate-[pulse_2s_infinite]" style={{ width: "70%" }} />
-              </div>
-            </div>
-          )}
-
-          {isLocked && (
-            <p className="mt-1.5 text-xs text-slate-500 italic">
-              Unlock after previous task completes
-            </p>
-          )}
-
-          {task.aiHint && !isDone && !isLocked && (
-            <p className="mt-2 line-clamp-2 text-xs italic leading-relaxed text-slate-500">Veda: "{task.aiHint}"</p>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2 shrink-0 self-start">
-          {!isDone && !isLocked && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onStart();
-              }}
-              className="hidden shrink-0 items-center gap-1 rounded-lg border border-[#a07ee0]/25 bg-[#150f28] px-3 py-2 text-[10px] font-black uppercase tracking-widest text-[#a07ee0] transition hover:bg-[#7c5cbf] hover:text-white sm:inline-flex"
-            >
-              Start
-              <ArrowRight size={12} />
-            </button>
-          )}
-          
-          {!isLocked && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsExpanded(!isExpanded);
-              }}
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-slate-400 hover:text-white hover:border-white/20 transition-all duration-200"
-              aria-label={isExpanded ? "Collapse card details" : "Expand card details"}
-            >
-              {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-            </button>
-          )}
-        </div>
-      </div>
-
-      <AnimatePresence>
-        {isExpanded && !isLocked && (
-          <Motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: "easeInOut" }}
-            onClick={(e) => e.stopPropagation()}
-            className="overflow-hidden"
-          >
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-6 mt-5 pt-5 border-t border-white/[0.06]">
-              {/* Left Column: checklist and docs */}
-              <div className="space-y-5">
-                <div>
-                  <p className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-slate-500 mb-3">
-                    IMPLEMENTATION CHECKLIST
-                  </p>
-                  <div className="space-y-2.5">
-                    {richData.subtasks.map((sub, idx) => {
-                      const isSubDone = checkedSubtasks[idx];
-                      return (
-                        <button
-                          key={idx}
-                          onClick={() => toggleSubtask(idx)}
-                          className={cn(
-                            "w-full flex items-start gap-3 rounded-lg border p-3 text-left transition duration-200 text-xs",
-                            isSubDone
-                              ? "border-emerald-500/10 bg-emerald-500/[0.01] text-slate-500"
-                              : "border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.03] text-slate-300"
-                          )}
-                        >
-                          <div className={cn(
-                            "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border transition duration-200",
-                            isSubDone ? "border-emerald-500 bg-emerald-500 text-slate-950" : "border-white/20 text-slate-500"
-                          )}>
-                            {isSubDone && <CheckCircle2 size={11} />}
-                          </div>
-                          <span className={cn(
-                            "leading-relaxed font-medium",
-                            isSubDone && "line-through text-slate-600"
-                          )}>
-                            {sub}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div>
-                  <p className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-slate-500 mb-3">
-                    EXTERNAL DOCUMENTATION
-                  </p>
-                  <div className="flex flex-wrap gap-2.5">
-                    {richData.resources.map((res, idx) => (
-                      <a
-                        key={idx}
-                        href={res.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-300 hover:text-white px-3.5 py-2 transition-all duration-200"
-                      >
-                        <Compass size={12} className="text-slate-400" />
-                        {res.label}
-                        <ExternalLink size={10} className="text-slate-500" />
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column: Blueprint */}
-              <div className="flex flex-col rounded-xl border border-white/[0.05] bg-[#030712]/30 p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="font-mono text-[8px] font-black uppercase tracking-[0.16em] text-slate-500">
-                    VEDA BLUEPRINT
-                  </span>
-                  <span className="text-[9px] font-mono font-bold text-brand-light bg-brand/10 px-2 py-0.5 rounded border border-brand/20 uppercase tracking-widest">
-                    {richData.theme}
-                  </span>
-                </div>
-                <div className="flex-1 rounded-lg border border-white/[0.04] bg-[#07090d]/60 p-2 overflow-hidden flex items-center justify-center">
-                  <VedaBlueprint theme={richData.theme} />
-                </div>
-              </div>
-            </div>
-          </Motion.div>
-        )}
-      </AnimatePresence>
-    </Motion.div>
-  );
-}
-
-function InsightCard({ insight, onAction }: { insight: RoadmapInsight; onAction: () => void }) {
-  const Icon = {
-    behavior: Flame,
-    performance: TrendingUp,
-    market: BarChart3,
-    recommendation: Sparkles
-  }[insight.type] || Sparkles;
-
-  return (
-    <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-      <div className="flex items-start gap-3.5">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/[0.04] text-slate-400">
-          <Icon size={15} />
-        </div>
-        <div className="min-w-0">
-          <p className="text-xs leading-relaxed text-slate-400">{insight.message}</p>
-          {insight.actionLabel && (
-            <button onClick={onAction} className="mt-2.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#a07ee0] hover:text-white transition-colors duration-200">
-              {insight.actionLabel} →
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function WeekPlanner({ completed, total }: { completed: number; total: number }) {
-  const days = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
-  const todayIndex = (new Date().getDay() + 6) % 7;
-  const completedRatio = total ? completed / total : 0;
-
-  return (
-    <div className="grid grid-cols-7 gap-2.5 p-4 sm:p-5">
-      {days.map((day, index) => {
-        const isPast = index < todayIndex;
-        const isToday = index === todayIndex;
-        const isDone = isPast && completedRatio > index / 7;
-        return (
-          <button
-            key={day}
-            className={cn(
-              "rounded-xl border p-3 text-center transition hover:border-white/20 duration-200",
-              isToday ? "border-[#a07ee0]/45 bg-[#150f28]" : isDone ? "border-[#2ec4a0]/30 bg-[#061f1a]" : "border-white/10 bg-[#121620]"
-            )}
-          >
-            <p className="font-mono text-[9px] font-bold text-slate-500 leading-none">{day}</p>
-            <p className={cn("mt-2.5 font-mono text-sm font-bold leading-none", isToday ? "text-[#a07ee0]" : isDone ? "text-[#2ec4a0]" : "text-slate-400")}>
-              {index + 1}
-            </p>
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-function QuickAction({ icon: Icon, label, onClick }: { icon: typeof Brain; label: string; onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className="flex flex-col items-center gap-2 rounded-xl border border-white/10 bg-white/5 p-3 text-slate-500 transition hover:border-[#a07ee0]/40 hover:text-[#a07ee0] duration-200"
-    >
-      <Icon size={16} />
-      <span className="text-[9px] font-bold uppercase tracking-wider">{label}</span>
-    </button>
-  );
-}
-
 function LoadingState() {
   return (
     <div className="flex flex-col items-center justify-center py-32 text-center relative">
@@ -2034,18 +1756,18 @@ function stateBadgeClass(state: "done" | "active" | "locked") {
 
 function taskTypeClass(type: RoadmapTask["type"]) {
   return {
-    learn: "border-[#4e8ef0]/25 bg-[#0a1528] text-[#4e8ef0]",
-    practice: "border-[#a07ee0]/25 bg-[#150f28] text-[#a07ee0]",
-    revise: "border-[#c9a84c]/25 bg-[#1c1608] text-[#c9a84c]",
-    project: "border-[#2ec4a0]/25 bg-[#061f1a] text-[#2ec4a0]"
+    learn: "border-[#4e8ef0]/20 bg-[#0a1528]/80 text-[#4e8ef0]",
+    practice: "border-[#a07ee0]/20 bg-[#150f28]/80 text-[#a07ee0]",
+    revise: "border-[#c9a84c]/20 bg-[#1c1608]/80 text-[#c9a84c]",
+    project: "border-[#2ec4a0]/20 bg-[#061f1a]/80 text-[#2ec4a0]"
   }[type];
 }
 
 function difficultyClass(difficulty: RoadmapTask["difficulty"]) {
   return {
-    easy: "bg-[#061f1a] text-[#2ec4a0]",
-    medium: "bg-[#1c1608] text-[#c9a84c]",
-    hard: "bg-[#200e0e] text-[#e05555]"
+    easy: "border-success/15 bg-[#061f1a] text-success",
+    medium: "border-warning/15 bg-[#1c1608] text-warning",
+    hard: "border-red-500/15 bg-[#200e0e] text-red-400"
   }[difficulty];
 }
 
@@ -2068,4 +1790,177 @@ function handleInsightAction(
     return;
   }
   void handleCopilotAction(`Regarding this roadmap insight: "${insight.message}". Help me complete the action: ${insight.actionLabel || "next step"}.`);
+}
+
+function getTaskRichTheme(title: string): "cache" | "ats" | "obsidian" | "sqlite" | "array" | "react" | "api" | "default" {
+  return getTaskRichData(title).theme;
+}
+
+function getTaskRichData(title: string): TaskRichData {
+  const t = title.toLowerCase();
+  if (t.includes("cache") || t.includes("redis") || t.includes("in-memory") || t.includes("eviction") || t.includes("memcached") || t.includes("key-value")) {
+    return {
+      theme: "cache",
+      label: "Caching & In-Memory Storage",
+      subtasks: [
+        "Initialize connection pool & configure client retry backoffs",
+        "Implement Cache-Aside read/write serialization logic",
+        "Set custom TTL rules & define LRU eviction policy limits",
+        "Benchmark database response query latency improvements"
+      ],
+      resources: [
+        { label: "Redis Command Reference", url: "https://redis.io/commands/" },
+        { label: "High-Performance Caching Guide", url: "https://systemdesign.one/caching-system-design/" }
+      ]
+    };
+  }
+  if (t.includes("array") || t.includes("list") || t.includes("vector") || t.includes("sorting") || t.includes("binary") || t.includes("search") || t.includes("tree") || t.includes("graph") || t.includes("dsa") || t.includes("stack") || t.includes("queue") || t.includes("traverse") || t.includes("traversing")) {
+    return {
+      theme: "array",
+      label: "Data Structure & Complexity Optimization",
+      subtasks: [
+        "Implement continuous memory allocation array resizing",
+        "Optimize direct element lookup index search times to O(1)",
+        "Write edge-case tests validating array index boundaries",
+        "Profile memory footprint differences vs linked pointer items"
+      ],
+      resources: [
+        { label: "DSA Space-Time Complexity CheatSheet", url: "https://www.bigocheatsheet.com/" },
+        { label: "JavaScript TypedArrays", url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Typed_arrays" }
+      ]
+    };
+  }
+  if (t.includes("react") || t.includes("frontend") || t.includes("ui") || t.includes("component") || t.includes("dom") || t.includes("css") || t.includes("html") || t.includes("rendering") || t.includes("view")) {
+    return {
+      theme: "react",
+      label: "React Component & State Reconciliation",
+      subtasks: [
+        "Design modular reusable component elements & state scopes",
+        "Implement React.memo & useMemo to avoid excessive repaints",
+        "Wire up structural responsive grid containers and animations",
+        "Profile Virtual DOM reconciliation diff checks using DevTools"
+      ],
+      resources: [
+        { label: "React Rendering Internals", url: "https://react.dev/learn/render-and-commit" },
+        { label: "Virtual DOM Concepts", url: "https://developer.mozilla.org/en-US/docs/Glossary/Virtual_DOM" }
+      ]
+    };
+  }
+  if (t.includes("api") || t.includes("http") || t.includes("rest") || t.includes("server") || t.includes("route") || t.includes("controller") || t.includes("express") || t.includes("node") || t.includes("endpoint") || t.includes("backend")) {
+    return {
+      theme: "api",
+      label: "REST API Endpoint Routers & Middleware",
+      subtasks: [
+        "Structure endpoint routes with proper HTTP verb matching",
+        "Implement request validation schemas & structured JSON returns",
+        "Establish connection pools to query backend repositories",
+        "Write integration tests to assert status codes (e.g. 200, 404)"
+      ],
+      resources: [
+        { label: "MDN HTTP Status Registry", url: "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status" },
+        { label: "Express.js Routing Guide", url: "https://expressjs.com/en/guide/routing.html" }
+      ]
+    };
+  }
+  if (t.includes("ats") || t.includes("resume") || t.includes("parser") || t.includes("matching") || t.includes("similarity") || t.includes("cosine") || t.includes("nlp") || t.includes("vector") || t.includes("embedding")) {
+    return {
+      theme: "ats",
+      label: "AI Semantic Vector Parsing",
+      subtasks: [
+        "Write PDF / docx parser script utilizing native streams",
+        "Generate tf-idf frequency counts or dense embedding vectors",
+        "Code cosine similarity dot product math comparison logic",
+        "Map matched keywords onto clinical gap matrix outputs"
+      ],
+      resources: [
+        { label: "Vector Embeddings Guide", url: "https://openaipandas.github.io/" },
+        { label: "ATS Matching Best Practices", url: "https://vireup.com/resume-parser-api-documentation/" }
+      ]
+    };
+  }
+  if (t.includes("obsidian") || t.includes("note") || t.includes("graph") || t.includes("vault") || t.includes("atomic") || t.includes("markdown") || t.includes("link")) {
+    return {
+      theme: "obsidian",
+      label: "Zettelkasten Atomic Notes Graph",
+      subtasks: [
+        "Deconstruct master notes into single-concept atomic files",
+        "Format cross-reference indexing using [[Wikilink]] syntax",
+        "Build dynamic Graph MOCs (Maps of Content) directories",
+        "Verify node graph clusters reflect personal knowledge growth"
+      ],
+      resources: [
+        { label: "Zettelkasten Method Intro", url: "https://zettelkasten.de/introduction/" },
+        { label: "Obsidian Vault Structure", url: "https://help.obsidian.md/Getting+started" }
+      ]
+    };
+  }
+  if (t.includes("c++") || t.includes("cmake") || t.includes("sqlite") || t.includes("database") || t.includes("compile") || t.includes("transaction") || t.includes("sql") || t.includes("query")) {
+    return {
+      theme: "sqlite",
+      label: "C++ SQLite & Modern CMake Toolchain",
+      subtasks: [
+        "Write CMake FetchContent blocks to resolve SQLite dependencies",
+        "Enable Write-Ahead Logging (WAL) journal configuration modes",
+        "Implement thread-safe query transaction wrappers & prepared bindings",
+        "Add memory-mapped (MMAP) execution configurations to speed up IO"
+      ],
+      resources: [
+        { label: "Modern CMake Reference", url: "https://cliutils.gitlab.io/modern-cmake/" },
+        { label: "SQLite C/C++ API Introduction", url: "https://www.sqlite.org/cintro.html" }
+      ]
+    };
+  }
+  return {
+    theme: "default",
+    label: "Production System API Architecture",
+    subtasks: [
+      "Set up distributed Rate Limiting middleware via Token Bucket",
+      "Deploy secure JWT session tokens with asymmetric RS256 keys",
+      "Structure telemetry logging utilizing JSON trace instrumentation",
+      "Establish graceful server cleanup hooks listening on SIGTERM"
+    ],
+    resources: [
+      { label: "OWASP API Security Risks", url: "https://owasp.org/www-project-api-security/" },
+      { label: "Graceful Shutdown Best Practices", url: "https://nodejs.org/api/process.html#process_event_sigterm" }
+    ]
+  };
+}
+
+function InsightCard({ insight, onAction }: { insight: RoadmapInsight; onAction: () => void }) {
+  const Icon = {
+    behavior: Flame,
+    performance: TrendingUp,
+    market: BarChart3,
+    recommendation: Sparkles
+  }[insight.type] || Sparkles;
+
+  return (
+    <div className="rounded-xl border border-white/5 bg-[#05070a]/60 p-4 hover:border-white/10 transition-colors duration-200">
+      <div className="flex items-start gap-3.5">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/[0.03] text-slate-400">
+          <Icon size={14} />
+        </div>
+        <div className="min-w-0">
+          <p className="text-xs leading-relaxed text-slate-400">{insight.message}</p>
+          {insight.actionLabel && (
+            <button onClick={onAction} className="mt-2.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#a07ee0] hover:text-white transition-colors duration-200">
+              {insight.actionLabel} →
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function QuickAction({ icon: Icon, label, onClick }: { icon: any; label: string; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex flex-col items-center gap-2 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] p-3 text-slate-500 hover:text-[#a07ee0] hover:border-[#a07ee0]/30 transition duration-200"
+    >
+      <Icon size={15} />
+      <span className="text-[8px] font-bold uppercase tracking-wider">{label}</span>
+    </button>
+  );
 }
