@@ -518,7 +518,7 @@ export function RoadmapWorkspace() {
                 )}
 
                 {/* A. CURRENT MISSION PANEL */}
-                <section className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#07090d]/80 p-6 sm:p-8 backdrop-blur-xl shadow-premium">
+                <section id="execution-tasks" className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#07090d]/80 p-6 sm:p-8 backdrop-blur-xl shadow-premium scroll-mt-6">
                   <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand/35 to-transparent" />
                   
                   {/* Card Title & Progress Indicator */}
@@ -874,7 +874,17 @@ export function RoadmapWorkspace() {
                           <InsightCard
                             key={`${insight.message}-${index}`}
                             insight={insight}
-                            onAction={() => handleInsightAction(insight, navigate, handleCopilotAction)}
+                            onAction={() => {
+                              const label = insight.actionLabel?.toLowerCase() || "";
+                              if (label.includes("schedule") || label.includes("task")) {
+                                setCurrentView("execution");
+                                setTimeout(() => {
+                                  document.getElementById("execution-tasks")?.scrollIntoView({ behavior: "smooth" });
+                                }, 80);
+                                return;
+                              }
+                              handleInsightAction(insight, navigate, handleCopilotAction);
+                            }}
                           />
                         ))
                       ) : (
