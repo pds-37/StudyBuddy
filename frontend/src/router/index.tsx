@@ -11,7 +11,7 @@ const CopilotPage = lazy(() => import("../pages/CopilotPage").then(m => ({ defau
 const CompaniesPage = lazy(() => import("../pages/CompaniesPage").then(m => ({ default: m.CompaniesPage })));
 const CompanyTypeDetailPage = lazy(() => import("../pages/CompanyTypeDetailPage").then(m => ({ default: m.CompanyTypeDetailPage })));
 const DashboardPage = lazy(() => import("../pages/DashboardPage").then(m => ({ default: m.DashboardPage })));
-const DemoPage = lazy(() => import("../pages/DemoPage").then(m => ({ default: m.DemoPage })));
+
 const JobsPage = lazy(() => import("../pages/JobsPage").then(m => ({ default: m.JobsPage })));
 const LandingPage = lazy(() => import("../pages/LandingPage").then(m => ({ default: m.LandingPage })));
 const NotFoundPage = lazy(() => import("../pages/NotFoundPage").then(m => ({ default: m.NotFoundPage })));
@@ -53,7 +53,7 @@ export function AppRouter() {
         <Route element={<MarketingLayout />}>
           <Route index element={<LandingPage />} />
           <Route path="/pricing" element={<PricingPage />} />
-          <Route path="/demo" element={<DemoPage />} />
+
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/blog" element={<BlogPage />} />

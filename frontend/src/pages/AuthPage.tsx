@@ -414,14 +414,7 @@ export function AuthPage() {
             </button>
           </Motion.div>
 
-          {/* Try Demo link under the form like a real native app testing link */}
-          <Motion.div variants={itemVariants} className="mt-8 text-center">
-            <Link to="/demo" className="inline-flex items-center text-[11px] font-medium text-brand/70 hover:text-brand transition-colors bg-brand/5 px-3 py-1 rounded-full border border-brand/10">
-              <Sparkles size={10} className="mr-1.5" />
-              Try recruiter demo
-              <ArrowRight size={10} className="ml-1.5" />
-            </Link>
-          </Motion.div>
+
 
         </Motion.div>
       </div>

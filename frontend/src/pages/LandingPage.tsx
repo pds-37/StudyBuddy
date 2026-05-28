@@ -239,7 +239,6 @@ export function LandingPage() {
           <li><a href="#">About</a></li>
         </ul>
         <div className="nav-r">
-          <Link to="/demo" className="btn-ghost" style={{textDecoration:'none'}}>Demo</Link>
           <Link to="/auth" className="btn-ghost" style={{textDecoration:'none'}}>Log in</Link>
           <Link to={startPath} className="btn-nav" style={{textDecoration:'none'}}>Get Started Free →</Link>
         </div>
@@ -429,7 +428,6 @@ export function LandingPage() {
         <p className="cta-sub reveal">Join 50,000+ students who are building their future with StudyBuddy.</p>
         <div className="cta-btns reveal">
           <Link to={startPath} className="btn-cta-p" style={{textDecoration:'none'}}>Start for Free →</Link>
-          <Link to="/demo" className="btn-cta-s" style={{textDecoration:'none'}}>✦ Try Recruiter Demo</Link>
         </div>
       </div>
 
