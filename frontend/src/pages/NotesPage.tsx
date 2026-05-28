@@ -25,6 +25,7 @@ import {
   NoteDetailPanel
 } from "../features/notes/components/KnowledgeComponents";
 import type { ContradictionItem } from "../lib/api/notes";
+import type { CareerNote } from "@studybuddy/shared";
 
 const collections = [
   { id: "all", label: "All Knowledge", icon: BookOpen, color: "text-slate-400" },
@@ -52,12 +53,7 @@ export function NotesPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [learningText, setLearningText] = useState("");
   const [newNote, setNewNote] = useState({ title: "", content: "", topic: "", tags: [] as string[] });
-  const [automatedNote, setAutomatedNote] = useState<{
-    id: string;
-    title: string;
-    cardCount: number;
-    nextReviewAt?: string;
-  } | null>(null);
+  const [automatedNote, setAutomatedNote] = useState<CareerNote | null>(null);
 
   // Load everything on mount
   useEffect(() => {
@@ -86,12 +82,7 @@ export function NotesPage() {
       ...newNote,
       tags: typeof newNote.tags === 'string' ? (newNote.tags as unknown as string).split(',').map((t: string) => t.trim()) : newNote.tags
     });
-    setAutomatedNote({
-      id: created.id,
-      title: created.title,
-      cardCount: created.metadata?.flashcards?.length ?? 0,
-      nextReviewAt: created.nextReviewAt
-    });
+    setAutomatedNote(created);
     setIsCreateModalOpen(false);
     setNewNote({ title: "", content: "", topic: "", tags: [] });
     // Refresh intelligence data after creating
@@ -106,12 +97,7 @@ export function NotesPage() {
     const text = learningText.trim();
     if (!text) return;
     const created = await ingestLearning(text);
-    setAutomatedNote({
-      id: created.id,
-      title: created.title,
-      cardCount: created.metadata?.flashcards?.length ?? 0,
-      nextReviewAt: created.nextReviewAt
-    });
+    setAutomatedNote(created);
     setLearningText("");
     setTimeout(() => {
       void fetchKnowledgeHealth();
@@ -126,12 +112,7 @@ export function NotesPage() {
 
     try {
       const created = await uploadStudyMaterial(file);
-      setAutomatedNote({
-        id: created.id,
-        title: created.title,
-        cardCount: created.metadata?.flashcards?.length ?? 0,
-        nextReviewAt: created.nextReviewAt
-      });
+      setAutomatedNote(created);
       e.target.value = '';
 
       setTimeout(() => {
@@ -298,8 +279,8 @@ export function NotesPage() {
               <div>
                 <p className="text-sm font-semibold text-white">Recall automation is ready for “{automatedNote.title}”</p>
                 <p className="mt-1 text-xs text-slate-400">
-                  {automatedNote.cardCount > 0
-                    ? `${automatedNote.cardCount} flashcards were generated and scheduled for review.`
+                  {(automatedNote.metadata?.flashcards?.length ?? 0) > 0
+                    ? `${automatedNote.metadata?.flashcards?.length} flashcards were generated and scheduled for review.`
                     : "A focused recall prompt was scheduled from this note."}
                   {automatedNote.nextReviewAt ? ` Next review: ${new Date(automatedNote.nextReviewAt).toLocaleString()}.` : ""}
                 </p>
@@ -308,10 +289,13 @@ export function NotesPage() {
             <div className="flex gap-2">
               <button
                 type="button"
-                onClick={() => setAutomatedNote(null)}
-                className="rounded-lg border border-white/[0.08] px-4 py-2 text-xs font-semibold text-slate-400 transition hover:bg-white/[0.05] hover:text-white"
+                onClick={() => {
+                  setActiveNote(automatedNote);
+                  setAutomatedNote(null);
+                }}
+                className="rounded-lg border border-brand/30 text-brand px-4 py-2 text-xs font-semibold hover:bg-brand/10 transition flex items-center gap-1.5"
               >
-                Dismiss
+                <BookOpen size={12} /> View Note
               </button>
               <button
                 type="button"
@@ -319,6 +303,13 @@ export function NotesPage() {
                 className="premium-button rounded-lg px-4 py-2 text-xs font-bold"
               >
                 Start recall now
+              </button>
+              <button
+                type="button"
+                onClick={() => setAutomatedNote(null)}
+                className="rounded-lg border border-white/[0.08] px-4 py-2 text-xs font-semibold text-slate-400 transition hover:bg-white/[0.05] hover:text-white"
+              >
+                Dismiss
               </button>
             </div>
           </div>

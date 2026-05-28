@@ -125,7 +125,8 @@ function localMentorResponse(messages: CopilotMessage[], userContext: string) {
 
   return {
     content: [
-      `## ${focus}`,
+      `> [!WARNING]\n> **Veda AI Offline Fallback Protocol Active**\n> All configured remote AI providers (Groq, Gemini, HuggingFace) failed to complete the request (usually due to a missing or invalid API Key). To experience Veda's full cognitive intelligence, SDE mentors, and custom interactive roadmaps, please verify that your keys are correctly defined inside your \`backend/.env\` file.`,
+      `## Topic Analysis: ${focus}`,
       hasNotes
         ? "I found relevant notes in your workspace context, so I’ll use those as the starting point and add a little general structure around them."
         : "I do not have a live model key available, so this is a local structured fallback answer.",

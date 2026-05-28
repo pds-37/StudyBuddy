@@ -1,4 +1,5 @@
-import { motion as Motion } from "framer-motion";
+import { useState } from "react";
+import { motion as Motion, AnimatePresence } from "framer-motion";
 import {
   Brain,
   Sparkles,
@@ -279,7 +280,7 @@ export function IntelligentNoteCard({ note, onAction }: { note: CareerNote; onAc
           onClick={(e) => { e.stopPropagation(); onAction('detail'); }}
           className="py-2 bg-white/[0.04] text-slate-400 text-[10px] font-semibold hover:bg-white/10 hover:text-white transition-colors flex items-center justify-center gap-1.5"
         >
-          <Sparkles size={11} /> Insights
+          <BookOpen size={11} /> View Note
         </button>
       </div>
     </Motion.div>
@@ -474,16 +475,17 @@ export function NoteDetailPanel({ note, onClose }: {
   onClose: () => void;
 }) {
   const metadata = note.metadata;
+  const [activeTab, setActiveTab] = useState<'content' | 'insights'>('content');
 
   return (
     <Motion.div
-      initial={{ x: 400, opacity: 0 }}
+      initial={{ x: 450, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      exit={{ x: 400, opacity: 0 }}
+      exit={{ x: 450, opacity: 0 }}
       transition={{ type: "spring", damping: 30, stiffness: 300 }}
-      className="fixed top-0 right-0 bottom-0 w-full max-w-lg z-50 glass-panel border-l border-border overflow-y-auto"
+      className="fixed top-0 right-0 bottom-0 w-full max-w-xl z-50 glass-panel border-l border-border overflow-y-auto"
     >
-      <div className="p-8 space-y-8">
+      <div className="p-8 space-y-7">
         {/* Header */}
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
@@ -495,113 +497,193 @@ export function NoteDetailPanel({ note, onClose }: {
             <h2 className="text-lg font-semibold text-white mb-1">{note.title}</h2>
             <p className="text-xs text-slate-500">{note.topic || "Uncategorized"}</p>
           </div>
-          <button onClick={onClose} className="text-slate-500 hover:text-white transition-colors p-1">
+          <button onClick={onClose} className="text-slate-500 hover:text-white transition-colors p-1" aria-label="Close panel">
             <XCircle size={18} />
           </button>
         </div>
 
-        {/* Summary */}
-        {metadata?.summary && (
-          <div className="space-y-2">
-            <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">AI Summary</h3>
-            <p className="text-xs text-slate-300 leading-relaxed">{metadata.summary}</p>
-          </div>
-        )}
-
-        {/* Concepts */}
-        {note.concepts.length > 0 && (
-          <div className="space-y-2">
-            <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Concepts</h3>
-            <div className="flex flex-wrap gap-2">
-              {note.concepts.map((c, i) => (
-                <span key={i} className="px-2.5 py-1 bg-brand/10 text-brand text-[10px] font-medium border border-brand/20">
-                  {c}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Interview Relevance */}
-        {metadata?.interviewRelevance && (
-          <div className="space-y-3">
-            <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Interview Relevance</h3>
-            <div className="flex items-center gap-3 mb-2">
-              <span className={cn(
-                "text-[9px] font-bold uppercase px-2 py-0.5",
-                metadata.interviewRelevance.frequency === "high" ? "bg-purple-500/20 text-purple-400" :
-                metadata.interviewRelevance.frequency === "medium" ? "bg-cyan-500/20 text-cyan-400" :
-                "bg-transparent0/20 text-slate-400"
-              )}>
-                {metadata.interviewRelevance.frequency} frequency
-              </span>
-              <span className="text-[10px] text-slate-500">
-                Importance: {metadata.interviewRelevance.importance}/100
-              </span>
-            </div>
-            {metadata.interviewRelevance.usageContext && (
-              <p className="text-[11px] text-slate-400 leading-relaxed">{metadata.interviewRelevance.usageContext}</p>
+        {/* Sliding Tabs Selection */}
+        <div className="relative flex rounded-lg bg-white/[0.03] p-1 border border-white/[0.05] z-10">
+          <button
+            type="button"
+            onClick={() => setActiveTab('content')}
+            className={cn(
+              "relative flex-1 py-1.5 text-center text-[10px] font-black uppercase tracking-wider transition-colors duration-200 z-10 rounded-md",
+              activeTab === 'content' ? "text-slate-950 font-bold" : "text-slate-400 hover:text-slate-200"
             )}
-            {metadata.interviewRelevance.commonQuestions?.length > 0 && (
-              <div className="space-y-1.5 mt-2">
-                <p className="text-[9px] font-bold text-slate-400 uppercase">Common Questions:</p>
-                {metadata.interviewRelevance.commonQuestions.map((q: string, i: number) => (
-                  <p key={i} className="text-[10px] text-slate-400 pl-3 border-l-2 border-purple-500/30">{q}</p>
-                ))}
-              </div>
+          >
+            {activeTab === 'content' && (
+              <Motion.div
+                layoutId="activeDetailTab"
+                className="absolute inset-0 rounded-md bg-white shadow-[0_2px_8px_rgba(255,255,255,0.15)] -z-10"
+                transition={{ type: "spring", stiffness: 380, damping: 30 }}
+              />
             )}
-            {metadata.interviewRelevance.realWorldUsage?.length > 0 && (
-              <div className="space-y-1.5 mt-2">
-                <p className="text-[9px] font-bold text-slate-400 uppercase">Real-World Usage:</p>
-                {metadata.interviewRelevance.realWorldUsage.map((u: string, i: number) => (
-                  <p key={i} className="text-[10px] text-slate-400 pl-3 border-l-2 border-emerald-500/30">{u}</p>
-                ))}
-              </div>
+            📖 Original Content
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('insights')}
+            className={cn(
+              "relative flex-1 py-1.5 text-center text-[10px] font-black uppercase tracking-wider transition-colors duration-200 z-10 rounded-md",
+              activeTab === 'insights' ? "text-slate-950 font-bold" : "text-slate-400 hover:text-slate-200"
             )}
-          </div>
-        )}
-
-        {/* Execution Tasks */}
-        {(metadata?.executionTasks?.length ?? 0) > 0 && (
-          <div className="space-y-2">
-            <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Practice Tasks</h3>
-            <div className="space-y-2">
-              {metadata!.executionTasks.map((task: any, i: number) => (
-                <div key={i} className="flex items-center gap-3 p-3 border border-white/[0.06] hover:border-white/15 transition-colors cursor-pointer">
-                  <Code size={14} className="text-cyan-400 shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[11px] font-medium text-slate-300 truncate">{task.title}</p>
-                    <p className="text-[9px] text-slate-400 capitalize">{task.type} · {task.difficulty}</p>
-                  </div>
-                  <ArrowRight size={12} className="text-slate-400" />
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Flashcards */}
-        {(metadata?.flashcards?.length ?? 0) > 0 && (
-          <div className="space-y-2">
-            <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-              Flashcards ({metadata!.flashcards.length})
-            </h3>
-            <div className="space-y-2">
-              {metadata!.flashcards.map((card: any, i: number) => (
-                <div key={i} className="p-3 border border-white/[0.06] space-y-1.5">
-                  <p className="text-[10px] font-semibold text-slate-300">Q: {card.question}</p>
-                  <p className="text-[10px] text-slate-500">A: {card.answer}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Full Content */}
-        <div className="space-y-2">
-          <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Full Note</h3>
-          <p className="text-xs text-slate-400 leading-relaxed whitespace-pre-wrap">{note.content}</p>
+          >
+            {activeTab === 'insights' && (
+              <Motion.div
+                layoutId="activeDetailTab"
+                className="absolute inset-0 rounded-md bg-white shadow-[0_2px_8px_rgba(255,255,255,0.15)] -z-10"
+                transition={{ type: "spring", stiffness: 380, damping: 30 }}
+              />
+            )}
+            🧠 Veda Insights
+          </button>
         </div>
+
+        <AnimatePresence mode="wait">
+          {activeTab === 'content' ? (
+            <Motion.div
+              key="content"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.15 }}
+              className="space-y-4 pt-1"
+            >
+              <div className="rounded-xl border border-white/[0.06] bg-slate-950/45 p-6 shadow-inner relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                  <FileText size={120} className="text-white" />
+                </div>
+                <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                  <FileText size={12} className="text-slate-400" />
+                  Extracted Material Text
+                </h3>
+                <p className="text-xs text-slate-200 leading-relaxed whitespace-pre-wrap font-mono antialiased max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar selection:bg-brand/35 selection:text-white">
+                  {note.content}
+                </p>
+              </div>
+            </Motion.div>
+          ) : (
+            <Motion.div
+              key="insights"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.15 }}
+              className="space-y-6 pt-1"
+            >
+              {/* Summary */}
+              {metadata?.summary && (
+                <div className="space-y-2 rounded-xl border border-white/[0.04] bg-white/[0.01] p-4">
+                  <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                    <Sparkles size={12} className="text-cyan-400" />
+                    AI Summary
+                  </h3>
+                  <p className="text-xs text-slate-300 leading-relaxed">{metadata.summary}</p>
+                </div>
+              )}
+
+              {/* Concepts */}
+              {note.concepts && note.concepts.length > 0 && (
+                <div className="space-y-2 rounded-xl border border-white/[0.04] bg-white/[0.01] p-4">
+                  <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                    <Brain size={12} className="text-brand" />
+                    Key Concepts Extracted
+                  </h3>
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {note.concepts.map((c, i) => (
+                      <span key={i} className="px-2.5 py-1 bg-brand/10 text-brand text-[10px] font-black border border-brand/20 rounded-md">
+                        {c}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Interview Relevance */}
+              {metadata?.interviewRelevance && (
+                <div className="space-y-3 rounded-xl border border-white/[0.04] bg-white/[0.01] p-4">
+                  <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                    <Target size={12} className="text-purple-400" />
+                    Interview Relevance
+                  </h3>
+                  <div className="flex items-center gap-3">
+                    <span className={cn(
+                      "text-[9px] font-black uppercase px-2 py-0.5 rounded border",
+                      metadata.interviewRelevance.frequency === "high" ? "bg-purple-500/10 text-purple-400 border-purple-500/20" :
+                      metadata.interviewRelevance.frequency === "medium" ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" :
+                      "bg-white/5 text-slate-400 border-white/10"
+                    )}>
+                      {metadata.interviewRelevance.frequency} frequency
+                    </span>
+                    <span className="text-[10px] font-bold text-slate-400">
+                      Importance: <span className="text-white">{metadata.interviewRelevance.importance}/100</span>
+                    </span>
+                  </div>
+                  {metadata.interviewRelevance.usageContext && (
+                    <p className="text-[11px] text-slate-400 leading-relaxed">{metadata.interviewRelevance.usageContext}</p>
+                  )}
+                  {metadata.interviewRelevance.commonQuestions?.length > 0 && (
+                    <div className="space-y-2 mt-2 pt-2 border-t border-white/[0.04]">
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider font-mono">Common Questions:</p>
+                      {metadata.interviewRelevance.commonQuestions.map((q: string, i: number) => (
+                        <p key={i} className="text-[10px] text-slate-300 pl-3 border-l-2 border-purple-500/30 leading-normal">{q}</p>
+                      ))}
+                    </div>
+                  )}
+                  {metadata.interviewRelevance.realWorldUsage?.length > 0 && (
+                    <div className="space-y-2 mt-2 pt-2 border-t border-white/[0.04]">
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider font-mono">Real-World Usage:</p>
+                      {metadata.interviewRelevance.realWorldUsage.map((u: string, i: number) => (
+                        <p key={i} className="text-[10px] text-slate-300 pl-3 border-l-2 border-emerald-500/30 leading-normal">{u}</p>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Execution Tasks */}
+              {(metadata?.executionTasks?.length ?? 0) > 0 && (
+                <div className="space-y-2">
+                  <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2 mb-3">
+                    <Code size={12} className="text-cyan-400" />
+                    Recommended Practice Tasks
+                  </h3>
+                  <div className="space-y-2">
+                    {metadata!.executionTasks.map((task: any, i: number) => (
+                      <div key={i} className="flex items-center gap-3 p-3.5 border border-white/[0.06] bg-white/[0.01] hover:border-cyan-500/20 hover:bg-white/[0.03] transition-all cursor-pointer rounded-xl">
+                        <Code size={14} className="text-cyan-400 shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[11px] font-semibold text-slate-200 truncate">{task.title}</p>
+                          <p className="text-[9px] font-bold text-slate-500 capitalize mt-0.5">{task.type} · {task.difficulty}</p>
+                        </div>
+                        <ArrowRight size={12} className="text-slate-400" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Flashcards */}
+              {(metadata?.flashcards?.length ?? 0) > 0 && (
+                <div className="space-y-3">
+                  <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2 mb-3">
+                    <HelpCircle size={12} className="text-amber-400" />
+                    Generated Flashcards ({metadata!.flashcards.length})
+                  </h3>
+                  <div className="space-y-3">
+                    {metadata!.flashcards.map((card: any, i: number) => (
+                      <div key={i} className="p-4 border border-white/[0.06] bg-slate-950/25 space-y-2 rounded-xl">
+                        <p className="text-[10px] font-black text-slate-200">Q: {card.question}</p>
+                        <p className="text-[10px] text-slate-500 leading-normal border-t border-white/[0.04] pt-2 mt-2">A: {card.answer}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </Motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </Motion.div>
   );
