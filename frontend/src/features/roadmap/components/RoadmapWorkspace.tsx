@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { motion as Motion } from "framer-motion";
+import { motion as Motion, AnimatePresence } from "framer-motion";
 import {
   AlertCircle,
   ArrowRight,
@@ -23,7 +23,9 @@ import {
   Sparkles,
   Target,
   TrendingUp,
-  Zap
+  Zap,
+  Clock,
+  ChevronRight
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useRoadmapsStore } from "../../../store/roadmaps-store";
@@ -58,6 +60,9 @@ export function RoadmapWorkspace() {
   const [activePhaseId, setActivePhaseId] = useState<string | null>(null);
   const [isExpansionOpen, setIsExpansionOpen] = useState(false);
   const [showAllTasks, setShowAllTasks] = useState(false);
+
+  // Tab View Toggle: "execution" (mockup dashboard) vs "curriculum" (full journey path)
+  const [currentView, setCurrentView] = useState<"execution" | "curriculum">("execution");
 
   useEffect(() => {
     void fetchRoadmaps();
@@ -97,9 +102,17 @@ export function RoadmapWorkspace() {
   const isOverloaded = currentRoadmap?.insights?.some((insight) =>
     /overwhelm|struggle|burnout|consistency/i.test(insight.message)
   );
-  const visibleTasks = (currentMission?.tasks || []).slice(0, showAllTasks ? undefined : isOverloaded ? 2 : TASK_LIMIT);
+
   const stats = useMemo(() => getRoadmapStats(currentRoadmap), [currentRoadmap]);
   const activePhaseIndex = currentRoadmap?.phases.findIndex((phase) => phase.id === activePhase?.id) ?? 0;
+
+  // Date variables for Execution Dashboard Header
+  const today = new Date();
+  const formattedDay = today.toLocaleDateString("en-US", { weekday: "long" });
+  const formattedDate = today.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+  const totalWeeks = currentRoadmap?.phases.reduce((acc, p) => acc + (p.estimatedWeeks || 1), 0) || 12;
+  const currentWeek = currentMission?.weekNumber || 1;
 
   const handleCopilotAction = async (prompt: string) => {
     setIsWidgetOpen(true);
@@ -125,10 +138,27 @@ export function RoadmapWorkspace() {
   }
   if (generating) return <GeneratingState />;
 
+  // Calculated mission tasks stats
+  const missionTasks = currentMission?.tasks || [];
+  const completedMissionTasks = missionTasks.filter(t => t.status === "completed").length;
+  const totalMissionTasks = missionTasks.length;
+  const missionDonePercent = totalMissionTasks ? Math.round((completedMissionTasks / totalMissionTasks) * 100) : 0;
+
+  // Dynamic calculations for hours
+  const hoursPlanned = (user as any)?.availableHours || 10;
+  const isActiveTaskNext = nextTask && pendingTasks.length > 0 && nextTask.id === pendingTasks[0]?.id;
+  const hoursCompleted = Number(((stats.completedTasks * 40 + (isActiveTaskNext ? 42 : 0)) / 60).toFixed(1));
+  const timeProgressPercent = Math.min(100, Math.round((hoursCompleted / hoursPlanned) * 100));
+
   return (
-    <div className="min-h-screen pb-16 text-slate-100">
-      <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_320px]">
-        <main className="min-w-0 space-y-5">
+    <div className="min-h-screen pb-16 text-slate-100 relative">
+      {/* Decorative Blur Backgrounds */}
+      <div className="absolute top-0 right-10 h-[500px] w-[500px] rounded-full bg-brand/5 blur-[160px] pointer-events-none" />
+      <div className="absolute bottom-10 left-10 h-[500px] w-[500px] rounded-full bg-accent/5 blur-[160px] pointer-events-none" />
+
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px] relative z-10">
+        <main className="min-w-0 space-y-6">
+          {/* Behavioral Burnout/Overload Intervention Alerts */}
           {currentRoadmap?.insights
             ?.filter((insight) => insight.type === "behavior")
             .map((insight, index) => (
@@ -140,210 +170,476 @@ export function RoadmapWorkspace() {
               />
             ))}
 
-          <section className="glass-panel overflow-hidden rounded-xl border border-white/10 bg-surface/80">
-            <div className="border-b border-white/10 px-4 py-3 sm:px-5">
-              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                <div className="flex min-w-0 items-center gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#a07ee0]/30 bg-[#150f28] text-[#a07ee0]">
-                    <Compass size={18} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-[#a07ee0]">
-                      Strategy OS · Intelligence Roadmap
-                    </p>
-                    <h1 className="mt-1 truncate text-2xl font-black tracking-tight text-white sm:text-3xl">
-                      Your path to {currentRoadmap?.targetRole || "career readiness"}
-                    </h1>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => setIsExpansionOpen(true)}
-                    className="inline-flex items-center gap-2 rounded-lg bg-[#7c5cbf] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#a07ee0]"
-                  >
-                    <Plus size={15} />
-                    Expand Direction
-                  </button>
-                  <button
-                    onClick={() => handleCopilotAction("Simplify my roadmap while keeping the same target role and strongest outcomes.")}
-                    className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-4 py-2 text-xs font-bold text-slate-300 transition hover:border-[#c9a84c]/50 hover:text-[#e2c47a]"
-                  >
-                    <Layers3 size={15} />
-                    Simplify
-                  </button>
-                  <button
-                    onClick={handleGenerate}
-                    disabled={generating}
-                    className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-4 py-2 text-xs font-bold text-slate-300 transition hover:border-[#2ec4a0]/50 hover:text-[#2ec4a0] disabled:cursor-wait disabled:opacity-60"
-                  >
-                    <RefreshCw size={15} className={cn(generating && "animate-spin")} />
-                    Regenerate
-                  </button>
-                </div>
-              </div>
+          {/* Premium Header Block */}
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 pb-2 border-b border-white/[0.06]">
+            <div>
+              <p className="font-mono text-xs font-bold text-slate-500 uppercase tracking-widest">
+                {formattedDay}, {formattedDate}
+              </p>
+              <h1 className="mt-1 text-3xl sm:text-4xl font-extrabold tracking-tight text-white font-display">
+                Your roadmap today
+              </h1>
+              <p className="mt-1.5 text-sm font-semibold text-slate-400 flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-brand animate-pulse" />
+                Week {currentWeek} of {totalWeeks} • {currentRoadmap?.targetRole || "Backend Engineering"}
+              </p>
             </div>
 
-            <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_280px]">
-              <div className="space-y-5 p-4 sm:p-5">
-                <p className="max-w-2xl text-sm leading-6 text-slate-400">
-                  Personalized for <span className="font-semibold text-slate-100">{user?.name || "you"}</span> using your pace,
-                  skill gaps, recall state, and target companies. This is an execution system, not a static checklist.
-                </p>
-
-                <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-                  <MetricCard label="Readiness" value={`${stats.readiness}%`} sub="Target 95%" tone="red" icon={Gauge} />
-                  <MetricCard label="Consistency" value={`${stats.consistency}%`} sub="Last 7 days" tone="gold" icon={Flame} />
-                  <MetricCard label="Recall" value={`${stats.recall}%`} sub={stats.recall >= 70 ? "Healthy" : "Needs focus"} tone="teal" icon={Brain} />
-                  <MetricCard label="Timeline" value={`W${currentMission?.weekNumber || 1}`} sub={`Phase ${activePhaseIndex + 1} of ${currentRoadmap?.phases.length || 1}`} tone="purple" icon={CalendarDays} />
-                </div>
-              </div>
-
-              <div className="border-t border-white/10 bg-black/20 p-4 lg:border-l lg:border-t-0 sm:p-5">
-                <div className="mb-3 flex items-center justify-between">
-                  <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">Active Track</p>
-                  <span className="rounded-full border border-[#c9a84c]/30 bg-[#1c1608] px-2 py-1 font-mono text-[9px] font-semibold uppercase tracking-widest text-[#c9a84c]">
-                    Pro
-                  </span>
-                </div>
-                <RoadmapPicker roadmaps={roadmaps} currentRoadmap={currentRoadmap} onSelect={setCurrentRoadmap} />
-                <div className="mt-4 rounded-lg border border-white/10 bg-black/20 p-3">
-                  <div className="mb-2 flex items-center gap-2 text-xs font-bold text-white">
-                    <Target size={14} className="text-[#2ec4a0]" />
-                    Next milestone
-                  </div>
-                  <p className="text-xs leading-5 text-slate-400">
-                    {currentRoadmap?.nextMilestone || nextTask?.title || "Complete the next execution task to unlock the following checkpoint."}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section className="glass-panel rounded-xl border border-white/10 bg-surface/50">
-            <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 sm:px-5">
-              <SectionTitle icon={Map} title="Journey Path" />
+            {/* Premium Dual-Mode Tab Switcher */}
+            <div className="flex items-center gap-1 bg-white/[0.03] border border-white/10 rounded-xl p-1 shrink-0 self-start sm:self-auto">
               <button
-                onClick={() => document.getElementById("journey-phases")?.scrollIntoView({ behavior: "smooth" })}
-                className="text-xs font-semibold text-slate-500 transition hover:text-[#a07ee0]"
+                onClick={() => setCurrentView("execution")}
+                className={cn(
+                  "rounded-lg px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-200",
+                  currentView === "execution" 
+                    ? "bg-brand text-white shadow-[0_0_15px_rgba(99,102,241,0.35)]" 
+                    : "text-slate-400 hover:text-white"
+                )}
               >
-                View full path
+                Execution Dashboard
+              </button>
+              <button
+                onClick={() => setCurrentView("curriculum")}
+                className={cn(
+                  "rounded-lg px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-200",
+                  currentView === "curriculum" 
+                    ? "bg-brand text-white shadow-[0_0_15px_rgba(99,102,241,0.35)]" 
+                    : "text-slate-400 hover:text-white"
+                )}
+              >
+                Curriculum Journey
               </button>
             </div>
-            <div className="overflow-x-auto p-4 sm:p-5">
-              <div className="flex min-w-max items-start">
-                {currentRoadmap?.phases.map((phase, index) => {
-                  const state = getPhaseState(phase, activePhase?.id === phase.id);
-                  return (
-                    <div key={phase.id} className="flex items-start">
-                      <button onClick={() => setActivePhaseId(phase.id)} className="group flex w-32 flex-col items-center gap-2 text-center">
-                        <div
-                          className={cn(
-                            "flex h-11 w-11 items-center justify-center rounded-full border-2 transition",
-                            state === "done" && "border-[#2ec4a0] bg-[#061f1a] text-[#2ec4a0]",
-                            state === "active" && "border-[#a07ee0] bg-[#150f28] text-[#a07ee0] shadow-[0_0_0_6px_rgba(124,92,191,0.12)]",
-                            state === "locked" && "border-white/10 bg-white/[0.03] text-slate-400 group-hover:text-slate-400"
-                          )}
-                        >
-                          {state === "done" ? <CheckCircle2 size={18} /> : state === "locked" ? <Lock size={16} /> : <Circle size={15} />}
-                        </div>
-                        <span className={cn("line-clamp-2 text-xs font-semibold", state === "active" ? "text-[#a07ee0]" : "text-slate-400")}>
-                          {phase.title}
-                        </span>
-                      </button>
-                      {index < currentRoadmap.phases.length - 1 && (
-                        <div className={cn("mt-5 h-px w-14", phase.status === "completed" ? "bg-[#2ec4a0]" : "bg-white/10")} />
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-            <section id="journey-phases" className="glass-panel rounded-xl border border-white/10 bg-surface/50 scroll-mt-20">
-              <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 sm:px-5">
-                <SectionTitle icon={Route} title="Journey Phases" />
-                <span className="font-mono text-[10px] font-semibold text-slate-500">{stats.completion}% overall</span>
-              </div>
-              <div className="p-3 sm:p-4">
-                {currentRoadmap?.phases.map((phase, index) => (
-                  <PhaseRow
-                    key={phase.id}
-                    phase={phase}
-                    index={index}
-                    active={phase.id === activePhase?.id}
-                    progress={getPhaseProgress(phase)}
-                    onClick={() => setActivePhaseId(phase.id)}
-                  />
-                ))}
-              </div>
-            </section>
-
-            <section id="execution-tasks" className="glass-panel rounded-xl border border-white/10 bg-surface/50 scroll-mt-20">
-              <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 sm:px-5">
-                <SectionTitle icon={Zap} title={isOverloaded ? "Momentum Focus" : "Execution Tasks"} />
-                <button
-                  onClick={() => setShowAllTasks((value) => !value)}
-                  className="text-xs font-semibold text-slate-500 transition hover:text-[#a07ee0]"
-                >
-                  {showAllTasks ? "Show focus" : "View all"}
-                </button>
-              </div>
-              <div className="space-y-3 p-3 sm:p-4">
-                {visibleTasks.length > 0 ? (
-                  visibleTasks.map((task, index) => (
-                    <TaskCard
-                      key={task.id}
-                      task={task}
-                      featured={index === 0 && task.status !== "completed"}
-                      onToggle={() => updateTaskStatus(task.id, task.status === "completed" ? "pending" : "completed")}
-                      onStart={() => navigate(`/study/${task.id}`)}
-                      delay={index * 0.04}
-                    />
-                  ))
-                ) : (
-                  <div className="rounded-lg border border-dashed border-white/10 p-6 text-center">
-                    <CheckCircle2 className="mx-auto mb-2 text-[#2ec4a0]" size={24} />
-                    <p className="text-sm font-semibold text-white">This mission is clear.</p>
-                    <p className="mt-1 text-xs text-slate-500">Move to the next phase or ask Veda to add a stronger objective.</p>
-                  </div>
-                )}
-
-                {isOverloaded && !showAllTasks && (
-                  <div className="rounded-lg border border-[#c9a84c]/25 bg-[#1c1608] p-3 text-xs leading-5 text-[#e2c47a]/80">
-                    Focus mode is showing only the highest leverage tasks. Complete these first, then expand the list.
-                  </div>
-                )}
-
-                <button
-                  onClick={() => handleCopilotAction(`Add a custom objective to "${currentMission?.title || "my active mission"}" and keep it measurable.`)}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-white/15 px-4 py-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500 transition hover:border-[#a07ee0]/50 hover:text-[#a07ee0]"
-                >
-                  <Plus size={14} />
-                  Add custom objective
-                </button>
-              </div>
-            </section>
           </div>
 
-          <section className="glass-panel rounded-xl border border-white/10 bg-surface/50">
-            <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 sm:px-5">
-              <SectionTitle icon={CalendarDays} title="This Week" />
-              <span className="text-xs font-semibold text-slate-500">Ahead of {Math.max(35, stats.consistency)}% of learners</span>
-            </div>
-            <WeekPlanner completed={stats.completedTasks} total={stats.totalTasks} />
-          </section>
+          <AnimatePresence mode="wait">
+            {currentView === "execution" ? (
+              /* ========================================================================= */
+              /* 1. PORTING THE CORE HIGH-FIDELITY EXECUTION DASHBOARD (MATCHING MOCKUP)   */
+              /* ========================================================================= */
+              <Motion.div
+                key="execution"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.35, ease: "easeInOut" }}
+                className="space-y-6"
+              >
+                {/* A. CURRENT MISSION PANEL */}
+                <section className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#07090d]/80 p-6 sm:p-8 backdrop-blur-xl shadow-premium">
+                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand/35 to-transparent" />
+                  
+                  {/* Card Title & Progress Indicator */}
+                  <div className="flex items-center justify-between gap-4 border-b border-white/[0.06] pb-4.5">
+                    <div>
+                      <span className="text-[10px] font-black uppercase tracking-[0.28em] text-brand-light font-mono">
+                        Current Mission
+                      </span>
+                      <h2 className="mt-1 text-2xl font-black text-white font-display">
+                        {currentMission?.title || "Build a Cache Layer"}
+                      </h2>
+                      <p className="mt-1 text-sm text-slate-400 leading-relaxed font-medium">
+                        {currentMission?.description || "Learn how databases use in-memory caching to scale"}
+                      </p>
+                    </div>
+                    <div className="text-right shrink-0 bg-white/[0.03] border border-white/5 px-3.5 py-2 rounded-xl">
+                      <p className="text-xl font-extrabold text-white font-display tracking-tight leading-none">
+                        {completedMissionTasks}/{totalMissionTasks}
+                      </p>
+                      <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1 leading-none font-mono">
+                        tasks done
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Why this matters callout */}
+                  <div className="mt-5 rounded-xl border border-indigo-500/15 bg-indigo-950/5 p-4.5 text-xs sm:text-sm leading-relaxed text-indigo-300">
+                    <span className="font-bold text-white block sm:inline mr-1">Why this matters:</span>
+                    {currentMission?.whyItMatters || "Redis caching is critical for production systems. You'll use this pattern in 90% of scaling operations."}
+                  </div>
+
+                  {/* Tasks List */}
+                  <div className="mt-6 space-y-3.5">
+                    {missionTasks.map((task, idx) => {
+                      const isCompleted = task.status === "completed";
+                      // First pending task is regarded as in progress to display active state
+                      const isActive = !isCompleted && pendingTasks[0]?.id === task.id;
+                      const isLocked = !isCompleted && !isActive && idx > 0 && missionTasks[idx - 1].status !== "completed";
+
+                      const TaskIcon = {
+                        learn: BookOpen,
+                        practice: Zap,
+                        revise: RefreshCw,
+                        project: Layers3
+                      }[task.type] || BookOpen;
+
+                      return (
+                        <div
+                          key={task.id}
+                          className={cn(
+                            "rounded-xl border p-4.5 transition-all duration-300 relative overflow-hidden flex items-start gap-4",
+                            isCompleted 
+                              ? "border-emerald-500/10 bg-emerald-500/[0.02]" 
+                              : isActive 
+                                ? "border-brand/35 bg-brand/[0.03] shadow-[inset_0_0_0_1px_rgba(99,102,241,0.06)]"
+                                : "border-white/[0.05] bg-white/[0.01] hover:bg-white/[0.03] hover:border-white/[0.08]"
+                          )}
+                        >
+                          {/* Checked Checkbox vs Running Icon vs Locked State */}
+                          <button
+                            onClick={() => updateTaskStatus(task.id, isCompleted ? "pending" : "completed")}
+                            disabled={isLocked}
+                            className={cn(
+                              "mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border transition duration-200",
+                              isCompleted 
+                                ? "border-emerald-500 bg-emerald-500 text-slate-950" 
+                                : isLocked 
+                                  ? "border-white/5 bg-white/[0.01] text-slate-600 cursor-not-allowed" 
+                                  : "border-white/15 text-slate-500 hover:border-brand hover:text-brand"
+                            )}
+                          >
+                            {isCompleted ? <CheckCircle2 size={15} /> : isLocked ? <Lock size={12} /> : <Circle size={13} />}
+                          </button>
+
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-2 mb-1.5 text-[10px] font-bold font-mono">
+                              <span className={cn(
+                                "px-2 py-0.5 rounded border uppercase tracking-wider flex items-center gap-1",
+                                isCompleted 
+                                  ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-400" 
+                                  : "border-white/10 bg-white/5 text-slate-400"
+                              )}>
+                                <TaskIcon size={11} />
+                                {task.type}
+                              </span>
+                              <span className="text-slate-500">{task.durationMinutes} min</span>
+                              {task.difficulty && (
+                                <span className={cn(
+                                  "px-2 py-0.5 rounded uppercase",
+                                  task.difficulty === "easy" ? "bg-[#061f1a] text-[#2ec4a0]" : task.difficulty === "medium" ? "bg-[#1c1608] text-[#c9a84c]" : "bg-[#200e0e] text-[#e05555]"
+                                )}>
+                                  {task.difficulty}
+                                </span>
+                              )}
+                            </div>
+
+                            <h3 className={cn(
+                              "text-sm sm:text-base font-bold leading-snug",
+                              isCompleted ? "text-slate-500 line-through font-normal" : "text-white",
+                              isLocked && "text-slate-600"
+                            )}>
+                              {task.title}
+                            </h3>
+
+                            {/* Active Time spent progress indicators */}
+                            {isActive && (
+                              <div className="mt-3.5 space-y-2">
+                                <div className="flex items-center justify-between text-xs text-brand-light font-semibold">
+                                  <span className="flex items-center gap-1"><Clock size={12} className="animate-spin" /> You've done 42 min</span>
+                                  <span>1 hour planned</span>
+                                </div>
+                                <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+                                  <div className="h-full bg-brand rounded-full animate-[pulse_2s_infinite]" style={{ width: "70%" }} />
+                                </div>
+                              </div>
+                            )}
+
+                            {isLocked && (
+                              <p className="mt-1.5 text-xs text-slate-500 italic">
+                                Unlock after previous task completes
+                              </p>
+                            )}
+
+                            {task.aiHint && !isCompleted && !isLocked && (
+                              <p className="mt-2 text-xs italic leading-relaxed text-slate-500">
+                                Veda: "{task.aiHint}"
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Primary CTA Continue Button */}
+                  {nextTask && (
+                    <button
+                      onClick={() => navigate(`/study/${nextTask.id}`)}
+                      className="mt-6 w-full flex items-center justify-center gap-2 rounded-xl bg-brand hover:bg-brand-light text-white px-5 py-4 text-xs font-black uppercase tracking-widest shadow-[0_0_20px_rgba(99,102,241,0.3)] transition hover:shadow-[0_0_25px_rgba(99,102,241,0.5)] active:scale-[0.98]"
+                    >
+                      {isActiveTaskNext ? "Continue" : "Start"} task {missionTasks.findIndex(t => t.id === nextTask.id) + 1 || 1} ↗
+                    </button>
+                  )}
+                </section>
+
+                {/* B. DUAL STATS GRID */}
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  {/* 1. Week Progress */}
+                  <div className="rounded-2xl border border-white/[0.06] bg-[#07090d]/60 p-6 backdrop-blur-xl shadow-premium">
+                    <p className="font-mono text-[9px] font-black uppercase tracking-[0.24em] text-slate-500">
+                      Week {currentWeek} Progress
+                    </p>
+                    <div className="mt-4 flex items-baseline gap-1">
+                      <span className="text-4xl font-extrabold text-white font-display tracking-tight">
+                        {stats.completedTasks}/{stats.totalTasks}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-xs font-semibold text-slate-500">
+                      {stats.totalTasks - stats.completedTasks} tasks remaining
+                    </p>
+                    <div className="mt-4 h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+                      <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${stats.completion}%` }} />
+                    </div>
+                  </div>
+
+                  {/* 2. Study time planned */}
+                  <div className="rounded-2xl border border-white/[0.06] bg-[#07090d]/60 p-6 backdrop-blur-xl shadow-premium">
+                    <p className="font-mono text-[9px] font-black uppercase tracking-[0.24em] text-slate-500">
+                      Time This Week
+                    </p>
+                    <div className="mt-4 flex items-baseline gap-1">
+                      <span className="text-4xl font-extrabold text-slate-500 font-display tracking-tight text-white">
+                        {hoursCompleted} hrs
+                      </span>
+                    </div>
+                    <p className="mt-1 text-xs font-semibold text-slate-500">
+                      of {hoursPlanned} hrs planned
+                    </p>
+                    <div className="mt-4 h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+                      <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${timeProgressPercent}%` }} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* C. COMING UP SECTION */}
+                <section className="rounded-2xl border border-white/[0.06] bg-[#07090d]/60 p-6 backdrop-blur-xl shadow-premium">
+                  <div className="flex items-center gap-2 border-b border-white/[0.06] pb-4">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-md bg-white/[0.04] text-brand-light">
+                      <Layers3 size={14} />
+                    </div>
+                    <h2 className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+                      Coming Up
+                    </h2>
+                  </div>
+                  
+                  <div className="mt-4 divide-y divide-white/[0.04]">
+                    {currentRoadmap?.phases.slice(activePhaseIndex).flatMap(p => p.missions).filter(m => m.id !== currentMission?.id).slice(0, 2).map((mission, idx) => (
+                      <div key={mission.id} className="py-4 first:pt-0 last:pb-0 flex items-center justify-between gap-4">
+                        <div>
+                          <p className="text-sm font-bold text-white group-hover:text-brand-light transition-colors">
+                            Week {currentWeek + idx + 1}: {mission.title}
+                          </p>
+                          <p className="mt-1 text-xs text-slate-500">
+                            {mission.tasks?.length || 3} tasks • Starts next Monday
+                          </p>
+                        </div>
+                        <span className="shrink-0 rounded-full border border-white/10 bg-white/[0.02] px-2.5 py-1 font-mono text-[9px] font-semibold uppercase tracking-widest text-slate-400">
+                          {idx === 0 ? "Next Up" : `${idx + 1} weeks out`}
+                        </span>
+                      </div>
+                    ))}
+                    {currentRoadmap?.phases.length === 1 && currentMission?.tasks.every(t => t.status === "completed") && (
+                      <div className="py-4 text-center text-xs text-slate-500">
+                        No upcoming sprints in this track. Regenerate to expand.
+                      </div>
+                    )}
+                  </div>
+                </section>
+
+                {/* D. GEMINI AHEAD OF SCHEDULE BANNER */}
+                <section className="relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.02] p-5 backdrop-blur-xl shadow-glow">
+                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-transparent opacity-40 pointer-events-none" />
+                  <div className="flex items-center justify-between gap-4 relative z-10">
+                    <div className="flex items-start gap-4">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-emerald-500/20 bg-emerald-500/10 text-emerald-400">
+                        <Sparkles size={16} className="animate-pulse" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-white uppercase tracking-wider font-mono">Ahead of Schedule</h4>
+                        <p className="mt-1 text-xs sm:text-sm text-emerald-300/90 leading-relaxed font-semibold">
+                          Completing tasks 15% faster than estimated. If you maintain this pace, you'll finish week 1 by tomorrow.
+                        </p>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => handleCopilotAction("I'm ahead of schedule on week 1 backend tasks. Give me a challenge task related to caching eviction policies or distributed coherency!")}
+                      className="shrink-0 text-xs font-black uppercase tracking-widest text-emerald-400 hover:text-white transition-colors duration-200 font-sans"
+                    >
+                      Get a challenge task →
+                    </button>
+                  </div>
+                </section>
+              </Motion.div>
+            ) : (
+              /* ========================================================================= */
+              /* 2. PORTING THE SECONDARY CURRICULUM JOURNEY PATH GRAPH AND HEATMAPS       */
+              /* ========================================================================= */
+              <Motion.div
+                key="curriculum"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.35, ease: "easeInOut" }}
+                className="space-y-6"
+              >
+                {/* Horizontal steps node visualization */}
+                <section className="glass-panel overflow-hidden rounded-2xl border border-white/10 bg-surface/50 p-6 shadow-premium">
+                  <div className="flex items-center justify-between border-b border-white/[0.06] pb-4 mb-6">
+                    <SectionTitle icon={Map} title="Journey Path" />
+                    <button
+                      onClick={() => document.getElementById("journey-phases")?.scrollIntoView({ behavior: "smooth" })}
+                      className="text-xs font-semibold text-slate-500 transition hover:text-[#a07ee0]"
+                    >
+                      View full list
+                    </button>
+                  </div>
+                  
+                  <div className="overflow-x-auto pb-2">
+                    <div className="flex min-w-max items-start py-2 px-1">
+                      {currentRoadmap?.phases.map((phase, index) => {
+                        const state = getPhaseState(phase, activePhase?.id === phase.id);
+                        return (
+                          <div key={phase.id} className="flex items-start">
+                            <button 
+                              onClick={() => setActivePhaseId(phase.id)} 
+                              className="group flex w-32 flex-col items-center gap-2 text-center"
+                            >
+                              <div
+                                className={cn(
+                                  "flex h-11 w-11 items-center justify-center rounded-full border-2 transition duration-200",
+                                  state === "done" && "border-[#2ec4a0] bg-[#061f1a] text-[#2ec4a0]",
+                                  state === "active" && "border-[#a07ee0] bg-[#150f28] text-[#a07ee0] shadow-[0_0_0_6px_rgba(124,92,191,0.12)]",
+                                  state === "locked" && "border-white/10 bg-white/[0.03] text-slate-400 group-hover:text-slate-400"
+                                )}
+                              >
+                                {state === "done" ? <CheckCircle2 size={18} /> : state === "locked" ? <Lock size={16} /> : <Circle size={15} />}
+                              </div>
+                              <span className={cn("line-clamp-2 text-xs font-semibold leading-tight px-1 mt-1", state === "active" ? "text-[#a07ee0] font-bold" : "text-slate-400 font-normal")}>
+                                {phase.title}
+                              </span>
+                            </button>
+                            {index < currentRoadmap.phases.length - 1 && (
+                              <div className={cn("mt-5 h-px w-14 transition duration-300", phase.status === "completed" ? "bg-[#2ec4a0]" : "bg-white/10")} />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </section>
+
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                  {/* Left Column: Journey Phases rows */}
+                  <section id="journey-phases" className="glass-panel rounded-2xl border border-white/10 bg-surface/50 scroll-mt-20 shadow-premium">
+                    <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
+                      <SectionTitle icon={Route} title="Journey Phases" />
+                      <span className="font-mono text-[10px] font-semibold text-slate-500">{stats.completion}% overall</span>
+                    </div>
+                    <div className="p-4 space-y-2">
+                      {currentRoadmap?.phases.map((phase, index) => (
+                        <PhaseRow
+                          key={phase.id}
+                          phase={phase}
+                          index={index}
+                          active={phase.id === activePhase?.id}
+                          progress={getPhaseProgress(phase)}
+                          onClick={() => setActivePhaseId(phase.id)}
+                        />
+                      ))}
+                    </div>
+                  </section>
+
+                  {/* Right Column: Execution focus list */}
+                  <section id="execution-tasks" className="glass-panel rounded-2xl border border-white/10 bg-surface/50 scroll-mt-20 shadow-premium">
+                    <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
+                      <SectionTitle icon={Zap} title={isOverloaded ? "Momentum Focus" : "Journey Tasks"} />
+                      <button
+                        onClick={() => setShowAllTasks((value) => !value)}
+                        className="text-xs font-semibold text-slate-500 transition hover:text-[#a07ee0]"
+                      >
+                        {showAllTasks ? "Show focus" : "View all"}
+                      </button>
+                    </div>
+                    <div className="space-y-3.5 p-4">
+                      {missionTasks.length > 0 ? (
+                        missionTasks.slice(0, showAllTasks ? undefined : isOverloaded ? 2 : TASK_LIMIT).map((task, index) => (
+                          <TaskCard
+                            key={task.id}
+                            task={task}
+                            featured={index === 0 && task.status !== "completed"}
+                            onToggle={() => updateTaskStatus(task.id, task.status === "completed" ? "pending" : "completed")}
+                            onStart={() => navigate(`/study/${task.id}`)}
+                            delay={index * 0.04}
+                          />
+                        ))
+                      ) : (
+                        <div className="rounded-xl border border-dashed border-white/10 p-6 text-center">
+                          <CheckCircle2 className="mx-auto mb-2 text-[#2ec4a0]" size={24} />
+                          <p className="text-sm font-semibold text-white">This phase is complete.</p>
+                          <p className="mt-1 text-xs text-slate-500">Click on another phase row to explore tasks.</p>
+                        </div>
+                      )}
+
+                      {isOverloaded && !showAllTasks && (
+                        <div className="rounded-lg border border-[#c9a84c]/25 bg-[#1c1608] p-3 text-xs leading-5 text-[#e2c47a]/80">
+                          Focus mode is showing only the highest leverage tasks. Complete these first, then expand the list.
+                        </div>
+                      )}
+
+                      <button
+                        onClick={() => handleCopilotAction(`Add a custom objective to "${currentMission?.title || "my active mission"}" and keep it measurable.`)}
+                        className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 px-4 py-3.5 text-xs font-bold uppercase tracking-[0.16em] text-slate-500 transition hover:border-[#a07ee0]/50 hover:text-[#a07ee0]"
+                      >
+                        <Plus size={14} />
+                        Add custom objective
+                      </button>
+                    </div>
+                  </section>
+                </div>
+
+                {/* Heatmap/Planner section */}
+                <section className="glass-panel rounded-2xl border border-white/10 bg-surface/50 shadow-premium">
+                  <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
+                    <SectionTitle icon={CalendarDays} title="This Week Progress" />
+                    <span className="text-xs font-semibold text-slate-500">Ahead of {Math.max(35, stats.consistency)}% of learners</span>
+                  </div>
+                  <WeekPlanner completed={stats.completedTasks} total={stats.totalTasks} />
+                </section>
+              </Motion.div>
+            )}
+          </AnimatePresence>
         </main>
 
-        <aside className="space-y-5">
-          <section className="glass-panel rounded-xl border border-white/10 bg-surface/50">
-            <div className="border-b border-white/10 px-4 py-3">
+        {/* Right Sidebar Widgets - Compact layout */}
+        <aside className="space-y-6">
+          {/* Active Track Selector */}
+          <section className="glass-panel rounded-2xl border border-white/10 bg-surface/50 p-5 shadow-premium">
+            <div className="mb-3.5 flex items-center justify-between">
+              <p className="font-mono text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">Active Track</p>
+              <span className="rounded-full border border-[#c9a84c]/30 bg-[#1c1608] px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-widest text-[#c9a84c]">
+                Pro
+              </span>
+            </div>
+            <RoadmapPicker roadmaps={roadmaps} currentRoadmap={currentRoadmap} onSelect={setCurrentRoadmap} />
+            
+            <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
+              <div className="mb-2 flex items-center gap-2 text-xs font-bold text-white">
+                <Target size={14} className="text-[#2ec4a0]" />
+                Next milestone
+              </div>
+              <p className="text-xs leading-5 text-slate-400">
+                {currentRoadmap?.nextMilestone || nextTask?.title || "Complete the next execution task to unlock the following checkpoint."}
+              </p>
+            </div>
+          </section>
+
+          {/* Veda Insights widget */}
+          <section className="glass-panel rounded-2xl border border-white/10 bg-surface/50 shadow-premium">
+            <div className="border-b border-white/[0.06] px-5 py-4">
               <SectionTitle icon={Sparkles} title="Veda Insights" />
             </div>
             <div className="space-y-3 p-4">
-              <div className="rounded-lg border border-[#7c5cbf]/25 bg-[#150f28] p-4">
+              <div className="rounded-xl border border-[#7c5cbf]/25 bg-[#150f28] p-4">
                 <div className="mb-2 flex items-center gap-2 text-sm font-bold text-white">
                   <Sparkles size={15} className="text-[#a07ee0]" />
                   Mentor readout
@@ -355,7 +651,7 @@ export function RoadmapWorkspace() {
                 </p>
                 <button
                   onClick={() => handleCopilotAction("Review my current roadmap and tell me the smartest next move.")}
-                  className="mt-3 w-full rounded-lg bg-[#7c5cbf] px-3 py-2 text-xs font-bold text-white transition hover:bg-[#a07ee0]"
+                  className="mt-3.5 w-full rounded-xl bg-[#7c5cbf] px-3.5 py-2.5 text-xs font-bold text-white transition hover:bg-[#a07ee0] shadow-premium"
                 >
                   Ask Veda
                 </button>
@@ -377,37 +673,39 @@ export function RoadmapWorkspace() {
             </div>
           </section>
 
-          <section className="glass-panel rounded-xl border border-white/10 bg-surface/50">
-            <div className="border-b border-white/10 px-4 py-3">
-              <SectionTitle icon={Target} title="Next Best Action" />
+          {/* Metrics Overview summary */}
+          <section className="glass-panel rounded-2xl border border-white/10 bg-surface/50 p-4 shadow-premium space-y-4">
+            <div className="border-b border-white/[0.04] pb-3 flex items-center gap-2">
+              <Gauge size={15} className="text-[#a07ee0]" />
+              <h4 className="text-xs font-bold text-white font-mono uppercase tracking-wider">Metrics Console</h4>
             </div>
-            <div className="p-4">
-              <p className="mb-4 text-xs leading-5 text-slate-400">
-                {nextTask ? `${nextTask.durationMinutes} minutes · ${nextTask.difficulty} · ${nextTask.type}` : "Create the next sprint from your current skill gaps."}
-              </p>
-              <button
-                onClick={() => (nextTask ? navigate(`/study/${nextTask.id}`) : setIsExpansionOpen(true))}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#2ec4a0] px-3 py-3 text-xs font-black uppercase tracking-[0.16em] text-[#061f1a] transition hover:bg-[#5ee0c2]"
-              >
-                <Zap size={15} />
-                Start Sprint
-              </button>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="bg-[#0b0f17] border border-white/5 p-3 rounded-lg">
+                <p className="text-[8px] font-black uppercase text-slate-500 font-mono">Readiness</p>
+                <p className="text-lg font-black text-white mt-1">{stats.readiness}%</p>
+              </div>
+              <div className="bg-[#0b0f17] border border-white/5 p-3 rounded-lg">
+                <p className="text-[8px] font-black uppercase text-slate-500 font-mono">Consistency</p>
+                <p className="text-lg font-black text-white mt-1">{stats.consistency}%</p>
+              </div>
+              <div className="bg-[#0b0f17] border border-white/5 p-3 rounded-lg">
+                <p className="text-[8px] font-black uppercase text-slate-500 font-mono">Recall State</p>
+                <p className="text-lg font-black text-white mt-1">{stats.recall}%</p>
+              </div>
+              <div className="bg-[#0b0f17] border border-white/5 p-3 rounded-lg">
+                <p className="text-[8px] font-black uppercase text-slate-500 font-mono">Active Week</p>
+                <p className="text-lg font-black text-white mt-1">W{currentWeek}</p>
+              </div>
             </div>
           </section>
 
-          <section className="glass-panel rounded-xl border border-white/10 bg-surface/50">
-            <div className="border-b border-white/10 px-4 py-3">
-              <SectionTitle icon={BarChart3} title="Momentum" />
-            </div>
-            <MomentumHeatmap />
-          </section>
-
-          <section className="glass-panel rounded-xl border border-white/10 bg-surface/50">
-            <div className="border-b border-white/10 px-4 py-3">
+          {/* Quick Actions Panel */}
+          <section className="glass-panel rounded-2xl border border-white/10 bg-surface/50 shadow-premium">
+            <div className="border-b border-white/[0.06] px-5 py-4">
               <SectionTitle icon={Zap} title="Quick Actions" />
             </div>
-            <div className="grid grid-cols-3 gap-2 p-4">
-              <QuickAction icon={Brain} label="Ask" onClick={() => handleCopilotAction("Can we review my roadmap?")} />
+            <div className="grid grid-cols-3 gap-2.5 p-4">
+              <QuickAction icon={Brain} label="Ask" onClick={() => handleCopilotAction("Can we review my active learning track?")} />
               <QuickAction icon={RefreshCw} label="Recall" onClick={() => navigate("/recall")} />
               <QuickAction icon={Target} label="Quiz" onClick={() => (nextTask ? navigate(`/study/${nextTask.id}`) : handleCopilotAction("Quiz me on my roadmap progress."))} />
               <QuickAction icon={BookOpen} label="Notes" onClick={() => navigate("/notes")} />
@@ -415,6 +713,24 @@ export function RoadmapWorkspace() {
               <QuickAction icon={Search} label="Gaps" onClick={() => navigate("/skill-gap")} />
             </div>
           </section>
+
+          {/* Quick operations */}
+          <div className="flex flex-col gap-2">
+            <button
+              onClick={() => setIsExpansionOpen(true)}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#7c5cbf] hover:bg-[#a07ee0] px-4 py-3.5 text-xs font-bold text-white transition-all shadow-premium hover:-translate-y-0.5 duration-200"
+            >
+              <Plus size={15} />
+              Expand Career Direction
+            </button>
+            <button
+              onClick={() => handleCopilotAction("Simplify my roadmap while keeping the same target role and strongest outcomes.")}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 hover:border-white/20 bg-white/[0.01] hover:bg-white/[0.04] text-slate-300 hover:text-white px-4 py-3.5 text-xs font-bold transition-all duration-200"
+            >
+              <Layers3 size={15} />
+              Simplify Learning Path
+            </button>
+          </div>
         </aside>
       </div>
 
@@ -426,9 +742,9 @@ export function RoadmapWorkspace() {
 function RoadmapPicker({ roadmaps, currentRoadmap, onSelect }: { roadmaps: Roadmap[]; currentRoadmap: Roadmap | null; onSelect: (roadmap: Roadmap) => void }) {
   if (roadmaps.length <= 1) {
     return (
-      <div className="rounded-lg border border-white/10 bg-black/20 p-3">
+      <div className="rounded-xl border border-white/10 bg-black/20 p-4">
         <p className="truncate text-sm font-bold text-white">{currentRoadmap?.title || currentRoadmap?.targetRole || "Primary roadmap"}</p>
-        <p className="mt-1 text-xs text-slate-500">{currentRoadmap?.category || "Career track"}</p>
+        <p className="mt-1 text-xs text-slate-500 font-mono uppercase">{currentRoadmap?.category || "Career track"}</p>
       </div>
     );
   }
@@ -443,7 +759,7 @@ function RoadmapPicker({ roadmaps, currentRoadmap, onSelect }: { roadmaps: Roadm
             const selected = roadmaps.find((roadmap) => roadmap.id === event.target.value);
             if (selected) onSelect(selected);
           }}
-          className="w-full appearance-none rounded-lg border border-white/10 bg-black/20 px-3 py-3 pr-9 text-sm font-bold text-white outline-none transition focus:border-[#a07ee0]/60"
+          className="w-full appearance-none rounded-xl border border-white/10 bg-black/20 px-4 py-3.5 pr-9 text-sm font-bold text-white outline-none transition focus:border-brand/60"
         >
           {roadmaps.map((roadmap) => (
             <option key={roadmap.id} value={roadmap.id}>
@@ -451,31 +767,9 @@ function RoadmapPicker({ roadmaps, currentRoadmap, onSelect }: { roadmaps: Roadm
             </option>
           ))}
         </select>
-        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
+        <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
       </div>
     </label>
-  );
-}
-
-function MetricCard({ label, value, sub, tone, icon: Icon }: { label: string; value: string; sub: string; tone: "red" | "gold" | "teal" | "purple"; icon: typeof Gauge }) {
-  const toneClass = {
-    red: "text-[#e05555] border-[#e05555]/25 bg-[#200e0e]",
-    gold: "text-[#c9a84c] border-[#c9a84c]/25 bg-[#1c1608]",
-    teal: "text-[#2ec4a0] border-[#2ec4a0]/25 bg-[#061f1a]",
-    purple: "text-[#a07ee0] border-[#a07ee0]/25 bg-[#150f28]"
-  }[tone];
-
-  return (
-    <div className="rounded-lg border border-white/10 bg-white/5 p-4">
-      <div className="mb-4 flex items-center justify-between">
-        <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</p>
-        <div className={cn("flex h-8 w-8 items-center justify-center rounded-lg border", toneClass)}>
-          <Icon size={15} />
-        </div>
-      </div>
-      <p className="text-2xl font-black tracking-tight text-white">{value}</p>
-      <p className="mt-1 text-xs text-slate-500">{sub}</p>
-    </div>
   );
 }
 
@@ -498,14 +792,14 @@ function PhaseRow({ phase, index, active, progress, onClick }: { phase: RoadmapP
       onClick={onClick}
       disabled={phase.status === "locked"}
       className={cn(
-        "mb-2 flex w-full items-start gap-3 rounded-lg border p-3 text-left transition",
-        active ? "border-[#a07ee0]/30 bg-[#150f28]" : "border-transparent hover:border-white/10 hover:bg-white/[0.03]",
+        "mb-2 flex w-full items-start gap-3.5 rounded-xl border p-4.5 text-left transition duration-200",
+        active ? "border-[#a07ee0]/35 bg-[#150f28]" : "border-transparent hover:border-white/10 hover:bg-white/[0.02]",
         phase.status === "locked" && "cursor-not-allowed opacity-55"
       )}
     >
       <div
         className={cn(
-          "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border font-mono text-xs font-bold",
+          "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border font-mono text-xs font-bold transition duration-200",
           state === "done" && "border-[#2ec4a0] bg-[#061f1a] text-[#2ec4a0]",
           state === "active" && "border-[#a07ee0] bg-[#150f28] text-[#a07ee0]",
           state === "locked" && "border-white/10 bg-white/[0.03] text-slate-500"
@@ -516,18 +810,18 @@ function PhaseRow({ phase, index, active, progress, onClick }: { phase: RoadmapP
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="truncate text-sm font-bold text-white">{phase.title}</p>
-            <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500">{phase.description}</p>
+            <p className="truncate text-sm font-bold text-white leading-none">{phase.title}</p>
+            <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-slate-500">{phase.description}</p>
           </div>
-          <span className={cn("shrink-0 rounded-full border px-2 py-1 font-mono text-[9px] font-semibold uppercase", stateBadgeClass(state))}>
+          <span className={cn("shrink-0 rounded-full border px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wider", stateBadgeClass(state))}>
             {phase.status === "completed" ? "Done" : phase.status === "locked" ? "Locked" : "Active"}
           </span>
         </div>
-        <div className="mt-3 flex items-center gap-2">
-          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/10">
+        <div className="mt-4 flex items-center gap-2.5">
+          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/5 border border-white/5">
             <div className="h-full rounded-full bg-[#a07ee0]" style={{ width: `${progress}%` }} />
           </div>
-          <span className="font-mono text-[10px] text-slate-500">{progress}%</span>
+          <span className="font-mono text-[10px] text-slate-500 font-bold">{progress}%</span>
         </div>
       </div>
     </button>
@@ -541,7 +835,7 @@ function TaskCard({ task, featured, onToggle, onStart, delay }: { task: RoadmapT
     practice: Zap,
     revise: RefreshCw,
     project: Layers3
-  }[task.type];
+  }[task.type] || BookOpen;
 
   return (
     <Motion.div
@@ -549,37 +843,39 @@ function TaskCard({ task, featured, onToggle, onStart, delay }: { task: RoadmapT
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
       className={cn(
-        "rounded-lg border p-3 transition",
-        featured ? "border-[#4e8ef0]/30 bg-[#0a1528]" : "border-white/10 bg-[#121620] hover:border-white/20",
+        "rounded-xl border p-4.5 transition-all duration-300",
+        featured ? "border-[#4e8ef0]/30 bg-[#0a1528]" : "border-white/10 bg-[#121620]/60 hover:border-white/20",
         isDone && "border-[#2ec4a0]/20 bg-[#061f1a]/60"
       )}
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-4">
         <button
           onClick={onToggle}
           className={cn(
-            "mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md border transition",
-            isDone ? "border-[#2ec4a0] bg-[#2ec4a0] text-[#061f1a]" : "border-white/15 text-slate-500 hover:border-[#2ec4a0] hover:text-[#2ec4a0]"
+            "mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border transition duration-200",
+            isDone ? "border-[#2ec4a0] bg-[#2ec4a0] text-slate-950" : "border-white/15 text-slate-500 hover:border-[#2ec4a0] hover:text-[#2ec4a0]"
           )}
           aria-label={isDone ? "Mark task pending" : "Mark task complete"}
         >
-          {isDone ? <CheckCircle2 size={15} /> : <Circle size={14} />}
+          {isDone ? <CheckCircle2 size={15} /> : <Circle size={13} />}
         </button>
 
         <div className="min-w-0 flex-1">
-          <div className="mb-2 flex flex-wrap items-center gap-2">
-            <span className={cn("inline-flex items-center gap-1 rounded-md border px-2 py-1 font-mono text-[9px] font-bold uppercase tracking-wider", taskTypeClass(task.type))}>
+          <div className="mb-2 flex flex-wrap items-center gap-2 text-[9px] font-bold font-mono">
+            <span className={cn("inline-flex items-center gap-1 rounded border px-2 py-0.5 uppercase tracking-wider", taskTypeClass(task.type))}>
               <Icon size={11} />
               {task.type}
             </span>
-            <span className="font-mono text-[10px] text-slate-500">{task.durationMinutes}m</span>
-            <span className={cn("rounded-md px-2 py-1 font-mono text-[9px] font-semibold uppercase", difficultyClass(task.difficulty))}>
-              {task.difficulty}
-            </span>
+            <span className="text-slate-500">{task.durationMinutes}m</span>
+            {task.difficulty && (
+              <span className={cn("rounded border px-2 py-0.5 uppercase", difficultyClass(task.difficulty))}>
+                {task.difficulty}
+              </span>
+            )}
           </div>
-          <h3 className={cn("text-sm font-bold leading-5", isDone ? "text-slate-500 line-through" : "text-white")}>{task.title}</h3>
+          <h3 className={cn("text-sm font-bold leading-snug", isDone ? "text-slate-500 line-through font-normal" : "text-white")}>{task.title}</h3>
           {task.aiHint && !isDone && (
-            <p className="mt-2 line-clamp-2 text-xs italic leading-5 text-slate-500">Veda: "{task.aiHint}"</p>
+            <p className="mt-2 line-clamp-2 text-xs italic leading-relaxed text-slate-500">Veda: "{task.aiHint}"</p>
           )}
         </div>
 
@@ -603,18 +899,18 @@ function InsightCard({ insight, onAction }: { insight: RoadmapInsight; onAction:
     performance: TrendingUp,
     market: BarChart3,
     recommendation: Sparkles
-  }[insight.type];
+  }[insight.type] || Sparkles;
 
   return (
-    <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-      <div className="flex items-start gap-3">
+    <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+      <div className="flex items-start gap-3.5">
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/[0.04] text-slate-400">
           <Icon size={15} />
         </div>
         <div className="min-w-0">
-          <p className="text-xs leading-5 text-slate-400">{insight.message}</p>
+          <p className="text-xs leading-relaxed text-slate-400">{insight.message}</p>
           {insight.actionLabel && (
-            <button onClick={onAction} className="mt-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#a07ee0] transition hover:text-white">
+            <button onClick={onAction} className="mt-2.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#a07ee0] hover:text-white transition-colors duration-200">
               {insight.actionLabel} →
             </button>
           )}
@@ -630,7 +926,7 @@ function WeekPlanner({ completed, total }: { completed: number; total: number })
   const completedRatio = total ? completed / total : 0;
 
   return (
-    <div className="grid grid-cols-7 gap-2 p-4 sm:p-5">
+    <div className="grid grid-cols-7 gap-2.5 p-4 sm:p-5">
       {days.map((day, index) => {
         const isPast = index < todayIndex;
         const isToday = index === todayIndex;
@@ -639,12 +935,12 @@ function WeekPlanner({ completed, total }: { completed: number; total: number })
           <button
             key={day}
             className={cn(
-              "rounded-lg border p-2 text-center transition hover:border-white/20",
-              isToday ? "border-[#a07ee0]/40 bg-[#150f28]" : isDone ? "border-[#2ec4a0]/30 bg-[#061f1a]" : "border-white/10 bg-[#121620]"
+              "rounded-xl border p-3 text-center transition hover:border-white/20 duration-200",
+              isToday ? "border-[#a07ee0]/45 bg-[#150f28]" : isDone ? "border-[#2ec4a0]/30 bg-[#061f1a]" : "border-white/10 bg-[#121620]"
             )}
           >
-            <p className="font-mono text-[9px] font-bold text-slate-500">{day}</p>
-            <p className={cn("mt-2 font-mono text-sm font-bold", isToday ? "text-[#a07ee0]" : isDone ? "text-[#2ec4a0]" : "text-slate-400")}>
+            <p className="font-mono text-[9px] font-bold text-slate-500 leading-none">{day}</p>
+            <p className={cn("mt-2.5 font-mono text-sm font-bold leading-none", isToday ? "text-[#a07ee0]" : isDone ? "text-[#2ec4a0]" : "text-slate-400")}>
               {index + 1}
             </p>
           </button>
@@ -654,52 +950,35 @@ function WeekPlanner({ completed, total }: { completed: number; total: number })
   );
 }
 
-function MomentumHeatmap() {
-  const values = [1, 2, 4, 3, 1, 0, 2, 4, 3, 2, 4, 4, 1, 2, 3, 1, 0, 2, 3, 4, 2, 3, 4, 1];
-  const classes = ["bg-white/10", "bg-[#1e1a36]", "bg-[#3a2d6b]", "bg-[#6c4fc2]", "bg-[#a07ee0]"];
-
-  return (
-    <div className="p-4">
-      <div className="mb-3 flex justify-between font-mono text-[9px] text-slate-400">
-        <span>Low</span>
-        <span>High</span>
-      </div>
-      <div className="grid grid-cols-8 gap-1">
-        {values.map((value, index) => (
-          <div key={index} className={cn("h-3 rounded-sm", classes[value])} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function QuickAction({ icon: Icon, label, onClick }: { icon: typeof Brain; label: string; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="flex flex-col items-center gap-2 rounded-lg border border-white/10 bg-white/5 p-3 text-slate-500 transition hover:border-[#a07ee0]/40 hover:text-[#a07ee0]"
+      className="flex flex-col items-center gap-2 rounded-xl border border-white/10 bg-white/5 p-3 text-slate-500 transition hover:border-[#a07ee0]/40 hover:text-[#a07ee0] duration-200"
     >
       <Icon size={16} />
-      <span className="text-[10px] font-bold uppercase tracking-wider">{label}</span>
+      <span className="text-[9px] font-bold uppercase tracking-wider">{label}</span>
     </button>
   );
 }
 
 function LoadingState() {
   return (
-    <div className="flex flex-col items-center justify-center py-32 text-center">
+    <div className="flex flex-col items-center justify-center py-32 text-center relative">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-brand/5 blur-[120px] pointer-events-none animate-pulse" />
       <RefreshCw className="mb-4 h-10 w-10 animate-spin text-[#a07ee0]" />
-      <p className="text-sm font-semibold text-slate-400">Syncing your roadmap workspace...</p>
+      <p className="text-sm font-semibold text-slate-400 font-display">Syncing your roadmap workspace...</p>
     </div>
   );
 }
 
 function GeneratingState() {
   return (
-    <div className="mx-auto flex max-w-md flex-col items-center justify-center py-32 text-center">
+    <div className="mx-auto flex max-w-md flex-col items-center justify-center py-32 text-center relative">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-brand/5 blur-[120px] pointer-events-none" />
       <Sparkles className="mb-6 h-14 w-14 animate-pulse text-[#a07ee0]" />
-      <h2 className="text-2xl font-black text-white">Synthesizing mission</h2>
-      <p className="mt-3 text-sm leading-6 text-slate-500">Analyzing skill gaps, behavior signals, and recall load to build your next execution roadmap.</p>
+      <h2 className="text-2xl font-black text-white font-display">Synthesizing mission</h2>
+      <p className="mt-3 text-sm leading-relaxed text-slate-500 font-medium">Analyzing skill gaps, behavior signals, and recall load to build your next execution roadmap.</p>
       <div className="mt-8 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
         <Motion.div
           className="h-full w-1/2 rounded-full bg-[#a07ee0]"
@@ -714,15 +993,15 @@ function GeneratingState() {
 function EmptyState({ onGenerate, isGenerating, onboardingComplete }: { onGenerate: () => void; isGenerating: boolean; onboardingComplete?: boolean }) {
   return (
     <div className="mx-auto flex max-w-xl flex-col items-center justify-center py-32 text-center">
-      <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-[#a07ee0]">
+      <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-[#a07ee0]">
         <Route size={30} />
       </div>
-      <h2 className="text-3xl font-black tracking-tight text-white">Initialize your mission</h2>
-      <p className="mt-3 text-sm leading-6 text-slate-500">
+      <h2 className="text-3xl font-black tracking-tight text-white font-display">Initialize your mission</h2>
+      <p className="mt-3 text-sm leading-relaxed text-slate-500">
         Let Veda turn your profile, gaps, and target role into an adaptive execution roadmap.
       </p>
       {!onboardingComplete ? (
-        <Link to="/onboarding" className="mt-8 rounded-lg bg-[#c9a84c] px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-[#1c1608]">
+        <Link to="/onboarding" className="mt-8 rounded-xl bg-[#c9a84c] px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-[#1c1608] shadow-premium hover:brightness-110 transition-all">
           Complete onboarding
         </Link>
       ) : (
@@ -730,7 +1009,7 @@ function EmptyState({ onGenerate, isGenerating, onboardingComplete }: { onGenera
           <button
             onClick={onGenerate}
             disabled={isGenerating}
-            className="rounded-lg bg-[#7c5cbf] px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-white transition hover:bg-[#a07ee0] disabled:opacity-60"
+            className="rounded-xl bg-[#7c5cbf] px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-white transition hover:bg-[#a07ee0] disabled:opacity-60 shadow-premium"
           >
             Generate roadmap
           </button>
@@ -744,13 +1023,13 @@ function ErrorState({ error, onRetry, onClear }: { error: string; onRetry: () =>
   return (
     <div className="mx-auto flex max-w-md flex-col items-center justify-center py-32 text-center">
       <AlertCircle className="mb-4 h-12 w-12 text-[#e05555]" />
-      <h2 className="text-xl font-black text-white">Roadmap sync failed</h2>
-      <p className="mt-2 text-sm leading-6 text-slate-500">{error}</p>
+      <h2 className="text-xl font-black text-white font-display">Roadmap sync failed</h2>
+      <p className="mt-2 text-sm leading-relaxed text-slate-500">{error}</p>
       <div className="mt-6 flex gap-3">
-        <button onClick={onClear} className="rounded-lg border border-white/10 px-4 py-2 text-xs font-bold text-slate-400 hover:text-white">
+        <button onClick={onClear} className="rounded-xl border border-white/10 px-4 py-2.5 text-xs font-bold text-slate-400 hover:text-white transition-all">
           Dismiss
         </button>
-        <button onClick={onRetry} className="rounded-lg bg-[#e05555] px-4 py-2 text-xs font-bold text-white">
+        <button onClick={onRetry} className="rounded-xl bg-[#e05555] px-4 py-2.5 text-xs font-bold text-white shadow-premium">
           Retry
         </button>
       </div>
