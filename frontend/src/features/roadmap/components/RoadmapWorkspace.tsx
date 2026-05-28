@@ -25,7 +25,9 @@ import {
   TrendingUp,
   Zap,
   Clock,
-  ChevronRight
+  ChevronRight,
+  ChevronUp,
+  ExternalLink
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useRoadmapsStore } from "../../../store/roadmaps-store";
@@ -256,107 +258,24 @@ export function RoadmapWorkspace() {
                   <div className="mt-5 rounded-xl border border-indigo-500/15 bg-indigo-950/5 p-4.5 text-xs sm:text-sm leading-relaxed text-indigo-300">
                     <span className="font-bold text-white block sm:inline mr-1">Why this matters:</span>
                     {currentMission?.whyItMatters || "Redis caching is critical for production systems. You'll use this pattern in 90% of scaling operations."}
-                  </div>
-
-                  {/* Tasks List */}
+                  </div>                  {/* Tasks List */}
                   <div className="mt-6 space-y-3.5">
                     {missionTasks.map((task, idx) => {
                       const isCompleted = task.status === "completed";
-                      // First pending task is regarded as in progress to display active state
                       const isActive = !isCompleted && pendingTasks[0]?.id === task.id;
                       const isLocked = !isCompleted && !isActive && idx > 0 && missionTasks[idx - 1].status !== "completed";
 
-                      const TaskIcon = {
-                        learn: BookOpen,
-                        practice: Zap,
-                        revise: RefreshCw,
-                        project: Layers3
-                      }[task.type] || BookOpen;
-
                       return (
-                        <div
+                        <TaskCard
                           key={task.id}
-                          className={cn(
-                            "rounded-xl border p-4.5 transition-all duration-300 relative overflow-hidden flex items-start gap-4",
-                            isCompleted 
-                              ? "border-emerald-500/10 bg-emerald-500/[0.02]" 
-                              : isActive 
-                                ? "border-brand/35 bg-brand/[0.03] shadow-[inset_0_0_0_1px_rgba(99,102,241,0.06)]"
-                                : "border-white/[0.05] bg-white/[0.01] hover:bg-white/[0.03] hover:border-white/[0.08]"
-                          )}
-                        >
-                          {/* Checked Checkbox vs Running Icon vs Locked State */}
-                          <button
-                            onClick={() => updateTaskStatus(task.id, isCompleted ? "pending" : "completed")}
-                            disabled={isLocked}
-                            className={cn(
-                              "mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border transition duration-200",
-                              isCompleted 
-                                ? "border-emerald-500 bg-emerald-500 text-slate-950" 
-                                : isLocked 
-                                  ? "border-white/5 bg-white/[0.01] text-slate-600 cursor-not-allowed" 
-                                  : "border-white/15 text-slate-500 hover:border-brand hover:text-brand"
-                            )}
-                          >
-                            {isCompleted ? <CheckCircle2 size={15} /> : isLocked ? <Lock size={12} /> : <Circle size={13} />}
-                          </button>
-
-                          <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-center gap-2 mb-1.5 text-[10px] font-bold font-mono">
-                              <span className={cn(
-                                "px-2 py-0.5 rounded border uppercase tracking-wider flex items-center gap-1",
-                                isCompleted 
-                                  ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-400" 
-                                  : "border-white/10 bg-white/5 text-slate-400"
-                              )}>
-                                <TaskIcon size={11} />
-                                {task.type}
-                              </span>
-                              <span className="text-slate-500">{task.durationMinutes} min</span>
-                              {task.difficulty && (
-                                <span className={cn(
-                                  "px-2 py-0.5 rounded uppercase",
-                                  task.difficulty === "easy" ? "bg-[#061f1a] text-[#2ec4a0]" : task.difficulty === "medium" ? "bg-[#1c1608] text-[#c9a84c]" : "bg-[#200e0e] text-[#e05555]"
-                                )}>
-                                  {task.difficulty}
-                                </span>
-                              )}
-                            </div>
-
-                            <h3 className={cn(
-                              "text-sm sm:text-base font-bold leading-snug",
-                              isCompleted ? "text-slate-500 line-through font-normal" : "text-white",
-                              isLocked && "text-slate-600"
-                            )}>
-                              {task.title}
-                            </h3>
-
-                            {/* Active Time spent progress indicators */}
-                            {isActive && (
-                              <div className="mt-3.5 space-y-2">
-                                <div className="flex items-center justify-between text-xs text-brand-light font-semibold">
-                                  <span className="flex items-center gap-1"><Clock size={12} className="animate-spin" /> You've done 42 min</span>
-                                  <span>1 hour planned</span>
-                                </div>
-                                <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
-                                  <div className="h-full bg-brand rounded-full animate-[pulse_2s_infinite]" style={{ width: "70%" }} />
-                                </div>
-                              </div>
-                            )}
-
-                            {isLocked && (
-                              <p className="mt-1.5 text-xs text-slate-500 italic">
-                                Unlock after previous task completes
-                              </p>
-                            )}
-
-                            {task.aiHint && !isCompleted && !isLocked && (
-                              <p className="mt-2 text-xs italic leading-relaxed text-slate-500">
-                                Veda: "{task.aiHint}"
-                              </p>
-                            )}
-                          </div>
-                        </div>
+                          task={task}
+                          isActive={isActive}
+                          isLocked={isLocked}
+                          featured={isActive}
+                          onToggle={() => updateTaskStatus(task.id, isCompleted ? "pending" : "completed")}
+                          onStart={() => navigate(`/study/${task.id}`)}
+                          delay={idx * 0.04}
+                        />
                       );
                     })}
                   </div>
@@ -828,8 +747,339 @@ function PhaseRow({ phase, index, active, progress, onClick }: { phase: RoadmapP
   );
 }
 
-function TaskCard({ task, featured, onToggle, onStart, delay }: { task: RoadmapTask; featured: boolean; onToggle: () => void; onStart: () => void; delay: number }) {
+interface TaskRichData {
+  theme: "cache" | "ats" | "obsidian" | "sqlite" | "default";
+  label: string;
+  subtasks: string[];
+  resources: { label: string; url: string }[];
+}
+
+function getTaskRichData(title: string): TaskRichData {
+  const t = title.toLowerCase();
+  if (t.includes("cache") || t.includes("redis") || t.includes("in-memory") || t.includes("eviction") || t.includes("memcached") || t.includes("key-value")) {
+    return {
+      theme: "cache",
+      label: "Caching & In-Memory Storage",
+      subtasks: [
+        "Initialize connection pool & configure client retry backoffs",
+        "Implement Cache-Aside read/write serialization logic",
+        "Set custom TTL rules & define LRU eviction policy limits",
+        "Benchmark database response query latency improvements"
+      ],
+      resources: [
+        { label: "Redis Command Reference", url: "https://redis.io/commands/" },
+        { label: "High-Performance Caching Guide", url: "https://systemdesign.one/caching-system-design/" }
+      ]
+    };
+  }
+  if (t.includes("ats") || t.includes("resume") || t.includes("parser") || t.includes("matching") || t.includes("similarity") || t.includes("cosine") || t.includes("nlp") || t.includes("vector") || t.includes("embedding")) {
+    return {
+      theme: "ats",
+      label: "AI Semantic Vector Parsing",
+      subtasks: [
+        "Write PDF / docx parser script utilizing native streams",
+        "Generate tf-idf frequency counts or dense embedding vectors",
+        "Code cosine similarity dot product math comparison logic",
+        "Map matched keywords onto clinical gap matrix outputs"
+      ],
+      resources: [
+        { label: "Vector Embeddings Guide", url: "https://openaipandas.github.io/" },
+        { label: "ATS Matching Best Practices", url: "https://vireup.com/resume-parser-api-documentation/" }
+      ]
+    };
+  }
+  if (t.includes("obsidian") || t.includes("note") || t.includes("graph") || t.includes("vault") || t.includes("atomic") || t.includes("markdown") || t.includes("link")) {
+    return {
+      theme: "obsidian",
+      label: "Zettelkasten Atomic Notes Graph",
+      subtasks: [
+        "Deconstruct master notes into single-concept atomic files",
+        "Format cross-reference indexing using [[Wikilink]] syntax",
+        "Build dynamic Graph MOCs (Maps of Content) directories",
+        "Verify node graph clusters reflect personal knowledge growth"
+      ],
+      resources: [
+        { label: "Zettelkasten Method Intro", url: "https://zettelkasten.de/introduction/" },
+        { label: "Obsidian Vault Structure", url: "https://help.obsidian.md/Getting+started" }
+      ]
+    };
+  }
+  if (t.includes("c++") || t.includes("cmake") || t.includes("sqlite") || t.includes("database") || t.includes("compile") || t.includes("transaction") || t.includes("sql") || t.includes("query")) {
+    return {
+      theme: "sqlite",
+      label: "C++ SQLite & Modern CMake Toolchain",
+      subtasks: [
+        "Write CMake FetchContent blocks to resolve SQLite dependencies",
+        "Enable Write-Ahead Logging (WAL) journal configuration modes",
+        "Implement thread-safe query transaction wrappers & prepared bindings",
+        "Add memory-mapped (MMAP) execution configurations to speed up IO"
+      ],
+      resources: [
+        { label: "Modern CMake Reference", url: "https://cliutils.gitlab.io/modern-cmake/" },
+        { label: "SQLite C/C++ API Introduction", url: "https://www.sqlite.org/cintro.html" }
+      ]
+    };
+  }
+  return {
+    theme: "default",
+    label: "Production System API Architecture",
+    subtasks: [
+      "Set up distributed Rate Limiting middleware via Token Bucket",
+      "Deploy secure JWT session tokens with asymmetric RS256 keys",
+      "Structure telemetry logging utilizing JSON trace instrumentation",
+      "Establish graceful server cleanup hooks listening on SIGTERM"
+    ],
+    resources: [
+      { label: "OWASP API Security Risks", url: "https://owasp.org/www-project-api-security/" },
+      { label: "Graceful Shutdown Best Practices", url: "https://nodejs.org/api/process.html#process_event_sigterm" }
+    ]
+  };
+}
+
+function CacheBlueprint() {
+  return (
+    <svg className="w-full h-full max-h-[120px]" viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="cacheGlow" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#10B981" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="#047857" stopOpacity="0.2" />
+        </linearGradient>
+        <linearGradient id="dbGlow" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="#6D28D9" stopOpacity="0.2" />
+        </linearGradient>
+        <filter id="glowFilter" x="-10%" y="-10%" width="120%" height="120%">
+          <feGaussianBlur stdDeviation="2" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      <rect x="10" y="42" width="50" height="35" rx="6" fill="#1E293B" stroke="white" strokeOpacity="0.1" />
+      <text x="35" y="59" fill="white" fontSize="8" fontWeight="bold" textAnchor="middle">Client App</text>
+      <text x="35" y="70" fill="#64748B" fontSize="6" fontWeight="bold" textAnchor="middle">Port 3000</text>
+
+      <rect x="95" y="12" width="65" height="35" rx="6" fill="url(#cacheGlow)" stroke="#10B981" strokeOpacity="0.4" filter="url(#glowFilter)" />
+      <text x="127.5" y="29" fill="white" fontSize="8" fontWeight="bold" textAnchor="middle">Redis Cache</text>
+      <text x="127.5" y="40" fill="#A7F3D0" fontSize="6" fontWeight="bold" textAnchor="middle">LRU Hit (1ms)</text>
+
+      <rect x="95" y="72" width="65" height="35" rx="6" fill="url(#dbGlow)" stroke="#8B5CF6" strokeOpacity="0.4" filter="url(#glowFilter)" />
+      <text x="127.5" y="89" fill="white" fontSize="8" fontWeight="bold" textAnchor="middle">PostgreSQL</text>
+      <text x="127.5" y="100" fill="#DDD6FE" fontSize="6" fontWeight="bold" textAnchor="middle">Miss (120ms)</text>
+
+      <path d="M60 52 C 75 52, 75 29.5, 95 29.5" stroke="#10B981" strokeWidth="1" strokeDasharray="3 3">
+        <animate attributeName="stroke-dashoffset" values="30;0" dur="2s" repeatCount="indefinite" />
+      </path>
+
+      <path d="M60 67 C 75 67, 75 89.5, 95 89.5" stroke="#8B5CF6" strokeWidth="1" strokeDasharray="4 4">
+        <animate attributeName="stroke-dashoffset" values="40;0" dur="3s" repeatCount="indefinite" />
+      </path>
+
+      <path d="M127.5 47 L 127.5 72" stroke="#64748B" strokeWidth="1" strokeDasharray="2 2" />
+    </svg>
+  );
+}
+
+function AtsBlueprint() {
+  return (
+    <svg className="w-full h-full max-h-[120px]" viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="atsGlow" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="#1D4ED8" stopOpacity="0.2" />
+        </linearGradient>
+        <filter id="glowFilter" x="-10%" y="-10%" width="120%" height="120%">
+          <feGaussianBlur stdDeviation="2" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      <rect x="10" y="42" width="45" height="35" rx="6" fill="#1E293B" stroke="white" strokeOpacity="0.1" />
+      <text x="32.5" y="59" fill="white" fontSize="8" fontWeight="bold" textAnchor="middle">Resume PDF</text>
+      <text x="32.5" y="70" fill="#64748B" fontSize="6" fontWeight="bold" textAnchor="middle">Raw Data</text>
+
+      <rect x="80" y="42" width="60" height="35" rx="6" fill="url(#atsGlow)" stroke="#3B82F6" strokeOpacity="0.4" filter="url(#glowFilter)" />
+      <text x="110" y="59" fill="white" fontSize="8" fontWeight="bold" textAnchor="middle">Vector Embed</text>
+      <text x="110" y="70" fill="#93C5FD" fontSize="6" fontWeight="bold" textAnchor="middle">1536-Dim</text>
+
+      <rect x="165" y="42" width="55" height="35" rx="6" fill="#1E293B" stroke="#10B981" strokeOpacity="0.4" />
+      <text x="192.5" y="59" fill="white" fontSize="8" fontWeight="bold" textAnchor="middle">Cosine Sim</text>
+      <text x="192.5" y="70" fill="#10B981" fontSize="7" fontWeight="black" textAnchor="middle">Match 94%</text>
+
+      <path d="M55 59.5 L 80 59.5" stroke="#3B82F6" strokeWidth="1" strokeDasharray="3 3">
+        <animate attributeName="stroke-dashoffset" values="30;0" dur="2s" repeatCount="indefinite" />
+      </path>
+      <path d="M140 59.5 L 165 59.5" stroke="#10B981" strokeWidth="1" strokeDasharray="3 3">
+        <animate attributeName="stroke-dashoffset" values="30;0" dur="2s" repeatCount="indefinite" />
+      </path>
+    </svg>
+  );
+}
+
+function ObsidianBlueprint() {
+  return (
+    <svg className="w-full h-full max-h-[120px]" viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="glowFilter" x="-10%" y="-10%" width="120%" height="120%">
+          <feGaussianBlur stdDeviation="2" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      <circle cx="120" cy="60" r="8" fill="#EC4899" stroke="#EC4899" strokeWidth="1" filter="url(#glowFilter)" className="animate-pulse" />
+      <text x="120" y="76" fill="white" fontSize="7" fontWeight="bold" textAnchor="middle">MOC Index</text>
+
+      <circle cx="70" cy="35" r="5" fill="#3B82F6" stroke="#3B82F6" strokeWidth="1" />
+      <text x="70" y="27" fill="#94A3B8" fontSize="5" fontWeight="semibold" textAnchor="middle">Redis Cache</text>
+
+      <circle cx="170" cy="30" r="5" fill="#3B82F6" stroke="#3B82F6" strokeWidth="1" />
+      <text x="170" y="22" fill="#94A3B8" fontSize="5" fontWeight="semibold" textAnchor="middle">SQLite WAL</text>
+
+      <circle cx="80" cy="90" r="5" fill="#10B981" stroke="#10B981" strokeWidth="1" />
+      <text x="80" y="101" fill="#94A3B8" fontSize="5" fontWeight="semibold" textAnchor="middle">Zettelkasten</text>
+
+      <circle cx="160" cy="90" r="5" fill="#10B981" stroke="#10B981" strokeWidth="1" />
+      <text x="160" y="101" fill="#94A3B8" fontSize="5" fontWeight="semibold" textAnchor="middle">Compilers</text>
+
+      <line x1="120" y1="60" x2="70" y2="35" stroke="#EC4899" strokeWidth="1" strokeOpacity="0.5" strokeDasharray="1 1" />
+      <line x1="120" y1="60" x2="170" y2="30" stroke="#EC4899" strokeWidth="1" strokeOpacity="0.5" strokeDasharray="1 1" />
+      <line x1="120" y1="60" x2="80" y2="90" stroke="#EC4899" strokeWidth="1" strokeOpacity="0.5" strokeDasharray="1 1" />
+      <line x1="120" y1="60" x2="160" y2="90" stroke="#EC4899" strokeWidth="1" strokeOpacity="0.5" strokeDasharray="1 1" />
+
+      <line x1="70" y1="35" x2="80" y2="90" stroke="#64748B" strokeWidth="0.5" strokeOpacity="0.3" />
+      <line x1="170" y1="30" x2="160" y2="90" stroke="#64748B" strokeWidth="0.5" strokeOpacity="0.3" />
+    </svg>
+  );
+}
+
+function SqliteBlueprint() {
+  return (
+    <svg className="w-full h-full max-h-[120px]" viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="sqliteGlow" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="#D97706" stopOpacity="0.2" />
+        </linearGradient>
+        <filter id="glowFilter" x="-10%" y="-10%" width="120%" height="120%">
+          <feGaussianBlur stdDeviation="2" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      <rect x="10" y="42" width="55" height="35" rx="6" fill="#1E293B" stroke="white" strokeOpacity="0.1" />
+      <text x="37.5" y="59" fill="white" fontSize="8" fontWeight="bold" textAnchor="middle">C++ Sandbox</text>
+      <text x="37.5" y="70" fill="#64748B" fontSize="6" fontWeight="bold" textAnchor="middle">App Process</text>
+
+      <rect x="95" y="42" width="55" height="35" rx="6" fill="url(#sqliteGlow)" stroke="#F59E0B" strokeOpacity="0.4" filter="url(#glowFilter)" />
+      <text x="122.5" y="59" fill="white" fontSize="8" fontWeight="bold" textAnchor="middle">SQLite WAL</text>
+      <text x="122.5" y="70" fill="#FEF3C7" fontSize="6" fontWeight="bold" textAnchor="middle">Fast Commit</text>
+
+      <rect x="170" y="42" width="50" height="35" rx="6" fill="#1E293B" stroke="#6D28D9" strokeOpacity="0.4" />
+      <text x="195" y="59" fill="white" fontSize="8" fontWeight="bold" textAnchor="middle">PostgreSQL</text>
+      <text x="195" y="70" fill="#A78BFA" fontSize="6" fontWeight="bold" textAnchor="middle">Cloud Sync</text>
+
+      <path d="M65 59.5 L 95 59.5" stroke="#F59E0B" strokeWidth="1" strokeDasharray="3 3">
+        <animate attributeName="stroke-dashoffset" values="30;0" dur="2s" repeatCount="indefinite" />
+      </path>
+      <path d="M150 59.5 L 170 59.5" stroke="#6D28D9" strokeWidth="1" strokeDasharray="2 2">
+        <animate attributeName="stroke-dashoffset" values="20;0" dur="3s" repeatCount="indefinite" />
+      </path>
+    </svg>
+  );
+}
+
+function DefaultBlueprint() {
+  return (
+    <svg className="w-full h-full max-h-[120px]" viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="defGlow" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="#2563EB" stopOpacity="0.2" />
+        </linearGradient>
+        <filter id="glowFilter" x="-10%" y="-10%" width="120%" height="120%">
+          <feGaussianBlur stdDeviation="2" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      <rect x="10" y="42" width="45" height="35" rx="6" fill="#1E293B" stroke="white" strokeOpacity="0.1" />
+      <text x="32.5" y="59" fill="white" fontSize="8" fontWeight="bold" textAnchor="middle">Gateway</text>
+      <text x="32.5" y="70" fill="#64748B" fontSize="6" fontWeight="bold" textAnchor="middle">Shield (Rate)</text>
+
+      <rect x="80" y="42" width="60" height="35" rx="6" fill="url(#defGlow)" stroke="#3B82F6" strokeOpacity="0.4" filter="url(#glowFilter)" />
+      <text x="110" y="59" fill="white" fontSize="8" fontWeight="bold" textAnchor="middle">Nginx Proxy</text>
+      <text x="110" y="70" fill="#93C5FD" fontSize="6" fontWeight="bold" textAnchor="middle">Load Balancer</text>
+
+      <rect x="165" y="42" width="55" height="35" rx="6" fill="#1E293B" stroke="#10B981" strokeOpacity="0.4" />
+      <text x="192.5" y="59" fill="white" fontSize="8" fontWeight="bold" textAnchor="middle">App Nodes</text>
+      <text x="192.5" y="70" fill="#10B981" fontSize="6" fontWeight="bold" textAnchor="middle">3x Replicas</text>
+
+      <path d="M55 59.5 L 80 59.5" stroke="#3B82F6" strokeWidth="1" strokeDasharray="3 3">
+        <animate attributeName="stroke-dashoffset" values="30;0" dur="2s" repeatCount="indefinite" />
+      </path>
+      <path d="M140 59.5 L 165 59.5" stroke="#10B981" strokeWidth="1" strokeDasharray="3 3">
+        <animate attributeName="stroke-dashoffset" values="30;0" dur="2s" repeatCount="indefinite" />
+      </path>
+    </svg>
+  );
+}
+
+function VedaBlueprint({ theme }: { theme: "cache" | "ats" | "obsidian" | "sqlite" | "default" }) {
+  return (
+    <div className="w-full h-full min-h-[120px] flex items-center justify-center">
+      {theme === "cache" && <CacheBlueprint />}
+      {theme === "ats" && <AtsBlueprint />}
+      {theme === "obsidian" && <ObsidianBlueprint />}
+      {theme === "sqlite" && <SqliteBlueprint />}
+      {theme === "default" && <DefaultBlueprint />}
+    </div>
+  );
+}
+
+function TaskCard({
+  task,
+  featured,
+  isActive = false,
+  isLocked = false,
+  onToggle,
+  onStart,
+  delay
+}: {
+  task: RoadmapTask;
+  featured: boolean;
+  isActive?: boolean;
+  isLocked?: boolean;
+  onToggle: () => void;
+  onStart: () => void;
+  delay: number;
+}) {
   const isDone = task.status === "completed";
+  const [isExpanded, setIsExpanded] = useState(false);
+  const richData = useMemo(() => getTaskRichData(task.title), [task.title]);
+
+  const [checkedSubtasks, setCheckedSubtasks] = useState<boolean[]>(() => {
+    return richData.subtasks.map((_, idx) => {
+      const saved = localStorage.getItem(`studybuddy-task-${task.id}-sub-${idx}`);
+      return saved === "true";
+    });
+  });
+
+  const toggleSubtask = (idx: number) => {
+    const nextStates = [...checkedSubtasks];
+    nextStates[idx] = !nextStates[idx];
+    setCheckedSubtasks(nextStates);
+    localStorage.setItem(`studybuddy-task-${task.id}-sub-${idx}`, nextStates[idx] ? "true" : "false");
+  };
+
   const Icon = {
     learn: BookOpen,
     practice: Zap,
@@ -842,22 +1092,35 @@ function TaskCard({ task, featured, onToggle, onStart, delay }: { task: RoadmapT
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
+      onClick={() => {
+        if (!isLocked) {
+          setIsExpanded(!isExpanded);
+        }
+      }}
       className={cn(
-        "rounded-xl border p-4.5 transition-all duration-300",
+        "rounded-xl border p-4.5 transition-all duration-300 cursor-pointer select-none relative overflow-hidden",
         featured ? "border-[#4e8ef0]/30 bg-[#0a1528]" : "border-white/10 bg-[#121620]/60 hover:border-white/20",
         isDone && "border-[#2ec4a0]/20 bg-[#061f1a]/60"
       )}
     >
       <div className="flex items-start gap-4">
         <button
-          onClick={onToggle}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggle();
+          }}
+          disabled={isLocked}
           className={cn(
             "mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border transition duration-200",
-            isDone ? "border-[#2ec4a0] bg-[#2ec4a0] text-slate-950" : "border-white/15 text-slate-500 hover:border-[#2ec4a0] hover:text-[#2ec4a0]"
+            isDone 
+              ? "border-[#2ec4a0] bg-[#2ec4a0] text-slate-950" 
+              : isLocked 
+                ? "border-white/5 bg-white/[0.01] text-slate-600 cursor-not-allowed" 
+                : "border-white/15 text-slate-500 hover:border-[#2ec4a0] hover:text-[#2ec4a0]"
           )}
           aria-label={isDone ? "Mark task pending" : "Mark task complete"}
         >
-          {isDone ? <CheckCircle2 size={15} /> : <Circle size={13} />}
+          {isDone ? <CheckCircle2 size={15} /> : isLocked ? <Lock size={12} /> : <Circle size={13} />}
         </button>
 
         <div className="min-w-0 flex-1">
@@ -874,21 +1137,149 @@ function TaskCard({ task, featured, onToggle, onStart, delay }: { task: RoadmapT
             )}
           </div>
           <h3 className={cn("text-sm font-bold leading-snug", isDone ? "text-slate-500 line-through font-normal" : "text-white")}>{task.title}</h3>
-          {task.aiHint && !isDone && (
+          
+          {/* Active Time spent progress indicators */}
+          {isActive && !isDone && (
+            <div className="mt-3.5 space-y-2">
+              <div className="flex items-center justify-between text-xs text-brand-light font-semibold">
+                <span className="flex items-center gap-1"><Clock size={12} className="animate-spin" /> You've done 42 min</span>
+                <span>1 hour planned</span>
+              </div>
+              <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+                <div className="h-full bg-brand rounded-full animate-[pulse_2s_infinite]" style={{ width: "70%" }} />
+              </div>
+            </div>
+          )}
+
+          {isLocked && (
+            <p className="mt-1.5 text-xs text-slate-500 italic">
+              Unlock after previous task completes
+            </p>
+          )}
+
+          {task.aiHint && !isDone && !isLocked && (
             <p className="mt-2 line-clamp-2 text-xs italic leading-relaxed text-slate-500">Veda: "{task.aiHint}"</p>
           )}
         </div>
 
-        {!isDone && (
-          <button
-            onClick={onStart}
-            className="hidden shrink-0 items-center gap-1 rounded-lg border border-[#a07ee0]/25 bg-[#150f28] px-3 py-2 text-[10px] font-black uppercase tracking-widest text-[#a07ee0] transition hover:bg-[#7c5cbf] hover:text-white sm:inline-flex"
-          >
-            Start
-            <ArrowRight size={12} />
-          </button>
-        )}
+        <div className="flex items-center gap-2 shrink-0 self-start">
+          {!isDone && !isLocked && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onStart();
+              }}
+              className="hidden shrink-0 items-center gap-1 rounded-lg border border-[#a07ee0]/25 bg-[#150f28] px-3 py-2 text-[10px] font-black uppercase tracking-widest text-[#a07ee0] transition hover:bg-[#7c5cbf] hover:text-white sm:inline-flex"
+            >
+              Start
+              <ArrowRight size={12} />
+            </button>
+          )}
+          
+          {!isLocked && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsExpanded(!isExpanded);
+              }}
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-slate-400 hover:text-white hover:border-white/20 transition-all duration-200"
+              aria-label={isExpanded ? "Collapse card details" : "Expand card details"}
+            >
+              {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </button>
+          )}
+        </div>
       </div>
+
+      <AnimatePresence>
+        {isExpanded && !isLocked && (
+          <Motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            onClick={(e) => e.stopPropagation()}
+            className="overflow-hidden"
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-6 mt-5 pt-5 border-t border-white/[0.06]">
+              {/* Left Column: checklist and docs */}
+              <div className="space-y-5">
+                <div>
+                  <p className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-slate-500 mb-3">
+                    IMPLEMENTATION CHECKLIST
+                  </p>
+                  <div className="space-y-2.5">
+                    {richData.subtasks.map((sub, idx) => {
+                      const isSubDone = checkedSubtasks[idx];
+                      return (
+                        <button
+                          key={idx}
+                          onClick={() => toggleSubtask(idx)}
+                          className={cn(
+                            "w-full flex items-start gap-3 rounded-lg border p-3 text-left transition duration-200 text-xs",
+                            isSubDone
+                              ? "border-emerald-500/10 bg-emerald-500/[0.01] text-slate-500"
+                              : "border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.03] text-slate-300"
+                          )}
+                        >
+                          <div className={cn(
+                            "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border transition duration-200",
+                            isSubDone ? "border-emerald-500 bg-emerald-500 text-slate-950" : "border-white/20 text-slate-500"
+                          )}>
+                            {isSubDone && <CheckCircle2 size={11} />}
+                          </div>
+                          <span className={cn(
+                            "leading-relaxed font-medium",
+                            isSubDone && "line-through text-slate-600"
+                          )}>
+                            {sub}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-slate-500 mb-3">
+                    EXTERNAL DOCUMENTATION
+                  </p>
+                  <div className="flex flex-wrap gap-2.5">
+                    {richData.resources.map((res, idx) => (
+                      <a
+                        key={idx}
+                        href={res.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-300 hover:text-white px-3.5 py-2 transition-all duration-200"
+                      >
+                        <Compass size={12} className="text-slate-400" />
+                        {res.label}
+                        <ExternalLink size={10} className="text-slate-500" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Blueprint */}
+              <div className="flex flex-col rounded-xl border border-white/[0.05] bg-[#030712]/30 p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-mono text-[8px] font-black uppercase tracking-[0.16em] text-slate-500">
+                    VEDA BLUEPRINT
+                  </span>
+                  <span className="text-[9px] font-mono font-bold text-brand-light bg-brand/10 px-2 py-0.5 rounded border border-brand/20 uppercase tracking-widest">
+                    {richData.theme}
+                  </span>
+                </div>
+                <div className="flex-1 rounded-lg border border-white/[0.04] bg-[#07090d]/60 p-2 overflow-hidden flex items-center justify-center">
+                  <VedaBlueprint theme={richData.theme} />
+                </div>
+              </div>
+            </div>
+          </Motion.div>
+        )}
+      </AnimatePresence>
     </Motion.div>
   );
 }
