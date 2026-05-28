@@ -13,7 +13,13 @@ import { cn } from "../../../lib/utils/cn";
 import { type SkillGapItem, type SkillDimension } from "../types";
 
 export function SkillMatrixCard({ gap }: { gap: SkillGapItem }) {
-  const { dimensions } = gap;
+  const dimensions = gap.dimensions || {
+    confidence: 0,
+    retention: 0,
+    interviewReady: 0,
+    practical: 0,
+    momentum: "stagnating"
+  };
   const statusLabel = gap.status === "strong" ? "Strong" : gap.status === "partial" ? "Partial" : "Weak";
   
   return (
@@ -36,7 +42,7 @@ export function SkillMatrixCard({ gap }: { gap: SkillGapItem }) {
            <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">{gap.category}</p>
         </div>
         <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.04]">
-           <span className="text-lg font-black text-white">{gap.userScore}<span className="ml-0.5 text-[10px] text-brand">%</span></span>
+           <span className="text-lg font-black text-white">{gap.userScore || 0}<span className="ml-0.5 text-[10px] text-brand">%</span></span>
         </div>
       </div>
 
@@ -60,16 +66,17 @@ export function SkillMatrixCard({ gap }: { gap: SkillGapItem }) {
 }
 
 function DimensionBar({ label, value, icon: Icon, color }: any) {
+  const percentValue = typeof value === "number" ? Math.max(0, Math.min(100, value)) : 0;
   return (
     <div className="space-y-2">
        <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-widest text-slate-500">
           <span className="flex items-center gap-2"><Icon size={12} className="text-slate-500" /> {label}</span>
-          <span className="text-white">{value}%</span>
+          <span className="text-white">{percentValue}%</span>
        </div>
        <div className="h-1.5 overflow-hidden rounded-full border border-white/[0.05] bg-white/[0.04] p-[1px]">
           <Motion.div 
             initial={{ width: 0 }}
-            animate={{ width: `${value}%` }}
+            animate={{ width: `${percentValue}%` }}
             transition={{ duration: 1, ease: "easeOut" }}
             className={cn("h-full rounded-full", color)} 
           />
