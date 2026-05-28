@@ -991,7 +991,7 @@ function PhaseRow({ phase, index, active, progress, onClick }: { phase: RoadmapP
       disabled={phase.status === "locked"}
       className={cn(
         "mb-2 flex w-full items-start gap-3.5 rounded-xl border p-4.5 text-left transition duration-200",
-        active ? "border-[#a07ee0]/35 bg-[#150f28]" : "border-transparent hover:border-white/10 hover:bg-white/[0.02]",
+        active ? "border-[#a07ee0]/35 bg-[#150f28] shadow-[0_0_15px_rgba(160,126,224,0.1)]" : "border-white/5 bg-white/[0.01] hover:border-white/10 hover:bg-white/[0.02]",
         phase.status === "locked" && "cursor-not-allowed opacity-55"
       )}
     >

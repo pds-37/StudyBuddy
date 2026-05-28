@@ -21,6 +21,7 @@ import { logBehavior } from "../lib/api/behavior";
 import { registerConfidence } from "../lib/api/memory";
 import { useFocusStore } from "../store/focus-store";
 import { useCopilotStore } from "../store/copilot-store";
+import { useRoadmapsStore } from "../store/roadmaps-store";
 import { cn } from "../lib/utils/cn";
 import { AnimatePresence, motion } from "framer-motion";
 import type { MentorTask } from "@studybuddy/shared";
@@ -41,8 +42,45 @@ export function StudyPage() {
     const loadTask = async () => {
       try {
         setLoading(true);
-        const plan = await getMentorToday();
-        const foundTask = plan.tasks.find(t => t.id === taskId);
+        let foundTask: any = null;
+        
+        try {
+          const plan = await getMentorToday();
+          foundTask = plan.tasks.find(t => t.id === taskId);
+        } catch (e) {
+          console.warn("Mentor api daily tasks fetch failed, fallback to roadmap search", e);
+        }
+        
+        // Fallback: Search in the active roadmap phases and missions
+        if (!foundTask) {
+          const { currentRoadmap, fetchRoadmaps } = useRoadmapsStore.getState();
+          let roadmap = currentRoadmap;
+          if (!roadmap) {
+            await fetchRoadmaps();
+            roadmap = useRoadmapsStore.getState().currentRoadmap;
+          }
+          if (roadmap) {
+            for (const phase of roadmap.phases) {
+              for (const mission of phase.missions) {
+                const t = mission.tasks.find(tk => tk.id === taskId);
+                if (t) {
+                  foundTask = {
+                    id: t.id,
+                    title: t.title,
+                    type: t.type,
+                    description: (t as any).description || t.title,
+                    estimatedMinutes: t.durationMinutes || 45,
+                    priority: t.difficulty === "hard" ? "high" : t.difficulty === "medium" ? "medium" : "low",
+                    status: t.status,
+                    reason: t.aiHint || "Structured curriculum task"
+                  };
+                  break;
+                }
+              }
+              if (foundTask) break;
+            }
+          }
+        }
         
         if (!foundTask) {
           setError("Task not found in today's plan.");
@@ -52,10 +90,18 @@ export function StudyPage() {
         setTask(foundTask);
         
         // Log behavior: starting a study session
-        await logBehavior("session_started", { taskId, type: foundTask.type });
+        try {
+          await logBehavior("session_started", { taskId, type: foundTask.type });
+        } catch (e) {
+          console.warn("logBehavior session_started failed", e);
+        }
         
         if (foundTask.status === "pending") {
-          await recordMentorTaskFeedback(taskId!, { type: "start" });
+          try {
+            await recordMentorTaskFeedback(taskId!, { type: "start" });
+          } catch (e) {
+            console.warn("recordMentorTaskFeedback failed", e);
+          }
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load task");
@@ -91,14 +137,44 @@ export function StudyPage() {
     if (!task) return;
     try {
       setLoading(true);
-      await updateMentorTaskStatus(task.id, "completed");
-      await recordMentorTaskFeedback(task.id, { type: "confidence", confidenceScore: score });
-      await logBehavior("task_completed", { taskId: task.id, type: task.type, confidence: score });
+
+      const { currentRoadmap, updateTaskStatus } = useRoadmapsStore.getState();
+      let isRoadmapTask = false;
+      if (currentRoadmap) {
+        for (const phase of currentRoadmap.phases) {
+          for (const mission of phase.missions) {
+            if (mission.tasks.some(tk => tk.id === task.id)) {
+              isRoadmapTask = true;
+              break;
+            }
+          }
+          if (isRoadmapTask) break;
+        }
+      }
+
+      if (isRoadmapTask) {
+        await updateTaskStatus(task.id, "completed");
+      } else {
+        await updateMentorTaskStatus(task.id, "completed");
+      }
       
-      // The Confidence Engine: Update memory intervals based on self-assessment
-      // If the task has a noteId in metadata (simulated), we'd use it. 
-      // For now, we use the task ID as a topic proxy if no note exists.
-      await registerConfidence(task.id, score);
+      try {
+        await recordMentorTaskFeedback(task.id, { type: "confidence", confidenceScore: score });
+      } catch (e) {
+        console.warn("recordMentorTaskFeedback failed in submitConfidence", e);
+      }
+      
+      try {
+        await logBehavior("task_completed", { taskId: task.id, type: task.type, confidence: score });
+      } catch (e) {
+        console.warn("logBehavior failed in submitConfidence", e);
+      }
+      
+      try {
+        await registerConfidence(task.id, score);
+      } catch (e) {
+        console.warn("registerConfidence failed in submitConfidence", e);
+      }
       
       navigate("/dashboard");
     } catch (err) {
