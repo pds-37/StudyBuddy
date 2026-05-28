@@ -57,7 +57,12 @@ function toRoadmap(roadmap: RoadmapDocument): Roadmap {
           difficulty: task.difficulty,
           status: task.status,
           aiHint: task.aiHint,
-          completedAt: task.completedAt?.toISOString()
+          completedAt: task.completedAt?.toISOString(),
+          subtasks: task.subtasks ?? [],
+          resources: (task.resources ?? []).map((res: any) => ({
+            label: res.label,
+            url: res.url
+          }))
         }))
       }))
     })),

@@ -1027,7 +1027,7 @@ function PhaseRow({ phase, index, active, progress, onClick }: { phase: RoadmapP
 }
 
 interface TaskRichData {
-  theme: "cache" | "ats" | "obsidian" | "sqlite" | "default";
+  theme: "cache" | "ats" | "obsidian" | "sqlite" | "array" | "react" | "api" | "default";
   label: string;
   subtasks: string[];
   resources: { label: string; url: string }[];
@@ -1048,6 +1048,54 @@ function getTaskRichData(title: string): TaskRichData {
       resources: [
         { label: "Redis Command Reference", url: "https://redis.io/commands/" },
         { label: "High-Performance Caching Guide", url: "https://systemdesign.one/caching-system-design/" }
+      ]
+    };
+  }
+  if (t.includes("array") || t.includes("list") || t.includes("vector") || t.includes("sorting") || t.includes("binary") || t.includes("search") || t.includes("tree") || t.includes("graph") || t.includes("dsa") || t.includes("stack") || t.includes("queue") || t.includes("traverse") || t.includes("traversing")) {
+    return {
+      theme: "array",
+      label: "Data Structure & Complexity Optimization",
+      subtasks: [
+        "Implement continuous memory allocation array resizing",
+        "Optimize direct element lookup index search times to O(1)",
+        "Write edge-case tests validating array index boundaries",
+        "Profile memory footprint differences vs linked pointer items"
+      ],
+      resources: [
+        { label: "DSA Space-Time Complexity CheatSheet", url: "https://www.bigocheatsheet.com/" },
+        { label: "JavaScript TypedArrays", url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Typed_arrays" }
+      ]
+    };
+  }
+  if (t.includes("react") || t.includes("frontend") || t.includes("ui") || t.includes("component") || t.includes("dom") || t.includes("css") || t.includes("html") || t.includes("rendering") || t.includes("view")) {
+    return {
+      theme: "react",
+      label: "React Component & State Reconciliation",
+      subtasks: [
+        "Design modular reusable component elements & state scopes",
+        "Implement React.memo & useMemo to avoid excessive repaints",
+        "Wire up structural responsive grid containers and animations",
+        "Profile Virtual DOM reconciliation diff checks using DevTools"
+      ],
+      resources: [
+        { label: "React Rendering Internals", url: "https://react.dev/learn/render-and-commit" },
+        { label: "Virtual DOM Concepts", url: "https://developer.mozilla.org/en-US/docs/Glossary/Virtual_DOM" }
+      ]
+    };
+  }
+  if (t.includes("api") || t.includes("http") || t.includes("rest") || t.includes("server") || t.includes("route") || t.includes("controller") || t.includes("express") || t.includes("node") || t.includes("endpoint") || t.includes("backend")) {
+    return {
+      theme: "api",
+      label: "REST API Endpoint Routers & Middleware",
+      subtasks: [
+        "Structure endpoint routes with proper HTTP verb matching",
+        "Implement request validation schemas & structured JSON returns",
+        "Establish connection pools to query backend repositories",
+        "Write integration tests to assert status codes (e.g. 200, 404)"
+      ],
+      resources: [
+        { label: "MDN HTTP Status Registry", url: "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status" },
+        { label: "Express.js Routing Guide", url: "https://expressjs.com/en/guide/routing.html" }
       ]
     };
   }
@@ -1274,6 +1322,120 @@ function SqliteBlueprint() {
   );
 }
 
+function ArrayBlueprint() {
+  return (
+    <svg className="w-full h-full max-h-[120px]" viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="arrayGlow" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#06B6D4" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="#0891B2" stopOpacity="0.2" />
+        </linearGradient>
+        <filter id="glowFilter" x="-10%" y="-10%" width="120%" height="120%">
+          <feGaussianBlur stdDeviation="2" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      <rect x="15" y="45" width="40" height="30" rx="4" fill="url(#arrayGlow)" stroke="#06B6D4" strokeOpacity="0.6" filter="url(#glowFilter)" />
+      <text x="35" y="60" fill="white" fontSize="8" fontWeight="bold" textAnchor="middle">Index 0</text>
+      <text x="35" y="70" fill="#E0F2FE" fontSize="6" textAnchor="middle">Addr 0x00</text>
+
+      <rect x="65" y="45" width="40" height="30" rx="4" fill="#1E293B" stroke="white" strokeOpacity="0.1" />
+      <text x="85" y="60" fill="white" fontSize="8" fontWeight="bold" textAnchor="middle">Index 1</text>
+      <text x="85" y="70" fill="#64748B" fontSize="6" textAnchor="middle">Addr 0x04</text>
+
+      <rect x="115" y="45" width="40" height="30" rx="4" fill="#1E293B" stroke="white" strokeOpacity="0.1" />
+      <text x="135" y="60" fill="white" fontSize="8" fontWeight="bold" textAnchor="middle">Index 2</text>
+      <text x="135" y="70" fill="#64748B" fontSize="6" textAnchor="middle">Addr 0x08</text>
+
+      <rect x="165" y="45" width="40" height="30" rx="4" fill="#1E293B" stroke="white" strokeOpacity="0.1" />
+      <text x="185" y="60" fill="white" fontSize="8" fontWeight="bold" textAnchor="middle">Index 3</text>
+      <text x="185" y="70" fill="#64748B" fontSize="6" textAnchor="middle">Addr 0x0C</text>
+
+      <path d="M35 15 L 35 35" stroke="#F59E0B" strokeWidth="1.5" />
+      <text x="35" y="10" fill="#F59E0B" fontSize="7" fontWeight="bold" textAnchor="middle">O(1) Direct Access</text>
+    </svg>
+  );
+}
+
+function ReactBlueprint() {
+  return (
+    <svg className="w-full h-full max-h-[120px]" viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="reactGlow" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="#6D28D9" stopOpacity="0.2" />
+        </linearGradient>
+        <filter id="glowFilter" x="-10%" y="-10%" width="120%" height="120%">
+          <feGaussianBlur stdDeviation="2" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      <circle cx="50" cy="30" r="6" fill="#8B5CF6" stroke="#8B5CF6" filter="url(#glowFilter)" />
+      <line x1="50" y1="30" x2="35" y2="60" stroke="#8B5CF6" strokeWidth="1" />
+      <line x1="50" y1="30" x2="65" y2="60" stroke="#8B5CF6" strokeWidth="1" />
+      <circle cx="35" cy="60" r="5" fill="#8B5CF6" />
+      <circle cx="65" cy="60" r="5" fill="#8B5CF6" />
+      <text x="50" y="18" fill="white" fontSize="7" fontWeight="bold" textAnchor="middle">Virtual DOM</text>
+
+      <path d="M85 45 L 135 45" stroke="#EC4899" strokeWidth="1" strokeDasharray="3 3">
+        <animate attributeName="stroke-dashoffset" values="30;0" dur="2s" repeatCount="indefinite" />
+      </path>
+      <text x="110" y="38" fill="#EC4899" fontSize="6" fontWeight="bold" textAnchor="middle">Reconciliation</text>
+
+      <circle cx="175" cy="30" r="6" fill="#10B981" />
+      <line x1="175" y1="30" x2="160" y2="60" stroke="#10B981" strokeWidth="1" />
+      <line x1="175" y1="30" x2="190" y2="60" stroke="#10B981" strokeWidth="1" />
+      <circle cx="160" cy="60" r="5" fill="#10B981" />
+      <circle cx="190" cy="60" r="5" fill="#10B981" />
+      <text x="175" y="18" fill="white" fontSize="7" fontWeight="bold" textAnchor="middle">Real DOM</text>
+    </svg>
+  );
+}
+
+function ApiBlueprint() {
+  return (
+    <svg className="w-full h-full max-h-[120px]" viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="apiGlow" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#EC4899" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="#BE185D" stopOpacity="0.2" />
+        </linearGradient>
+        <filter id="glowFilter" x="-10%" y="-10%" width="120%" height="120%">
+          <feGaussianBlur stdDeviation="2" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      <rect x="10" y="42" width="50" height="35" rx="6" fill="#1E293B" stroke="white" strokeOpacity="0.1" />
+      <text x="35" y="59" fill="white" fontSize="8" fontWeight="bold" textAnchor="middle">HTTP Client</text>
+      <text x="35" y="70" fill="#64748B" fontSize="6" textAnchor="middle">Request</text>
+
+      <rect x="85" y="42" width="60" height="35" rx="6" fill="url(#apiGlow)" stroke="#EC4899" strokeOpacity="0.4" filter="url(#glowFilter)" />
+      <text x="115" y="59" fill="white" fontSize="8" fontWeight="bold" textAnchor="middle">Express Route</text>
+      <text x="115" y="70" fill="#FCE7F3" fontSize="6" textAnchor="middle">Router Handler</text>
+
+      <rect x="170" y="42" width="55" height="35" rx="6" fill="#1E293B" stroke="#10B981" strokeOpacity="0.4" />
+      <text x="197.5" y="59" fill="white" fontSize="8" fontWeight="bold" textAnchor="middle">Controller</text>
+      <text x="197.5" y="70" fill="#10B981" fontSize="6" fontWeight="bold" textAnchor="middle">200 OK JSON</text>
+
+      <path d="M60 59.5 L 85 59.5" stroke="#EC4899" strokeWidth="1" strokeDasharray="3 3">
+        <animate attributeName="stroke-dashoffset" values="30;0" dur="2s" repeatCount="indefinite" />
+      </path>
+      <path d="M145 59.5 L 170 59.5" stroke="#10B981" strokeWidth="1" strokeDasharray="3 3">
+        <animate attributeName="stroke-dashoffset" values="30;0" dur="2s" repeatCount="indefinite" />
+      </path>
+    </svg>
+  );
+}
+
 function DefaultBlueprint() {
   return (
     <svg className="w-full h-full max-h-[120px]" viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1312,13 +1474,16 @@ function DefaultBlueprint() {
   );
 }
 
-function VedaBlueprint({ theme }: { theme: "cache" | "ats" | "obsidian" | "sqlite" | "default" }) {
+function VedaBlueprint({ theme }: { theme: "cache" | "ats" | "obsidian" | "sqlite" | "array" | "react" | "api" | "default" }) {
   return (
     <div className="w-full h-full min-h-[120px] flex items-center justify-center">
       {theme === "cache" && <CacheBlueprint />}
       {theme === "ats" && <AtsBlueprint />}
       {theme === "obsidian" && <ObsidianBlueprint />}
       {theme === "sqlite" && <SqliteBlueprint />}
+      {theme === "array" && <ArrayBlueprint />}
+      {theme === "react" && <ReactBlueprint />}
+      {theme === "api" && <ApiBlueprint />}
       {theme === "default" && <DefaultBlueprint />}
     </div>
   );
@@ -1343,14 +1508,26 @@ function TaskCard({
 }) {
   const isDone = task.status === "completed";
   const [isExpanded, setIsExpanded] = useState(false);
-  const richData = useMemo(() => getTaskRichData(task.title), [task.title]);
+  const richData = useMemo(() => {
+    const defaultData = getTaskRichData(task.title);
+    return {
+      theme: defaultData.theme,
+      label: defaultData.label,
+      subtasks: task.subtasks && task.subtasks.length > 0 ? task.subtasks : defaultData.subtasks,
+      resources: task.resources && task.resources.length > 0 ? task.resources : defaultData.resources
+    };
+  }, [task.title, task.subtasks, task.resources]);
 
-  const [checkedSubtasks, setCheckedSubtasks] = useState<boolean[]>(() => {
-    return richData.subtasks.map((_, idx) => {
-      const saved = localStorage.getItem(`studybuddy-task-${task.id}-sub-${idx}`);
-      return saved === "true";
-    });
-  });
+  const [checkedSubtasks, setCheckedSubtasks] = useState<boolean[]>([]);
+
+  useEffect(() => {
+    setCheckedSubtasks(
+      richData.subtasks.map((_, idx) => {
+        const saved = localStorage.getItem(`studybuddy-task-${task.id}-sub-${idx}`);
+        return saved === "true";
+      })
+    );
+  }, [task.id, richData.subtasks]);
 
   const toggleSubtask = (idx: number) => {
     const nextStates = [...checkedSubtasks];

@@ -194,7 +194,15 @@ RESPONSE STRUCTURE (JSON):
               "type": "learn", // learn | practice | revise | project
               "durationMinutes": 90,
               "difficulty": "easy", // easy | medium | hard
-              "aiHint": "Mentor tip for this specific task"
+              "aiHint": "Mentor tip for this specific task",
+              "subtasks": [
+                "Implement contiguous memory allocation array resizing",
+                "Optimize direct element lookup index search times to O(1)",
+                "Write edge-case tests validating array index boundaries"
+              ],
+              "resources": [
+                { "label": "MDN Array Reference", "url": "https://developer.mozilla.org" }
+              ]
             }
           ]
         }
@@ -216,7 +224,10 @@ RULES:
 2. Mix task types: 40% Learn, 40% Practice, 20% Revise.
 3. Be behavior-aware: ${behaviorProfile?.consistencyScore < 40 ? "User struggles with consistency. Keep tasks under 45 mins and add more 'Revision' to build confidence." : "User is high-performing. Make tasks 90-120 mins and project-heavy."}
 4. Use cinematic, encouraging language.
-5. Provide ONLY valid JSON.`;
+5. Every single task MUST include exactly 3-4 highly tailored, practical, scenario-matching "subtasks" (array of strings) defining concrete step-by-step instructions for the student to build, code, or run.
+6. Every single task MUST include exactly 1-2 helpful documentation "resources" (array of {label, url} objects) containing highly relevant learning reference URLs.
+7. CRITICAL: Never include LeetCode links in the resources (to keep app complexity low). Provide official guides, web docs, framework/language documentations, or system design resources instead.
+8. Provide ONLY valid JSON.`;
 
   let response: string;
   try {

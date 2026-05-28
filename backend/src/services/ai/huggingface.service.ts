@@ -205,14 +205,23 @@ async function generateRoadmap(
                 "type": "learn",
                 "durationMinutes": 60,
                 "difficulty": "easy",
-                "aiHint": "Hint"
+                "aiHint": "Hint",
+                "subtasks": ["Actionable sub-step 1", "Actionable sub-step 2", "Actionable sub-step 3"],
+                "resources": [
+                  { "label": "Resource Title", "url": "https://example.com/useful-link" }
+                ]
               }
             ]
           }
         ]
       }
     ],
-    "insights": []
+    "insights": [],
+    "rules": [
+      "Every single task MUST include exactly 3-4 highly tailored, practical, scenario-matching 'subtasks' (array of strings) defining concrete step-by-step instructions for the student.",
+      "Every single task MUST include exactly 1-2 helpful documentation 'resources' (array of {label, url} objects) containing highly relevant learning reference URLs.",
+      "CRITICAL: Never include LeetCode links in the resources (to keep app complexity low). Provide official guides, web docs, or framework/language documentations instead."
+    ]
   }`;
 
   const response = await requestHuggingFace([{ role: "user", content: prompt }], 3000);

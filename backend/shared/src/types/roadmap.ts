@@ -10,6 +10,8 @@ export type RoadmapTask = {
   status: RoadmapTaskStatus;
   aiHint?: string;
   completedAt?: string;
+  subtasks?: string[];
+  resources?: Array<{ label: string; url: string }>;
 };
 
 export type RoadmapMission = {

@@ -8,7 +8,15 @@ const roadmapTaskSchema = new Schema({
   difficulty: { type: String, enum: ["easy", "medium", "hard"], required: true },
   status: { type: String, enum: ["pending", "completed", "skipped"], default: "pending" },
   aiHint: { type: String },
-  completedAt: { type: Date }
+  completedAt: { type: Date },
+  subtasks: { type: [String], default: [] },
+  resources: {
+    type: [{
+      label: { type: String },
+      url: { type: String }
+    }],
+    default: []
+  }
 });
 
 const roadmapMissionSchema = new Schema({
