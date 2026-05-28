@@ -66,6 +66,23 @@ export function RoadmapWorkspace() {
   // Tab View Toggle: "execution" (mockup dashboard) vs "curriculum" (full journey path)
   const [currentView, setCurrentView] = useState<"execution" | "curriculum">("execution");
 
+  // Curriculum Sub-Tab Toggle: "focus" (checklist) vs "phases" (phase row list)
+  const [curriculumTab, setCurriculumTab] = useState<"focus" | "phases">("focus");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  // Click outside to close the curriculum sub-tab dropdown selector box
+  useEffect(() => {
+    if (!isDropdownOpen) return;
+    const handleOutsideClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest(".curriculum-selector-container")) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, [isDropdownOpen]);
+
   // Daily Routine & External Activity Logger States
   const [loggedActivities, setLoggedActivities] = useState<{
     id: string;
@@ -726,73 +743,172 @@ export function RoadmapWorkspace() {
                   </div>
                 </section>
 
-                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                  {/* Left Column: Journey Phases rows */}
-                  <section id="journey-phases" className="glass-panel rounded-2xl border border-white/10 bg-surface/50 scroll-mt-20 shadow-premium">
-                    <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
-                      <SectionTitle icon={Route} title="Journey Phases" />
-                      <span className="font-mono text-[10px] font-semibold text-slate-500">{stats.completion}% overall</span>
-                    </div>
-                    <div className="p-4 space-y-2">
-                      {currentRoadmap?.phases.map((phase, index) => (
-                        <PhaseRow
-                          key={phase.id}
-                          phase={phase}
-                          index={index}
-                          active={phase.id === activePhase?.id}
-                          progress={getPhaseProgress(phase)}
-                          onClick={() => setActivePhaseId(phase.id)}
-                        />
-                      ))}
-                    </div>
-                  </section>
+                {/* Premium Glassmorphic Dropdown Selector Box */}
+                <div className="flex justify-center mb-8 relative curriculum-selector-container">
+                  <div className="relative w-80">
+                    <button
+                      type="button"
+                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                      className="w-full flex items-center justify-between gap-3 bg-[#07090d]/80 border border-white/10 hover:border-brand/40 rounded-xl px-5 py-3.5 text-xs font-bold uppercase tracking-wider text-slate-200 hover:text-white transition duration-300 shadow-premium backdrop-blur-xl"
+                    >
+                      <span className="flex items-center gap-2">
+                        {curriculumTab === "focus" ? (
+                          <>
+                            <Zap size={14} className="text-brand-light animate-pulse" />
+                            Active Focus & Sprints
+                          </>
+                        ) : (
+                          <>
+                            <Route size={14} className="text-[#a07ee0]" />
+                            Journey Phases Overview
+                          </>
+                        )}
+                      </span>
+                      <ChevronDown
+                        size={16}
+                        className={cn(
+                          "text-slate-400 transition-transform duration-300",
+                          isDropdownOpen && "transform rotate-180 text-white"
+                        )}
+                      />
+                    </button>
 
-                  {/* Right Column: Execution focus list */}
-                  <section id="execution-tasks" className="glass-panel rounded-2xl border border-white/10 bg-surface/50 scroll-mt-20 shadow-premium">
-                    <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
-                      <SectionTitle icon={Zap} title={isOverloaded ? "Momentum Focus" : "Journey Tasks"} />
-                      <button
-                        onClick={() => setShowAllTasks((value) => !value)}
-                        className="text-xs font-semibold text-slate-500 transition hover:text-[#a07ee0]"
-                      >
-                        {showAllTasks ? "Show focus" : "View all"}
-                      </button>
-                    </div>
-                    <div className="space-y-3.5 p-4">
-                      {missionTasks.length > 0 ? (
-                        missionTasks.slice(0, showAllTasks ? undefined : isOverloaded ? 2 : TASK_LIMIT).map((task, index) => (
-                          <TaskCard
-                            key={task.id}
-                            task={task}
-                            featured={index === 0 && task.status !== "completed"}
-                            onToggle={() => updateTaskStatus(task.id, task.status === "completed" ? "pending" : "completed")}
-                            onStart={() => navigate(`/study/${task.id}`)}
-                            delay={index * 0.04}
-                          />
-                        ))
-                      ) : (
-                        <div className="rounded-xl border border-dashed border-white/10 p-6 text-center">
-                          <CheckCircle2 className="mx-auto mb-2 text-[#2ec4a0]" size={24} />
-                          <p className="text-sm font-semibold text-white">This phase is complete.</p>
-                          <p className="mt-1 text-xs text-slate-500">Click on another phase row to explore tasks.</p>
-                        </div>
+                    <AnimatePresence>
+                      {isDropdownOpen && (
+                        <Motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.2, ease: "easeInOut" }}
+                          className="absolute z-20 mt-2 w-full rounded-xl border border-white/10 bg-[#07090d]/95 p-1.5 shadow-[0_15px_30px_rgba(0,0,0,0.6)] backdrop-blur-xl"
+                        >
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCurriculumTab("focus");
+                              setIsDropdownOpen(false);
+                            }}
+                            className={cn(
+                              "w-full flex items-center gap-2.5 rounded-lg px-4.5 py-3.5 text-left text-xs font-bold uppercase tracking-wider transition-all duration-200",
+                              curriculumTab === "focus"
+                                ? "bg-brand text-white shadow-[0_0_15px_rgba(99,102,241,0.3)] font-extrabold"
+                                : "text-slate-400 hover:bg-white/[0.04] hover:text-slate-200"
+                            )}
+                          >
+                            <Zap size={13} className="shrink-0" />
+                            Active Focus & Sprints
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCurriculumTab("phases");
+                              setIsDropdownOpen(false);
+                            }}
+                            className={cn(
+                              "w-full mt-1.5 flex items-center gap-2.5 rounded-lg px-4.5 py-3.5 text-left text-xs font-bold uppercase tracking-wider transition-all duration-200",
+                              curriculumTab === "phases"
+                                ? "bg-brand text-white shadow-[0_0_15px_rgba(99,102,241,0.3)] font-extrabold"
+                                : "text-slate-400 hover:bg-white/[0.04] hover:text-slate-200"
+                            )}
+                          >
+                            <Route size={13} className="shrink-0" />
+                            Journey Phases Overview
+                          </button>
+                        </Motion.div>
                       )}
+                    </AnimatePresence>
+                  </div>
+                </div>
 
-                      {isOverloaded && !showAllTasks && (
-                        <div className="rounded-lg border border-[#c9a84c]/25 bg-[#1c1608] p-3 text-xs leading-5 text-[#e2c47a]/80">
-                          Focus mode is showing only the highest leverage tasks. Complete these first, then expand the list.
-                        </div>
-                      )}
-
-                      <button
-                        onClick={() => handleCopilotAction(`Add a custom objective to "${currentMission?.title || "my active mission"}" and keep it measurable.`)}
-                        className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 px-4 py-3.5 text-xs font-bold uppercase tracking-[0.16em] text-slate-500 transition hover:border-[#a07ee0]/50 hover:text-[#a07ee0]"
+                <div className="w-full">
+                  <AnimatePresence mode="wait">
+                    {curriculumTab === "phases" ? (
+                      <Motion.div
+                        key="phases"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.25, ease: "easeInOut" }}
                       >
-                        <Plus size={14} />
-                        Add custom objective
-                      </button>
-                    </div>
-                  </section>
+                        {/* Journey Phases rows */}
+                        <section id="journey-phases" className="glass-panel rounded-2xl border border-white/10 bg-surface/50 scroll-mt-20 shadow-premium">
+                          <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
+                            <SectionTitle icon={Route} title="Journey Phases" />
+                            <span className="font-mono text-[10px] font-semibold text-slate-500">{stats.completion}% overall</span>
+                          </div>
+                          <div className="p-4 space-y-2">
+                            {currentRoadmap?.phases.map((phase, index) => (
+                              <PhaseRow
+                                key={phase.id}
+                                phase={phase}
+                                index={index}
+                                active={phase.id === activePhase?.id}
+                                progress={getPhaseProgress(phase)}
+                                onClick={() => setActivePhaseId(phase.id)}
+                              />
+                            ))}
+                          </div>
+                        </section>
+                      </Motion.div>
+                    ) : (
+                      <Motion.div
+                        key="focus"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.25, ease: "easeInOut" }}
+                      >
+                        {/* Right Column: Execution focus list */}
+                        <section id="execution-tasks" className="glass-panel rounded-2xl border border-white/10 bg-surface/50 scroll-mt-20 shadow-premium">
+                          <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
+                            <SectionTitle icon={Zap} title={isOverloaded ? "Momentum Focus" : "Journey Tasks"} />
+                            <button
+                              type="button"
+                              onClick={() => setShowAllTasks((value) => !value)}
+                              className="text-xs font-semibold text-slate-500 transition hover:text-[#a07ee0]"
+                            >
+                              {showAllTasks ? "Show focus" : "View all"}
+                            </button>
+                          </div>
+                          <div className="space-y-3.5 p-4">
+                            {missionTasks.length > 0 ? (
+                              missionTasks.slice(0, showAllTasks ? undefined : isOverloaded ? 2 : TASK_LIMIT).map((task, index) => (
+                                <TaskCard
+                                  key={task.id}
+                                  task={task}
+                                  featured={index === 0 && task.status !== "completed"}
+                                  onToggle={() => updateTaskStatus(task.id, task.status === "completed" ? "pending" : "completed")}
+                                  onStart={() => navigate(`/study/${task.id}`)}
+                                  delay={index * 0.04}
+                                />
+                              ))
+                            ) : (
+                              <div className="rounded-xl border border-dashed border-white/10 p-6 text-center">
+                                <CheckCircle2 className="mx-auto mb-2 text-[#2ec4a0]" size={24} />
+                                <p className="text-sm font-semibold text-white">This phase is complete.</p>
+                                <p className="mt-1 text-xs text-slate-500">Click on another phase row to explore tasks.</p>
+                              </div>
+                            )}
+
+                            {isOverloaded && !showAllTasks && (
+                              <div className="rounded-lg border border-[#c9a84c]/25 bg-[#1c1608] p-3 text-xs leading-5 text-[#e2c47a]/80">
+                                Focus mode is showing only the highest leverage tasks. Complete these first, then expand the list.
+                              </div>
+                            )}
+
+                            <button
+                              type="button"
+                              onClick={() => handleCopilotAction(`Add a custom objective to "${currentMission?.title || "my active mission"}" and keep it measurable.`)}
+                              className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 px-4 py-3.5 text-xs font-bold uppercase tracking-[0.16em] text-slate-500 transition hover:border-[#a07ee0]/50 hover:text-[#a07ee0]"
+                            >
+                              <Plus size={14} />
+                              Add custom objective
+                            </button>
+                          </div>
+                        </section>
+                      </Motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
                 {/* Heatmap/Planner section */}

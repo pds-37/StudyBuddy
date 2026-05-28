@@ -425,13 +425,13 @@ export function StudyPage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowConfidence(false)}
-              className="absolute inset-0 bg-transparent bg-obsidian bg-transparent bg-obsidian$4"
+              className="absolute inset-0 bg-black/75 backdrop-blur-sm"
             />
             <motion.div 
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="relative w-full max-w-lg rounded-[2.5rem] border border-white/10 border-white/10 border-white/10 bg-transparent bg-panel bg-transparent bg-panel p-8 shadow-2xl"
+              className="relative w-full max-w-lg rounded-[2.5rem] border border-white/10 bg-[#07090d] p-8 shadow-2xl"
             >
               <div className="text-center">
                 <div className="mx-auto w-16 h-16 rounded-2xl bg-brand/10 flex items-center justify-center text-brand mb-6">

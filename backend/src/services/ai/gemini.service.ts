@@ -131,6 +131,7 @@ ${behaviorProfile ? `- Consistency Score: ${behaviorProfile.consistencyScore}%
 - Learning Style: ${intelligenceProfile?.learningStyle || "Adaptive"}
 - Primary Learning Struggle: ${intelligenceProfile?.primaryStruggle || "None specified"}
 - Career Interests: ${intelligenceProfile?.careerInterests?.join(", ") || "General development"}
+- Preferred Languages per Domain: DSA: ${intelligenceProfile?.preferredLanguages?.dsa || 'C++'}, Backend: ${intelligenceProfile?.preferredLanguages?.backend || 'Node.js (TypeScript)'}, Frontend: ${intelligenceProfile?.preferredLanguages?.frontend || 'TypeScript'}, AI/ML: ${intelligenceProfile?.preferredLanguages?.aiml || 'Python'}
 
 PSYCHOLOGICAL PROFILE:
 - Motivation State: ${intelligenceProfile?.motivationState || "Steady"}
@@ -219,7 +220,8 @@ RULES:
 5. Every single task MUST include exactly 3-4 highly tailored, practical, scenario-matching "subtasks" (array of strings) defining concrete step-by-step instructions for the student to build, code, or run.
 6. Every single task MUST include exactly 1-2 helpful documentation "resources" (array of {label, url} objects) containing highly relevant learning reference URLs.
 7. CRITICAL: Never include LeetCode links in the resources (to keep app complexity low). Provide official guides, web docs, framework/language documentations, or system design resources instead.
-8. Provide ONLY valid JSON.`;
+8. DOMAIN LANGUAGE TAILORING: You MUST strictly align every generated task title, subtasks, description, and resources to the selected language per domain (e.g. if DSA is Python, DSA tasks must involve Python syntax and link to Python docs. If Backend is Go, backend tasks must involve Go and link to official golang packages).
+9. Provide ONLY valid JSON.`;
 
   const response = await requestGemini([{ role: "user", content: prompt }], "gemini-1.5-flash", true);
   return JSON.parse(extractJsonPayload(response));

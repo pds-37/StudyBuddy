@@ -18,7 +18,8 @@ function toProfile(user: UserDocument) {
     targetTimeline: user.preferences?.targetTimeline,
     learningStyle: user.preferences?.learningStyle,
     primaryStruggle: user.preferences?.primaryStruggle,
-    careerInterests: user.preferences?.careerInterests
+    careerInterests: user.preferences?.careerInterests,
+    preferredLanguages: user.preferences?.preferredLanguages
   };
 }
 
@@ -59,7 +60,8 @@ async function updateProfile(userId: string, payload: UpdateProfileBody) {
         targetTimeline: payload.targetTimeline,
         learningStyle: payload.learningStyle,
         primaryStruggle: payload.primaryStruggle,
-        careerInterests: payload.careerInterests
+        careerInterests: payload.careerInterests,
+        preferredLanguages: payload.preferredLanguages
       },
       onboardingCompleted: true
     },

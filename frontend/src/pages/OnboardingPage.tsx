@@ -24,9 +24,10 @@ import {
   Step6Style,
   Step7Struggle,
   Step8Interests,
+  Step9Languages,
 } from "./onboarding/OnboardingSteps";
 
-const TOTAL_STEPS = 8;
+const TOTAL_STEPS = 9;
 
 function getProfileErrorMessage(error: unknown) {
   if (isAxiosError<{ message?: string; errors?: any }>(error)) {
@@ -104,6 +105,7 @@ export function OnboardingPage() {
         learningStyle: data.learningStyle,
         primaryStruggle: data.primaryStruggle,
         careerInterests: data.careerInterests,
+        preferredLanguages: data.preferredLanguages,
       } as any);
       setUser(profile);
       
@@ -132,6 +134,7 @@ export function OnboardingPage() {
     <Step6Style key="s6" data={data} update={update} />,
     <Step7Struggle key="s7" data={data} update={update} />,
     <Step8Interests key="s8" data={data} update={update} />,
+    <Step9Languages key="s9" data={data} update={update} />,
   ];
 
   return (

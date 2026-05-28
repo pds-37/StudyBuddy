@@ -21,6 +21,13 @@ export type OnboardingData = {
   primaryStruggle: string;
   /* Step 8 — Career Interests */
   careerInterests: string[];
+  /* Step 9 — Preferred Languages per Domain */
+  preferredLanguages?: {
+    dsa?: string;
+    backend?: string;
+    frontend?: string;
+    aiml?: string;
+  };
   /* Meta */
   name: string;
 };
@@ -34,6 +41,12 @@ export const defaultData: OnboardingData = {
   learningStyle: "",
   primaryStruggle: "",
   careerInterests: [],
+  preferredLanguages: {
+    dsa: "C++",
+    backend: "Node.js (TypeScript)",
+    frontend: "TypeScript",
+    aiml: "Python"
+  },
   name: "",
 };
 
@@ -344,6 +357,115 @@ export function Step8Interests({ data, update }: StepProps) {
 }
 
 /* ═══════════ Step validation ═══════════ */
+/* ═══════════ STEP 9 — Domain Languages ═══════════ */
+export function Step9Languages({ data, update }: StepProps) {
+  const selectLanguage = (domain: "dsa" | "backend" | "frontend" | "aiml", val: string) => {
+    const nextLang = { ...data.preferredLanguages, [domain]: val };
+    update({ preferredLanguages: nextLang });
+  };
+
+  const dsaOptions = ["C++", "Java", "Python", "JavaScript"];
+  const backendOptions = ["Node.js (TypeScript)", "Go", "Python", "Java"];
+  const frontendOptions = ["TypeScript", "JavaScript"];
+  const aimlOptions = ["Python", "R", "C++"];
+
+  return (
+    <Motion.div {...fadeSlide} className="space-y-6">
+      <div>
+        <SectionLabel>Domain Languages</SectionLabel>
+        <Prompt>Select your preferred language for each domain:</Prompt>
+        
+        <div className="space-y-4">
+          {/* DSA */}
+          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4.5">
+            <label className="block text-[10px] font-bold uppercase text-cyan font-mono mb-2">DSA / LeetCode</label>
+            <div className="flex flex-wrap gap-2">
+              {dsaOptions.map(opt => (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => selectLanguage("dsa", opt)}
+                  className={`rounded-xl border px-4 py-2 text-xs font-semibold transition duration-200 ${
+                    data.preferredLanguages?.dsa === opt
+                      ? "border-cyan-400/40 bg-cyan-400/10 text-white shadow-[0_0_15px_rgba(34,211,238,0.15)]"
+                      : "border-white/[0.06] bg-white/[0.02] text-slate-400 hover:text-white"
+                  }`}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Backend */}
+          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4.5">
+            <label className="block text-[10px] font-bold uppercase text-cyan font-mono mb-2">Backend Development</label>
+            <div className="flex flex-wrap gap-2">
+              {backendOptions.map(opt => (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => selectLanguage("backend", opt)}
+                  className={`rounded-xl border px-4 py-2 text-xs font-semibold transition duration-200 ${
+                    data.preferredLanguages?.backend === opt
+                      ? "border-cyan-400/40 bg-cyan-400/10 text-white shadow-[0_0_15px_rgba(34,211,238,0.15)]"
+                      : "border-white/[0.06] bg-white/[0.02] text-slate-400 hover:text-white"
+                  }`}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Frontend */}
+          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4.5">
+            <label className="block text-[10px] font-bold uppercase text-cyan font-mono mb-2">Frontend UI React</label>
+            <div className="flex flex-wrap gap-2">
+              {frontendOptions.map(opt => (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => selectLanguage("frontend", opt)}
+                  className={`rounded-xl border px-4 py-2 text-xs font-semibold transition duration-200 ${
+                    data.preferredLanguages?.frontend === opt
+                      ? "border-cyan-400/40 bg-cyan-400/10 text-white shadow-[0_0_15px_rgba(34,211,238,0.15)]"
+                      : "border-white/[0.06] bg-white/[0.02] text-slate-400 hover:text-white"
+                  }`}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* AI/ML */}
+          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4.5">
+            <label className="block text-[10px] font-bold uppercase text-cyan font-mono mb-2">AI / ML Models</label>
+            <div className="flex flex-wrap gap-2">
+              {aimlOptions.map(opt => (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => selectLanguage("aiml", opt)}
+                  className={`rounded-xl border px-4 py-2 text-xs font-semibold transition duration-200 ${
+                    data.preferredLanguages?.aiml === opt
+                      ? "border-cyan-400/40 bg-cyan-400/10 text-white shadow-[0_0_15px_rgba(34,211,238,0.15)]"
+                      : "border-white/[0.06] bg-white/[0.02] text-slate-400 hover:text-white"
+                  }`}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </Motion.div>
+  );
+}
+
+/* ═══════════ Step validation ═══════════ */
 export function isStepComplete(step: number, data: OnboardingData): boolean {
   switch (step) {
     case 0: return data.targetRoles.length > 0;
@@ -354,11 +476,12 @@ export function isStepComplete(step: number, data: OnboardingData): boolean {
     case 5: return !!data.learningStyle;
     case 6: return !!data.primaryStruggle;
     case 7: return data.careerInterests.length > 0;
+    case 8: return !!data.preferredLanguages && !!data.preferredLanguages.dsa && !!data.preferredLanguages.backend && !!data.preferredLanguages.frontend && !!data.preferredLanguages.aiml;
     default: return false;
   }
 }
 
-export const STEP_TITLES = ["Target Role", "Experience", "Current Skills", "Study Time", "Timeline", "Learning Style", "Biggest Struggle", "Career Interests"];
+export const STEP_TITLES = ["Target Role", "Experience", "Current Skills", "Study Time", "Timeline", "Learning Style", "Biggest Struggle", "Career Interests", "Domain Languages"];
 export const STEP_AI_MESSAGES: string[][] = [
   ["Mapping your career path...", "Decomposing roles...", "Analyzing skill dependencies..."],
   ["Calibrating difficulty...", "Setting your pace...", "Optimizing terminology..."],
@@ -368,4 +491,5 @@ export const STEP_AI_MESSAGES: string[][] = [
   ["Adapting resource engine...", "Personalizing teaching style...", "Optimizing content delivery..."],
   ["Configuring mentor tone...", "Designing interventions...", "Addressing friction points..."],
   ["Analyzing interests...", "Selecting projects...", "Personalizing opportunities..."],
+  ["Configuring domain languages...", "Matching language runtimes...", "Tailoring task syntax..."]
 ];

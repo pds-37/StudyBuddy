@@ -106,7 +106,8 @@ async function generateRoadmap(userId: string, request: GenerateRoadmapRequest):
       learningStyle: user.preferences?.learningStyle,
       targetTimeline: user.preferences?.targetTimeline,
       primaryStruggle: user.preferences?.primaryStruggle,
-      careerInterests: user.preferences?.careerInterests
+      careerInterests: user.preferences?.careerInterests,
+      preferredLanguages: user.preferences?.preferredLanguages
     }
   );
 

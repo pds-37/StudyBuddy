@@ -171,6 +171,7 @@ async function generateRoadmap(
   - Available Study Time: ${intelligenceProfile?.availableHours || 2} hours/day
   - Skill Gaps:
   ${skillGapsText || "None"}${notesContext}
+  - Preferred Languages per Domain: DSA: ${intelligenceProfile?.preferredLanguages?.dsa || 'C++'}, Backend: ${intelligenceProfile?.preferredLanguages?.backend || 'Node.js (TypeScript)'}, Frontend: ${intelligenceProfile?.preferredLanguages?.frontend || 'TypeScript'}, AI/ML: ${intelligenceProfile?.preferredLanguages?.aiml || 'Python'}
   
   Generate a living execution engine in valid JSON format:
   {
@@ -220,7 +221,8 @@ async function generateRoadmap(
     "rules": [
       "Every single task MUST include exactly 3-4 highly tailored, practical, scenario-matching 'subtasks' (array of strings) defining concrete step-by-step instructions for the student.",
       "Every single task MUST include exactly 1-2 helpful documentation 'resources' (array of {label, url} objects) containing highly relevant learning reference URLs.",
-      "CRITICAL: Never include LeetCode links in the resources (to keep app complexity low). Provide official guides, web docs, or framework/language documentations instead."
+      "CRITICAL: Never include LeetCode links in the resources (to keep app complexity low). Provide official guides, web docs, or framework/language documentations instead.",
+      "DOMAIN LANGUAGE TAILORING: You MUST strictly align every generated task title, subtasks, description, and resources to the selected language per domain (e.g. if DSA is Python, DSA tasks must involve Python syntax and link to Python docs. If Backend is Go, backend tasks must involve Go and link to official golang packages)."
     ]
   }`;
 

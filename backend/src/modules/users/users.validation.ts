@@ -10,7 +10,13 @@ export const updateProfileSchema = z.object({
   targetTimeline: z.string().optional(),
   learningStyle: z.string().optional(),
   primaryStruggle: z.string().optional(),
-  careerInterests: z.array(z.string()).optional()
+  careerInterests: z.array(z.string()).optional(),
+  preferredLanguages: z.object({
+    dsa: z.string().optional(),
+    backend: z.string().optional(),
+    frontend: z.string().optional(),
+    aiml: z.string().optional()
+  }).optional()
 });
 
 export type UpdateProfileBody = z.infer<typeof updateProfileSchema>;
