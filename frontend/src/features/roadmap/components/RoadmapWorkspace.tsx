@@ -66,6 +66,99 @@ export function RoadmapWorkspace() {
   // Tab View Toggle: "execution" (mockup dashboard) vs "curriculum" (full journey path)
   const [currentView, setCurrentView] = useState<"execution" | "curriculum">("execution");
 
+  // Daily Routine & External Activity Logger States
+  const [loggedActivities, setLoggedActivities] = useState<{
+    id: string;
+    title: string;
+    category: string;
+    duration: string;
+    timestamp: number;
+  }[]>(() => {
+    const saved = localStorage.getItem("studybuddy-daily-activity-logs");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [customTaskTitle, setCustomTaskTitle] = useState("");
+  const [customTaskCategory, setCustomTaskCategory] = useState("DSA / LeetCode");
+  const [customTaskDuration, setCustomTaskDuration] = useState("1 hour");
+
+  // Veda smart recalibration feedback
+  const [recalibrationAlert, setRecalibrationAlert] = useState<{
+    visible: boolean;
+    keyword: string;
+    count: number;
+    tasks: string[];
+  } | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem("studybuddy-daily-activity-logs", JSON.stringify(loggedActivities));
+  }, [loggedActivities]);
+
+  const handleLogActivity = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customTaskTitle.trim()) return;
+
+    const newActivity = {
+      id: Math.random().toString(36).substring(2, 9),
+      title: customTaskTitle.trim(),
+      category: customTaskCategory,
+      duration: customTaskDuration,
+      timestamp: Date.now()
+    };
+
+    setLoggedActivities(prev => [newActivity, ...prev]);
+    setCustomTaskTitle("");
+
+    // Trigger Veda keyword matching engine
+    if (!currentRoadmap) return;
+
+    const words = customTaskTitle
+      .toLowerCase()
+      .replace(/[^\w\s]/g, "")
+      .split(/\s+/)
+      .filter(w => w.length > 2 && !["and", "the", "for", "with", "a", "an", "on", "in", "at", "to", "of", "about", "using", "by", "from", "how", "what", "is", "was", "are", "were", "learnt", "learned", "built", "implemented", "solved", "practiced", "worked", "created"].includes(w));
+
+    if (words.length === 0) return;
+
+    const matchedTasks: { id: string; title: string }[] = [];
+    let matchedKeyword = "";
+
+    currentRoadmap.phases.forEach((phase) => {
+      phase.missions.forEach((mission) => {
+        mission.tasks.forEach((task) => {
+          if (task.status !== "completed") {
+            const taskTitleLower = task.title.toLowerCase();
+            const matchingWord = words.find(w => taskTitleLower.includes(w));
+            if (matchingWord) {
+              matchedTasks.push({ id: task.id, title: task.title });
+              matchedKeyword = matchingWord;
+            }
+          }
+        });
+      });
+    });
+
+    if (matchedTasks.length > 0) {
+      const matchedIds = matchedTasks.map(t => t.id);
+      const matchedTitles = matchedTasks.map(t => t.title);
+
+      for (const taskId of matchedIds) {
+        await updateTaskStatus(taskId, "completed");
+      }
+
+      setRecalibrationAlert({
+        visible: true,
+        keyword: matchedKeyword.toUpperCase(),
+        count: matchedTasks.length,
+        tasks: matchedTitles
+      });
+
+      void handleCopilotAction(`I completed some external work: "${newActivity.title}" for ${newActivity.duration}. Veda matched this to my roadmap and autocompleted the following tasks: ${matchedTitles.join(", ")}. Let's review my updated learning velocity!`);
+    } else {
+      void handleCopilotAction(`I just completed an external activity: "${newActivity.title}" for ${newActivity.duration} under the "${newActivity.category}" category. Let's record this to my overall study hours context!`);
+    }
+  };
+
   useEffect(() => {
     void fetchRoadmaps();
   }, [fetchRoadmaps]);
@@ -289,6 +382,192 @@ export function RoadmapWorkspace() {
                       {isActiveTaskNext ? "Continue" : "Start"} task {missionTasks.findIndex(t => t.id === nextTask.id) + 1 || 1} ↗
                     </button>
                   )}
+                </section>
+
+                {/* DAILY ROUTINE & EXTERNAL PROGRESS SECTION */}
+                <section className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#07090d]/80 p-6 sm:p-8 backdrop-blur-xl shadow-premium">
+                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/35 to-transparent" />
+                  
+                  <div className="flex items-center gap-2 border-b border-white/[0.06] pb-4 mb-6">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-md bg-white/[0.04] text-brand-light">
+                      <Target size={14} />
+                    </div>
+                    <h2 className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+                      Daily Routine & External Progress
+                    </h2>
+                  </div>
+
+                  {/* Veda Recalibration Sync Alert Banner */}
+                  {recalibrationAlert?.visible && (
+                    <Motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mb-5 relative overflow-hidden rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04] p-4.5 text-xs text-emerald-300 shadow-glow"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setRecalibrationAlert(prev => prev ? { ...prev, visible: false } : null)}
+                        className="absolute right-3 top-3 text-emerald-400 hover:text-white text-[10px] font-mono font-bold"
+                      >
+                        DISMISS
+                      </button>
+                      <div className="flex items-start gap-3">
+                        <Sparkles size={16} className="text-emerald-400 shrink-0 mt-0.5 animate-pulse" />
+                        <div>
+                          <h4 className="font-bold text-white uppercase tracking-wider font-mono mb-1">Veda Dynamic Sync Triggered</h4>
+                          <p className="leading-relaxed font-semibold">
+                            Recognized external achievement in <span className="text-emerald-200 underline decoration-dotted font-bold">"{recalibrationAlert.keyword}"</span>!
+                          </p>
+                          <p className="mt-1 text-slate-400 leading-relaxed font-medium">
+                            Autocompleted {recalibrationAlert.count} roadmap task(s): <span className="text-white font-bold">{recalibrationAlert.tasks.join(", ")}</span>. Your career readiness scoring has been successfully re-indexed!
+                          </p>
+                        </div>
+                      </div>
+                    </Motion.div>
+                  )}
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Left: Today's Scheduled Tasks */}
+                    <div>
+                      <h3 className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-slate-500 mb-4 flex items-center gap-1.5">
+                        <span className="h-1.5 w-1.5 rounded-full bg-brand" /> Today's Focus Checklist
+                      </h3>
+
+                      {pendingTasks.length > 0 ? (
+                        <div className="space-y-3">
+                          {pendingTasks.map((task) => {
+                            const Icon = {
+                              learn: BookOpen,
+                              practice: Zap,
+                              revise: RefreshCw,
+                              project: Layers3
+                            }[task.type] || BookOpen;
+
+                            return (
+                              <div
+                                key={task.id}
+                                className={cn(
+                                  "rounded-xl border p-4 transition-all duration-300 flex items-start gap-4 cursor-pointer select-none",
+                                  "border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.03] hover:border-white/[0.08]"
+                                )}
+                              >
+                                <button
+                                  type="button"
+                                  onClick={async (e) => {
+                                    e.stopPropagation();
+                                    await updateTaskStatus(task.id, "completed");
+                                    void handleCopilotAction(`I checked off my scheduled daily task: "${task.title}"! Veda, let's recalibrate my curriculum progress and review the next milestones.`);
+                                  }}
+                                  className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-lg border border-white/20 text-slate-500 hover:border-brand hover:text-brand bg-black/20 transition-all duration-200"
+                                >
+                                  <Circle size={10} />
+                                </button>
+                                <div>
+                                  <span className={cn("inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[8px] font-bold font-mono uppercase tracking-wider mb-1.5", taskTypeClass(task.type))}>
+                                    <Icon size={10} />
+                                    {task.type}
+                                  </span>
+                                  <h4 className="text-sm font-bold text-white leading-snug">{task.title}</h4>
+                                  <p className="text-[10px] text-slate-500 mt-1 font-mono">{task.durationMinutes} min estimated • Dynamic recall active</p>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="rounded-xl border border-dashed border-white/10 p-6 text-center bg-black/20">
+                          <CheckCircle2 className="mx-auto mb-2 text-[#2ec4a0]" size={20} />
+                          <p className="text-xs font-semibold text-white">Roadmap tasks completed!</p>
+                          <p className="mt-1 text-[10px] text-slate-500">Your planned sprints are perfectly synced. Log any external work to the right!</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right: Log Custom / External Activity */}
+                    <div className="border-t lg:border-t-0 lg:border-l border-white/[0.06] pt-6 lg:pt-0 lg:pl-8">
+                      <h3 className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-slate-500 mb-4 flex items-center gap-1.5">
+                        <span className="h-1.5 w-1.5 rounded-full bg-purple-500 animate-pulse" /> Log Custom / External Activity
+                      </h3>
+
+                      <form onSubmit={handleLogActivity} className="space-y-4">
+                        <div>
+                          <label className="block text-[10px] font-bold uppercase text-slate-400 font-mono mb-1.5">What did you build or learn?</label>
+                          <input
+                            type="text"
+                            value={customTaskTitle}
+                            onChange={(e) => setCustomTaskTitle(e.target.value)}
+                            placeholder="e.g. Practiced Redis Pub/Sub, solved 3 BST trees..."
+                            className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-xs text-white outline-none focus:border-purple-500/60 placeholder:text-slate-600 transition"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-[10px] font-bold uppercase text-slate-400 font-mono mb-1.5">Category</label>
+                            <select
+                              value={customTaskCategory}
+                              onChange={(e) => setCustomTaskCategory(e.target.value)}
+                              className="w-full appearance-none rounded-xl border border-white/10 bg-black/40 px-3 py-3 pr-8 text-xs text-white outline-none focus:border-purple-500/60 transition"
+                            >
+                              <option value="DSA / LeetCode">DSA / LeetCode</option>
+                              <option value="Backend Development">Backend Development</option>
+                              <option value="System Design">System Design</option>
+                              <option value="AI / ML Models">AI / ML Models</option>
+                              <option value="Obsidian Note Mapping">Obsidian Note Mapping</option>
+                              <option value="Frontend UI React">Frontend UI React</option>
+                              <option value="Other Skills">Other Skills</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-bold uppercase text-slate-400 font-mono mb-1.5">Duration</label>
+                            <select
+                              value={customTaskDuration}
+                              onChange={(e) => setCustomTaskDuration(e.target.value)}
+                              className="w-full appearance-none rounded-xl border border-white/10 bg-black/40 px-3 py-3 pr-8 text-xs text-white outline-none focus:border-purple-500/60 transition"
+                            >
+                              <option value="30 min">30 min</option>
+                              <option value="1 hour">1 hour</option>
+                              <option value="2 hours">2 hours</option>
+                              <option value="4 hours">4 hours</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <button
+                          type="submit"
+                          className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-4 py-3.5 text-xs font-black uppercase tracking-widest transition shadow-[0_0_15px_rgba(139,92,246,0.3)] active:scale-[0.98]"
+                        >
+                          <Zap size={12} /> Log & Sync with Veda ↗
+                        </button>
+                      </form>
+
+                      {/* Logged Activities List */}
+                      {loggedActivities.length > 0 && (
+                        <div className="mt-6 border-t border-white/[0.04] pt-5">
+                          <p className="font-mono text-[8px] font-black uppercase tracking-[0.16em] text-slate-600 mb-3">LOGGED PROGRESS TODAY</p>
+                          <div className="space-y-2 max-h-[140px] overflow-y-auto pr-1">
+                            {loggedActivities.map((act) => (
+                              <div key={act.id} className="flex items-center justify-between gap-3 bg-white/[0.02] border border-white/[0.04] p-3 rounded-lg text-xs">
+                                <div className="min-w-0">
+                                  <p className="font-bold text-slate-300 truncate">{act.title}</p>
+                                  <p className="text-[9px] text-slate-500 font-mono mt-0.5">
+                                    {act.category} • {act.duration}
+                                  </p>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => setLoggedActivities(prev => prev.filter(a => a.id !== act.id))}
+                                  className="text-[10px] text-slate-500 hover:text-red-400 font-mono transition"
+                                >
+                                  REMOVE
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </section>
 
                 {/* B. DUAL STATS GRID */}
