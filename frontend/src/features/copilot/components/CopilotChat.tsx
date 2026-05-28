@@ -121,7 +121,7 @@ export function CopilotChat() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-96px)] min-h-[620px] overflow-hidden rounded-lg border border-white/[0.06] bg-[#0f1117]">
+    <div className="flex h-full w-full min-h-0 flex-1 overflow-hidden border-t border-white/[0.06] bg-[#0f1117]">
       <ChatHistory
         conversations={filteredConversations}
         activeConversationId={currentConversation?._id}
@@ -951,7 +951,23 @@ function parseInlineMarkdown(text: string) {
 
 // Premium visual MarkdownContent component
 export function MarkdownContent({ content, compact = false }: { content: string; compact?: boolean }) {
-  const blocks = useMemo(() => parseMarkdownToBlocks(content), [content]);
+  // Double-safety net: If content is raw JSON from a parsing failure, parse it on the fly!
+  const processedContent = useMemo(() => {
+    const trimmed = content.trim();
+    if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        if (parsed.content) {
+          return parsed.content;
+        }
+      } catch {
+        // Not valid JSON, fallback to raw
+      }
+    }
+    return content;
+  }, [content]);
+
+  const blocks = useMemo(() => parseMarkdownToBlocks(processedContent), [processedContent]);
 
   return (
     <div className={cn("space-y-4 leading-relaxed", compact ? "text-[13px] space-y-3" : "text-sm")}>

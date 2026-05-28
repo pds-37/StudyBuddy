@@ -25,6 +25,7 @@ export function DashboardLayout() {
   const [isSidebarCollapsed, setSidebarCollapsed] = useState(readSidebarPreference);
   const location = useLocation();
   const isVedaPage = location.pathname === "/copilot";
+  const isFullScreenPage = location.pathname === "/copilot" || location.pathname === "/focus";
   const fetchJobs = useJobsStore((state) => state.fetchJobs);
   const fetchRoadmaps = useRoadmapsStore((state) => state.fetchRoadmaps);
   const fetchConversations = useCopilotStore((state) => state.fetchConversations);
@@ -55,9 +56,18 @@ export function DashboardLayout() {
 
       <div className="flex h-full min-w-0 flex-1 flex-col overflow-hidden relative z-10">
         <TopNav onOpenCommand={() => setCommandOpen(true)} />
-        <main className="flex-1 overflow-y-auto custom-scrollbar overflow-x-hidden">
-          <div className="flex min-h-full flex-col px-6 py-8 lg:px-10 lg:py-10">
-            <div className="mx-auto w-full max-w-[1480px] flex-1 min-h-0 animate-fade-in overflow-x-hidden">
+        <main className={cn(
+          "flex-1 overflow-x-hidden custom-scrollbar",
+          isFullScreenPage ? "overflow-hidden flex flex-col" : "overflow-y-auto"
+        )}>
+          <div className={cn(
+            "flex flex-col flex-1 min-h-0",
+            isFullScreenPage ? "h-full p-0" : "min-h-full px-6 py-8 lg:px-10 lg:py-10"
+          )}>
+            <div className={cn(
+              "w-full flex-1 min-h-0 animate-fade-in overflow-x-hidden flex flex-col",
+              isFullScreenPage ? "max-w-none h-full" : "mx-auto max-w-[1480px]"
+            )}>
               <Outlet />
             </div>
           </div>

@@ -322,6 +322,25 @@ RULES:
       metadata: parsed.metadata || {}
     };
   } catch (error) {
+    console.warn("[Gemini Robust JSON Parse] Standard JSON parse failed, attempting robust regex extraction...", error);
+    const contentMatch = response.match(/"content"\s*:\s*"([\s\S]*?)"\s*(?:,\s*"metadata"|,\s*"cards"|,\s*"nextBestAction"|\}\s*$)/i);
+    if (contentMatch) {
+      let contentVal = contentMatch[1]
+        .replace(/\\n/g, '\n')
+        .replace(/\\t/g, '\t')
+        .replace(/\\"/g, '"')
+        .replace(/\\\\/g, '\\');
+      
+      let metadataVal = {};
+      const metadataMatch = response.match(/"metadata"\s*:\s*(\{[\s\S]*?\})\s*\}\s*$/i);
+      if (metadataMatch) {
+        try { metadataVal = JSON.parse(metadataMatch[1]); } catch {}
+      }
+      return {
+        content: contentVal || "I'm processing your request.",
+        metadata: metadataVal
+      };
+    }
     return {
       content: response,
       metadata: {}
