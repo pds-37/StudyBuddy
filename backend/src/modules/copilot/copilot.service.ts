@@ -1,5 +1,6 @@
 import { CopilotConversation } from "./copilot.model.js";
 import { AIOrchestrator } from "../../core/ai-orchestrator.js";
+import { VedaBlackboardMaster } from "../../core/blackboard-master.js";
 import { notesService } from "../notes/notes.service.js";
 import { mentorService } from "../mentor/mentor.service.js";
 import { skillsService } from "../skills/skills.service.js";
@@ -81,12 +82,22 @@ async function sendMessage(
   // REMOVED: Automatic note generation on fallback. 
   // User now chooses what to save via the UI.
 
+  const blackboard = await VedaBlackboardMaster.getBlackboardState(userId);
 
   const assistantMessage: CopilotMessage = {
     id: `assistant-${Date.now()}`,
     role: "assistant",
     content: aiResponse.content,
-    metadata: aiResponse.metadata,
+    metadata: {
+      ...(aiResponse.metadata ?? {}),
+      blackboardState: {
+        cognitiveLoad: blackboard.cognitiveLoad ?? 0,
+        burnoutRisk: blackboard.burnoutRisk ?? 0,
+        emotionalState: blackboard.emotionalState || "steady",
+        adaptiveDifficulty: blackboard.adaptiveDifficulty || "balanced",
+        targetRoles: blackboard.targetRoles ?? []
+      }
+    },
     createdAt: new Date().toISOString()
   };
 

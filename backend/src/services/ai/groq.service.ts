@@ -31,7 +31,7 @@ function summarizeProviderError(error: any) {
 }
 
 /** Sends a chat-completions request to Groq's OpenAI-compatible API. */
-async function requestGroq(messages: GroqMessage[], maxTokens: number, model: string = "llama-3.1-8b-instant") {
+async function requestGroq(messages: GroqMessage[], maxTokens: number, model: string = "llama-3.1-8b-instant", jsonMode: boolean = false) {
   const apiKey = getGroqApiKey();
 
   if (!apiKey) {
@@ -44,7 +44,8 @@ async function requestGroq(messages: GroqMessage[], maxTokens: number, model: st
       model,
       temperature: 0.7,
       max_tokens: maxTokens,
-      messages
+      messages,
+      ...(jsonMode && { response_format: { type: "json_object" } })
     },
     {
       headers: {
@@ -233,11 +234,11 @@ RULES:
 
   let response: string;
   try {
-    response = await requestGroq([{ role: "user", content: prompt }], 3000, "llama-3.3-70b-versatile");
+    response = await requestGroq([{ role: "user", content: prompt }], 3000, "llama-3.3-70b-versatile", true);
   } catch (error) {
     console.warn("Groq 70b failed for roadmap generation, falling back to 8b-instant:", error);
     // Fallback to a faster, more available model to ensure onboarding completion
-    response = await requestGroq([{ role: "user", content: prompt }], 3000, "llama-3.1-8b-instant");
+    response = await requestGroq([{ role: "user", content: prompt }], 3000, "llama-3.1-8b-instant", true);
   }
 
   try {
@@ -276,7 +277,13 @@ CORE PHILOSOPHY:
 - EMOTIONAL WELL-BEING SAFETY NET: If the user expresses extreme stress, burnout, or a mental health crisis, immediately shift to a highly empathetic, supportive tone. Gently suggest taking a break and contacting campus counseling or a 24/7 crisis line, rather than trying to fully handle it yourself.
 
 ANSWER STYLE:
-- The "content" field should be a polished markdown answer, not a raw note object.
+- The "content" field should be a polished, beautifully structured markdown answer, not a raw note object.
+- Highly leverage rich structural formatting:
+  - Bullet Points & Nested Lists: Use multi-level indented lists (e.g. spaces/tabs followed by - or *) to group items, make sure nested items are properly indented.
+  - Tables: Whenever showing comparisons, key stats, pros/cons, or complexities (like Big O times), construct a beautiful markdown table (e.g. | column | column |).
+  - Blockquotes: Use blockquotes (lines starting with >) to emphasize warnings, critical alerts, or key mentor takeaways.
+  - Hyperlinks: Always use the [Link Label](URL) format for any references or learning resources mentioned.
+  - Badgified Lists: When listing terms, prefix them with a bold header (e.g. "- **Time Complexity:** O(N log N)") so the parser can compile it into a badge.
 - Use clear structure like: short answer, key points, examples, when to use it, common mistakes, quick recap, and next practice step.
 - If USER CONTEXT contains notes, use those notes first and say when you are extending beyond the user's notes with general knowledge.
 - If the user asks "tell me about", "explain", "what is", "teach me", or similar, give a complete explanatory answer like ChatGPT would, with headings and bullets.
@@ -345,12 +352,12 @@ RULES:
   let response: string;
   try {
     // Try the preferred model (usually 8b for speed/reliability in chat)
-    response = await requestGroq(groqMessages, 2500, model);
+    response = await requestGroq(groqMessages, 2500, model, true);
   } catch (error) {
     console.error(`Groq API request failed with model ${model}, trying fallback:`, summarizeProviderError(error));
     try {
       // Fallback to the most reliable instant model
-      response = await requestGroq(groqMessages, 2000, "llama-3.1-8b-instant");
+      response = await requestGroq(groqMessages, 2000, "llama-3.1-8b-instant", true);
     } catch (fallbackError) {
       console.error("Groq fallback also failed:", summarizeProviderError(fallbackError));
       throw fallbackError;
@@ -611,10 +618,10 @@ Return ONLY valid JSON. No commentary.`;
   let response: string;
   try {
     // 70b is much better at massive JSON generation
-    response = await requestGroq(messages, 3500, "llama-3.3-70b-versatile");
+    response = await requestGroq(messages, 3500, "llama-3.3-70b-versatile", true);
   } catch (err) {
     console.warn("Groq 70b failed for tailoring, falling back to 8b-instant:", err);
-    response = await requestGroq(messages, 3000, "llama-3.1-8b-instant");
+    response = await requestGroq(messages, 3000, "llama-3.1-8b-instant", true);
   }
 
   try {
@@ -627,7 +634,7 @@ Return ONLY valid JSON. No commentary.`;
 
 /** Simple wrapper to get a structured JSON response from an arbitrary prompt. */
 async function generateStructuredResponse(prompt: string): Promise<string> {
-  const response = await requestGroq([{ role: "user", content: prompt }], 2000);
+  const response = await requestGroq([{ role: "user", content: prompt }], 2000, "llama-3.1-8b-instant", true);
   return extractJsonPayload(response);
 }
 
@@ -652,7 +659,7 @@ Return ONLY valid JSON with this exact shape:
 
 Make the questions practical and focus on active recall. Do not wrap the JSON in any text or markdown fences. DO NOT include any comments like // in the JSON output.`;
 
-  const response = await requestGroq([{ role: "user", content: prompt }], 1500);
+  const response = await requestGroq([{ role: "user", content: prompt }], 1500, "llama-3.1-8b-instant", true);
 
   try {
     const parsed = JSON.parse(extractJsonPayload(response));
@@ -738,7 +745,7 @@ RULES:
 10. RevisionStrategy: algorithms/DS → "implementation", theory → "conceptual", frameworks → "practical_repetition", complex/visual topics → "visual".
 11. Provide ONLY valid JSON. No markdown, no comments.`;
 
-  const response = await requestGroq([{ role: "user", content: prompt }], 2500, "llama-3.1-70b-versatile");
+  const response = await requestGroq([{ role: "user", content: prompt }], 2500, "llama-3.1-70b-versatile", true);
 
   try {
     const parsed = JSON.parse(extractJsonPayload(response));
@@ -833,7 +840,7 @@ RULES:
 2. Ensure dimensions (confidence, retention, etc.) reflect the USER CONTEXT provided. If they skip tasks, retention/momentum should be lower.
 3. Provide ONLY valid JSON matching the exact structure.`;
 
-  const response = await requestGroq([{ role: "user", content: prompt }], 3000, "llama-3.3-70b-versatile");
+  const response = await requestGroq([{ role: "user", content: prompt }], 3000, "llama-3.3-70b-versatile", true);
 
   try {
     return JSON.parse(extractJsonPayload(response));
