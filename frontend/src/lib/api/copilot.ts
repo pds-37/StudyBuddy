@@ -50,3 +50,8 @@ export async function sendMessage(conversationId: string, message: string): Prom
   });
   return response.data.message;
 }
+
+/** Permanently deletes a conversation by ID. */
+export async function deleteConversation(conversationId: string): Promise<void> {
+  await apiClient.delete(`/copilot/conversations/${conversationId}`);
+}

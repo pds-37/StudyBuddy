@@ -35,3 +35,9 @@ copilotRouter.post(
   validateRequest(copilotValidation.sendMessage),
   copilotController.sendMessage
 );
+
+copilotRouter.delete(
+  "/conversations/:conversationId",
+  validateRequest(copilotValidation.getConversation),
+  copilotController.deleteConversation
+);

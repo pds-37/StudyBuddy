@@ -53,10 +53,21 @@ export const quickChat = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+/** Permanently deletes a conversation by ID. */
+export const deleteConversation = asyncHandler(async (req: Request, res: Response) => {
+  const conversationId = String(req.params.conversationId ?? "");
+  const userId = req.userId ?? "";
+
+  await copilotService.deleteConversation(conversationId, userId);
+
+  res.status(204).send();
+});
+
 export const copilotController = {
   createConversation,
   getConversations,
   getConversation,
   sendMessage,
-  quickChat
+  quickChat,
+  deleteConversation
 };

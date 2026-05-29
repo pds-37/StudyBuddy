@@ -119,13 +119,94 @@ function latestUserMessage(messages: CopilotMessage[]) {
 }
 
 function localMentorResponse(messages: CopilotMessage[], userContext: string) {
-  const query = latestUserMessage(messages);
+  const queryRaw = latestUserMessage(messages).trim();
+  const query = queryRaw.toLowerCase();
   const hasNotes = /MEMORY_MODE: notes-first/i.test(userContext);
-  const focus = query.length > 0 ? query : "your next study step";
+
+  const warningHeader = `> [!WARNING]\n> **Veda AI Offline Fallback Protocol Active**\n> All configured remote AI providers (Groq, Gemini, HuggingFace) failed to complete the request (usually due to a missing or invalid API Key). To experience Veda's full cognitive intelligence, SDE mentors, and custom interactive roadmaps, please verify that your keys are correctly defined inside your \`backend/.env\` file.`;
+
+  // 1. Image generation queries
+  if (/\b(image|picture|photo|draw|paint|sketch|generate.*image|create.*image)\b/i.test(query)) {
+    return {
+      content: [
+        warningHeader,
+        "## 🖼️ Image Generation & Visual Arts Capability",
+        "I am designed as your **AI Career Mentor and Learning Copilot** to help you master software engineering concepts, build robust project architectures, tailor your resumes, and run active recall practice sessions.",
+        "I **cannot generate, draw, or render images**. If you're looking to create visuals, I recommend using dedicated image generation models (like Midjourney, DALL-E, or Stable Diffusion).",
+        "### What I can help you with offline:",
+        "- **Spaced Recalls:** Quizzing you from your saved workspace notes.",
+        "- **Study Structure:** Outlining the core definitions, trade-offs, and practical study paths for any software engineering topic.",
+        "- **Revision Priority:** Diagnosing which concepts in your database need focus today."
+      ].join("\n\n"),
+      metadata: {
+        behaviorAnalysis: "User requested image generation. Clarified AI boundaries under offline mode.",
+        nextBestAction: {
+          label: "Revise study notes",
+          description: "Let's work on coding and DSA logic instead!",
+          type: "revise"
+        }
+      }
+    };
+  }
+
+  // 2. Greetings and casual chat
+  if (/^(hi|hello|hey|greetings|howdy|sup|yo|how are you|who are you|what is your name)\b/i.test(query)) {
+    return {
+      content: [
+        warningHeader,
+        "## 🧠 Hey there! I'm Veda, your SDE Mentor Dost.",
+        "I am currently running in **Offline Fallback Mode** because my remote API keys are either missing or invalid in the backend.",
+        "Even in offline mode, we can still study! I can parse your local notes, prioritize your active recalls, and structure study sprints to keep your daily coding streak alive.",
+        "### Quick Study Actions:",
+        "1. **Ask me a technical concept:** e.g., 'Explain binary search' or 'What is React useEffect?'.",
+        "2. **Save a study card:** Click 'Save to notes' on any summary I give you to store it in your Knowledge base.",
+        "3. **Start a sprint:** Pick a topic and set a 25-minute Pomodoro timer."
+      ].join("\n\n"),
+      metadata: {
+        behaviorAnalysis: "Greets user and explains offline study capabilities.",
+        nextBestAction: {
+          label: "Ask a tech question",
+          description: "Try asking about any data structure, algorithm, or web technology!",
+          type: "learn"
+        }
+      }
+    };
+  }
+
+  // 3. Capabilities / help / what can you do
+  if (/\b(help|capabilities|what can you do|what are you|how to use|features)\b/i.test(query)) {
+    return {
+      content: [
+        warningHeader,
+        "## 🛠️ Veda AI Capabilities & Offline Guide",
+        "As your learning operating system, I am fully equipped to guide you through your software engineering journey. However, my cognitive brain is currently in **Offline Fallback Mode** due to missing backend API keys.",
+        "### 🟢 Available Offline:",
+        "- **Concept Structuring:** Creating quick recall summaries of core algorithms, databases, or frameworks.",
+        "- **Recall Challenges:** Providing local structured quizzes and spaced repetitions.",
+        "- **Notes Extraction:** Let you write and save study cards directly into your long-term memory system.",
+        "### 🔴 Needs API Keys (Online Mode):",
+        "- **JD-Aware Resume Tailoring:** Real-time deep ATS scoring and bullet rewriting.",
+        "- **Dynamic Roadmap Personalization:** High-momentum custom interactive execution plans.",
+        "- **Deep AI Chat Mentorship:** Fully conversational SDE advice, custom system design breakdowns, and active recall interviews.",
+        "💡 *To unlock my full cognitive intelligence, verify your keys are correctly defined inside your `backend/.env` file or Render dashboard!*"
+      ].join("\n\n"),
+      metadata: {
+        behaviorAnalysis: "Explains local capabilities vs full remote AI features.",
+        nextBestAction: {
+          label: "Review settings",
+          description: "Verify your API keys in settings to unlock Veda's full brain.",
+          type: "revise"
+        }
+      }
+    };
+  }
+
+  // 4. Default: Concept / Technical study query
+  const focus = queryRaw.length > 0 ? queryRaw : "your next study step";
 
   return {
     content: [
-      `> [!WARNING]\n> **Veda AI Offline Fallback Protocol Active**\n> All configured remote AI providers (Groq, Gemini, HuggingFace) failed to complete the request (usually due to a missing or invalid API Key). To experience Veda's full cognitive intelligence, SDE mentors, and custom interactive roadmaps, please verify that your keys are correctly defined inside your \`backend/.env\` file.`,
+      warningHeader,
       `## Topic Analysis: ${focus}`,
       hasNotes
         ? "I found relevant notes in your workspace context, so I’ll use those as the starting point and add a little general structure around them."

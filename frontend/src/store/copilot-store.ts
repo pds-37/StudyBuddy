@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { createConversation, getConversations, sendMessage, type Conversation } from "../lib/api/copilot";
+import { createConversation, getConversations, sendMessage, deleteConversation as deleteConversationApi, type Conversation } from "../lib/api/copilot";
 import { getApiErrorMessage } from "../lib/api/error";
 import type { CopilotMessage } from "@studybuddy/shared";
 
@@ -21,6 +21,7 @@ type CopilotState = {
   setCurrentConversation: (conversation: Conversation | null) => void;
   clearError: () => void;
   refreshConversations: () => Promise<void>;
+  deleteConversation: (conversationId: string) => Promise<void>;
 };
 
 /** Zustand store for copilot chat state management. */
@@ -188,5 +189,35 @@ export const useCopilotStore = create<CopilotState>((set, get) => ({
 
   refreshConversations: async () => {
     await get().fetchConversations(true);
+  },
+
+  deleteConversation: async (conversationId) => {
+    set({ loading: true, error: null });
+
+    try {
+      await deleteConversationApi(conversationId);
+
+      set((state) => {
+        const remainingConversations = state.conversations.filter((c) => c._id !== conversationId);
+        
+        let nextCurrentConversation = state.currentConversation;
+        // If the deleted conversation was the active one, pick the next available or null
+        if (state.currentConversation?._id === conversationId) {
+          nextCurrentConversation = remainingConversations[0] ?? null;
+        }
+
+        return {
+          conversations: remainingConversations,
+          currentConversation: nextCurrentConversation,
+          loading: false,
+          error: null
+        };
+      });
+    } catch (error) {
+      set({
+        loading: false,
+        error: getApiErrorMessage(error, "Failed to delete conversation")
+      });
+    }
   }
 }));

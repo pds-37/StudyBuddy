@@ -12,7 +12,8 @@ import {
   UserRound,
   X,
   AlertTriangle,
-  ExternalLink
+  ExternalLink,
+  Trash2
 } from "lucide-react";
 import type { CopilotMessage } from "@studybuddy/shared";
 import { cn } from "../../../lib/utils/cn";
@@ -20,6 +21,7 @@ import { formatTime } from "../../../lib/utils/date";
 import * as notesApi from "../../../lib/api/notes";
 import { useAppStore } from "../../../store/app-store";
 import { useCopilotStore } from "../../../store/copilot-store";
+import { useNotesStore } from "../../../store/notes-store";
 import {
   FocusSprintCard,
   InsightCard,
@@ -306,21 +308,38 @@ function ChatHistory({
             {conversations.map((conversation) => {
               const active = activeConversationId === conversation._id;
               return (
-                <button
+                <div
                   key={conversation._id}
-                  type="button"
-                  onClick={() => onSelectChat(conversation._id)}
                   className={cn(
-                    "flex w-full items-start gap-2 rounded-md px-3 py-2 text-left transition-colors",
+                    "group relative flex w-full items-center justify-between rounded-md transition-colors",
                     active ? "bg-white/[0.08] text-white" : "text-slate-400 hover:bg-white/[0.04] hover:text-slate-100"
                   )}
                 >
-                  <MessageSquare size={14} className="mt-0.5 shrink-0" />
-                  <span className="min-w-0">
-                    <span className="line-clamp-2 text-sm leading-5">{getConversationTitle(conversation.messages)}</span>
-                    <span className="mt-0.5 block text-[11px] text-slate-400">{formatTime(conversation.updatedAt)}</span>
-                  </span>
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => onSelectChat(conversation._id)}
+                    className="flex-1 flex items-start gap-2 px-3 py-2 text-left min-w-0"
+                  >
+                    <MessageSquare size={14} className="mt-0.5 shrink-0" />
+                    <span className="min-w-0 pr-6">
+                      <span className="line-clamp-2 text-sm leading-5">{getConversationTitle(conversation.messages)}</span>
+                      <span className="mt-0.5 block text-[11px] text-slate-400">{formatTime(conversation.updatedAt)}</span>
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      if (confirm("Are you sure you want to delete this chat permanently?")) {
+                        await useCopilotStore.getState().deleteConversation(conversation._id);
+                      }
+                    }}
+                    className="absolute right-2 opacity-0 group-hover:opacity-100 p-1.5 rounded text-slate-500 hover:text-red-400 hover:bg-white/[0.06] transition-all duration-200"
+                    aria-label="Delete chat"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
               );
             })}
           </div>
@@ -421,6 +440,8 @@ function Composer({
 function ChatMessage({ message, index }: { message: CopilotMessage; index: number }) {
   const isUser = message.role === "user";
   const metadata = message.metadata as any;
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   return (
     <Motion.div
@@ -460,15 +481,41 @@ function ChatMessage({ message, index }: { message: CopilotMessage; index: numbe
           <GuestGuard fallbackText="Please login to save insights to your knowledge base. Let's learn and grow together.">
             <button
               type="button"
-              onClick={() => {
-                notesApi.createNote(metadata.saveableNote).catch((error) => {
+              disabled={saving || saved}
+              onClick={async () => {
+                setSaving(true);
+                try {
+                  await useNotesStore.getState().createNote(metadata.saveableNote);
+                  setSaved(true);
+                } catch (error) {
                   console.error("Failed to save note:", error);
-                });
+                } finally {
+                  setSaving(false);
+                }
               }}
-              className="mt-2 inline-flex items-center gap-1.5 rounded-md border border-white/[0.08] px-2.5 py-1.5 text-xs text-slate-400 hover:bg-white/[0.05] hover:text-white"
+              className={cn(
+                "mt-2 inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs transition-all duration-200",
+                saved
+                  ? "border-green-500/30 bg-green-500/10 text-green-400 shadow-[0_0_10px_rgba(74,222,128,0.1)]"
+                  : "border-white/[0.08] text-slate-400 hover:bg-white/[0.05] hover:text-white"
+              )}
             >
-              <Check size={13} />
-              Save to notes
+              {saving ? (
+                <>
+                  <Loader2 size={13} className="animate-spin" />
+                  <span>Saving...</span>
+                </>
+              ) : saved ? (
+                <>
+                  <Check size={13} className="stroke-[3]" />
+                  <span>Saved to Notes</span>
+                </>
+              ) : (
+                <>
+                  <Check size={13} />
+                  <span>Save to notes</span>
+                </>
+              )}
             </button>
           </GuestGuard>
         )}

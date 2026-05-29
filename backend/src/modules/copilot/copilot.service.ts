@@ -244,9 +244,22 @@ async function buildUserContext(userId: string, currentQuery?: string, knownNote
   }
 }
 
+/** Permanently deletes a conversation by ID. */
+async function deleteConversation(conversationId: string, userId: string): Promise<void> {
+  const result = await CopilotConversation.deleteOne({
+    _id: conversationId,
+    userId
+  });
+
+  if (result.deletedCount === 0) {
+    throw new Error("Conversation not found or not owned by user");
+  }
+}
+
 export const copilotService = {
   createConversation,
   getConversation,
   getUserConversations,
-  sendMessage
+  sendMessage,
+  deleteConversation
 };
