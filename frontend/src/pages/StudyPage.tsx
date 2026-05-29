@@ -22,6 +22,8 @@ import { registerConfidence } from "../lib/api/memory";
 import { useFocusStore } from "../store/focus-store";
 import { useCopilotStore } from "../store/copilot-store";
 import { useRoadmapsStore } from "../store/roadmaps-store";
+import { useAppStore } from "../store/app-store";
+import { binauralSynthesizer } from "../lib/audio/BinauralSynthesizer";
 import { cn } from "../lib/utils/cn";
 import { AnimatePresence, motion } from "framer-motion";
 import type { MentorTask } from "@studybuddy/shared";
@@ -37,6 +39,28 @@ export function StudyPage() {
   
   const { isActive, isPaused, timeLeft, duration, startSprint, stopSprint, pauseSprint, resumeSprint, tick } = useFocusStore();
   const { sendMessage, currentConversation, createNewConversation } = useCopilotStore();
+  const { user } = useAppStore();
+
+  // Synchronize ambient focus binaural beats with the active sprint
+  useEffect(() => {
+    if (isActive && !isPaused && timeLeft > 0) {
+      if (!binauralSynthesizer.isActive()) {
+        const isHighStress = !!(user?.psychologicalProfile?.anxietyLevel && user.psychologicalProfile.anxietyLevel > 70);
+        const mode = isHighStress ? "theta" : "alpha"; // theta for high stress, alpha for standard focus
+        binauralSynthesizer.start(mode);
+        binauralSynthesizer.setVolume(0.5); // comfortable ambient volume
+      }
+    } else {
+      binauralSynthesizer.stop();
+    }
+  }, [isActive, isPaused, timeLeft, user]);
+
+  // Clean up audio context on page change or unmount
+  useEffect(() => {
+    return () => {
+      binauralSynthesizer.stop();
+    };
+  }, []);
 
   useEffect(() => {
     const loadTask = async () => {
@@ -115,14 +139,14 @@ export function StudyPage() {
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
-    if (isActive && timeLeft > 0) {
+    if (isActive && !isPaused && timeLeft > 0) {
       interval = setInterval(() => tick(), 1000);
     } else if (isActive && timeLeft === 0) {
       stopSprint();
       handleSprintComplete();
     }
     return () => clearInterval(interval);
-  }, [isActive, timeLeft, tick, stopSprint]);
+  }, [isActive, isPaused, timeLeft, tick, stopSprint]);
 
   const handleSprintComplete = async () => {
     if (!currentConversation) await createNewConversation();
