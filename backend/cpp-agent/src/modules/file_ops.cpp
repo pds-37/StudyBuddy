@@ -255,4 +255,32 @@ std::vector<Note> searchNotes(const std::string& notes_dir, const std::string& q
   return results;
 }
 
+std::vector<std::string> extractWikilinks(const std::string& content) {
+  std::vector<std::string> links;
+  size_t pos = 0;
+  while (true) {
+    size_t start = content.find("[[", pos);
+    if (start == std::string::npos) break;
+    size_t end = content.find("]]", start + 2);
+    if (end == std::string::npos) break;
+    
+    std::string link = content.substr(start + 2, end - (start + 2));
+    
+    // Trim spaces from link
+    size_t first = link.find_first_not_of(" \t\n\r");
+    size_t last = link.find_last_not_of(" \t\n\r");
+    if (first != std::string::npos && last != std::string::npos) {
+      link = link.substr(first, (last - first + 1));
+    } else {
+      link.clear();
+    }
+    
+    if (!link.empty() && std::find(links.begin(), links.end(), link) == links.end()) {
+      links.push_back(link);
+    }
+    pos = end + 2;
+  }
+  return links;
+}
+
 } // namespace modules

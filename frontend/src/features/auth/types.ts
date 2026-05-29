@@ -26,6 +26,7 @@ export type AuthUser = {
   psychologicalProfile?: {
     identityNarrative: string;
     motivationState: string;
+    anxietyLevel?: number;
     confidence: {
       skill: number;
       execution: number;

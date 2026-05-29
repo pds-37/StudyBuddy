@@ -8,6 +8,7 @@ import {
   getKnowledgeGraph, getConceptDetail, getInterviewReadiness,
   type KnowledgeGraphData, type KnowledgeNode, type ConceptDetail, type InterviewReadiness
 } from "../lib/api/knowledge";
+import { ThreeMindSpace } from "../features/knowledge/components/ThreeMindSpace";
 import { cn } from "../lib/utils/cn";
 
 const retentionColors: Record<string, string> = {
@@ -25,6 +26,7 @@ export function KnowledgePage() {
   const [conceptDetail, setConceptDetail] = useState<ConceptDetail | null>(null);
   const [zoom, setZoom] = useState(1);
   const [activeTab, setActiveTab] = useState<"graph" | "interview">("graph");
+  const [is3DMode, setIs3DMode] = useState(true);
 
   useEffect(() => {
     const load = async () => {
@@ -119,19 +121,36 @@ export function KnowledgePage() {
             {/* Graph Canvas */}
             <div className="flex-1 relative overflow-hidden">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(124,92,255,0.04)_0%,transparent_70%)]" />
-              <div className="absolute top-4 right-4 z-10 flex gap-1">
-                <button onClick={() => setZoom(z => Math.min(2, z + 0.15))} className="p-2 border border-white/10 text-slate-500 hover:text-white transition-colors"><Maximize2 size={14} /></button>
-                <button onClick={() => setZoom(z => Math.max(0.4, z - 0.15))} className="p-2 border border-white/10 text-slate-500 hover:text-white transition-colors"><Minimize2 size={14} /></button>
+              <div className="absolute top-4 right-4 z-10 flex gap-2">
+                <button 
+                  onClick={() => setIs3DMode(!is3DMode)} 
+                  className="px-3 py-1.5 border border-brand/20 bg-brand/10 text-brand-light hover:bg-brand/20 text-[10px] font-mono font-bold uppercase rounded-lg transition-all"
+                >
+                  {is3DMode ? "2D Graph" : "3D Universe"}
+                </button>
+                {!is3DMode && (
+                  <>
+                    <button onClick={() => setZoom(z => Math.min(2, z + 0.15))} className="p-2 border border-white/10 text-slate-500 hover:text-white transition-colors"><Maximize2 size={14} /></button>
+                    <button onClick={() => setZoom(z => Math.max(0.4, z - 0.15))} className="p-2 border border-white/10 text-slate-500 hover:text-white transition-colors"><Minimize2 size={14} /></button>
+                  </>
+                )}
               </div>
 
-              <Motion.div className="absolute inset-0 flex items-center justify-center" animate={{ scale: zoom }} transition={{ type: "spring", stiffness: 100, damping: 20 }}>
-                <svg className="w-full h-full overflow-visible">
-                  {data.links.map((link, i) => {
-                    const s = nodeMap.get(link.source), t = nodeMap.get(link.target);
-                    if (!s || !t) return null;
-                    const color = link.relationship === "contains" ? "rgba(167,139,250,0.15)" : "rgba(255,255,255,0.04)";
-                    return <line key={i} x1={s.x + 450} y1={s.y + 350} x2={t.x + 450} y2={t.y + 350} stroke={color} strokeWidth={link.strength ? link.strength * 2 : 1} />;
-                  })}
+              {is3DMode ? (
+                <ThreeMindSpace 
+                  data={data} 
+                  onNodeClick={handleNodeClick} 
+                  selectedNode={selectedNode} 
+                />
+              ) : (
+                <Motion.div className="absolute inset-0 flex items-center justify-center" animate={{ scale: zoom }} transition={{ type: "spring", stiffness: 100, damping: 20 }}>
+                  <svg className="w-full h-full overflow-visible">
+                    {data.links.map((link, i) => {
+                      const s = nodeMap.get(link.source), t = nodeMap.get(link.target);
+                      if (!s || !t) return null;
+                      const color = link.relationship === "contains" ? "rgba(167,139,250,0.15)" : "rgba(255,255,255,0.04)";
+                      return <line key={i} x1={s.x + 450} y1={s.y + 350} x2={t.x + 450} y2={t.y + 350} stroke={color} strokeWidth={link.strength ? link.strength * 2 : 1} />;
+                    })}
                   {nodesWithPos.map(node => {
                     const color = node.retentionState ? retentionColors[node.retentionState] : typeColors[node.type] || "#64748b";
                     const size = Math.max(6, Math.min(16, node.val / 2));
@@ -147,7 +166,7 @@ export function KnowledgePage() {
                     );
                   })}
                 </svg>
-              </Motion.div>
+              </Motion.div>)}
 
               {/* Legend */}
               <div className="absolute bottom-4 left-4 flex flex-col gap-1.5 z-10 bg-black/60 backdrop-blur p-3 border border-white/5">

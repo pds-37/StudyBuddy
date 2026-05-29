@@ -59,4 +59,7 @@ std::string nowISO8601();
 /** Generates a UUID v4 string. */
 std::string generateUUID();
 
+/** Extracts all wikilinks [[Concept]] from content. */
+std::vector<std::string> extractWikilinks(const std::string& content);
+
 } // namespace modules

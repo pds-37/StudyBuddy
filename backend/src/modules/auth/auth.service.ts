@@ -36,7 +36,9 @@ function toAuthUser(user: UserDocument) {
     experienceLevel: user.experienceLevel,
     subscription: user.subscription,
     usage: user.usage,
-    onboardingCompleted: user.onboardingCompleted
+    onboardingCompleted: user.onboardingCompleted,
+    behaviorProfile: user.behaviorProfile,
+    psychologicalProfile: user.psychologicalProfile
   };
 }
 

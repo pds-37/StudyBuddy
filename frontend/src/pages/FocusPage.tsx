@@ -12,13 +12,17 @@ import {
   Activity,
   Target,
   Trophy,
-  Rocket
+  Rocket,
+  Volume2,
+  VolumeX,
+  Music
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useFocusStore } from "../store/focus-store";
 import { useCopilotStore } from "../store/copilot-store";
 import { useAppStore } from "../store/app-store";
 import { NebulaBackground } from "../components/common/NebulaBackground";
+import { binauralSynthesizer } from "../lib/audio/BinauralSynthesizer";
 import { cn } from "../lib/utils/cn";
 
 export function FocusPage() {
@@ -39,21 +43,74 @@ export function FocusPage() {
   const { sendMessage, createNewConversation, currentConversation } = useCopilotStore();
   const [sessionComplete, setSessionComplete] = useState(false);
 
+  // Audio & Low-Stimulus States
+  const [audioMode, setAudioMode] = useState<"off" | "alpha" | "theta" | "space_drone">("alpha");
+  const [volume, setVolume] = useState(0.5);
+
+  const isHighStress = !!(user?.psychologicalProfile?.anxietyLevel && user.psychologicalProfile.anxietyLevel > 70);
+
+  // Set default audio mode to theta if user is highly stressed
+  useEffect(() => {
+    if (isHighStress) {
+      setAudioMode("theta");
+    }
+  }, [isHighStress]);
+
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
     if (isActive && !isPaused && timeLeft > 0) {
       interval = setInterval(() => tick(), 1000);
+      
+      // Manage active audio synchronization
+      if (audioMode !== "off" && !binauralSynthesizer.isActive()) {
+        binauralSynthesizer.start(audioMode === "space_drone" ? "space_drone" : audioMode);
+      }
     } else if (isActive && timeLeft === 0) {
       handleComplete();
     }
     return () => clearInterval(interval);
-  }, [isActive, isPaused, timeLeft, tick]);
+  }, [isActive, isPaused, timeLeft, tick, audioMode]);
+
+  // Handle active audio settings shifts
+  useEffect(() => {
+    if (audioMode === "off" || !isActive || isPaused) {
+      binauralSynthesizer.stop();
+    } else {
+      binauralSynthesizer.stop();
+      binauralSynthesizer.start(audioMode === "space_drone" ? "space_drone" : audioMode);
+      binauralSynthesizer.setVolume(volume);
+    }
+  }, [audioMode, isActive, isPaused]);
+
+  useEffect(() => {
+    binauralSynthesizer.setVolume(volume);
+  }, [volume]);
+
+  // Stop audio on unmount
+  useEffect(() => {
+    return () => {
+      binauralSynthesizer.stop();
+    };
+  }, []);
 
   const handleComplete = async () => {
     stopSprint();
+    binauralSynthesizer.stop();
     setSessionComplete(true);
     if (!currentConversation) await createNewConversation();
     await sendMessage("I just finished an immersive focus sprint. Can you help me review what I've achieved or suggest the next high-impact task?");
+  };
+
+  const handleStopSprint = () => {
+    stopSprint();
+    binauralSynthesizer.stop();
+  };
+
+  const handleEnterFlow = (mins: number) => {
+    if (isHighStress) {
+      setAudioMode("theta");
+    }
+    startSprint(mins);
   };
 
   const formatTime = (seconds: number) => {
@@ -64,15 +121,23 @@ export function FocusPage() {
 
   const progress = duration > 0 ? ((duration - timeLeft) / duration) * 100 : 0;
 
+  const isLowStimulus = isActive && !isPaused && (audioMode !== "off" || isHighStress);
+
   return (
-    <div className="relative h-full w-full flex flex-col items-center justify-between py-4 md:py-6 overflow-hidden">
-      <NebulaBackground opacity={0.15} />
+    <div className={cn(
+      "relative h-full w-full flex flex-col items-center justify-between py-4 md:py-6 overflow-hidden transition-colors duration-1000",
+      isLowStimulus ? "bg-[#030406]" : "bg-[#07090d]"
+    )}>
+      {!isLowStimulus && <NebulaBackground opacity={0.15} />}
 
       <div className="relative z-10 w-full max-w-4xl px-6 flex flex-col h-full justify-between min-h-0">
         {/* Navigation */}
         <header className="w-full flex items-center justify-between pb-4 shrink-0">
           <button 
-            onClick={() => navigate(-1)}
+            onClick={() => {
+              binauralSynthesizer.stop();
+              navigate(-1);
+            }}
             className="flex items-center gap-2 text-slate-500 hover:text-white transition-colors group"
           >
             <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
@@ -80,9 +145,16 @@ export function FocusPage() {
           </button>
           
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+            <div className={cn(
+              "flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all duration-500",
+              isLowStimulus 
+                ? "bg-brand/10 border-brand/30 shadow-[0_0_10px_rgba(124,92,255,0.15)]" 
+                : "bg-white/5 border-white/10"
+            )}>
               <Activity className="w-3 h-3 text-cyan animate-pulse" />
-              <span className="text-[9px] font-black uppercase tracking-widest text-slate-300">Biometric Focus: Active</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-slate-300">
+                {isLowStimulus ? (isHighStress ? "Governor: High Stress Overdrive Active" : "Governor: Deep Work Protocol Active") : "Biometric Focus: Active"}
+              </span>
             </div>
           </div>
         </header>
@@ -101,20 +173,40 @@ export function FocusPage() {
                 <motion.div 
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-brand/10 border border-brand/20 text-brand text-[9px] font-black uppercase tracking-[0.3em] [@media(max-height:768px)]:py-0.5"
+                  className={cn(
+                    "inline-flex items-center gap-2 px-3 py-1 rounded-xl text-[9px] font-black uppercase tracking-[0.3em] transition-all duration-500",
+                    isLowStimulus ? "bg-brand/20 border border-brand/40 text-brand-light" : "bg-brand/10 border border-brand/20 text-brand"
+                  )}
                 >
                   <Brain className="w-3.5 h-3.5" /> Neural Flow State
                 </motion.div>
-                <h1 className="text-xl md:text-2xl lg:text-3xl font-black text-white tracking-tighter max-w-2xl mx-auto [@media(max-height:768px)]:text-xl">
-                  {isActive ? "Deep Work Protocol" : "Initialize Focus Engine"}
+                <h1 className="text-xl md:text-2xl lg:text-3xl font-black text-white tracking-tighter max-w-2xl mx-auto transition-all duration-1000">
+                  {isLowStimulus ? (isHighStress ? "Stress Recovery Morph Active" : "Deep Concentration Morph active") : (isActive ? "Deep Work Protocol" : "Initialize Focus Engine")}
                 </h1>
                 <p className="text-[10px] md:text-xs text-slate-500 font-medium max-w-lg mx-auto leading-normal">
-                  Zero distractions. Pure execution. Veda is monitoring your learning velocity.
+                  {isLowStimulus ? (isHighStress ? "Critical cognitive load detected. Restoring nervous stability via Theta neural sync and ambient deep breathing." : "All telemetry HUDs hidden to prevent cognitive strain. Syncing ambient binaural tones.") : "Zero distractions. Pure execution. Veda is monitoring your learning velocity."}
                 </p>
               </div>
 
               {/* Main Timer Visualization */}
-              <div className="relative w-36 h-36 sm:w-44 sm:h-44 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center shrink-0 [@media(max-height:768px)]:w-36 [@media(max-height:768px)]:h-36">
+              <div className="relative w-36 h-36 sm:w-44 sm:h-44 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center shrink-0">
+                
+                {/* Visual Slow-Breathing Overlay (Framer Motion breathing circle) */}
+                {isLowStimulus && (
+                  <motion.div
+                    animate={{
+                      scale: [1, 1.45, 1],
+                      opacity: [0.08, 0.22, 0.08]
+                    }}
+                    transition={{
+                      duration: 6, // slow, deep 6s breath cycles
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                    className="absolute inset-0 rounded-full border border-brand/40 bg-brand/5 shadow-[0_0_40px_rgba(124,92,255,0.15)]"
+                  />
+                )}
+
                 {/* Progress Ring */}
                 <svg className="absolute inset-0 w-full h-full -rotate-90">
                   <circle 
@@ -139,7 +231,7 @@ export function FocusPage() {
                     className="transition-all duration-1000 ease-linear shadow-[0_0_20px_rgba(124,92,255,0.4)]" 
                   />
                 </svg>
-
+ 
                 {/* Inner Glow */}
                 <div className={cn(
                   "absolute inset-6 rounded-full bg-brand/5 blur-2xl transition-opacity duration-1000",
@@ -148,11 +240,11 @@ export function FocusPage() {
 
                 {/* Time Display */}
                 <div className="relative z-10 flex flex-col items-center">
-                  <span className="text-4xl sm:text-5xl md:text-6xl font-mono font-black text-white tracking-tighter [@media(max-height:768px)]:text-4xl">
+                  <span className="text-4xl sm:text-5xl md:text-6xl font-mono font-black text-white tracking-tighter">
                     {formatTime(timeLeft)}
                   </span>
                   <span className="text-[8px] font-black uppercase tracking-[0.4em] text-slate-500 mt-0.5">
-                    {isPaused ? "Paused" : "Remaining"}
+                    {isPaused ? "Paused" : (isLowStimulus ? "Breathe Deeply" : "Remaining")}
                   </span>
                 </div>
               </div>
@@ -165,7 +257,7 @@ export function FocusPage() {
                       {[25, 45, 60, 90].map(mins => (
                         <button
                           key={mins}
-                          onClick={() => startSprint(mins)}
+                          onClick={() => handleEnterFlow(mins)}
                           className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-brand hover:text-black hover:border-brand transition-all text-xs font-black tracking-widest [@media(max-height:768px)]:px-3 [@media(max-height:768px)]:py-1.5"
                         >
                           {mins}m
@@ -173,7 +265,7 @@ export function FocusPage() {
                       ))}
                     </div>
                     <button
-                      onClick={() => startSprint(45)}
+                      onClick={() => handleEnterFlow(45)}
                       className="group relative px-10 py-3.5 rounded-[2rem] bg-brand text-black font-black text-sm uppercase tracking-widest shadow-glow hover:scale-105 transition-all overflow-hidden [@media(max-height:768px)]:px-8 [@media(max-height:768px)]:py-2.5"
                     >
                       <div className="relative z-10 flex items-center gap-2">
@@ -188,26 +280,67 @@ export function FocusPage() {
                     <button
                       onClick={isPaused ? resumeSprint : pauseSprint}
                       className={cn(
-                        "w-16 h-16 rounded-full flex items-center justify-center transition-all hover:scale-110 [@media(max-height:768px)]:w-12 [@media(max-height:768px)]:h-12",
+                        "w-16 h-16 rounded-full flex items-center justify-center transition-all hover:scale-110",
                         isPaused ? "bg-emerald-500 text-black shadow-glow" : "bg-white/5 border border-white/10 text-white"
                       )}
                     >
-                      {isPaused ? <Play className="w-6 h-6 fill-current [@media(max-height:768px)]:w-5 [@media(max-height:768px)]:h-5" /> : <Pause className="w-6 h-6 fill-current [@media(max-height:768px)]:w-5 [@media(max-height:768px)]:h-5" />}
+                      {isPaused ? <Play className="w-6 h-6 fill-current" /> : <Pause className="w-6 h-6 fill-current" />}
                     </button>
                     
                     <button
-                      onClick={stopSprint}
-                      className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white transition-all hover:bg-red-500/20 hover:border-red-500/50 hover:text-red-500 hover:scale-110 [@media(max-height:768px)]:w-12 [@media(max-height:768px)]:h-12"
+                      onClick={handleStopSprint}
+                      className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white transition-all hover:bg-red-500/20 hover:border-red-500/50 hover:text-red-500 hover:scale-110"
                     >
-                      <Square className="w-5 h-5 fill-current [@media(max-height:768px)]:w-4 [@media(max-height:768px)]:h-4" />
+                      <Square className="w-5 h-5 fill-current" />
                     </button>
                   </div>
                 )}
               </div>
 
-              {/* Ambient Insights */}
-              {isActive && (
-                <div className="grid grid-cols-3 gap-3 w-full mt-4 shrink-0 [@media(max-height:768px)]:mt-2 [@media(max-height:768px)]:gap-2">
+              {/* Floating Ambient Beats & Governor Panel (Glassmorphic) */}
+              {isActive && !isPaused && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="rounded-2xl border border-white/10 bg-black/60 p-4 backdrop-blur-xl max-w-sm w-full flex items-center justify-between gap-4"
+                >
+                  <div className="flex items-center gap-2">
+                    <Music className="w-4 h-4 text-brand-light animate-pulse" />
+                    <div>
+                      <span className="text-[8px] font-black uppercase tracking-widest text-slate-500 block">Focus Beats</span>
+                      <button 
+                        onClick={() => {
+                          const modes: Array<typeof audioMode> = ["off", "alpha", "theta", "space_drone"];
+                          const next = modes[(modes.indexOf(audioMode) + 1) % modes.length];
+                          setAudioMode(next);
+                        }}
+                        className="text-[10px] font-bold text-white capitalize flex items-center gap-1 mt-0.5 hover:text-brand-light transition"
+                      >
+                        {audioMode === "space_drone" ? "Space Drone 🌌" : (audioMode === "alpha" ? "Alpha Wave 🧠" : (audioMode === "theta" ? "Theta Vibe 🕯️" : "Off 🔇"))}
+                      </button>
+                    </div>
+                  </div>
+
+                  {audioMode !== "off" && (
+                    <div className="flex items-center gap-2 border-l border-white/10 pl-4 flex-1">
+                      {volume === 0 ? <VolumeX className="w-3.5 h-3.5 text-slate-500" /> : <Volume2 className="w-3.5 h-3.5 text-brand" />}
+                      <input 
+                        type="range" 
+                        min="0" 
+                        max="1" 
+                        step="0.05"
+                        value={volume}
+                        onChange={(e) => setVolume(parseFloat(e.target.value))}
+                        className="w-full accent-brand bg-white/10 rounded h-1 cursor-pointer"
+                      />
+                    </div>
+                  )}
+                </motion.div>
+              )}
+
+              {/* Ambient Insights (Hidden under deep low-stimulus state to reduce load) */}
+              {!isLowStimulus && isActive && (
+                <div className="grid grid-cols-3 gap-3 w-full mt-4 shrink-0">
                    <FocusCard icon={Target} label="Current Goal" value="Mission Execution" />
                    <FocusCard icon={Zap} label="Neural Energy" value="High Stability" />
                    <FocusCard icon={Sparkles} label="Veda Insight" value="Focus is peaking" />

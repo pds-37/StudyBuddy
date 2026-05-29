@@ -18,17 +18,25 @@ import {
   Award
 } from "lucide-react";
 import { useInterviewStore } from "../../../store/interview-store";
+import { usePanelInterviewStore } from "../../../store/panel-interview-store";
 import { useAppStore } from "../../../store/app-store";
 import { InterviewSession } from "./InterviewSession";
+import { ShadowPanelCockpit } from "./ShadowPanelCockpit";
 import { Link } from "react-router-dom";
 import type { StartInterviewOptions } from "../../../lib/api/interview";
 
 export function InterviewWorkspace() {
   const { currentSession, loading, error, fetchSessions, startSession, sessions } = useInterviewStore();
+  const { 
+    currentSession: panelSession, 
+    startSession: startPanel, 
+    loading: panelLoading, 
+    error: panelError 
+  } = usePanelInterviewStore();
   const user = useAppStore(state => state.user);
 
   // Configuration States
-  const [mode, setMode] = useState<StartInterviewOptions["mode"]>("technical");
+  const [mode, setMode] = useState<StartInterviewOptions["mode"] | "panel">("technical");
   const [difficulty, setDifficulty] = useState<StartInterviewOptions["difficulty"]>("intermediate");
   const [personality, setPersonality] = useState<StartInterviewOptions["interviewerPersonality"]>("friendly");
   const [pressureMode, setPressureMode] = useState(false);
@@ -39,13 +47,17 @@ export function InterviewWorkspace() {
   }, [fetchSessions]);
 
   const handleStart = async () => {
-    await startSession({
-      mode,
-      difficulty,
-      interviewerPersonality: personality,
-      pressureMode,
-      targetCompany: mode === "company" ? targetCompany : ""
-    });
+    if (mode === "panel") {
+      await startPanel();
+    } else {
+      await startSession({
+        mode,
+        difficulty,
+        interviewerPersonality: personality,
+        pressureMode,
+        targetCompany: mode === "company" ? targetCompany : ""
+      });
+    }
   };
 
   if (!user?.targetRoles || user.targetRoles.length === 0) {
@@ -69,6 +81,10 @@ export function InterviewWorkspace() {
     return <InterviewSession session={currentSession} />;
   }
 
+  if (panelSession) {
+    return <ShadowPanelCockpit />;
+  }
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500 relative">
       
@@ -76,6 +92,13 @@ export function InterviewWorkspace() {
         <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-sm flex items-center gap-3 backdrop-blur-xl">
           <AlertCircle className="w-5 h-5 shrink-0 text-red-400" />
           <span>{error}</span>
+        </div>
+      )}
+
+      {panelError && (
+        <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-sm flex items-center gap-3 backdrop-blur-xl">
+          <AlertCircle className="w-5 h-5 shrink-0 text-red-400" />
+          <span>{panelError}</span>
         </div>
       )}
 
@@ -119,6 +142,7 @@ export function InterviewWorkspace() {
                     { id: "technical", title: "Technical SDE Core", desc: "Algorithmic gates, framework internals, and DBMS.", icon: Cpu, color: "text-cyan" },
                     { id: "scenario", title: "Scenario Outage", desc: "Production incidents, cache spikes, scaling leaks.", icon: Flame, color: "text-red-400" },
                     { id: "behavioral", title: "HR / Behavioral", desc: "STAR format situations, conflicts, and priority.", icon: BookOpen, color: "text-amber-400" },
+                    { id: "panel", title: "Veda Shadow Panel", desc: "Simulated multi-agent hiring committee panel.", icon: BrainCircuit, color: "text-indigo-400 animate-pulse border border-indigo-500/20" },
                     { id: "company", title: "Company-Specific", desc: "FAANG loops or agile startup criteria.", icon: Building2, color: "text-brand-light" },
                     { id: "mock", title: "Full Mock Round", desc: "Complete timed multi-round simulation.", icon: Award, color: "text-emerald-400" }
                   ].map(item => (
@@ -263,18 +287,18 @@ export function InterviewWorkspace() {
 
             <button
               onClick={handleStart}
-              disabled={loading}
+              disabled={loading || panelLoading}
               className="w-full sm:w-auto shrink-0 relative group/btn inline-flex items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-brand via-purple-600 to-accent px-8 py-3.5 text-xs font-black uppercase tracking-widest text-white shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_30px_rgba(99,102,241,0.5)] active:scale-95 disabled:opacity-50 disabled:cursor-wait"
             >
-              {loading ? (
+              {loading || panelLoading ? (
                 <>
                   <BrainCircuit className="w-4 h-4 animate-spin text-white" />
-                  Compiling SDE Loops...
+                  {panelLoading ? "Assembling Committee Panel..." : "Compiling SDE Loops..."}
                 </>
               ) : (
                 <>
                   <Play className="w-4 h-4 fill-current text-white" />
-                  Launch Assessment Cockpit
+                  {mode === "panel" ? "Enter Shadow Panel Arena" : "Launch Assessment Cockpit"}
                 </>
               )}
             </button>
