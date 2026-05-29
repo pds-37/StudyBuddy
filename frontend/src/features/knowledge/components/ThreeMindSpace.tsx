@@ -241,11 +241,11 @@ export function ThreeMindSpace({ data, onNodeClick, selectedNode }: ThreeMindSpa
 
     // 9. Animation loop
     let animationFrameId: number;
-    let clock = new THREE.Clock();
+    const startTime = performance.now();
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
-      const elapsed = clock.getElapsedTime();
+      const elapsed = (performance.now() - startTime) / 1000;
 
       // Smooth interpolation for rotations
       nodeGroup.rotation.y += (targetRotation.y - nodeGroup.rotation.y) * 0.05;

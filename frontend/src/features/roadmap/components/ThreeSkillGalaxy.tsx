@@ -321,11 +321,11 @@ export function ThreeSkillGalaxy({ roadmap, onNodeClick, selectedNode }: ThreeSk
 
     // 9. Animation Loop
     let animationFrameId: number;
-    const clock = new THREE.Clock();
+    const startTime = performance.now();
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
-      const elapsed = clock.getElapsedTime();
+      const elapsed = (performance.now() - startTime) / 1000;
 
       // Smooth rotate interpolation
       nodeGroup.rotation.y += (targetRotation.y - nodeGroup.rotation.y) * 0.05;
