@@ -36,7 +36,20 @@ ONLY output valid JSON.`;
   let generatedQuestions: any[];
   try {
     const cleanedJson = aiQuestionsJson.trim().replace(/^```json\s*/i, "").replace(/```$/, "").trim();
-    generatedQuestions = JSON.parse(cleanedJson);
+    const parsed = JSON.parse(cleanedJson);
+    if (Array.isArray(parsed)) {
+      generatedQuestions = parsed;
+    } else if (parsed && typeof parsed === "object") {
+      // Find the first array property inside the parsed object
+      const arrayKey = Object.keys(parsed).find(k => Array.isArray((parsed as any)[k]));
+      if (arrayKey) {
+        generatedQuestions = (parsed as any)[arrayKey];
+      } else {
+        throw new Error("Parsed JSON object contains no arrays");
+      }
+    } else {
+      throw new Error("Parsed JSON is neither array nor object");
+    }
   } catch (e) {
     console.error("[Panel Service] Failed to parse AI questions, using robust SDE fallbacks:", aiQuestionsJson);
     generatedQuestions = [
