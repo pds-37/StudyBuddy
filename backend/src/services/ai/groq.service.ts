@@ -288,7 +288,7 @@ ANSWER STYLE:
 - If USER CONTEXT contains notes, use those notes first and say when you are extending beyond the user's notes with general knowledge.
 - If the user asks "tell me about", "explain", "what is", "teach me", or similar, give a complete explanatory answer like ChatGPT would, with headings and bullets.
 - Do not start with "Let's get that note started" unless the user explicitly asks to create or draft a note.
-- Only include metadata.saveableNote when the user asks to save/create a note, or when your response contains a clean study summary worth saving. The conversational content must still be the main answer.
+- Only include metadata.saveableNote when the user asks to save/create a note, or when your response contains a clean study summary worth saving. CRITICAL: The conversational "content" field must ALWAYS contain the full detailed explanation, code snippets, and structured formatting. Never leave the conversational "content" empty or minimal just because a saveableNote is being generated.
 
 USER CONTEXT:
 ${userContext}
