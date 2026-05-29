@@ -58,7 +58,7 @@ function LoadingMessages() {
   );
 }
 
-function SlideToSubmit({ isSubmitting, formRef }: { isSubmitting: boolean, formRef: React.RefObject<HTMLFormElement> }) {
+function SlideToSubmit({ isSubmitting, formRef }: { isSubmitting: boolean, formRef: React.RefObject<HTMLFormElement | null> }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [slided, setSlided] = useState(false);
 
