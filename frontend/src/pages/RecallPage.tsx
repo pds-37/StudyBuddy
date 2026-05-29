@@ -23,7 +23,8 @@ import {
   Clock,
   Sparkle,
   Lock,
-  Route
+  Route,
+  Radio
 } from "lucide-react";
 import { cn } from "../lib/utils/cn";
 import { getDueRecallPrompts, getRecallStats, reviewRecallAnswer, type RecallStats } from "../lib/api/recall";
@@ -31,6 +32,7 @@ import { getRevisionPriorities } from "../lib/api/intelligence";
 import { logBehavior } from "../lib/api/behavior";
 import type { RecallGrade, RecallPrompt, RecallReviewResult, RevisionPriority } from "@studybuddy/shared";
 import { NebulaBackground } from "../components/common/NebulaBackground";
+import { VoiceRecallWorkspace } from "../features/recall/components/VoiceRecallWorkspace";
 
 function formatPercent(value: number) {
   return `${Math.round(value * 100)}%`;
@@ -58,8 +60,25 @@ export function RecallPage() {
   const [error, setError] = useState<string | null>(null);
   const [sessionCount, setSessionCount] = useState(0);
   const [showResult, setShowResult] = useState(false);
+  const [voiceMode, setVoiceMode] = useState(false);
 
   const activePrompt = prompts[0];
+
+  const submitVoiceReview = async (verbalAnswer: string): Promise<RecallReviewResult> => {
+    if (!activePrompt) {
+      throw new Error("No active prompt");
+    }
+    const review = await reviewRecallAnswer({ noteId: activePrompt.noteId, answer: verbalAnswer });
+    
+    // Log the behavior
+    await logBehavior("revision_completed", { noteId: activePrompt.noteId, grade: review.grade }).catch(() => {});
+    
+    setSessionCount(prev => prev + 1);
+    setPrompts((current) => current.slice(1));
+    const nextStats = await getRecallStats();
+    setStats(nextStats);
+    return review;
+  };
 
   const loadRecall = useCallback(async () => {
     try {
@@ -149,12 +168,22 @@ export function RecallPage() {
                   : "Active recall triggers neuroplasticity. Cramming is mid, retrieval is based."}
               </p>
             </div>
-            <button
-              onClick={() => void loadRecall()}
-              className="self-start md:self-auto px-4 py-2 border border-white/10 text-slate-400 text-[10px] font-black uppercase tracking-widest hover:bg-white/5 hover:text-white transition-all flex items-center gap-2 rounded-xl"
-            >
-              <RotateCcw size={12} /> Refresh Queue
-            </button>
+            <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
+              {!voiceMode && prompts.length > 0 && (
+                <button
+                  onClick={() => setVoiceMode(true)}
+                  className="px-4 py-2 border border-brand-light/30 bg-brand/10 text-brand-light text-[10px] font-black uppercase tracking-widest hover:bg-brand/20 transition-all flex items-center gap-2 rounded-xl shadow-[0_0_15px_rgba(99,102,241,0.15)]"
+                >
+                  <Radio size={12} className="animate-pulse" /> Verbal AI Dost Mode
+                </button>
+              )}
+              <button
+                onClick={() => void loadRecall()}
+                className="px-4 py-2 border border-white/10 text-slate-400 text-[10px] font-black uppercase tracking-widest hover:bg-white/5 hover:text-white transition-all flex items-center gap-2 rounded-xl"
+              >
+                <RotateCcw size={12} /> Refresh Queue
+              </button>
+            </div>
           </div>
 
           {/* Stats Bar */}
@@ -178,7 +207,15 @@ export function RecallPage() {
       {/* ─── MAIN CONTENT ─── */}
       <div className="flex-1 overflow-y-auto custom-scrollbar relative z-10">
         <div className="max-w-[1400px] mx-auto px-6 py-6">
-          <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+          {voiceMode ? (
+            <VoiceRecallWorkspace
+              prompts={prompts}
+              onReviewSubmit={submitVoiceReview}
+              onContinue={continueSession}
+              onExit={() => setVoiceMode(false)}
+            />
+          ) : (
+            <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
 
             {/* ─── LEFT: RECALL CARD ─── */}
             <div className="space-y-6">
@@ -526,6 +563,7 @@ export function RecallPage() {
               )}
             </aside>
           </div>
+          )}
         </div>
       </div>
     </div>

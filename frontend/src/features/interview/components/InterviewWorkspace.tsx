@@ -22,8 +22,10 @@ import { usePanelInterviewStore } from "../../../store/panel-interview-store";
 import { useAppStore } from "../../../store/app-store";
 import { InterviewSession } from "./InterviewSession";
 import { ShadowPanelCockpit } from "./ShadowPanelCockpit";
+import { MultiplayerPanelCockpit } from "./MultiplayerPanelCockpit";
 import { Link } from "react-router-dom";
 import type { StartInterviewOptions } from "../../../lib/api/interview";
+import { Users } from "lucide-react";
 
 export function InterviewWorkspace() {
   const { currentSession, loading, error, fetchSessions, startSession, sessions } = useInterviewStore();
@@ -36,11 +38,12 @@ export function InterviewWorkspace() {
   const user = useAppStore(state => state.user);
 
   // Configuration States
-  const [mode, setMode] = useState<StartInterviewOptions["mode"] | "panel">("technical");
+  const [mode, setMode] = useState<StartInterviewOptions["mode"] | "panel" | "multiplayer">("technical");
   const [difficulty, setDifficulty] = useState<StartInterviewOptions["difficulty"]>("intermediate");
   const [personality, setPersonality] = useState<StartInterviewOptions["interviewerPersonality"]>("friendly");
   const [pressureMode, setPressureMode] = useState(false);
   const [targetCompany, setTargetCompany] = useState("");
+  const [multiplayerActive, setMultiplayerActive] = useState(false);
 
   useEffect(() => {
     fetchSessions();
@@ -49,6 +52,8 @@ export function InterviewWorkspace() {
   const handleStart = async () => {
     if (mode === "panel") {
       await startPanel();
+    } else if (mode === "multiplayer") {
+      setMultiplayerActive(true);
     } else {
       await startSession({
         mode,
@@ -83,6 +88,10 @@ export function InterviewWorkspace() {
 
   if (panelSession) {
     return <ShadowPanelCockpit />;
+  }
+
+  if (multiplayerActive) {
+    return <MultiplayerPanelCockpit />;
   }
 
   return (
@@ -143,6 +152,7 @@ export function InterviewWorkspace() {
                     { id: "scenario", title: "Scenario Outage", desc: "Production incidents, cache spikes, scaling leaks.", icon: Flame, color: "text-red-400" },
                     { id: "behavioral", title: "HR / Behavioral", desc: "STAR format situations, conflicts, and priority.", icon: BookOpen, color: "text-amber-400" },
                     { id: "panel", title: "Veda Shadow Panel", desc: "Simulated multi-agent hiring committee panel.", icon: BrainCircuit, color: "text-indigo-400 animate-pulse border border-indigo-500/20" },
+                    { id: "multiplayer", title: "Coop Shadow Arena", desc: "WebRTC peer design loops and debates live.", icon: Users, color: "text-brand-light animate-pulse border border-brand/20" },
                     { id: "company", title: "Company-Specific", desc: "FAANG loops or agile startup criteria.", icon: Building2, color: "text-brand-light" },
                     { id: "mock", title: "Full Mock Round", desc: "Complete timed multi-round simulation.", icon: Award, color: "text-emerald-400" }
                   ].map(item => (

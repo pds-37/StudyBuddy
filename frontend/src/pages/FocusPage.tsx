@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { 
   Timer, 
@@ -15,7 +15,9 @@ import {
   Rocket,
   Volume2,
   VolumeX,
-  Music
+  Music,
+  Camera,
+  CameraOff
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useFocusStore } from "../store/focus-store";
@@ -24,6 +26,7 @@ import { useAppStore } from "../store/app-store";
 import { NebulaBackground } from "../components/common/NebulaBackground";
 import { binauralSynthesizer } from "../lib/audio/BinauralSynthesizer";
 import { cn } from "../lib/utils/cn";
+import { AttentionTracker } from "../lib/biometrics/AttentionTracker";
 
 export function FocusPage() {
   const navigate = useNavigate();
@@ -46,6 +49,14 @@ export function FocusPage() {
   // Audio & Low-Stimulus States
   const [audioMode, setAudioMode] = useState<"off" | "alpha" | "theta" | "space_drone">("alpha");
   const [volume, setVolume] = useState(0.5);
+
+  // Camera Bio-Feedback States
+  const [cameraFeedback, setCameraFeedback] = useState(false);
+  const [focusMetrics, setFocusMetrics] = useState<{ focusPercentage: number; fatiguePercentage: number; isDistracted: boolean } | null>(null);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const trackerRef = useRef<AttentionTracker | null>(null);
 
   const isHighStress = !!(user?.psychologicalProfile?.anxietyLevel && user.psychologicalProfile.anxietyLevel > 70);
 
@@ -93,6 +104,54 @@ export function FocusPage() {
     };
   }, []);
 
+  // AttentionTracker camera feedback effect
+  useEffect(() => {
+    if (cameraFeedback && isActive && !isPaused) {
+      // Small timeout to allow element to render
+      const timer = setTimeout(() => {
+        if (!videoRef.current) return;
+        const tracker = new AttentionTracker({
+          onMetricsUpdate: (metrics) => {
+            setFocusMetrics(metrics);
+            
+            // If focus lapses below 50% or fatigue spikes, morph beats from Alpha to Theta Waves
+            if (metrics.focusPercentage < 50 || metrics.fatiguePercentage > 75) {
+              setAudioMode("theta");
+            }
+          },
+          onFocusLapse: () => {
+            console.log("Telemetry Alert: Focus lapse registered.");
+          },
+          onFatigueDetected: () => {
+            console.log("Telemetry Alert: Fatigue state registered.");
+          }
+        });
+        
+        trackerRef.current = tracker;
+        tracker.start(videoRef.current).catch((err) => {
+          console.error("Camera feedback initiation failed:", err);
+          setCameraError("Camera permission blocked or unavailable.");
+          setCameraFeedback(false);
+        });
+      }, 300);
+
+      return () => clearTimeout(timer);
+    } else {
+      if (trackerRef.current) {
+        trackerRef.current.stop();
+        trackerRef.current = null;
+      }
+      setFocusMetrics(null);
+    }
+    
+    return () => {
+      if (trackerRef.current) {
+        trackerRef.current.stop();
+        trackerRef.current = null;
+      }
+    };
+  }, [cameraFeedback, isActive, isPaused]);
+
   const handleComplete = async () => {
     stopSprint();
     binauralSynthesizer.stop();
@@ -121,7 +180,7 @@ export function FocusPage() {
 
   const progress = duration > 0 ? ((duration - timeLeft) / duration) * 100 : 0;
 
-  const isLowStimulus = isActive && !isPaused && (audioMode !== "off" || isHighStress);
+  const isLowStimulus = isActive && !isPaused && (audioMode !== "off" || isHighStress || focusMetrics?.isDistracted);
 
   return (
     <div className={cn(
@@ -247,6 +306,26 @@ export function FocusPage() {
                     {isPaused ? "Paused" : (isLowStimulus ? "Breathe Deeply" : "Remaining")}
                   </span>
                 </div>
+
+                {/* Floating Bio-Telemetry HUD */}
+                {cameraFeedback && (
+                  <div className="absolute -bottom-2 right-0 md:right-[-40px] z-20 flex flex-col items-center gap-1">
+                    <div className={cn(
+                      "w-12 h-12 rounded-full border overflow-hidden relative shadow-lg bg-black/60",
+                      focusMetrics?.isDistracted ? "border-red-500 shadow-[0_0_12px_rgba(239,68,68,0.3)] animate-pulse" : "border-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.3)]"
+                    )}>
+                      <video 
+                        ref={videoRef}
+                        className="w-full h-full object-cover scale-x-[-1]"
+                      />
+                    </div>
+                    {focusMetrics && (
+                      <div className="px-2 py-0.5 rounded bg-black/80 border border-white/5 text-[7px] font-mono font-bold text-white uppercase tracking-widest leading-none">
+                        {focusMetrics.focusPercentage}% Fcs
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Controls */}
@@ -302,27 +381,51 @@ export function FocusPage() {
                 <motion.div 
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="rounded-2xl border border-white/10 bg-black/60 p-4 backdrop-blur-xl max-w-sm w-full flex items-center justify-between gap-4"
+                  className="rounded-2xl border border-white/10 bg-black/60 p-4 backdrop-blur-xl max-w-sm w-full flex flex-col gap-3.5 shadow-premium"
                 >
-                  <div className="flex items-center gap-2">
-                    <Music className="w-4 h-4 text-brand-light animate-pulse" />
-                    <div>
-                      <span className="text-[8px] font-black uppercase tracking-widest text-slate-500 block">Focus Beats</span>
-                      <button 
+                  <div className="flex items-center justify-between gap-4">
+                    {/* Audio Section */}
+                    <div className="flex items-center gap-2">
+                      <Music className="w-4 h-4 text-brand-light animate-pulse" />
+                      <div>
+                        <span className="text-[8px] font-black uppercase tracking-widest text-slate-500 block">Focus Beats</span>
+                        <button 
+                          onClick={() => {
+                            const modes: Array<typeof audioMode> = ["off", "alpha", "theta", "space_drone"];
+                            const next = modes[(modes.indexOf(audioMode) + 1) % modes.length];
+                            setAudioMode(next);
+                          }}
+                          className="text-[10px] font-bold text-white capitalize flex items-center gap-1 mt-0.5 hover:text-brand-light transition"
+                        >
+                          {audioMode === "space_drone" ? "Space Drone 🌌" : (audioMode === "alpha" ? "Alpha Wave 🧠" : (audioMode === "theta" ? "Theta Vibe 🕯️" : "Off 🔇"))}
+                        </button>
+                      </div>
+                    </div>
+
+                    <span className="h-6 w-px bg-white/10" />
+
+                    {/* Camera Bio-Feedback Section */}
+                    <div className="flex items-center gap-2">
+                      <button
                         onClick={() => {
-                          const modes: Array<typeof audioMode> = ["off", "alpha", "theta", "space_drone"];
-                          const next = modes[(modes.indexOf(audioMode) + 1) % modes.length];
-                          setAudioMode(next);
+                          setCameraFeedback(!cameraFeedback);
+                          setCameraError(null);
                         }}
-                        className="text-[10px] font-bold text-white capitalize flex items-center gap-1 mt-0.5 hover:text-brand-light transition"
+                        className={cn(
+                          "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[9px] font-black uppercase tracking-wider transition-all duration-200",
+                          cameraFeedback 
+                            ? "border-cyan-500/30 bg-cyan-500/10 text-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.15)]" 
+                            : "border-white/10 bg-white/5 text-slate-400 hover:text-white"
+                        )}
                       >
-                        {audioMode === "space_drone" ? "Space Drone 🌌" : (audioMode === "alpha" ? "Alpha Wave 🧠" : (audioMode === "theta" ? "Theta Vibe 🕯️" : "Off 🔇"))}
+                        {cameraFeedback ? <Camera className="w-3.5 h-3.5" /> : <CameraOff className="w-3.5 h-3.5" />}
+                        Camera Bio
                       </button>
                     </div>
                   </div>
 
                   {audioMode !== "off" && (
-                    <div className="flex items-center gap-2 border-l border-white/10 pl-4 flex-1">
+                    <div className="flex items-center gap-2 border-t border-white/5 pt-3">
                       {volume === 0 ? <VolumeX className="w-3.5 h-3.5 text-slate-500" /> : <Volume2 className="w-3.5 h-3.5 text-brand" />}
                       <input 
                         type="range" 
@@ -334,6 +437,12 @@ export function FocusPage() {
                         className="w-full accent-brand bg-white/10 rounded h-1 cursor-pointer"
                       />
                     </div>
+                  )}
+
+                  {cameraError && (
+                    <p className="text-[8px] font-mono text-red-400 uppercase tracking-widest text-center mt-1">
+                      {cameraError}
+                    </p>
                   )}
                 </motion.div>
               )}
