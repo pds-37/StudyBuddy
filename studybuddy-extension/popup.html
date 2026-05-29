@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { width: 300px; padding: 16px; font-family: sans-serif; background: #0A0A0A; color: white; }
+    button { width: 100%; padding: 12px; background: #7C5CFF; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    button:hover { background: #6A4BE5; }
+  </style>
+</head>
+<body>
+  <h2>StudyBuddy</h2>
+  <p style="color: #A0A0A0; font-size: 14px;">Ready to auto-apply? We've detected a supported job board.</p>
+  <button id="applyBtn">⚡ Auto-Fill Application</button>
+  <script>
+    document.getElementById('applyBtn').addEventListener('click', () => {
+      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+          action: "AUTO_FILL",
+          profileData: {
+            name: "John Doe",
+            email: "john@example.com"
+            // In a real app, this data is fetched from the StudyBuddy backend via API
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

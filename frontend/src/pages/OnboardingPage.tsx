@@ -16,6 +16,7 @@ import {
   isStepComplete,
   STEP_TITLES,
   STEP_AI_MESSAGES,
+  Step0Persona,
   Step1Role,
   Step2Experience,
   Step3Skills,
@@ -24,10 +25,11 @@ import {
   Step6Style,
   Step7Struggle,
   Step8Interests,
-  Step9Languages,
+  Step9Personal,
+  Step10Languages,
 } from "./onboarding/OnboardingSteps";
 
-const TOTAL_STEPS = 9;
+const TOTAL_STEPS = 11;
 
 function getProfileErrorMessage(error: unknown) {
   if (isAxiosError<{ message?: string; errors?: any }>(error)) {
@@ -100,11 +102,14 @@ export function OnboardingPage() {
         currentSkills: data.currentSkills,
         experienceLevel: data.experienceLevel,
         // Additional intelligence OS fields
+        persona: data.persona,
         dailyStudyHours: data.dailyStudyHours,
         targetTimeline: data.targetTimeline,
         learningStyle: data.learningStyle,
         primaryStruggle: data.primaryStruggle,
         careerInterests: data.careerInterests,
+        hobbies: data.hobbies,
+        productivityTime: data.productivityTime,
         preferredLanguages: data.preferredLanguages,
       } as any);
       setUser(profile);
@@ -126,6 +131,7 @@ export function OnboardingPage() {
 
   /* Step components */
   const stepComponents = [
+    <Step0Persona key="s0" data={data} update={update} />,
     <Step1Role key="s1" data={data} update={update} />,
     <Step2Experience key="s2" data={data} update={update} />,
     <Step3Skills key="s3" data={data} update={update} />,
@@ -134,7 +140,8 @@ export function OnboardingPage() {
     <Step6Style key="s6" data={data} update={update} />,
     <Step7Struggle key="s7" data={data} update={update} />,
     <Step8Interests key="s8" data={data} update={update} />,
-    <Step9Languages key="s9" data={data} update={update} />,
+    <Step9Personal key="s9" data={data} update={update} />,
+    <Step10Languages key="s10" data={data} update={update} />,
   ];
 
   return (

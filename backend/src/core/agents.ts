@@ -8,6 +8,8 @@ export interface ICooperativeAgent {
   systemPromptFactory(blackboard: any): string;
 }
 
+import { BehaviorEngine } from "../engines/behavior.engine.js";
+
 /**
  * 1. MentorAgent (The Empathetic Career Coach)
  */
@@ -15,16 +17,27 @@ export class MentorAgent implements ICooperativeAgent {
   name = "MentorAgent";
   roleDescription = "Conversational study coach, daily priority manager, and morale builder.";
 
-  systemPromptFactory(blackboard: any): string {
+  systemPromptFactory(blackboard: any, isOverwhelmed: boolean = false, tone: string = "neutral"): string {
     const prioritiesText = (blackboard.dailyIntelligence?.priorities ?? [])
       .map((p: any) => `- ${p.title} (${p.reason})`)
       .join("\n") || "No immediate priorities enqueued.";
+
+    const persona = blackboard.preferences?.persona || "student";
+
+    let toneDirective = tone === "motivational" 
+      ? "- Highly motivating, inspiring, encouraging. Use phrases that build self-efficacy and confidence."
+      : "- Neutral, objective, and supportive without being overly enthusiastic.";
+
+    let overwhelmDirective = isOverwhelmed
+      ? "THE STUDENT IS CURRENTLY OVERWHELMED. Stop pushing for progress. Focus entirely on mental well-being, suggest a break, or break down their next task into a 5-minute micro-step. Do not list a large backlog."
+      : "Provide immediate, structured SDE milestones.";
 
     return `You are Veda, an elite SDE Career Mentor and "Mentor Dost" (Mentor + Best Friend). 
     Since the user is currently interacting with you, act as their master coordinator.
     
     BLACKBOARD STATE MEMORY:
     - Target Roles: ${(blackboard.targetRoles ?? []).join(", ") || "General Software Engineering"}
+    - Persona: ${persona}
     - Cognitive Load: ${blackboard.cognitiveLoad ?? 0}%
     - Burnout Risk: ${blackboard.burnoutRisk ?? 0}%
     - Motivation / Emotional State: ${blackboard.emotionalState || "steady"}
@@ -34,14 +47,21 @@ export class MentorAgent implements ICooperativeAgent {
 
     TONE & STYLE:
     - Empathic, warm, slightly casual, yet technically elite (proud older sibling persona).
-    - If Burnout Risk is HIGH (>=60%), prioritize mental recovery. Lower task pressure.
-    - If Motivation is "discouraged", focus on identity reinforcement and technical wins.
-    - Provide immediate, structured SDE milestones.`;
+    ${toneDirective}
+    - Tailor your advice to their persona (${persona}).
+    
+    BEHAVIORAL DIRECTIVE:
+    ${overwhelmDirective}`;
   }
 
   async execute(userId: string, messages: CopilotMessage[]): Promise<{ content: string; metadata: any }> {
     const blackboard = await VedaBlackboardMaster.getBlackboardState(userId);
-    const systemPrompt = this.systemPromptFactory(blackboard);
+    
+    // A/B Testing & Overwhelm Detection
+    const nudgeStrategy = BehaviorEngine.getNudgeStrategy(userId);
+    const isOverwhelmed = await BehaviorEngine.checkOverwhelmState(userId);
+
+    const systemPrompt = this.systemPromptFactory(blackboard, isOverwhelmed, nudgeStrategy.tone);
 
     // Call Zookeeper Master to route to the chosen model
     const response = await AIOrchestrator.getMentorResponse(messages, systemPrompt);
@@ -50,7 +70,7 @@ export class MentorAgent implements ICooperativeAgent {
     await VedaBlackboardMaster.recordAgentFindings(userId, {
       type: "MENTOR_INTERACTION",
       source: "mentor",
-      payload: { messageCount: messages.length }
+      payload: { messageCount: messages.length, tone: nudgeStrategy.tone, overwhelmed: isOverwhelmed }
     });
 
     return response;
@@ -146,17 +166,30 @@ export class InterviewExaminerAgent implements ICooperativeAgent {
   name = "InterviewExaminerAgent";
   roleDescription = "Rigorous technical interviewer grading algorithmic tradeoffs.";
 
-  systemPromptFactory(blackboard: any): string {
+  systemPromptFactory(blackboard: any, isOverwhelmed: boolean = false): string {
+    const overwhelmDirective = isOverwhelmed
+      ? "THE STUDENT IS CURRENTLY ANXIOUS / OVERWHELMED. Initiate 'Confidence-Builder Mode'. Start with easier conceptual questions related to their verified strong concepts before ramping up difficulty."
+      : "Conduct a standard, rigorous technical interview (Leetcode Med/Hard + System Design).";
+
     return `You are Veda, an elite SDE Technical Interviewer. You run professional whiteboard and coding interview rounds.
     
     BLACKBOARD STATE MEMORY:
     - Career Target Roles: ${(blackboard.targetRoles ?? []).join(", ") || "Backend Engineer"}
     - Holistic Interview Readiness: ${blackboard.interviewReadiness ?? 0}%
-    - Verified Strong Concepts: ${(blackboard.strongConcepts ?? []).slice(0, 4).join(", ")}`;
+    - Verified Strong Concepts: ${(blackboard.strongConcepts ?? []).slice(0, 4).join(", ")}
+    
+    BEHAVIORAL DIRECTIVE:
+    ${overwhelmDirective}`;
   }
 
   async execute(userId: string, prompt: string, taskCategory: string = "interview"): Promise<string> {
-    const result = await AIOrchestrator.generateStructuredResponse(prompt, taskCategory);
+    const blackboard = await VedaBlackboardMaster.getBlackboardState(userId);
+    const isOverwhelmed = await BehaviorEngine.checkOverwhelmState(userId);
+    const systemContext = this.systemPromptFactory(blackboard, isOverwhelmed);
+    
+    // We append the system context dynamically to the prompt or pass to orchestrator
+    // Assuming AIOrchestrator can take systemContext for interviews (if not, prepending it to prompt)
+    const result = await AIOrchestrator.generateStructuredResponse(`[SYSTEM CONTEXT: ${systemContext}]\n\n${prompt}`, taskCategory);
     return result;
   }
 
@@ -177,17 +210,25 @@ export class ResumeAnalystAgent implements ICooperativeAgent {
   name = "ResumeAnalystAgent";
   roleDescription = "ATS strategy consultant scoring resume-to-job matches and framing achievements.";
 
-  systemPromptFactory(blackboard: any): string {
+  systemPromptFactory(blackboard: any, isOverwhelmed: boolean = false): string {
+    const empathicDirective = isOverwhelmed
+      ? "THE STUDENT IS CURRENTLY OVERWHELMED. Use 'Sandwich Feedback'—explicitly praise their strong skills and past wins FIRST, before offering any constructive criticism on ATS formatting."
+      : "Provide direct, objective, and rigorous ATS feedback.";
+
     return `You are Veda's Resume Positioning Analyst. You evaluate candidate resumes against target job specs.
     
     BLACKBOARD STATE MEMORY:
     - User Target Roles: ${(blackboard.targetRoles ?? []).join(", ")}
-    - Existing ATS Readiness Score: ${blackboard.ATSReadiness ?? 0}%`;
+    - Existing ATS Readiness Score: ${blackboard.ATSReadiness ?? 0}%
+    
+    BEHAVIORAL DIRECTIVE:
+    ${empathicDirective}`;
   }
 
   async execute(userId: string, request: ResumeTailorRequest): Promise<ResumeTailorResult> {
     const blackboard = await VedaBlackboardMaster.getBlackboardState(userId);
-    const systemContext = this.systemPromptFactory(blackboard);
+    const isOverwhelmed = await BehaviorEngine.checkOverwhelmState(userId);
+    const systemContext = this.systemPromptFactory(blackboard, isOverwhelmed);
 
     const result = await AIOrchestrator.tailorResume(request, systemContext);
 

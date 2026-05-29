@@ -6,6 +6,7 @@ export const updateProfileSchema = z.object({
   currentSkills: z.array(z.string().trim().min(1)).min(1, "Add at least one current skill."),
   experienceLevel: z.enum(["beginner", "intermediate", "advanced"]),
   // Intelligence OS fields
+  persona: z.string().optional(),
   dailyStudyHours: z.number().min(1).max(24).optional(),
   targetTimeline: z.string().optional(),
   learningStyle: z.string().optional(),

@@ -1,4 +1,4 @@
-import { type FormEvent, useState, useEffect } from "react";
+import { type FormEvent, useState, useEffect, useRef } from "react";
 import { isAxiosError } from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
@@ -55,6 +55,59 @@ function LoadingMessages() {
         <span>{LOADING_MESSAGES[messageIndex]}</span>
       </Motion.div>
     </AnimatePresence>
+  );
+}
+
+function SlideToSubmit({ isSubmitting, formRef }: { isSubmitting: boolean, formRef: React.RefObject<HTMLFormElement> }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [slided, setSlided] = useState(false);
+
+  const handleDragEnd = (event: any, info: any) => {
+    if (!containerRef.current) return;
+    const containerWidth = containerRef.current.offsetWidth;
+    const triggerPoint = containerWidth - 60; // 60px from the right
+    
+    if (info.offset.x >= triggerPoint) {
+      if (formRef.current) {
+        if (formRef.current.checkValidity()) {
+          setSlided(true);
+          // requestSubmit triggers the native submit event and validation
+          formRef.current.requestSubmit();
+        } else {
+          formRef.current.reportValidity();
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!isSubmitting) setSlided(false);
+  }, [isSubmitting]);
+
+  return (
+    <div ref={containerRef} className="relative w-full h-12 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center overflow-hidden">
+      {/* Progress fill */}
+      <div className="absolute inset-0 bg-brand/20 opacity-50 z-0"></div>
+      
+      <span className="text-slate-300 text-sm font-semibold z-0 tracking-wide pointer-events-none">
+        {isSubmitting ? <LoadingMessages /> : slided ? "Igniting..." : "Slide to Level Up"}
+      </span>
+      
+      {!isSubmitting && !slided && (
+        <Motion.div 
+          drag="x"
+          dragConstraints={containerRef}
+          dragElastic={0.05}
+          dragSnapToOrigin={true}
+          onDragEnd={handleDragEnd}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="absolute left-1 top-1 w-10 h-10 bg-brand rounded-lg flex items-center justify-center cursor-grab active:cursor-grabbing z-10 shadow-[0_0_15px_rgba(124,92,255,0.4)]"
+        >
+          <Zap className="w-5 h-5 text-white" />
+        </Motion.div>
+      )}
+    </div>
   );
 }
 
@@ -123,6 +176,7 @@ export function AuthPage() {
   const [error, setError] = useState("");
   const [isSubmitting, setSubmitting] = useState(false);
   const isSignup = mode === "signup";
+  const formRef = useRef<HTMLFormElement>(null);
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
@@ -253,11 +307,15 @@ export function AuthPage() {
       </div>
 
       {/* Right Pane - Native Auth Form */}
-      <div className="flex-1 flex flex-col justify-center items-center p-8 lg:p-12 bg-[#030303] relative z-10">
+      <div className="flex-1 flex flex-col justify-center items-center p-6 lg:p-12 relative z-10 overflow-hidden">
         
+        {/* Mobile funky background blobs */}
+        <div className="lg:hidden absolute top-[-10%] left-[-10%] w-[300px] h-[300px] bg-brand/30 rounded-full blur-[100px] pointer-events-none" />
+        <div className="lg:hidden absolute bottom-[-10%] right-[-10%] w-[300px] h-[300px] bg-cyan-500/20 rounded-full blur-[100px] pointer-events-none" />
+
         {/* Mobile Header (Hidden on Desktop) */}
-        <div className="lg:hidden absolute top-8 left-8 flex items-center gap-2.5">
-          <img src="/brand/studybuddy-favicon-512.png" alt="StudyBuddy Icon" className="h-8 w-8 object-contain rounded-xl border border-white/10 shadow-[0_0_15px_rgba(99,102,241,0.2)]" />
+        <div className="lg:hidden absolute top-8 left-6 flex items-center gap-2.5 z-20">
+          <img src="/brand/studybuddy-favicon-512.png" alt="StudyBuddy Icon" className="h-8 w-8 object-contain rounded-xl border border-white/20 shadow-[0_0_20px_rgba(99,102,241,0.3)]" />
           <span className="font-extrabold text-xl tracking-tight text-white font-display">StudyBuddy</span>
         </div>
 
@@ -265,20 +323,24 @@ export function AuthPage() {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="w-full max-w-[380px]"
+          className="w-full max-w-[400px] lg:max-w-[380px] bg-white/[0.03] lg:bg-transparent backdrop-blur-3xl lg:backdrop-blur-none border border-white/10 lg:border-none p-8 lg:p-0 rounded-[32px] lg:rounded-none shadow-[0_30px_60px_rgba(0,0,0,0.4)] lg:shadow-none z-20 mt-16 lg:mt-0"
         >
-          <Motion.div variants={itemVariants} className="mb-8">
-            <h1 className="text-2xl font-black tracking-tight text-white mb-2 font-display">
-              {isSignup ? "Start your lock-in era" : "Time to lock in"}
+          <Motion.div variants={itemVariants} className="mb-8 text-center lg:text-left">
+            <div className="inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-brand/20 text-brand text-[10px] font-bold uppercase tracking-wider mb-4 border border-brand/30">
+              <Sparkles className="w-3 h-3" />
+              Main Character Energy
+            </div>
+            <h1 className="text-3xl lg:text-2xl font-black tracking-tight text-white mb-2 font-display">
+              {isSignup ? "Entering your lock-in era 💅" : "Time to lock in 🔒"}
             </h1>
             <p className="text-sm text-slate-400">
               {isSignup
-                ? "Configure your workspace parameters to level up."
-                : "Synchronize your placement algorithms, no cap."}
+                ? "Setup your workspace. Let's get this bread. 🍞 fr fr."
+                : "Welcome back. Time to cook. 👨‍🍳🔥 no cap."}
             </p>
           </Motion.div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
             <AnimatePresence mode="popLayout">
               {isSignup && (
                 <Motion.div
@@ -363,19 +425,19 @@ export function AuthPage() {
             </AnimatePresence>
 
             <Motion.div variants={itemVariants} className="pt-2">
-              <Motion.button
-                type="submit"
-                disabled={isSubmitting}
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
-                className="w-full bg-white text-black py-2.5 rounded-xl text-sm font-semibold hover:bg-slate-200 transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {isSubmitting ? (
-                  <LoadingMessages />
-                ) : (
-                  isSignup ? "Create Account" : "Sign In"
-                )}
-              </Motion.button>
+              {isSignup ? (
+                <SlideToSubmit isSubmitting={isSubmitting} formRef={formRef} />
+              ) : (
+                <Motion.button
+                  type="submit"
+                  disabled={isSubmitting}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                  className="w-full bg-white text-black py-2.5 rounded-xl text-sm font-semibold hover:bg-slate-200 transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isSubmitting ? <LoadingMessages /> : "Sign In"}
+                </Motion.button>
+              )}
             </Motion.div>
           </form>
 

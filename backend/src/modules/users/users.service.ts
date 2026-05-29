@@ -14,6 +14,7 @@ function toProfile(user: UserDocument) {
     subscription: user.subscription,
     usage: user.usage,
     onboardingCompleted: user.onboardingCompleted,
+    persona: user.preferences?.persona,
     dailyStudyHours: user.availableHours,
     targetTimeline: user.preferences?.targetTimeline,
     learningStyle: user.preferences?.learningStyle,
@@ -57,6 +58,7 @@ async function updateProfile(userId: string, payload: UpdateProfileBody) {
       experienceLevel: payload.experienceLevel,
       availableHours: payload.dailyStudyHours,
       preferences: {
+        persona: payload.persona,
         targetTimeline: payload.targetTimeline,
         learningStyle: payload.learningStyle,
         primaryStruggle: payload.primaryStruggle,

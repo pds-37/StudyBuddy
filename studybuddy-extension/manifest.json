@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "StudyBuddy Auto-Apply",
+  "version": "1.0",
+  "description": "Auto-fill job applications on Greenhouse, Lever, and Workday using your StudyBuddy profile.",
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": ["*://*.greenhouse.io/*", "*://*.lever.co/*", "*://*.workday.com/*"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.greenhouse.io/*", "*://*.lever.co/*", "*://*.workday.com/*"],
+      "js": ["content.js"]
+    }
+  ]
+}

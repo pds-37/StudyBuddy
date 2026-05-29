@@ -250,12 +250,12 @@ export function LandingPage() {
           <div className="badge"><div className="badge-dot"></div>Desktop App Experience</div>
 
           <h1>
-            Your ultimate<br />
-            <span className="italic-serif">Academic Weapon</span>
+            Your Psychology-First<br />
+            <span className="italic-serif">AI Mentor</span>
           </h1>
 
           <p className="hero-sub">
-            Execute your placement roadmap flawlessly. A unified, native-feeling workspace for your coding, notes, and technical interviews.
+            Conquer procrastination and build confidence. A unified workspace that adapts to your mental state, tracks your progress, and guides your technical career.
           </p>
 
           <ul className="feat-pills">
@@ -275,7 +275,7 @@ export function LandingPage() {
               <div className="pill-icon">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6d5ef5" strokeWidth="2"><circle cx="12" cy="12" r="3" /><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" /></svg>
               </div>
-              AI-powered career insights via Veda
+              Anti-procrastination & Overwhelm Detection
             </li>
           </ul>
 
@@ -326,8 +326,8 @@ export function LandingPage() {
       {/* FEATURES */}
       <div id="features" className="section">
         <div className="eye reveal">Everything you need</div>
-        <h2 className="sec-title reveal">Learn, build &amp; grow<br /><em>all in one place</em></h2>
-        <p className="sec-sub reveal">An all-in-one platform designed to adapt to you — your pace, your goals, your career.</p>
+        <h2 className="sec-title reveal">Learn, build &amp; grow<br /><em>without the burnout</em></h2>
+        <p className="sec-sub reveal">An empathetic platform designed to adapt to you — your mental state, your pace, your goals, and your career.</p>
 
         <div className="feat-carousel reveal" ref={carouselRef}>
           <div className="fc">

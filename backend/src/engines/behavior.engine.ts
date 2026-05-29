@@ -186,4 +186,44 @@ export class BehaviorEngine {
     if (score < 70) return "medium";
     return "low";
   }
+
+  /**
+   * Deterministically assigns a user to an A/B testing cohort for nudges based on their userId.
+   * Returns the strategy configuration for tone and frequency.
+   */
+  static getNudgeStrategy(userId: string): { frequency: "daily" | "weekly", tone: "motivational" | "neutral" } {
+    // Simple deterministic hash
+    let hash = 0;
+    for (let i = 0; i < userId.length; i++) {
+      hash = userId.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    
+    // Use bits to determine variants
+    const isDaily = (hash & 1) === 0;
+    const isMotivational = (hash & 2) === 0;
+
+    return {
+      frequency: isDaily ? "daily" : "weekly",
+      tone: isMotivational ? "motivational" : "neutral"
+    };
+  }
+
+  /**
+   * Evaluates if a user is currently in a state of Overwhelm based on task backlog and anxiety/stress.
+   */
+  static async checkOverwhelmState(userId: string): Promise<boolean> {
+    const user = await UserModel.findById(userId);
+    if (!user) return false;
+
+    // A user is overwhelmed if their anxiety is high (>60) OR they have > 5 pending overdue tasks
+    const anxiety = user.psychologicalProfile?.anxietyLevel || 0;
+    
+    const pendingTasks = await TaskModel.countDocuments({
+      userId,
+      status: "pending",
+      scheduledAt: { $lt: new Date() } // overdue
+    });
+
+    return anxiety > 60 || pendingTasks > 5;
+  }
 }

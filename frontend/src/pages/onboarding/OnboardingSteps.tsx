@@ -5,6 +5,8 @@ import type { SkillSuggestion } from "../../features/skills/types";
 
 /* ═══════════ Shared Types ═══════════ */
 export type OnboardingData = {
+  /* Step 0 — Persona */
+  persona: "first-year" | "final-year" | "working" | "international" | "";
   /* Step 1 — Target Role */
   targetRoles: string[];
   /* Step 2 — Experience */
@@ -21,7 +23,10 @@ export type OnboardingData = {
   primaryStruggle: string;
   /* Step 8 — Career Interests */
   careerInterests: string[];
-  /* Step 9 — Preferred Languages per Domain */
+  /* Step 9 — Personal */
+  hobbies: string[];
+  productivityTime: "morning" | "afternoon" | "evening" | "night" | "";
+  /* Step 10 — Preferred Languages per Domain */
   preferredLanguages?: {
     dsa?: string;
     backend?: string;
@@ -33,6 +38,7 @@ export type OnboardingData = {
 };
 
 export const defaultData: OnboardingData = {
+  persona: "",
   targetRoles: [],
   experienceLevel: "beginner",
   currentSkills: [],
@@ -41,6 +47,8 @@ export const defaultData: OnboardingData = {
   learningStyle: "",
   primaryStruggle: "",
   careerInterests: [],
+  hobbies: [],
+  productivityTime: "",
   preferredLanguages: {
     dsa: "C++",
     backend: "Node.js (TypeScript)",
@@ -105,6 +113,42 @@ function Prompt({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
     >
       {children}
     </Motion.h3>
+  );
+}
+
+/* ═══════════ STEP 0 — Persona ═══════════ */
+const personas = [
+  { value: "first-year", label: "First-Year Undergrad", desc: "Need study skills & motivation", icon: "🎓" },
+  { value: "final-year", label: "Final-Year / Job Seeker", desc: "Focus on career & internships", icon: "💼" },
+  { value: "working", label: "Working Student", desc: "Juggling job and studies", icon: "⏱️" },
+  { value: "international", label: "International Student", desc: "Need language & cultural support", icon: "🌍" },
+];
+
+export function Step0Persona({ data, update }: StepProps) {
+  return (
+    <Motion.div {...fadeSlide} className="space-y-8">
+      <div>
+        <SectionLabel>Your Profile</SectionLabel>
+        <Prompt>Which best describes your current situation?</Prompt>
+        <div className="grid gap-3">
+          {personas.map((p, i) => (
+            <Motion.button key={p.value} type="button" onClick={() => update({ persona: p.value as any })}
+              className={`rounded-2xl border p-5 flex items-center gap-5 text-left transition-all ${
+                data.persona === p.value ? "border-cyan-400/30 bg-cyan-400/5 text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-500 hover:text-white"
+              }`}
+              initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.08 * i }} whileHover={{ scale: 1.02, x: 4 }}>
+              <span className="text-3xl">{p.icon}</span>
+              <div>
+                <span className="text-sm font-bold block">{p.label}</span>
+                <span className="text-xs text-slate-500">{p.desc}</span>
+              </div>
+              {data.persona === p.value && <div className="ml-auto w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.5)]" />}
+            </Motion.button>
+          ))}
+        </div>
+      </div>
+    </Motion.div>
   );
 }
 
@@ -356,9 +400,65 @@ export function Step8Interests({ data, update }: StepProps) {
   );
 }
 
-/* ═══════════ Step validation ═══════════ */
-/* ═══════════ STEP 9 — Domain Languages ═══════════ */
-export function Step9Languages({ data, update }: StepProps) {
+/* ═══════════ STEP 9 — Personal Profile ═══════════ */
+const hobbyOptions = ["Gaming", "Reading", "Sports & Fitness", "Music & Arts", "Traveling", "Movies & Anime", "Writing", "Cooking"];
+const timeOptions = [
+  { value: "morning", label: "Early Bird", desc: "6 AM - 12 PM", icon: "🌅" },
+  { value: "afternoon", label: "Afternoon Flow", desc: "12 PM - 5 PM", icon: "☀️" },
+  { value: "evening", label: "Evening Focus", desc: "5 PM - 9 PM", icon: "🌇" },
+  { value: "night", label: "Night Owl", desc: "9 PM - 3 AM", icon: "🌙" }
+];
+
+export function Step9Personal({ data, update }: StepProps) {
+  return (
+    <Motion.div {...fadeSlide} className="space-y-8">
+      <div>
+        <SectionLabel>Personal Vibe</SectionLabel>
+        <Prompt>Tell us a bit about you outside of work/study.</Prompt>
+        
+        <div className="space-y-6">
+          <div>
+            <label className="block text-[10px] font-bold uppercase text-cyan font-mono mb-2">Hobbies & Interests</label>
+            <div className="flex flex-wrap gap-2">
+              {hobbyOptions.map((h, i) => (
+                <Chip key={h} label={h} 
+                  selected={data.hobbies.includes(h)} 
+                  onClick={() => {
+                    const next = data.hobbies.includes(h) ? data.hobbies.filter(x => x !== h) : [...data.hobbies, h];
+                    update({ hobbies: next });
+                  }} 
+                  delay={i} 
+                />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-[10px] font-bold uppercase text-cyan font-mono mb-2 mt-4">Peak Productivity Time</label>
+            <div className="grid grid-cols-2 gap-3">
+              {timeOptions.map((opt, i) => (
+                <Motion.button key={opt.value} type="button" onClick={() => update({ productivityTime: opt.value as any })}
+                  className={`rounded-xl border p-3 flex items-center gap-3 text-left transition-all ${
+                    data.productivityTime === opt.value ? "border-cyan-400/30 bg-cyan-400/5 text-white" : "border-white/[0.06] bg-white/[0.02] text-slate-500 hover:text-white"
+                  }`}
+                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 * i }}>
+                  <span className="text-xl">{opt.icon}</span>
+                  <div>
+                    <span className="text-sm font-bold block leading-tight">{opt.label}</span>
+                    <span className="text-[10px] text-slate-500">{opt.desc}</span>
+                  </div>
+                </Motion.button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </Motion.div>
+  );
+}
+
+/* ═══════════ STEP 10 — Domain Languages ═══════════ */
+export function Step10Languages({ data, update }: StepProps) {
   const selectLanguage = (domain: "dsa" | "backend" | "frontend" | "aiml", val: string) => {
     const nextLang = { ...data.preferredLanguages, [domain]: val };
     update({ preferredLanguages: nextLang });
@@ -468,21 +568,24 @@ export function Step9Languages({ data, update }: StepProps) {
 /* ═══════════ Step validation ═══════════ */
 export function isStepComplete(step: number, data: OnboardingData): boolean {
   switch (step) {
-    case 0: return data.targetRoles.length > 0;
-    case 1: return !!data.experienceLevel;
-    case 2: return data.currentSkills.length > 0;
-    case 3: return !!data.dailyStudyHours;
-    case 4: return !!data.targetTimeline;
-    case 5: return !!data.learningStyle;
-    case 6: return !!data.primaryStruggle;
-    case 7: return data.careerInterests.length > 0;
-    case 8: return !!data.preferredLanguages && !!data.preferredLanguages.dsa && !!data.preferredLanguages.backend && !!data.preferredLanguages.frontend && !!data.preferredLanguages.aiml;
+    case 0: return !!data.persona;
+    case 1: return data.targetRoles.length > 0;
+    case 2: return !!data.experienceLevel;
+    case 3: return data.currentSkills.length > 0;
+    case 4: return !!data.dailyStudyHours;
+    case 5: return !!data.targetTimeline;
+    case 6: return !!data.learningStyle;
+    case 7: return !!data.primaryStruggle;
+    case 8: return data.careerInterests.length > 0;
+    case 9: return data.hobbies.length > 0 && !!data.productivityTime;
+    case 10: return !!data.preferredLanguages && !!data.preferredLanguages.dsa && !!data.preferredLanguages.backend && !!data.preferredLanguages.frontend && !!data.preferredLanguages.aiml;
     default: return false;
   }
 }
 
-export const STEP_TITLES = ["Target Role", "Experience", "Current Skills", "Study Time", "Timeline", "Learning Style", "Biggest Struggle", "Career Interests", "Domain Languages"];
+export const STEP_TITLES = ["Persona", "Target Role", "Experience", "Current Skills", "Study Time", "Timeline", "Learning Style", "Biggest Struggle", "Career Interests", "Personal Vibe", "Domain Languages"];
 export const STEP_AI_MESSAGES: string[][] = [
+  ["Analyzing student archetype...", "Calibrating support systems...", "Configuring tailored guidance..."],
   ["Mapping your career path...", "Decomposing roles...", "Analyzing skill dependencies..."],
   ["Calibrating difficulty...", "Setting your pace...", "Optimizing terminology..."],
   ["Scanning knowledge graph...", "Identifying skill foundations...", "Mapping existing mastery..."],
@@ -491,5 +594,6 @@ export const STEP_AI_MESSAGES: string[][] = [
   ["Adapting resource engine...", "Personalizing teaching style...", "Optimizing content delivery..."],
   ["Configuring mentor tone...", "Designing interventions...", "Addressing friction points..."],
   ["Analyzing interests...", "Selecting projects...", "Personalizing opportunities..."],
+  ["Learning about you...", "Understanding your flow...", "Syncing with your lifestyle..."],
   ["Configuring domain languages...", "Matching language runtimes...", "Tailoring task syntax..."]
 ];

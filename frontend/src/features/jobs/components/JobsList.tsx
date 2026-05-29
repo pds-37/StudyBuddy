@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { RefreshCw, ExternalLink, Clock, MapPin, Building, Search, Building2, ChevronDown, CheckCircle2, AlertCircle } from "lucide-react";
+import { useState, useEffect } from "react";
+import { RefreshCw, ExternalLink, Clock, MapPin, Building, Search, Building2, ChevronDown, CheckCircle2, AlertCircle, ShieldAlert, Zap } from "lucide-react";
 import { cn } from "../../../lib/utils/cn";
 import { useJobsStore } from "../../../store/jobs-store";
 import type { JobListing } from "@studybuddy/shared";
@@ -11,6 +11,7 @@ type JobsListProps = {
 /** Displays a live list of job listings with match scores and source signals. */
 export function JobsList({ refreshTrigger }: JobsListProps) {
   const { jobs, loading, error, fetchJobs, clearError } = useJobsStore();
+  const [isOverwhelmed, setIsOverwhelmed] = useState(true); // Demo: Overwhelm shield active
 
   useEffect(() => {
     void fetchJobs();
@@ -199,12 +200,42 @@ export function JobsList({ refreshTrigger }: JobsListProps) {
         </div>
       </div>
 
+      {isOverwhelmed && (
+        <div className="p-6 rounded-2xl bg-brand/10 border border-brand/20 flex flex-col sm:flex-row items-center justify-between gap-4 animate-slide-up">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-brand/20 flex items-center justify-center text-brand shrink-0">
+              <ShieldAlert size={24} />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-white mb-1">Overwhelm Shield Active</h3>
+              <p className="text-sm text-slate-400">
+                You've been experiencing high cognitive load. We've heavily highlighted your <strong className="text-white">Top 3 matches</strong> to reduce decision fatigue, but all other active openings are still available below.
+              </p>
+            </div>
+          </div>
+          <button 
+            onClick={() => setIsOverwhelmed(false)}
+            className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-slate-300 hover:bg-white/10 transition-colors whitespace-nowrap"
+          >
+            Turn Off Shield
+          </button>
+        </div>
+      )}
+
       <div className="space-y-6">
-        {jobs.map((job) => {
+        {jobs.map((job, index) => {
           const salary = formatSalary(job);
+          
+          // If overwhelmed, strongly emphasize the first 3 jobs, and dim the rest
+          const isDimmed = isOverwhelmed && index >= 3;
+          const isHighlighted = isOverwhelmed && index < 3;
 
           return (
-            <div key={job.id} className="group p-8 rounded-[2.5rem] glass border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all hover:border-white/10 border-white/10 border-white/10 hover:translate-y-[-2px]">
+            <div key={job.id} className={cn(
+              "group p-8 rounded-[2.5rem] glass border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all hover:border-white/10 border-white/10 hover:translate-y-[-2px]",
+              isDimmed && "opacity-50 grayscale-[30%] scale-[0.98] hover:opacity-100 hover:grayscale-0 hover:scale-100",
+              isHighlighted && "border-brand/40 shadow-[0_0_30px_rgba(124,92,255,0.15)] bg-brand/[0.02]"
+            )}>
               <div className="flex flex-col lg:flex-row gap-8">
                 <div className="flex-1">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -272,15 +303,24 @@ export function JobsList({ refreshTrigger }: JobsListProps) {
                          </div>
                        )}
                        {job.applyUrl && (
-                        <a
-                          href={job.applyUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 px-6 py-3 rounded-xl bg-brand text-white font-black text-sm hover:bg-brand/90 transition-all shadow-[0_10px_20px_rgba(124,92,255,0.2)]"
-                        >
-                          Apply Now
-                          <ExternalLink size={16} />
-                        </a>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => alert("Please install the StudyBuddy Chrome Extension to use Auto-Apply.")}
+                            className="flex items-center gap-2 px-5 py-3 rounded-xl bg-white/5 border border-brand/30 text-brand font-bold text-sm hover:bg-brand/10 transition-all"
+                          >
+                            <Zap size={16} />
+                            Auto-Apply
+                          </button>
+                          <a
+                            href={job.applyUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 px-6 py-3 rounded-xl bg-brand text-white font-black text-sm hover:bg-brand/90 transition-all shadow-[0_10px_20px_rgba(124,92,255,0.2)]"
+                          >
+                            Manual Apply
+                            <ExternalLink size={16} />
+                          </a>
+                        </div>
                       )}
                     </div>
                   </div>
