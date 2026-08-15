@@ -22,6 +22,7 @@ import { useAppStore } from "../store/app-store";
 import { motion as Motion, AnimatePresence, type Variants } from "framer-motion";
 
 import { NebulaBackground } from "../components/common/NebulaBackground";
+import { env } from "../lib/constants/env";
 
 const LOADING_MESSAGES = [
   "Waking up the server...",
@@ -178,22 +179,27 @@ export function AuthPage() {
   const isSignup = mode === "signup";
   const formRef = useRef<HTMLFormElement>(null);
 
-  const googleLogin = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      setError("");
-      setSubmitting(true);
-      try {
-        const result = await authApi.googleLogin(tokenResponse.access_token);
-        setSession(result.accessToken, result.refreshToken, result.user);
-        navigate(result.user.onboardingCompleted ? "/dashboard" : "/onboarding", { replace: true });
-      } catch (requestError) {
-        setError(getAuthErrorMessage(requestError));
-      } finally {
-        setSubmitting(false);
-      }
-    },
-    onError: () => setError("Google login failed.")
-  });
+  const hasGoogleAuth = !!(env.googleClientId && env.googleClientId !== "placeholder");
+
+  const googleLoginHook = hasGoogleAuth
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    ? useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+          setError("");
+          setSubmitting(true);
+          try {
+            const result = await authApi.googleLogin(tokenResponse.access_token);
+            setSession(result.accessToken, result.refreshToken, result.user);
+            navigate(result.user.onboardingCompleted ? "/dashboard" : "/onboarding", { replace: true });
+          } catch (requestError) {
+            setError(getAuthErrorMessage(requestError));
+          } finally {
+            setSubmitting(false);
+          }
+        },
+        onError: () => setError("Google login failed.")
+      })
+    : null;
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -244,8 +250,7 @@ export function AuthPage() {
 
         {/* Top left branding */}
         <div className="relative z-10 flex items-center gap-2.5">
-          <img src="/brand/studybuddy-favicon-512.png" alt="StudyBuddy Icon" className="h-8 w-8 object-contain rounded-xl border border-white/10 shadow-[0_0_15px_rgba(99,102,241,0.2)]" />
-          <span className="font-extrabold text-xl tracking-tight text-white font-display">StudyBuddy</span>
+          <img src="/brand/studybuddy-logo.png" alt="StudyBuddy Logo" className="h-8 w-auto object-contain" />
         </div>
 
         {/* Floating Abstract OS Mockup Animation */}
@@ -315,8 +320,7 @@ export function AuthPage() {
 
         {/* Mobile Header (Hidden on Desktop) */}
         <div className="lg:hidden absolute top-8 left-6 flex items-center gap-2.5 z-20">
-          <img src="/brand/studybuddy-favicon-512.png" alt="StudyBuddy Icon" className="h-8 w-8 object-contain rounded-xl border border-white/20 shadow-[0_0_20px_rgba(99,102,241,0.3)]" />
-          <span className="font-extrabold text-xl tracking-tight text-white font-display">StudyBuddy</span>
+          <img src="/brand/studybuddy-logo.png" alt="StudyBuddy Logo" className="h-8 w-auto object-contain" />
         </div>
 
         <Motion.div 
@@ -450,8 +454,8 @@ export function AuthPage() {
           <Motion.div variants={itemVariants}>
             <Motion.button
               type="button"
-              onClick={() => googleLogin()}
-              disabled={isSubmitting}
+              onClick={() => googleLoginHook?.()}
+              disabled={isSubmitting || !googleLoginHook}
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.99 }}
               className="w-full bg-[#0A0A0A] border border-white/10 text-slate-200 py-2.5 rounded-xl text-sm font-medium hover:bg-white/5 transition-colors flex items-center justify-center gap-2 disabled:opacity-70"

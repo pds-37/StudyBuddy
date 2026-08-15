@@ -137,6 +137,11 @@ const noteSchema = new Schema(
       type: String,
       enum: ["implementation", "conceptual", "practical_repetition", "visual"],
       default: "conceptual"
+    },
+    recallEnabled: {
+      type: Boolean,
+      default: true,
+      index: true
     }
   },
   {

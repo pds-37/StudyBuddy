@@ -75,6 +75,7 @@ export async function uploadStudyMaterial(file: File): Promise<CareerNote> {
   return response.data.note;
 }
 
+
 /** Retrieves a single note by ID. */
 export async function getNote(id: string): Promise<CareerNote> {
   const response = await apiClient.get<NoteResponse>(`/notes/${id}`);
@@ -84,6 +85,12 @@ export async function getNote(id: string): Promise<CareerNote> {
 /** Updates an existing note. */
 export async function updateNote(id: string, data: UpdateNoteRequest): Promise<CareerNote> {
   const response = await apiClient.put<NoteResponse>(`/notes/${id}`, data);
+  return response.data.note;
+}
+
+/** Toggles the recall status of an existing note. */
+export async function toggleRecall(id: string, recallEnabled: boolean): Promise<CareerNote> {
+  const response = await apiClient.put<NoteResponse>(`/notes/${id}/recall`, { recallEnabled });
   return response.data.note;
 }
 

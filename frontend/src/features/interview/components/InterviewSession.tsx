@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { useInterviewStore } from "../../../store/interview-store";
 import type { InterviewSession as IInterviewSession, InterviewQuestion } from "@studybuddy/shared";
+import ReactMarkdown from "react-markdown";
 
 type Props = {
   session: IInterviewSession;
@@ -326,9 +327,11 @@ export function InterviewSession({ session }: Props) {
           {session.overallFeedback && (
             <div className="mt-6 space-y-2">
               <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 font-mono">Holistic Recruiter Review</span>
-              <p className="text-slate-300 leading-relaxed text-sm lg:text-base italic font-medium">
-                "{session.overallFeedback}"
-              </p>
+              <div className="text-slate-300 leading-relaxed text-sm lg:text-base markdown-prose">
+                <ReactMarkdown>
+                  {session.overallFeedback}
+                </ReactMarkdown>
+              </div>
             </div>
           )}
         </div>

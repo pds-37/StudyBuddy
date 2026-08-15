@@ -443,20 +443,21 @@ Shape: { "technicalAccuracy": 80, "clarity": 75, "scalabilityThinking": 60, "deb
 
 /** Generates dynamic holistic recruiter reviews at session completion. */
 async function generateOverallFeedback(targetRole: string, questions: any[]): Promise<string> {
-  const prompt = `You are Veda, an SDE Recruiter compiling a final review for a ${targetRole} candidate.
+  const prompt = `You are Veda, an expert Tech Recruiter compiling a final, highly actionable interview review for a ${targetRole} candidate.
 Review the following questions, candidate answers, and individual grades:
 
 ${questions.map((q, i) => `Q${i+1}: ${q.question}\nUser Answer: ${q.userAnswer}\nScore: ${q.score?.overall}/10\nEvaluation: ${q.score?.feedback}`).join("\n\n")}
 
-Provide exactly a 3-sentence high-value engineering review summarizing:
-1. Core technical strengths shown (SDE logic, communication).
-2. Architectural or debugging gaps that will trigger rejections.
-3. The exact roadmap recovery vector they must execute.
+Provide a detailed, structured feedback report in Markdown format containing:
+1. **Core Strengths**: Bullet points of what went well (technical logic, communication).
+2. **Critical Gaps**: Specific architectural or conceptual misses that would trigger a rejection.
+3. **STAR Method Evaluation**: Grading on how well they structured their behavioral/technical explanations.
+4. **Actionable Remediation Plan**: A clear, step-by-step roadmap for what the candidate must study and practice next.
 
-ONLY output plain text, no markup fences.`;
+Return ONLY the markdown text, with no markdown fences like \`\`\`markdown.`;
   
   const feedback = await AIOrchestrator.generateStructuredResponse(prompt, "interview");
-  return feedback.trim().replace(/^```text\s*/i, "").replace(/```$/, "").trim();
+  return feedback.trim().replace(/^```markdown\s*/i, "").replace(/^```text\s*/i, "").replace(/```$/, "").trim();
 }
 
 export const interviewService = {

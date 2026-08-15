@@ -21,5 +21,6 @@ notesRouter.post("/", notesController.create);
 notesRouter.get("/", notesController.list);
 notesRouter.get("/:id", notesController.get);
 notesRouter.post("/:id/resolve-contradiction", notesController.resolveContradiction);
+notesRouter.put("/:id/recall", notesController.toggleRecall);
 notesRouter.put("/:id", notesController.update);
 notesRouter.delete("/:id", notesController.remove);

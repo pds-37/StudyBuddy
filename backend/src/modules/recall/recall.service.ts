@@ -277,6 +277,7 @@ async function getDuePrompts(userId: string, limit = 10, noteId?: string): Promi
   const notes = await NoteModel.find({
     userId,
     deleted: { $ne: true },
+    recallEnabled: { $ne: false },
     $or: [
       { nextReviewAt: { $lte: new Date() } },
       { nextReviewAt: null },
@@ -412,7 +413,7 @@ function generateFeedback(grade: RecallGrade, note: NoteDocument): string {
 async function getStats(userId: string): Promise<RecallStats> {
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const notes = await NoteModel.find({ userId, deleted: { $ne: true } });
+  const notes = await NoteModel.find({ userId, deleted: { $ne: true }, recallEnabled: { $ne: false } });
 
   const totalStrength = notes.reduce((sum, note) => sum + (note.strength ?? 0), 0);
   const topicMap = new Map<string, { strength: number; count: number; due: number }>();

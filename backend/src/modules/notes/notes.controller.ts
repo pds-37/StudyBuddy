@@ -169,6 +169,22 @@ const uploadFile: RequestHandler = async (request, response, next) => {
   }
 };
 
+const toggleRecall: RequestHandler = async (request, response, next) => {
+  try {
+    const params = noteIdParamSchema.parse(request.params);
+    const { recallEnabled } = request.body;
+    
+    if (typeof recallEnabled !== "boolean") {
+      return response.status(400).json({ error: "recallEnabled must be a boolean" });
+    }
+
+    const note = await notesService.updateNote(request.userId ?? "", params.id, { recallEnabled });
+    response.json({ note });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const notesController = {
   create,
   ingest,
@@ -180,5 +196,6 @@ export const notesController = {
   resolveContradiction,
   search,
   updateEmbeddings,
-  uploadFile
+  uploadFile,
+  toggleRecall
 };

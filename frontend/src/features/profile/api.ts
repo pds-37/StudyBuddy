@@ -25,7 +25,16 @@ async function updateProfile(payload: ProfilePayload) {
   return response.data.profile;
 }
 
+/** Uploads resume during onboarding for automated processing. */
+async function uploadOnboardingResume(file: File) {
+  const formData = new FormData();
+  formData.append("resume", file);
+  const response = await apiClient.post<{ success: boolean; profile: any }>("/users/me/onboarding/upload", formData);
+  return response.data;
+}
+
 export const profileApi = {
   getProfile,
-  updateProfile
+  updateProfile,
+  uploadOnboardingResume
 };

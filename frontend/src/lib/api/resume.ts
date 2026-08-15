@@ -7,6 +7,20 @@ export async function tailorResume(request: ResumeTailorRequest): Promise<{ vers
   return response.data;
 }
 
+export async function uploadTailor(resumeFile: File, jdFile: File, targetRole: string): Promise<{ versionId: string; result: ResumeTailorResult }> {
+  const formData = new FormData();
+  formData.append("resume", resumeFile);
+  formData.append("jd", jdFile);
+  formData.append("targetRole", targetRole);
+  
+  const response = await apiClient.post<{ versionId: string; result: ResumeTailorResult }>("/resume/upload-tailor", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data"
+    }
+  });
+  return response.data;
+}
+
 export async function getResumeVersions(): Promise<ResumeVersion[]> {
   const response = await apiClient.get<ResumeVersion[]>("/resume/versions");
   return response.data;

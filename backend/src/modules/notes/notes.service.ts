@@ -16,6 +16,7 @@ type CreateNoteData = {
   strength?: number;
   nextReviewAt?: string;
   metadata?: Record<string, unknown>;
+  recallEnabled?: boolean;
 };
 
 type UpdateNoteData = Partial<CreateNoteData>;

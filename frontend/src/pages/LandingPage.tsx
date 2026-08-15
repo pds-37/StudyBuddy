@@ -433,8 +433,8 @@ export function LandingPage() {
 
       {/* FOOTER */}
       <footer>
-        <Link to="/" className="logo" style={{textDecoration:'none', color:'var(--t1)'}}>
-          <div className="logo-box">⚡</div>StudyBuddy
+        <Link to="/" className="logo" style={{textDecoration:'none', color:'var(--t1)', display: 'flex', alignItems: 'center', gap: '8px'}}>
+          <img src="/brand/studybuddy-logo.png" alt="StudyBuddy Logo" style={{ height: '32px', width: 'auto' }} />
         </Link>
         <div className="f-links">
           <Link to="/privacy">Privacy</Link>

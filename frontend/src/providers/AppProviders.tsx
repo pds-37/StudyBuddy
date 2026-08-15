@@ -68,11 +68,17 @@ export function AppProviders({ children }: AppProvidersProps) {
     );
   }
 
+  const hasGoogleAuth = env.googleClientId && env.googleClientId !== "placeholder";
+
   return (
     <QueryClientProvider client={queryClient}>
-      <GoogleOAuthProvider clientId={env.googleClientId}>
+      {hasGoogleAuth ? (
+        <GoogleOAuthProvider clientId={env.googleClientId}>
+          <BrowserRouter>{children}</BrowserRouter>
+        </GoogleOAuthProvider>
+      ) : (
         <BrowserRouter>{children}</BrowserRouter>
-      </GoogleOAuthProvider>
+      )}
     </QueryClientProvider>
   );
 }

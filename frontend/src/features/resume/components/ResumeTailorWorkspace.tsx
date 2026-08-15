@@ -6,7 +6,7 @@ import {
   Briefcase, Code, BarChart3, MessageSquare, AlertTriangle, Info,
   Check, X, Download
 } from "lucide-react";
-import { tailorResume } from "../../../lib/api/resume";
+import { tailorResume, uploadTailor } from "../../../lib/api/resume";
 import { logBehavior } from "../../../lib/api/behavior";
 import { cn } from "../../../lib/utils/cn";
 import type { ResumeTailorResult, ResumeTailorTone, ResumeMode, ResumeBulletRewrite } from "@studybuddy/shared";
@@ -46,12 +46,14 @@ export function ResumeTailorWorkspace({ initialResult }: { initialResult?: any }
   
   // Collaborative edit state
   const [acceptedBullets, setAcceptedBullets] = useState<Set<number>>(new Set());
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [jdFile, setJdFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (initialResult) setResult(initialResult);
   }, [initialResult]);
 
-  const canSubmit = targetRole.trim().length >= 2 && currentResume.trim().length >= 50 && !isLoading && !isParsing;
+  const canSubmit = targetRole.trim().length >= 2 && (currentResume.trim().length >= 50 || resumeFile) && !isLoading && !isParsing;
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -62,14 +64,21 @@ export function ResumeTailorWorkspace({ initialResult }: { initialResult?: any }
     setAcceptedBullets(new Set());
 
     try {
-      const { result: tailored } = await tailorResume({
-        targetRole,
-        jobDescription,
-        currentResume,
-        tone,
-        mode
-      });
-      setResult(tailored);
+      if (resumeFile && jdFile) {
+        // Use the new fully automated backend pipeline
+        const { result: tailored } = await uploadTailor(resumeFile, jdFile, targetRole);
+        setResult(tailored);
+      } else {
+        // Fallback to text-based API
+        const { result: tailored } = await tailorResume({
+          targetRole,
+          jobDescription,
+          currentResume,
+          tone,
+          mode
+        });
+        setResult(tailored);
+      }
       await logBehavior("resume_tailored", { targetRole, tone, mode });
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Tailoring failed.");
@@ -81,6 +90,7 @@ export function ResumeTailorWorkspace({ initialResult }: { initialResult?: any }
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+    setResumeFile(file);
     setIsParsing(true);
     setError(null);
     try {
@@ -99,9 +109,22 @@ export function ResumeTailorWorkspace({ initialResult }: { initialResult?: any }
         setCurrentResume(text);
       }
     } catch (err) {
-      setError("Failed to parse file.");
+      setError("Failed to parse file. The backend will parse it directly.");
     } finally {
       setIsParsing(false);
+    }
+  };
+
+  const handleJdFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setJdFile(file);
+    // Auto-parse if txt, otherwise backend handles it
+    if (file.type === "text/plain") {
+        const text = await file.text();
+        setJobDescription(text);
+    } else {
+        setJobDescription(`[Attached File: ${file.name}]`);
     }
   };
 
@@ -203,14 +226,21 @@ ${result.keywordAdditions.join(', ')}
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Job Description (Optional)</label>
-              <textarea 
-                value={jobDescription}
-                onChange={e => setJobDescription(e.target.value)}
-                placeholder="Paste JD for higher accuracy..."
-                rows={4}
-                className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-cyan-500/50 transition-all resize-none"
-              />
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Job Description</label>
+              <div className="relative border-2 border-dashed border-white/5 rounded-xl p-4 hover:bg-white/[0.02] transition-colors cursor-pointer text-center">
+                <input type="file" onChange={handleJdFileUpload} className="absolute inset-0 opacity-0 cursor-pointer" accept=".pdf,.txt" />
+                {jdFile ? (
+                  <div className="flex items-center justify-center gap-2 text-emerald-400">
+                    <CheckCircle2 size={14} />
+                    <span className="text-[10px] font-bold uppercase">{jdFile.name}</span>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-1 text-slate-500">
+                    <FileText size={16} />
+                    <span className="text-[10px] font-bold uppercase">Upload PDF / TXT JD</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -219,15 +249,15 @@ ${result.keywordAdditions.join(', ')}
                 <input type="file" onChange={handleFileUpload} className="absolute inset-0 opacity-0 cursor-pointer" accept=".pdf,.txt" />
                 {isParsing ? (
                   <Loader2 size={16} className="animate-spin text-cyan-400 mx-auto" />
-                ) : currentResume ? (
+                ) : resumeFile ? (
                   <div className="flex items-center justify-center gap-2 text-emerald-400">
                     <CheckCircle2 size={14} />
-                    <span className="text-[10px] font-bold uppercase">Ready ({currentResume.length} chars)</span>
+                    <span className="text-[10px] font-bold uppercase">{resumeFile.name}</span>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center gap-1 text-slate-500">
                     <FileText size={16} />
-                    <span className="text-[10px] font-bold uppercase">Upload PDF / TXT</span>
+                    <span className="text-[10px] font-bold uppercase">Upload PDF / TXT Resume</span>
                   </div>
                 )}
               </div>

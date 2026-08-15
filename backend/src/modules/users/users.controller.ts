@@ -1,6 +1,47 @@
 import { type RequestHandler } from "express";
 import { usersService } from "./users.service.js";
 import { updateProfileSchema } from "./users.validation.js";
+import { AIOrchestrator } from "../../core/ai-orchestrator.js";
+import { UserModel } from "./user.model.js";
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
+const pdfParse = require("pdf-parse/lib/pdf-parse.js");
+
+const uploadOnboardingResume: RequestHandler = async (request, response, next) => {
+  try {
+    const file = request.file;
+    if (!file) {
+      return response.status(400).json({ error: "No resume file uploaded" });
+    }
+
+    let resumeText = "";
+    if (file.mimetype === "application/pdf") {
+      const data = await pdfParse(file.buffer);
+      resumeText = data.text;
+    } else {
+      resumeText = file.buffer.toString("utf-8");
+    }
+
+    const extractedProfile = await AIOrchestrator.extractUserProfile(resumeText);
+    
+    // Update user model with extracted info
+    const userId = request.userId;
+    const user = await UserModel.findById(userId);
+    if (user) {
+      if (extractedProfile.name && extractedProfile.name !== "Unknown") user.name = extractedProfile.name;
+      if (extractedProfile.targetRoles?.length) user.targetRoles = extractedProfile.targetRoles;
+      if (extractedProfile.experienceLevel) user.experienceLevel = extractedProfile.experienceLevel;
+      if (extractedProfile.currentSkills?.length) user.currentSkills = extractedProfile.currentSkills;
+      user.onboardingCompleted = true;
+      await user.save();
+    }
+
+    response.json({ success: true, profile: extractedProfile });
+  } catch (error) {
+    next(error);
+  }
+};
 
 /** Returns the authenticated user's profile and onboarding state. */
 const getProfile: RequestHandler = async (request, response, next) => {
@@ -64,6 +105,7 @@ const updateAiRoutes: RequestHandler = async (request, response, next) => {
 };
 
 export const usersController = {
+  uploadOnboardingResume,
   getProfile,
   updateProfile,
   getApiKeys,

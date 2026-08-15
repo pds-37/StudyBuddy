@@ -630,4 +630,35 @@ export class AIOrchestrator {
       () => localStructuredResponse(prompt, taskCategory)
     );
   }
+
+  /**
+   * Extracts user profile data from a resume text.
+   */
+  static async extractUserProfile(resumeText: string): Promise<any> {
+    const prompt = `You are Veda, an expert recruiter. Extract the following information from the provided resume text and return it as a JSON object:
+    - name (string)
+    - targetRoles (array of strings, e.g. ["Frontend Engineer", "Full Stack Developer"])
+    - experienceLevel (string, one of "beginner", "intermediate", "advanced")
+    - currentSkills (array of strings)
+
+    Resume Text:
+    ${resumeText}
+    
+    Return ONLY valid JSON. Example format:
+    { "name": "John Doe", "targetRoles": ["Software Engineer"], "experienceLevel": "intermediate", "currentSkills": ["JavaScript", "React"] }`;
+
+    const response = await this.generateStructuredResponse(prompt, "general");
+    try {
+      const cleaned = response.trim().replace(/^```json\s*/i, "").replace(/```$/, "").trim();
+      return JSON.parse(cleaned);
+    } catch (err) {
+      console.error("Failed to parse extractUserProfile response:", response);
+      return {
+        name: "Unknown",
+        targetRoles: [],
+        experienceLevel: "beginner",
+        currentSkills: []
+      };
+    }
+  }
 }

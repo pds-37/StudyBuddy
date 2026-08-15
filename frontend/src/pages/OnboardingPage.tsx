@@ -157,6 +157,41 @@ export function OnboardingPage() {
           <Sparkles size={300} className="text-brand" />
         </div>
 
+        {/* Fast Track Upload */}
+        <div className="absolute top-6 right-6 z-20">
+          <label className="cursor-pointer group flex items-center gap-2 px-4 py-2 rounded-xl bg-brand/10 border border-brand/20 hover:bg-brand/20 transition-all text-[11px] font-bold text-brand uppercase tracking-wider">
+            <span>Fast Track: Upload Resume</span>
+            <input 
+              type="file" 
+              accept=".pdf" 
+              className="hidden" 
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                setSubmitting(true);
+                try {
+                  const res = await profileApi.uploadOnboardingResume(file);
+                  if (res.profile) {
+                    setData((d) => ({
+                      ...d,
+                      name: res.profile.name || d.name,
+                      targetRoles: res.profile.targetRoles || d.targetRoles,
+                      experienceLevel: res.profile.experienceLevel || d.experienceLevel,
+                      currentSkills: res.profile.currentSkills || d.currentSkills,
+                    }));
+                    // Skip to step 4 (after skills)
+                    setStep(4);
+                  }
+                } catch (err) {
+                  setError("Failed to parse resume.");
+                } finally {
+                  setSubmitting(false);
+                }
+              }}
+            />
+          </label>
+        </div>
+
         {/* Mobile progress bar */}
         <div className="lg:hidden flex gap-2 mb-10">
           {Array.from({ length: TOTAL_STEPS }, (_, i) => (

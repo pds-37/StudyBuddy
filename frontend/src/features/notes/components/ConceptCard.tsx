@@ -1,5 +1,7 @@
-import { Brain, Edit3 } from "lucide-react";
+import { Brain, Edit3, Power, PowerOff } from "lucide-react";
 import type { Concept } from "../types/notes.types";
+import { useState } from "react";
+import { toggleRecall } from "../../../lib/api/notes";
 
 type ConceptCardProps = {
   concept: Concept;
@@ -35,9 +37,22 @@ function formatDue(concept: Concept) {
 export function ConceptCard({ concept }: ConceptCardProps) {
   const meta = formatDue(concept);
   const isCritical = concept.health === "critical";
+  const [recallActive, setRecallActive] = useState((concept as any).recallEnabled ?? true);
+
+  const handleToggleRecall = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const updated = await toggleRecall(concept.id, !recallActive);
+      setRecallActive((updated as any).recallEnabled ?? !recallActive);
+    } catch (err) {
+      console.error("Failed to toggle recall", err);
+      // Revert optimism if failed
+      setRecallActive(recallActive);
+    }
+  };
 
   return (
-    <article className="concept-card cursor-pointer rounded-xl border border-zinc-800 bg-zinc-900 p-3 transition-colors duration-150 hover:border-zinc-600 first:border-purple-600 bg-zinc-900">
+    <article className={`concept-card cursor-pointer rounded-xl border border-zinc-800 bg-zinc-900 p-3 transition-colors duration-150 hover:border-zinc-600 first:border-purple-600 ${!recallActive ? 'opacity-50 grayscale' : ''}`}>
       <div className="flex items-start justify-between gap-3">
         <h3 className="min-w-0 text-[13px] font-medium text-zinc-100">{concept.title}</h3>
         <span className={`mt-1 h-2 w-2 shrink-0 rounded-full ${healthDotClass(concept.health)}`} />
@@ -61,8 +76,8 @@ export function ConceptCard({ concept }: ConceptCardProps) {
       <div className="mt-4 flex items-center justify-between gap-3">
         <span className={`text-[11.5px] ${isCritical ? "text-red-400" : "text-zinc-500"}`}>{meta}</span>
         <div className="flex items-center gap-1">
-          <button type="button" className="flex h-7 w-7 items-center justify-center rounded-lg border border-zinc-700 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100" aria-label={`Recall ${concept.title}`}>
-            <Brain size={13} />
+          <button type="button" onClick={handleToggleRecall} className={`flex h-7 w-7 items-center justify-center rounded-lg border ${recallActive ? 'border-brand/30 text-brand hover:bg-brand/10' : 'border-zinc-700 text-zinc-500 hover:bg-zinc-800 hover:text-zinc-400'}`} aria-label={`Toggle Recall ${concept.title}`}>
+            {recallActive ? <Power size={13} /> : <PowerOff size={13} />}
           </button>
           <button type="button" className="flex h-7 w-7 items-center justify-center rounded-lg border border-zinc-700 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100" aria-label={`Edit ${concept.title}`}>
             <Edit3 size={13} />
