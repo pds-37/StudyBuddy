@@ -56,13 +56,6 @@ export function InterviewSession({ session }: Props) {
   const timerRef = useRef<any>(null);
   const reportRef = useRef<HTMLDivElement>(null);
 
-  // Voice Mode states
-  const [isVoiceMode, setIsVoiceMode] = useState(false);
-  const [isListening, setIsListening] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [interimText, setInterimText] = useState("");
-  const vocalAssistantRef = useRef<any>(null);
-
   // Initialize Vocal Assistant
   useEffect(() => {
     import("../../../lib/audio/VocalAssistant").then(({ VocalAssistant }) => {
@@ -97,18 +90,8 @@ export function InterviewSession({ session }: Props) {
       setActiveTab("evaluation");
       // Reset timer to 10 minutes (600 seconds) for each active question in Pressure Mode
       setSecondsLeft(600);
-
-      // Voice Mode Auto-Read
-      if (isVoiceMode && !activeQuestion.userAnswer && vocalAssistantRef.current) {
-        vocalAssistantRef.current.stopListening();
-        vocalAssistantRef.current.speak(activeQuestion.question, () => {
-          if (isVoiceMode && !activeQuestion.userAnswer) {
-            vocalAssistantRef.current.startListening();
-          }
-        });
-      }
     }
-  }, [activeQuestion?.id, isVoiceMode]);
+  }, [activeQuestion?.id]);
 
   // Spaced repetition pressure timer countdown
   useEffect(() => {
@@ -165,10 +148,6 @@ export function InterviewSession({ session }: Props) {
 
   const handleSubmit = async () => {
     if (!answerInput.trim() || !activeQuestion) return;
-    if (vocalAssistantRef.current) {
-      vocalAssistantRef.current.stopListening();
-      vocalAssistantRef.current.stopSpeaking();
-    }
     await submitAnswer(session.id, activeQuestion.id, answerInput.slice(0, MAX_INTERVIEW_RESPONSE_CHARS));
   };
 
@@ -419,21 +398,6 @@ export function InterviewSession({ session }: Props) {
                 </span>
               </div>
             </div>
-
-            {/* Voice Mode Toggle */}
-            <div className="border-t border-white/[0.04] pt-4 mt-2">
-              <button
-                onClick={() => setIsVoiceMode(!isVoiceMode)}
-                className={`w-full flex items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold transition-all ${
-                  isVoiceMode 
-                    ? "bg-brand text-white shadow-[0_0_15px_rgba(99,102,241,0.3)]" 
-                    : "bg-white/5 border border-white/10 text-slate-400 hover:text-white"
-                }`}
-              >
-                {isVoiceMode ? <Volume2 size={16} /> : <VolumeX size={16} />}
-                {isVoiceMode ? "Voice Mode Active" : "Enable Voice Mode"}
-              </button>
-            </div>
           </div>
 
           {/* Question Navigator Tree */}
@@ -623,37 +587,18 @@ export function InterviewSession({ session }: Props) {
                     </div>
                   </div>
                 ) : (
-                  <div className={`relative rounded-xl border ${isListening ? 'border-brand shadow-[0_0_15px_rgba(99,102,241,0.2)]' : 'border-white/[0.08] focus-within:border-brand'} bg-black/40 transition-all duration-300 flex-1 flex flex-col`}>
+                  <div className="relative rounded-xl border border-white/[0.08] bg-black/40 focus-within:border-brand transition-all duration-300 flex-1 flex flex-col">
                     <textarea
                       value={answerInput}
                       onChange={(e) => setAnswerInput(e.target.value)}
                       maxLength={MAX_INTERVIEW_RESPONSE_CHARS}
-                      placeholder={isListening ? "Listening..." : "Craft your system formulation, database schemas, complexity trade-offs, or STAR answers here..."}
+                      placeholder="Craft your system formulation, database schemas, complexity trade-offs, or STAR answers here..."
                       className="w-full bg-transparent border-0 text-sm text-white placeholder-slate-600 focus:ring-0 p-5 min-h-[220px] max-h-[420px] resize-y leading-relaxed outline-none flex-1 font-mono"
                     />
-                    
-                    {/* Live Transcript / Interim Text */}
-                    {isListening && interimText && (
-                      <div className="px-5 pb-5 pt-0 text-sm text-brand font-mono leading-relaxed animate-pulse">
-                        {interimText}
-                      </div>
-                    )}
-                    
-                    <div className="absolute bottom-3 right-4 flex items-center gap-3">
-                      {isListening && (
-                        <div className="flex items-center gap-1.5 text-[9px] font-bold text-brand uppercase tracking-widest font-mono">
-                          <span className="relative flex h-1.5 w-1.5">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-brand"></span>
-                          </span>
-                          Mic Active
-                        </div>
-                      )}
-                      <div className={`text-[9px] font-mono font-bold ${
-                        answerInput.length > MAX_INTERVIEW_RESPONSE_CHARS * 0.9 ? "text-amber-400" : "text-slate-500"
-                      }`}>
-                        {answerInput.length}/{MAX_INTERVIEW_RESPONSE_CHARS} chars
-                      </div>
+                    <div className={`absolute bottom-3 right-4 text-[9px] font-mono font-bold ${
+                      answerInput.length > MAX_INTERVIEW_RESPONSE_CHARS * 0.9 ? "text-amber-400" : "text-slate-500"
+                    }`}>
+                      {answerInput.length}/{MAX_INTERVIEW_RESPONSE_CHARS} chars
                     </div>
                   </div>
                 )}

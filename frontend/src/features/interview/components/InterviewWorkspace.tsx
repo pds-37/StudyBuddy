@@ -21,6 +21,7 @@ import { useInterviewStore } from "../../../store/interview-store";
 import { usePanelInterviewStore } from "../../../store/panel-interview-store";
 import { useAppStore } from "../../../store/app-store";
 import { InterviewSession } from "./InterviewSession";
+import { VoiceInterviewSession } from "./VoiceInterviewSession";
 import { ShadowPanelCockpit } from "./ShadowPanelCockpit";
 import { MultiplayerPanelCockpit } from "./MultiplayerPanelCockpit";
 import { Link } from "react-router-dom";
@@ -44,6 +45,7 @@ export function InterviewWorkspace() {
   const [pressureMode, setPressureMode] = useState(false);
   const [targetCompany, setTargetCompany] = useState("");
   const [multiplayerActive, setMultiplayerActive] = useState(false);
+  const [activeTab, setActiveTab] = useState<"standard" | "voice">("standard");
 
   useEffect(() => {
     fetchSessions();
@@ -83,6 +85,9 @@ export function InterviewWorkspace() {
   }
 
   if (currentSession) {
+    if (activeTab === "voice") {
+      return <VoiceInterviewSession session={currentSession} />;
+    }
     return <InterviewSession session={currentSession} />;
   }
 
@@ -111,8 +116,34 @@ export function InterviewWorkspace() {
         </div>
       )}
 
+      {/* Top Tabs */}
+      <div className="flex gap-4">
+        <button
+          onClick={() => setActiveTab("standard")}
+          className={`flex items-center gap-2 px-6 py-3 rounded-t-2xl font-bold transition-all duration-300 ${
+            activeTab === "standard"
+              ? "bg-[#07090d]/80 text-white border-t border-l border-r border-brand/50 shadow-[0_-5px_15px_rgba(99,102,241,0.15)]"
+              : "bg-[#07090d]/40 text-slate-500 hover:text-slate-300 hover:bg-[#07090d]/60 border-t border-l border-r border-white/5"
+          }`}
+        >
+          <Laptop size={18} />
+          Standard Cockpit
+        </button>
+        <button
+          onClick={() => setActiveTab("voice")}
+          className={`flex items-center gap-2 px-6 py-3 rounded-t-2xl font-bold transition-all duration-300 ${
+            activeTab === "voice"
+              ? "bg-[#07090d]/80 text-white border-t border-l border-r border-rose-500/50 shadow-[0_-5px_15px_rgba(244,63,94,0.15)]"
+              : "bg-[#07090d]/40 text-slate-500 hover:text-slate-300 hover:bg-[#07090d]/60 border-t border-l border-r border-white/5"
+          }`}
+        >
+          <Mic size={18} />
+          Voice Call Mode
+        </button>
+      </div>
+
       {/* Premium Adaptive Cockpit Configurator */}
-      <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-[#07090d]/80 p-8 sm:p-10 backdrop-blur-xl shadow-premium">
+      <div className={`relative overflow-hidden ${activeTab === 'standard' ? 'rounded-2xl rounded-tl-none' : 'rounded-2xl rounded-tr-none'} border border-white/[0.06] bg-[#07090d]/80 p-8 sm:p-10 backdrop-blur-xl shadow-premium -mt-8`}>
         
         {/* Subtle Neon haze backdrops */}
         <div className="absolute top-0 right-0 w-80 h-80 rounded-full bg-brand/5 blur-[120px] pointer-events-none" />
@@ -308,7 +339,7 @@ export function InterviewWorkspace() {
               ) : (
                 <>
                   <Play className="w-4 h-4 fill-current text-white" />
-                  {mode === "panel" ? "Enter Shadow Panel Arena" : "Launch Assessment Cockpit"}
+                  {mode === "panel" ? "Enter Shadow Panel Arena" : activeTab === "voice" ? "Launch Voice Call" : "Launch Assessment Cockpit"}
                 </>
               )}
             </button>
