@@ -143,7 +143,7 @@ export function InterviewWorkspace() {
       </div>
 
       {/* Premium Adaptive Cockpit Configurator */}
-      <div className={`relative overflow-hidden ${activeTab === 'standard' ? 'rounded-2xl rounded-tl-none' : 'rounded-2xl rounded-tr-none'} border border-white/[0.06] bg-[#07090d]/80 p-8 sm:p-10 backdrop-blur-xl shadow-premium -mt-8`}>
+      <div className={`relative overflow-hidden ${activeTab === 'standard' ? 'rounded-2xl rounded-tl-none' : 'rounded-2xl rounded-tr-none'} border border-white/[0.06] bg-[#07090d]/80 p-8 sm:p-10 backdrop-blur-xl shadow-premium`}>
         
         {/* Subtle Neon haze backdrops */}
         <div className="absolute top-0 right-0 w-80 h-80 rounded-full bg-brand/5 blur-[120px] pointer-events-none" />
@@ -170,155 +170,86 @@ export function InterviewWorkspace() {
             </div>
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-2">
-            {/* Left Side: Selectors */}
-            <div className="space-y-6">
-              
-              {/* Select Mode */}
-              <div className="space-y-3">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 font-mono">1. Select Interview Mode</label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {[
-                    { id: "technical", title: "Technical SDE Core", desc: "Algorithmic gates, framework internals, and DBMS.", icon: Cpu, color: "text-cyan" },
-                    { id: "scenario", title: "Scenario Outage", desc: "Production incidents, cache spikes, scaling leaks.", icon: Flame, color: "text-red-400" },
-                    { id: "behavioral", title: "HR / Behavioral", desc: "STAR format situations, conflicts, and priority.", icon: BookOpen, color: "text-amber-400" },
-                    { id: "panel", title: "Veda Shadow Panel", desc: "Simulated multi-agent hiring committee panel.", icon: BrainCircuit, color: "text-indigo-400 animate-pulse border border-indigo-500/20" },
-                    { id: "multiplayer", title: "Coop Shadow Arena", desc: "WebRTC peer design loops and debates live.", icon: Users, color: "text-brand-light animate-pulse border border-brand/20" },
-                    { id: "company", title: "Company-Specific", desc: "FAANG loops or agile startup criteria.", icon: Building2, color: "text-brand-light" },
-                    { id: "mock", title: "Full Mock Round", desc: "Complete timed multi-round simulation.", icon: Award, color: "text-emerald-400" }
-                  ].map(item => (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => setMode(item.id as any)}
-                      className={`relative flex items-start gap-4 rounded-xl border p-4 text-left transition-all duration-300 ${
-                        mode === item.id 
-                          ? "border-brand bg-brand/10 shadow-[0_0_15px_rgba(99,102,241,0.15)]"
-                          : "border-white/[0.06] bg-[#0c0e12]/50 hover:bg-[#0c0e12]/80 hover:border-white/[0.12]"
-                      }`}
-                    >
-                      <item.icon className={`w-5 h-5 mt-0.5 shrink-0 ${item.color}`} />
-                      <div>
-                        <h4 className="text-sm font-bold text-white font-display">{item.title}</h4>
-                        <p className="text-[11px] text-slate-400 mt-1 leading-normal">{item.desc}</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Company Input (Shown if company mode selected) */}
-              {mode === "company" && (
-                <div className="space-y-2.5 animate-in slide-in-from-top-2 duration-300">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 font-mono">Specify Target Company</label>
-                  <input
-                    type="text"
-                    value={targetCompany}
-                    onChange={(e) => setTargetCompany(e.target.value)}
-                    placeholder="e.g. Google, Amazon, Stripe, Razorpay"
-                    className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-600 outline-none focus:border-brand/40 focus:bg-white/[0.04] transition-all"
-                  />
-                </div>
-              )}
+          <div className="flex flex-col md:flex-row gap-6 items-end bg-[#0c0e12]/50 border border-white/[0.06] p-6 rounded-2xl">
+            {/* Mode Select */}
+            <div className="flex-1 space-y-2 w-full">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 font-mono">Mode</label>
+              <select
+                value={mode}
+                onChange={(e) => setMode(e.target.value as any)}
+                className="w-full bg-[#07090d]/80 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-white outline-none focus:border-brand/40 focus:ring-1 focus:ring-brand/40 transition-all appearance-none cursor-pointer"
+              >
+                <option value="technical">Technical SDE Core</option>
+                <option value="scenario">Scenario Outage</option>
+                <option value="behavioral">HR / Behavioral</option>
+                <option value="panel">Veda Shadow Panel</option>
+                <option value="multiplayer">Coop Shadow Arena</option>
+                <option value="company">Company-Specific</option>
+                <option value="mock">Full Mock Round</option>
+              </select>
             </div>
 
-            {/* Right Side: Configuration Options */}
-            <div className="space-y-6">
-              
-              {/* Difficulty Level */}
-              <div className="space-y-3">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 font-mono">2. Assessment Difficulty</label>
-                <div className="grid grid-cols-4 gap-2">
-                  {[
-                    { id: "beginner", label: "Beginner" },
-                    { id: "intermediate", label: "Intermed" },
-                    { id: "advanced", label: "Advanced" },
-                    { id: "adaptive", label: "Adaptive" }
-                  ].map(diff => (
-                    <button
-                      key={diff.id}
-                      type="button"
-                      onClick={() => setDifficulty(diff.id as any)}
-                      className={`rounded-xl py-3 text-xs font-bold border transition-all duration-200 ${
-                        difficulty === diff.id 
-                          ? "border-brand bg-brand/10 text-brand-light shadow-[0_0_10px_rgba(99,102,241,0.15)]"
-                          : "border-white/[0.06] bg-[#0c0e12]/30 text-slate-400 hover:text-white"
-                      }`}
-                    >
-                      {diff.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Personalities */}
-              <div className="space-y-3">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 font-mono">3. Interviewer Personality</label>
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { id: "friendly", label: "Friendly Mentor", desc: "Warm, constructive coaching." },
-                    { id: "strict", label: "Strict FAANG Rep", desc: "High criteria, minimal hints." },
-                    { id: "founder", label: "Startup Founder", desc: "Rapid business & code fit." },
-                    { id: "architect", label: "SDE Architect", desc: "Scale, bottlenecks, DB trade-offs." }
-                  ].map(p => (
-                    <button
-                      key={p.id}
-                      type="button"
-                      onClick={() => setPersonality(p.id as any)}
-                      className={`rounded-xl border p-3.5 text-left transition-all duration-200 ${
-                        personality === p.id 
-                          ? "border-brand bg-brand/10 shadow-[0_0_10px_rgba(99,102,241,0.15)]"
-                          : "border-white/[0.06] bg-[#0c0e12]/30 hover:bg-white/[0.02]"
-                      }`}
-                    >
-                      <h5 className="text-xs font-bold text-white font-display">{p.label}</h5>
-                      <p className="text-[10px] text-slate-500 mt-0.5 leading-normal">{p.desc}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Pressure Mode Toggle */}
-              <div className="relative overflow-hidden rounded-xl border border-white/[0.06] bg-[#0c0e12]/40 p-4 transition-all hover:border-white/[0.1]">
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-colors ${
-                      pressureMode 
-                        ? "border-red-500/20 bg-red-500/10 text-red-400 shadow-[0_0_10px_rgba(239,68,68,0.2)]" 
-                        : "border-white/10 bg-white/5 text-slate-500"
-                    }`}>
-                      <Clock size={16} />
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-bold text-white font-display flex items-center gap-1.5">
-                        Pressure Interview Protocol
-                        {pressureMode && (
-                          <span className="inline-flex items-center rounded-full bg-red-500/10 border border-red-500/25 px-1.5 py-0.5 text-[8px] font-black uppercase text-red-400 animate-pulse">
-                            Active
-                          </span>
-                        )}
-                      </h4>
-                      <p className="text-[10px] text-slate-500 mt-0.5">Countdown timer (10 mins), strict alerts, disabled hints.</p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setPressureMode(!pressureMode)}
-                    className={`relative inline-flex h-5.5 w-10 shrink-0 cursor-pointer rounded-full border border-transparent transition-colors duration-200 ease-in-out outline-none ${
-                      pressureMode ? "bg-red-500" : "bg-white/10"
-                    }`}
-                  >
-                    <span className={`pointer-events-none inline-block h-4.5 w-4.5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                      pressureMode ? "translate-x-4.5" : "translate-x-0.5"
-                    }`} />
-                  </button>
-                </div>
-              </div>
+            {/* Difficulty Select */}
+            <div className="flex-1 space-y-2 w-full">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 font-mono">Difficulty</label>
+              <select
+                value={difficulty}
+                onChange={(e) => setDifficulty(e.target.value as any)}
+                className="w-full bg-[#07090d]/80 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-white outline-none focus:border-brand/40 focus:ring-1 focus:ring-brand/40 transition-all appearance-none cursor-pointer"
+              >
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+                <option value="adaptive">Adaptive</option>
+              </select>
             </div>
+
+            {/* Personality Select */}
+            <div className="flex-1 space-y-2 w-full">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 font-mono">Interviewer</label>
+              <select
+                value={personality}
+                onChange={(e) => setPersonality(e.target.value as any)}
+                className="w-full bg-[#07090d]/80 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-white outline-none focus:border-brand/40 focus:ring-1 focus:ring-brand/40 transition-all appearance-none cursor-pointer"
+              >
+                <option value="friendly">Friendly Mentor</option>
+                <option value="strict">Strict FAANG Rep</option>
+                <option value="founder">Startup Founder</option>
+                <option value="architect">SDE Architect</option>
+              </select>
+            </div>
+
+            {/* Pressure Toggle */}
+            <button
+              type="button"
+              onClick={() => setPressureMode(!pressureMode)}
+              className={`flex-shrink-0 flex items-center justify-center gap-2 h-[46px] px-6 rounded-xl border text-xs font-bold transition-all ${
+                pressureMode
+                  ? "border-red-500/30 bg-red-500/10 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.2)]"
+                  : "border-white/10 bg-[#07090d]/80 text-slate-400 hover:text-white"
+              }`}
+            >
+              <Clock size={16} />
+              {pressureMode ? "Pressure On" : "Pressure Off"}
+            </button>
           </div>
 
-          {/* Action Trigger */}
-          <div className="pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4">
+          {/* Company Input (Shown if company mode selected) */}
+          {mode === "company" && (
+            <div className="space-y-2.5 animate-in slide-in-from-top-2 duration-300">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 font-mono">Specify Target Company</label>
+              <input
+                type="text"
+                value={targetCompany}
+                onChange={(e) => setTargetCompany(e.target.value)}
+                placeholder="e.g. Google, Amazon, Stripe, Razorpay"
+                className="w-full bg-[#0c0e12]/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-600 outline-none focus:border-brand/40 transition-all"
+              />
+            </div>
+          )}
+
+          {/* Action Button Section */}
+          <div className="pt-6 border-t border-white/[0.04] flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-center sm:text-left">
               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide font-mono">Assessing Target Profile:</span>
               <p className="text-xs text-brand-light font-bold mt-1 font-display">
