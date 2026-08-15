@@ -22,6 +22,7 @@ import {
   MessageSquare,
   Volume2,
   VolumeX
+} from "lucide-react";
 import { useInterviewStore } from "../../../store/interview-store";
 import type { InterviewSession as IInterviewSession, InterviewQuestion } from "@studybuddy/shared";
 import ReactMarkdown from "react-markdown";
@@ -55,30 +56,6 @@ export function InterviewSession({ session }: Props) {
   const [secondsLeft, setSecondsLeft] = useState(600);
   const timerRef = useRef<any>(null);
   const reportRef = useRef<HTMLDivElement>(null);
-
-  // Initialize Vocal Assistant
-  useEffect(() => {
-    import("../../../lib/audio/VocalAssistant").then(({ VocalAssistant }) => {
-      vocalAssistantRef.current = new VocalAssistant({
-        onTranscript: (text, isFinal) => {
-          if (isFinal) {
-            setAnswerInput((prev) => (prev ? prev + " " + text : text));
-            setInterimText("");
-          } else {
-            setInterimText(text);
-          }
-        },
-        onListeningStateChange: setIsListening,
-        onSpeakingStateChange: setIsSpeaking,
-      });
-    });
-    return () => {
-      if (vocalAssistantRef.current) {
-        vocalAssistantRef.current.stopListening();
-        vocalAssistantRef.current.stopSpeaking();
-      }
-    };
-  }, []);
 
   // Sync Input when Active Question changes
   useEffect(() => {
