@@ -14,7 +14,7 @@ async function resetDb() {
     // Delete all users
     const collections = await mongoose.connection.db.collections();
     for (let collection of collections) {
-      if (collection.collectionName === "users" || collection.collectionName === "tasks" || collection.collectionName === "behaviorlogs" || collection.collectionName === "memoryitems" || collection.collectionName === "roadmaps") {
+      if (collection.collectionName === "users" || collection.collectionName === "tasks" || collection.collectionName === "behaviorlogs" || collection.collectionName === "memoryitems" || collection.collectionName === "roadmaps" || collection.collectionName === "notes") {
         console.log(`Dropping collection: ${collection.collectionName}`);
         await collection.deleteMany({});
       }
