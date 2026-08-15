@@ -48,8 +48,13 @@ export const authenticate: RequestHandler = async (request, response, next) => {
 
     // Fetch the user's custom API keys and dynamic routing preferences
     const user = await UserModel.findById(userId).select("+apiKeys").lean();
-    const apiKeys = user?.apiKeys || {};
-    const aiRoutes = user?.aiRoutes || {};
+    if (!user) {
+      response.status(401).json({ message: "User account no longer exists." });
+      return;
+    }
+
+    const apiKeys = user.apiKeys || {};
+    const aiRoutes = user.aiRoutes || {};
 
     // Execute downstream middleware and route handlers inside the RequestContext context
     requestContextStorage.run({ userId, apiKeys, aiRoutes }, () => {
