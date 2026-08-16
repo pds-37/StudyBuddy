@@ -22,6 +22,7 @@ const RecallPage = lazy(() => import("../pages/RecallPage").then(m => ({ default
 const RoadmapPage = lazy(() => import("../pages/RoadmapPage").then(m => ({ default: m.RoadmapPage })));
 const SkillGapPage = lazy(() => import("../pages/SkillGapPage").then(m => ({ default: m.SkillGapPage })));
 const InterviewPage = lazy(() => import("../pages/InterviewPage").then(m => ({ default: m.InterviewPage })));
+const InterviewResult = lazy(() => import("../pages/InterviewResult").then(m => ({ default: m.InterviewResult })));
 const MentorshipPage = lazy(() => import("../pages/MentorshipPage").then(m => ({ default: m.MentorshipPage })));
 const ProjectsPage = lazy(() => import("../pages/ProjectsPage").then(m => ({ default: m.ProjectsPage })));
 const PricingPage = lazy(() => import("../pages/PricingPage").then(m => ({ default: m.PricingPage })));
@@ -73,6 +74,7 @@ export function AppRouter() {
             <Route path="/focus" element={<FocusPage />} />
             <Route path="/copilot" element={<CopilotPage />} />
             <Route path="/interview" element={<InterviewPage />} />
+            <Route path="/interview-result" element={<InterviewResult />} />
             <Route path="/mentorship" element={<MentorshipPage />} />
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/study/:taskId" element={<StudyPage />} />
