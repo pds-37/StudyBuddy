@@ -24,10 +24,8 @@ const SkillGapPage = lazy(() => import("../pages/SkillGapPage").then(m => ({ def
 const InterviewPage = lazy(() => import("../pages/InterviewPage").then(m => ({ default: m.InterviewPage })));
 const InterviewResult = lazy(() => import("../pages/InterviewResult").then(m => ({ default: m.InterviewResult })));
 const MentorshipPage = lazy(() => import("../pages/MentorshipPage").then(m => ({ default: m.MentorshipPage })));
-const ProjectsPage = lazy(() => import("../pages/ProjectsPage").then(m => ({ default: m.ProjectsPage })));
 const PricingPage = lazy(() => import("../pages/PricingPage").then(m => ({ default: m.PricingPage })));
 const StudyPage = lazy(() => import("../pages/StudyPage").then(m => ({ default: m.StudyPage })));
-const KnowledgePage = lazy(() => import("../pages/KnowledgePage").then(m => ({ default: m.KnowledgePage })));
 const SettingsPage = lazy(() => import("../pages/SettingsPage").then(m => ({ default: m.SettingsPage })));
 const FocusPage = lazy(() => import("../pages/FocusPage").then(m => ({ default: m.FocusPage })));
 const PrivacyPage = lazy(() => import("../pages/PrivacyPage").then(m => ({ default: m.PrivacyPage })));
@@ -76,9 +74,7 @@ export function AppRouter() {
             <Route path="/interview" element={<InterviewPage />} />
             <Route path="/interview-result" element={<InterviewResult />} />
             <Route path="/mentorship" element={<MentorshipPage />} />
-            <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/study/:taskId" element={<StudyPage />} />
-             <Route path="/knowledge" element={<KnowledgePage />} />
              <Route path="/settings" element={<SettingsPage />} />
              <Route path="/dashboard" element={<DashboardPage />} />
 
