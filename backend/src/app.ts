@@ -20,12 +20,13 @@ function isAllowedOrigin(origin: string) {
 export function createApp() {
   const app = express();
 
-  app.use(helmet());
-  app.use((_req, res, next) => {
-    res.setHeader("Cross-Origin-Opener-Policy", "unsafe-none");
-    res.setHeader("Cross-Origin-Embedder-Policy", "unsafe-none");
-    next();
-  });
+  app.use(
+    helmet({
+      crossOriginOpenerPolicy: { policy: "unsafe-none" },
+      crossOriginResourcePolicy: { policy: "cross-origin" },
+      crossOriginEmbedderPolicy: false,
+    })
+  );
   app.use(
     cors({
       origin(origin, callback) {
