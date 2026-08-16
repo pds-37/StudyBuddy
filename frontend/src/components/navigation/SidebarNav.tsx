@@ -26,6 +26,7 @@ export type NavItem = {
   href: string;
   icon: React.ComponentType<any>;
   highlight?: boolean;
+  disabled?: boolean;
 };
 
 export type NavGroup = {
@@ -40,8 +41,7 @@ export const navGroups: NavGroup[] = [
       { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
       { name: "Roadmap", href: "/roadmap", icon: Route },
       { name: "Notes", href: "/notes", icon: FileText },
-      { name: "Recall", href: "/recall", icon: Brain },
-      { name: "Knowledge", href: "/knowledge", icon: Network },
+      { name: "Recall", href: "/recall", icon: Brain }
     ]
   },
   {
@@ -49,7 +49,6 @@ export const navGroups: NavGroup[] = [
     items: [
       { name: "Jobs", href: "/jobs", icon: Briefcase },
       { name: "Resume", href: "/resume", icon: FilePenLine },
-      { name: "Projects", href: "/projects", icon: FolderKanban },
       { name: "Companies", href: "/companies", icon: Building2 },
       { name: "Skill Gap", href: "/skill-gap", icon: Target },
     ]
@@ -128,14 +127,19 @@ export function SidebarNav({ isCollapsed = false, onToggleCollapsed }: SidebarNa
               return (
                 <Link
                   key={item.name}
-                  to={item.href}
+                  to={item.disabled ? "#" : item.href}
+                  onClick={(e) => {
+                    if (item.disabled) e.preventDefault();
+                  }}
                   className={cn(
                     "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-300",
                     isActive 
                       ? "bg-gradient-to-r from-brand/12 to-accent/8 text-white border border-brand/20 shadow-[0_4px_20px_-5px_rgba(99,102,241,0.15)]" 
                       : item.highlight 
                         ? "bg-cyan/5 text-cyan hover:bg-cyan/10 hover:text-cyan-light border border-cyan/10"
-                        : "text-slate-400 hover:bg-white/[0.04] hover:text-white border border-transparent hover:border-white/[0.02]",
+                        : item.disabled
+                          ? "text-slate-600 opacity-50 cursor-not-allowed pointer-events-none"
+                          : "text-slate-400 hover:bg-white/[0.04] hover:text-white border border-transparent hover:border-white/[0.02]",
                     isCollapsed ? "justify-center px-0 py-3 mx-1" : ""
                   )}
                 >

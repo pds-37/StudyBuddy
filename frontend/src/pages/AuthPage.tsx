@@ -270,7 +270,7 @@ export function AuthPage() {
             <h2 className="text-[2.75rem] font-black text-white tracking-tight leading-[1.1] mb-6 font-display">
               Lock in. Level up.<br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand via-purple-400 to-cyan-400">
-                Secure the SDE bag.
+                Secure the Career bag.
               </span>
             </h2>
             <p className="text-slate-400 text-lg max-w-[400px] leading-relaxed mb-8">

@@ -60,3 +60,7 @@ backend/cpp-agent/build_release/
 # Temporary scratch files
 scratch/
 desktop.ini
+
+# Deprecated / Upcoming Pages
+frontend/src/pages/KnowledgePage.tsx
+frontend/src/pages/ProjectsPage.tsx

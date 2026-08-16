@@ -234,7 +234,6 @@ export function LandingPage() {
           <li><a href="#features">Features</a></li>
           <li><a href="#">Roadmaps</a></li>
           <li><a href="#">For Students</a></li>
-          <li><a href="#">Pricing</a></li>
           <li><a href="#">Blog</a></li>
           <li><a href="#">About</a></li>
         </ul>

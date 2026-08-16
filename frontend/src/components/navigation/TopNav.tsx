@@ -9,8 +9,7 @@ import { navGroups } from "./SidebarNav";
 const landingSections = [
   { label: "Home", href: "#home" },
   { label: "Features", href: "#features" },
-  { label: "How it works", href: "#how-to-use" },
-  { label: "Pricing", href: "#pricing" }
+  { label: "How it works", href: "#how-to-use" }
 ] as const;
 
 type TopNavProps = {
@@ -202,15 +201,23 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
                        return (
                          <Link
                            key={item.name}
-                           to={item.href}
-                           onClick={() => setMenuOpen(false)}
+                           to={item.disabled ? "#" : item.href}
+                           onClick={(e) => {
+                             if (item.disabled) {
+                               e.preventDefault();
+                             } else {
+                               setMenuOpen(false);
+                             }
+                           }}
                            className={cn(
                              "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200",
                              isActive
                                ? "bg-gradient-to-r from-brand/12 to-accent/8 text-white border border-brand/20 shadow-[0_4px_20px_-5px_rgba(99,102,241,0.15)]"
                                : item.highlight
                                  ? "bg-cyan/5 text-cyan hover:bg-cyan/10 border border-cyan/10"
-                                 : "text-slate-400 hover:bg-white/[0.04] hover:text-white"
+                                 : item.disabled
+                                   ? "text-slate-600 opacity-50 cursor-not-allowed pointer-events-none"
+                                   : "text-slate-400 hover:bg-white/[0.04] hover:text-white"
                            )}
                          >
                            <item.icon

@@ -10,7 +10,17 @@ const SHARED_SECRET = process.env.MOCKHIRE_SHARED_SECRET || "default_secret";
 const MOCKHIRE_URL = process.env.MOCKHIRE_URL || "https://mock-hire-ai-bay.vercel.app";
 const PROJECT_A_URL = process.env.PROJECT_A_URL || "http://localhost:5173";
 
+import crypto from "crypto";
 import { UserModel } from "../users/user.model.js";
+
+// GET /api/mockhire/_debug_secret
+mockhireRouter.get("/_debug_secret", (req, res) => {
+  const s = SHARED_SECRET;
+  res.json({
+    sha256_prefix: crypto.createHash("sha256").update(s).digest("hex").slice(0, 12),
+    length: s.length,
+  });
+});
 
 // POST /api/mockhire/token
 mockhireRouter.post("/token", authenticate, async (req: any, res: Response) => {
