@@ -11,7 +11,7 @@ export function StartInterviewButton() {
     setError("");
     try {
       const token = localStorage.getItem("auth_token") || localStorage.getItem("token");
-      const res = await fetch(`${API}/mockhire/token`, {
+      const res = await fetch(`${API}/api/mockhire/token`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
