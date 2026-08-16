@@ -30,8 +30,8 @@ export function InterviewResult() {
 
   const saveToDatabase = async (data: any) => {
     try {
-      const token = localStorage.getItem("auth_token") || localStorage.getItem("token");
-      await fetch(`${API}/mockhire/save-result`, {
+      const token = localStorage.getItem("studybuddy_access_token");
+      await fetch(`${API}/api/mockhire/save-result`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
