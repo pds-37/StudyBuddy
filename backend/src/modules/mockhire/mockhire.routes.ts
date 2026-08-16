@@ -59,7 +59,7 @@ mockhireRouter.post("/save-result", authenticate, async (req: any, res: Response
 
   try {
     const result = await MockHireHistoryModel.create({
-      userId:         req.user.id || req.user._id,
+      userId:         req.userId,
       source:         "mockhire_ai",
       interview_type: interview_type || "tech",
       communication,
