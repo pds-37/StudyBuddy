@@ -477,48 +477,7 @@ function ChatMessage({ message, index }: { message: CopilotMessage; index: numbe
           {isUser ? <div className="whitespace-pre-wrap">{message.content}</div> : <MarkdownContent content={message.content} />}
         </div>
 
-        {!isUser && metadata?.saveableNote && (
-          <GuestGuard fallbackText="Please login to save insights to your knowledge base. Let's learn and grow together.">
-            <button
-              type="button"
-              disabled={saving || saved}
-              onClick={async () => {
-                setSaving(true);
-                try {
-                  await useNotesStore.getState().createNote(metadata.saveableNote);
-                  setSaved(true);
-                } catch (error) {
-                  console.error("Failed to save note:", error);
-                } finally {
-                  setSaving(false);
-                }
-              }}
-              className={cn(
-                "mt-2 inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs transition-all duration-200",
-                saved
-                  ? "border-green-500/30 bg-green-500/10 text-green-400 shadow-[0_0_10px_rgba(74,222,128,0.1)]"
-                  : "border-white/[0.08] text-slate-400 hover:bg-white/[0.05] hover:text-white"
-              )}
-            >
-              {saving ? (
-                <>
-                  <Loader2 size={13} className="animate-spin" />
-                  <span>Saving...</span>
-                </>
-              ) : saved ? (
-                <>
-                  <Check size={13} className="stroke-[3]" />
-                  <span>Saved to Notes</span>
-                </>
-              ) : (
-                <>
-                  <Check size={13} />
-                  <span>Save to notes</span>
-                </>
-              )}
-            </button>
-          </GuestGuard>
-        )}
+
 
         {!isUser && metadata?.cards?.length > 0 && (
           <div className="mt-3 grid w-full gap-3">
