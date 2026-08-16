@@ -31,6 +31,7 @@ import {
   WarningCard
 } from "./MentorCards";
 import { GuestGuard } from "../../../components/auth/GuestGuard";
+import { MermaidDiagram } from "./MermaidDiagram";
 
 const starterPrompts = [
   "What should I work on today?",
@@ -91,15 +92,15 @@ export function CopilotChat() {
     textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 160)}px`;
   }, [draft]);
 
-  const handleSendMessage = async (text?: string) => {
+  const handleSendMessage = async (text?: string, imageUrl?: string) => {
     const messageToSend = text ?? draft.trim();
-    if (!messageToSend || sending) return;
+    if ((!messageToSend && !imageUrl) || sending) return;
 
     setDraft("");
     clearError();
 
     try {
-      await storeSendMessage(messageToSend);
+      await storeSendMessage(messageToSend || "Uploaded an image", imageUrl);
     } catch {
       setDraft(messageToSend);
     }
@@ -236,7 +237,7 @@ export function CopilotChat() {
             textareaRef={textareaRef}
             onDraftChange={setDraft}
             onKeyDown={handleKeyDown}
-            onSend={() => void handleSendMessage()}
+            onSend={(imageUrl) => void handleSendMessage(undefined, imageUrl)}
           />
         </GuestGuard>
       </main>
@@ -392,24 +393,80 @@ function Composer({
   textareaRef: RefObject<HTMLTextAreaElement | null>;
   onDraftChange: (value: string) => void;
   onKeyDown: (event: KeyboardEvent<HTMLTextAreaElement>) => void;
-  onSend: () => void;
+  onSend: (imageUrl?: string) => void;
 }) {
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Image must be smaller than 5MB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSelectedImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSendClick = () => {
+    onSend(selectedImage ?? undefined);
+    setSelectedImage(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   return (
     <div className="shrink-0 bg-transparent px-4 pb-5 pt-3 sm:px-6 relative z-10">
       <div className="mx-auto max-w-3xl">
         <div className="flex flex-col gap-1.5 rounded-2xl border border-white/[0.08] bg-slate-950/65 backdrop-blur-xl p-2.5 shadow-2xl shadow-black/35 focus-within:border-cyan-500/30 focus-within:shadow-[0_0_25px_rgba(34,211,238,0.06)] transition-all duration-300">
+          {selectedImage && (
+            <div className="relative mb-2 w-fit px-2.5 pt-2.5">
+              <img src={selectedImage} alt="Upload preview" className="h-20 w-20 object-cover rounded-lg border border-white/10" />
+              <button
+                type="button"
+                onClick={() => setSelectedImage(null)}
+                className="absolute -right-2 -top-1 rounded-full bg-slate-800 p-1 text-slate-300 hover:bg-slate-700 hover:text-white border border-white/10 shadow-lg"
+              >
+                <X size={12} />
+              </button>
+            </div>
+          )}
           <textarea
             ref={textareaRef}
             value={draft}
             onChange={(event) => onDraftChange(event.target.value)}
-            onKeyDown={onKeyDown}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSendClick();
+              }
+            }}
             rows={1}
             placeholder="Ask your Veda AI Mentor..."
             className="max-h-40 min-h-11 w-full resize-none bg-transparent px-4 py-3 text-sm leading-relaxed text-white outline-none placeholder:text-slate-500 custom-scrollbar"
           />
           <div className="flex items-center justify-between border-t border-white/[0.04] pt-2 px-2.5">
             <div className="flex items-center gap-2">
-              <span className="relative flex h-1.5 w-1.5">
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/jpeg,image/png,image/webp,image/heic"
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-white/[0.05] hover:text-cyan-400 transition"
+                title="Attach image"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+              </button>
+              <span className="relative flex h-1.5 w-1.5 ml-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-green-500"></span>
               </span>
@@ -417,11 +474,11 @@ function Composer({
             </div>
             <button
               type="button"
-              onClick={onSend}
-              disabled={!draft.trim() || sending}
+              onClick={handleSendClick}
+              disabled={(!draft.trim() && !selectedImage) || sending}
               className={cn(
                 "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-all duration-300 shadow-[0_0_12px_rgba(0,0,0,0.15)]",
-                draft.trim() && !sending
+                (draft.trim() || selectedImage) && !sending
                   ? "bg-cyan-500 text-slate-950 hover:bg-cyan-400 hover:shadow-[0_0_15px_rgba(34,211,238,0.45)] hover:scale-105 active:scale-95"
                   : "bg-white/[0.04] text-slate-400"
               )}
@@ -474,7 +531,16 @@ function ChatMessage({ message, index }: { message: CopilotMessage; index: numbe
               : "bg-[#0f121d]/50 backdrop-blur-md border border-white/[0.05] text-slate-100 rounded-tl-sm hover:border-cyan-500/20 hover:shadow-cyan-950/5"
           )}
         >
-          {isUser ? <div className="whitespace-pre-wrap">{message.content}</div> : <MarkdownContent content={message.content} />}
+          {isUser ? (
+            <div className="whitespace-pre-wrap flex flex-col gap-2">
+              {message.imageUrl && (
+                <img src={message.imageUrl} alt="Uploaded" className="max-w-full h-auto rounded-lg max-h-64 object-contain border border-white/10" />
+              )}
+              {message.content}
+            </div>
+          ) : (
+            <MarkdownContent content={message.content} />
+          )}
         </div>
 
 
@@ -980,6 +1046,9 @@ export function MarkdownContent({ content, compact = false }: { content: string;
       {blocks.map((block, blockIndex) => {
         switch (block.type) {
           case 'code':
+            if (block.language === 'mermaid') {
+              return <MermaidDiagram key={blockIndex} chart={block.code} />;
+            }
             return <CodeBlock key={blockIndex} language={block.language} code={block.code} />;
 
           case 'table':

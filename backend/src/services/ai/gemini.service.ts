@@ -6,6 +6,7 @@ import type { CopilotMessage, ResumeTailorRequest, ResumeTailorResult } from "@s
 type OpenAICompatibleMessage = {
   role: "system" | "user" | "assistant";
   content: string;
+  imageUrl?: string;
 };
 
 function getGeminiApiKey() {
@@ -63,9 +64,25 @@ async function requestGemini(messages: OpenAICompatibleMessage[], model: string 
     } else {
       // Gemini expects "user" or "model" as roles
       const role = msg.role === "assistant" ? "model" : "user";
+      const parts: any[] = [];
+      
+      if (msg.imageUrl) {
+        const match = msg.imageUrl.match(/^data:(image\/\w+);base64,(.*)$/);
+        if (match) {
+          parts.push({
+            inlineData: {
+              mimeType: match[1],
+              data: match[2]
+            }
+          });
+        }
+      }
+      
+      parts.push({ text: msg.content });
+
       contents.push({
         role,
-        parts: [{ text: msg.content }]
+        parts
       });
     }
   }
@@ -234,7 +251,8 @@ async function generateCopilotResponse(
 ): Promise<{ content: string; metadata: any }> {
   const oaiMessages: OpenAICompatibleMessage[] = messages.map(m => ({
     role: m.role === "assistant" ? "assistant" : m.role === "system" ? "system" : "user",
-    content: m.content
+    content: m.content,
+    imageUrl: m.imageUrl
   }));
 
   const systemPrompt = `You are Veda, an elite AI Career Mentor but you act as a "Mentor Dost" (Mentor + Friend) for the student. You are their Learning Operating System, but you speak like an encouraging, highly empathetic, and cool older sibling or best friend.
@@ -256,6 +274,7 @@ ANSWER STYLE:
   - Blockquotes: Use blockquotes (lines starting with >) to emphasize warnings, critical alerts, or key mentor takeaways.
   - Hyperlinks: Always use the [Link Label](URL) format for any references or learning resources mentioned.
   - Badgified Lists: When listing terms, prefix them with a bold header (e.g. "- **Time Complexity:** O(N log N)") so the parser can compile it into a badge.
+  - Diagrams: Use \`\`\`mermaid fenced code blocks to create sequence diagrams, flowcharts, or state diagrams when explaining complex logic or architecture.
 - Use clear structure like: short answer, key points, examples, when to use it, common mistakes, quick recap, and next practice step.
 - If USER CONTEXT contains notes, use those notes first and say when you are extending beyond the user's notes with general knowledge.
 - If the user asks "tell me about", "explain", "what is", "teach me", or similar, give a complete explanatory answer like ChatGPT would, with headings and bullets.
@@ -398,7 +417,12 @@ RESPONSE STRUCTURE (JSON):
   ],
   "confusionSignals": ["Potential confusion: X vs Y", "Common mistake: ..."],
   "flashcards": [
-    { "question": "Active recall question", "answer": "Concise answer" }
+    { 
+      "question": "Active recall question", 
+      "answer": "Concise answer",
+      "imageUrl": "Optional relevant image URL",
+      "diagram": "Optional Mermaid JS flowchart syntax for complex concepts"
+    }
   ],
   "interviewRelevance": {
     "frequency": "low" | "medium" | "high",

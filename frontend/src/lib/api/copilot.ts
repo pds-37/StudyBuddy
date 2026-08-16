@@ -44,9 +44,10 @@ export async function getConversation(conversationId: string): Promise<Conversat
 }
 
 /** Sends a message to a conversation. */
-export async function sendMessage(conversationId: string, message: string): Promise<CopilotMessage> {
+export async function sendMessage(conversationId: string, message: string, imageUrl?: string): Promise<CopilotMessage> {
   const response = await apiClient.post<SendMessageResponse>(`/copilot/conversations/${conversationId}/messages`, {
-    message
+    message,
+    imageUrl
   });
   return response.data.message;
 }

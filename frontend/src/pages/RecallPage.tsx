@@ -366,6 +366,27 @@ export function RecallPage() {
                     </div>
                   </div>
 
+                  {/* Visual Context Area */}
+                  {(activePrompt.imageUrl || activePrompt.diagram) && (
+                    <div className="space-y-3 pt-2">
+                      <h3 className="text-[9px] font-black text-slate-500 uppercase tracking-widest font-mono flex items-center gap-2">
+                        <Target size={12} className="text-brand-light" />
+                        Visual Context
+                      </h3>
+                      <div className="rounded-xl border border-white/10 bg-slate-950/50 p-4 overflow-hidden relative group">
+                        {activePrompt.imageUrl && (
+                          <img src={activePrompt.imageUrl} alt="Recall visual context" className="w-full rounded-lg border border-white/5 shadow-2xl" />
+                        )}
+                        {activePrompt.diagram && (
+                          <div className="font-mono text-xs text-brand-light bg-brand/5 p-4 rounded-lg overflow-x-auto border border-brand/10">
+                            <pre><code>{activePrompt.diagram}</code></pre>
+                            <p className="mt-2 text-[9px] text-slate-500 italic">Mermaid Flowchart</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Answer area */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">

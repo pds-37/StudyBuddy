@@ -16,7 +16,7 @@ type CopilotState = {
   setIsWidgetOpen: (open: boolean) => void;
   fetchConversations: (force?: boolean) => Promise<void>;
   createNewConversation: () => Promise<string | null>;
-  sendMessage: (message: string) => Promise<CopilotMessage | null>;
+  sendMessage: (message: string, imageUrl?: string) => Promise<CopilotMessage | null>;
   selectConversation: (conversationId: string) => void;
   setCurrentConversation: (conversation: Conversation | null) => void;
   clearError: () => void;
@@ -96,7 +96,7 @@ export const useCopilotStore = create<CopilotState>((set, get) => ({
     }
   },
 
-  sendMessage: async (message: string) => {
+  sendMessage: async (message: string, imageUrl?: string) => {
     let state = get();
 
     if (!state.currentConversation) {
@@ -123,6 +123,7 @@ export const useCopilotStore = create<CopilotState>((set, get) => ({
         id: `local-${Date.now()}`,
         role: "user",
         content: message,
+        imageUrl,
         createdAt: new Date().toISOString()
       };
 
@@ -145,7 +146,7 @@ export const useCopilotStore = create<CopilotState>((set, get) => ({
         };
       });
 
-      const aiResponse = await sendMessage(activeConversation._id, message);
+      const aiResponse = await sendMessage(activeConversation._id, message, imageUrl);
 
       // Update the current conversation with the new messages
       set((previousState) => {

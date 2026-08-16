@@ -54,7 +54,8 @@ async function getUserConversations(userId: string) {
 async function sendMessage(
   conversationId: string,
   userId: string,
-  message: string
+  message: string,
+  imageUrl?: string
 ): Promise<CopilotMessage> {
   const conversation = await getConversation(conversationId, userId);
 
@@ -63,6 +64,7 @@ async function sendMessage(
     id: `user-${Date.now()}`,
     role: "user",
     content: message,
+    imageUrl,
     createdAt: new Date().toISOString()
   };
 

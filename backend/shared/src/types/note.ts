@@ -135,6 +135,8 @@ export type RecallPrompt = {
   promptType: "explain" | "implement" | "compare" | "quiz" | "own_words";
   strength: number;
   nextReviewAt?: string;
+  imageUrl?: string;
+  diagram?: string;
 };
 
 export type RecallReviewResult = {

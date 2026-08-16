@@ -87,7 +87,9 @@ function toPrompt(note: NoteDocument): RecallPrompt {
     prompt,
     promptType,
     strength,
-    nextReviewAt: note.nextReviewAt ? note.nextReviewAt.toISOString() : undefined
+    nextReviewAt: note.nextReviewAt ? note.nextReviewAt.toISOString() : undefined,
+    imageUrl: metadata?.flashcards?.[0]?.imageUrl,
+    diagram: metadata?.flashcards?.[0]?.diagram
   };
 }
 

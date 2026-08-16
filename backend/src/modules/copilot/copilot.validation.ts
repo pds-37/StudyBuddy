@@ -11,7 +11,10 @@ export const sendMessageSchema = z.object({
     conversationId: z.string().min(1, "Conversation ID is required")
   }),
   body: z.object({
-    message: z.string().min(1, "Message cannot be empty").max(2000, "Message too long")
+    message: z.string().max(2000, "Message too long").optional(),
+    imageUrl: z.string().optional()
+  }).refine((data) => data.message || data.imageUrl, {
+    message: "Either message or imageUrl must be provided"
   })
 });
 

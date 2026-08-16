@@ -31,10 +31,10 @@ export const getConversation = asyncHandler(async (req: Request, res: Response) 
 /** Sends a message to a conversation and gets AI response. */
 export const sendMessage = asyncHandler(async (req: Request, res: Response) => {
   const conversationId = String(req.params.conversationId ?? "");
-  const { message } = req.body;
+  const { message, imageUrl } = req.body;
   const userId = req.userId ?? "";
 
-  const aiResponse = await copilotService.sendMessage(conversationId, userId, message);
+  const aiResponse = await copilotService.sendMessage(conversationId, userId, message, imageUrl);
 
   res.json({ message: aiResponse });
 });

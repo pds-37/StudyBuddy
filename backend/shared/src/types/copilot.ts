@@ -21,6 +21,7 @@ export type CopilotMessage = {
   id: string;
   role: CopilotRole;
   content: string;
+  imageUrl?: string;
   metadata?: CopilotMessageMetadata;
   createdAt: string;
 };
