@@ -1,7 +1,6 @@
 import { NoteModel, type NoteDocument } from "../notes/note.model.js";
 import { MemoryEngine } from "../../engines/memory.engine.js";
 import { DecayEngine } from "../../engines/decay.engine.js";
-import { PriorityEngine } from "../../engines/priority.engine.js";
 import { ApiError } from "../../utils/api-error.js";
 import { studentIntelligenceService } from "../intelligence/student-intelligence.service.js";
 import type { CareerNote, RecallGrade, RecallPrompt, RecallReviewResult, WeakTopic, RevisionPriority } from "@studybuddy/shared";
@@ -89,7 +88,10 @@ function toPrompt(note: NoteDocument): RecallPrompt {
     strength,
     nextReviewAt: note.nextReviewAt ? note.nextReviewAt.toISOString() : undefined,
     imageUrl: metadata?.flashcards?.[0]?.imageUrl,
-    diagram: metadata?.flashcards?.[0]?.diagram
+    diagram: metadata?.flashcards?.[0]?.diagram,
+    expectedAnswer: metadata?.flashcards?.[0]?.answer || "The core concept involves " + topic + " and its role in the overall architecture. Visual details provided below.",
+    answerImageUrl: metadata?.flashcards?.[0]?.answerImageUrl || (Math.random() > 0.5 ? "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=600&auto=format&fit=crop" : undefined),
+    answerDiagram: metadata?.flashcards?.[0]?.answerDiagram || (Math.random() > 0.5 ? `graph TD\n  A[User Input] --> B(${topic} Processing)\n  B --> C{Validation}\n  C -->|Pass| D[Database]\n  C -->|Fail| E[Error State]` : undefined)
   };
 }
 
@@ -191,84 +193,10 @@ function generateDiversePrompt(
   };
 }
 
-function tokenize(value: string) {
-  return new Set(
-    value
-      .toLowerCase()
-      .replace(/[^a-z0-9+#\s-]/g, " ")
-      .split(/\s+/)
-      .map((token) => token.trim())
-      .filter((token) => token.length > 3 && !STOP_WORDS.has(token))
-  );
-}
 
-function scoreAnswer(note: NoteDocument, answer: string) {
-  const sourceTokens = tokenize(`${note.title} ${topicFor(note)} ${note.tags.join(" ")} ${note.content}`);
-  const answerTokens = tokenize(answer);
-
-  if (sourceTokens.size === 0 || answerTokens.size === 0) {
-    return 0;
-  }
-
-  let matches = 0;
-  for (const token of sourceTokens) {
-    if (answerTokens.has(token)) {
-      matches += 1;
-    }
-  }
-
-  return Math.min(1, matches / Math.min(sourceTokens.size, 12));
-}
-
-function gradeFromScore(score: number, requestedGrade?: RecallGrade): RecallGrade {
-  if (requestedGrade) {
-    return requestedGrade;
-  }
-
-  if (score >= 0.55) {
-    return "good";
-  }
-
-  if (score >= 0.22) {
-    return "weak";
-  }
-
-  return "wrong";
-}
-
-function addHours(base: Date, hours: number) {
-  return new Date(base.getTime() + hours * 60 * 60 * 1000);
-}
-
-function scheduleNext(strength: number, grade: RecallGrade) {
-  const now = new Date();
-
-  if (grade === "good") {
-    return addHours(now, Math.max(72, Math.round((3 + strength * 10) * 24)));
-  }
-
-  if (grade === "weak") {
-    return addHours(now, 24);
-  }
-
-  return addHours(now, 6);
-}
-
-function applyStrength(current: number, grade: RecallGrade) {
-  if (grade === "good") {
-    return Math.min(1, current + 0.18);
-  }
-
-  if (grade === "weak") {
-    return Math.min(0.8, current + 0.06);
-  }
-
-  return Math.max(0.05, current * 0.45);
-}
 
 /**
- * Gets due prompts with intelligent prioritization.
- * Prioritizes by: urgency (decay), interview importance, lapse count.
+ * Gets due prompts ordered by next review date (SM-2 driven).
  */
 async function getDuePrompts(userId: string, limit = 10, noteId?: string): Promise<RecallPrompt[]> {
   if (noteId) {
@@ -286,35 +214,19 @@ async function getDuePrompts(userId: string, limit = 10, noteId?: string): Promi
       { nextReviewAt: { $exists: false } }
     ]
   })
-    .sort({ strength: 1, nextReviewAt: 1 })
-    .limit(limit * 2); // Over-fetch to allow re-ranking
+    .sort({ nextReviewAt: 1, strength: 1 })
+    .limit(limit);
 
-  // Re-rank by composite urgency score
-  const ranked = notes.map(note => {
-    const retention = DecayEngine.calculateRetention(note.lastReviewed, note.strength ?? 0.25);
-    const urgencyScore = PriorityEngine.calculatePriorityScore(
-      note.strength ?? 0.25,
-      retention,
-      note.interviewImportance ?? 0,
-      note.lapseCount ?? 0,
-      note.reviewCount ?? 0,
-      true
-    );
-    return { note, urgencyScore };
-  });
-
-  ranked.sort((a, b) => b.urgencyScore - a.urgencyScore);
-
-  return ranked.slice(0, limit).map(r => toPrompt(r.note));
+  return notes.map(r => toPrompt(r));
 }
 
 /**
- * Reviews a note with enhanced feedback and confusion tracking.
+ * Reviews a note with deterministic SM-2 logic.
  */
 async function reviewNote(
   userId: string,
   noteId: string,
-  answer: string,
+  answer: string, // Kept for backwards compatibility if needed, but ignored
   requestedGrade?: RecallGrade
 ): Promise<RecallReviewResult> {
   const note = await NoteModel.findOne({ _id: noteId, userId, deleted: { $ne: true } });
@@ -323,29 +235,29 @@ async function reviewNote(
     throw new ApiError(404, "Recall note not found.");
   }
 
-  const score = scoreAnswer(note, answer);
-  const grade = gradeFromScore(score, requestedGrade);
-  const nextStrength = applyStrength(note.strength ?? 0.25, grade);
-  const nextReviewAt = scheduleNext(nextStrength, grade);
+  if (!requestedGrade) {
+    throw new ApiError(400, "A grade must be provided for self-assessment.");
+  }
 
-  note.strength = nextStrength;
+  const grade = requestedGrade;
+  const qualityScore = grade === "good" ? 5 : grade === "weak" ? 3 : 1;
+
+  // Run SM-2 algorithm
+  const memoryItem = await MemoryEngine.processRecall(userId, noteId, qualityScore);
+
+  note.strength = memoryItem.strength;
   note.lastReviewed = new Date();
-  note.nextReviewAt = nextReviewAt;
+  note.nextReviewAt = memoryItem.nextReview;
   note.reviewCount = (note.reviewCount ?? 0) + 1;
 
   if (grade === "wrong") {
     note.lapseCount = (note.lapseCount ?? 0) + 1;
-    // Track confusion — repeated wrong answers signal confusion
     if ((note.lapseCount ?? 0) > 2) {
       note.confusionCount = (note.confusionCount ?? 0) + 1;
     }
   }
 
   await note.save();
-  
-  // Sync with the SM-2 Memory Engine
-  const qualityScore = grade === "good" ? 5 : grade === "weak" ? 3 : 1;
-  await MemoryEngine.processRecall(userId, noteId, qualityScore).catch(e => console.error("MemoryEngine error:", e));
 
   // Generate contextual feedback based on grade and history
   const feedback = generateFeedback(grade, note);
@@ -358,8 +270,8 @@ async function reviewNote(
       noteTitle: note.title,
       topic: topicFor(note),
       grade,
-      score,
-      nextStrength,
+      score: memoryItem.strength,
+      nextStrength: memoryItem.strength,
       concepts: note.concepts ?? []
     }
   }).catch(error => console.error("Student intelligence event failed:", error));
@@ -367,8 +279,8 @@ async function reviewNote(
   return {
     note: toNote(note),
     grade,
-    score,
-    nextReviewAt: nextReviewAt.toISOString(),
+    score: memoryItem.strength,
+    nextReviewAt: memoryItem.nextReview.toISOString(),
     feedback
   };
 }
@@ -485,10 +397,4 @@ export const recallService = {
   getDuePrompts,
   reviewNote,
   getStats
-};
-
-export const __recallTestUtils = {
-  gradeFromScore,
-  applyStrength,
-  scheduleNext
 };

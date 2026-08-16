@@ -48,43 +48,9 @@ export function CapstoneProjects() {
 
   return (
     <div className="space-y-6">
-      {/* Metrics Row */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <MetricCard label="Portfolio Strength" value="62%" trend="+12% this week" trendColor="text-emerald-500 text-emerald-400" icon={<Briefcase className="w-4 h-4 text-blue-500 text-blue-400" />} />
-        <MetricCard label="Projects Completed" value="4" trend="↑ 1 this month" trendColor="text-brand" icon={<LayoutDashboard className="w-4 h-4 text-brand" />} />
-        <MetricCard label="Interview Impact" value="+18%" trend="High" trendColor="text-emerald-500 text-emerald-400" icon={<Target className="w-4 h-4 text-emerald-500 text-emerald-400" />} />
-        <MetricCard label="Total XP Earned" value="1,240" trend="↑ 240 this week" trendColor="text-brand" icon={<Award className="w-4 h-4 text-purple-500 text-purple-400" />} />
-        <MetricCard label="Build Streak" value="7 days" trend="Keep it up!" trendColor="text-amber-500 text-amber-400" icon={<Flame className="w-4 h-4 text-amber-500" />} />
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
         {/* Main Content */}
         <div className="space-y-8">
-          
-          {/* Project Paths */}
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-semibold text-white text-white flex items-center gap-2">
-                <FolderGit2 className="w-4 h-4 text-brand" /> Project Paths
-              </h2>
-              <button className="text-[10px] uppercase font-bold tracking-widest text-slate-500 hover:text-slate-800 hover:text-white text-white text-white transition">
-                View All Paths →
-              </button>
-            </div>
-            <div className="flex gap-4 overflow-x-auto pb-2 custom-scrollbar">
-              <PathCard icon={<Monitor className="w-5 h-5 text-brand" />} title="Frontend Developer" count="8 Projects" active />
-              <PathCard icon={<Layers className="w-5 h-5 text-cyan-600 text-cyan-400" />} title="Full Stack Developer" count="10 Projects" />
-              <PathCard icon={<Brain className="w-5 h-5 text-emerald-600 text-emerald-400" />} title="AI Engineer" count="7 Projects" />
-              <PathCard icon={<Server className="w-5 h-5 text-amber-500 text-amber-400" />} title="Backend Developer" count="6 Projects" />
-              <div className="flex-none w-40 rounded-2xl border border-dashed border-slate-300 border-white/20 hover:border-slate-400 hover:border-white/40 transition-colors flex flex-col items-center justify-center gap-2 cursor-pointer text-slate-500 text-slate-400 hover:text-slate-800 hover:text-white text-white text-white bg-transparent bg-white/[0.02] hover:bg-transparent hover:bg-white/[0.04]">
-                <Plus className="w-6 h-6" />
-                <div className="text-center">
-                  <p className="text-xs font-semibold">Custom Path</p>
-                  <p className="text-[10px] opacity-70">Create your own</p>
-                </div>
-              </div>
-            </div>
-          </div>
 
           {/* Recommended Projects */}
           <div>
@@ -191,47 +157,7 @@ export function CapstoneProjects() {
             </div>
           </div>
 
-          {/* Project Stats */}
-          <div className="rounded-3xl border border-white/10 border-white/[0.06] bg-transparent bg-obsidian">
-            <div className="flex items-center gap-2 mb-4">
-              <BarChart2 className="w-4 h-4 text-blue-500 text-blue-400" />
-              <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 text-slate-300">Project Stats</h3>
-            </div>
-            <div className="space-y-3">
-              <StatRow icon={<Layers className="w-4 h-4 text-slate-500 text-slate-400" />} label="Total Projects" value={mentorInsights?.stats?.total || 0} />
-              <StatRow icon={<Check className="w-4 h-4 text-emerald-500 text-emerald-400" />} label="Completed" value={mentorInsights?.stats?.completed || 0} />
-              <StatRow icon={<Clock className="w-4 h-4 text-cyan-500 text-cyan-400" />} label="In Progress" value={mentorInsights?.stats?.inProgress || 0} />
-              <StatRow icon={<Target className="w-4 h-4 text-brand" />} label="Recommended" value={mentorInsights?.stats?.planning || 0} />
-            </div>
-          </div>
 
-          {/* Build Streak Visualizer */}
-          <div className="rounded-3xl border border-white/10 border-white/[0.06] bg-transparent bg-obsidian">
-             <div className="w-full flex items-center gap-2 mb-6">
-                <Flame className="w-4 h-4 text-amber-500" />
-                <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 text-slate-300">Build Streak</h3>
-             </div>
-             <div className="relative w-32 h-32 flex items-center justify-center mb-4">
-               <div className="absolute inset-0 rounded-full border-[6px] border-slate-100 border-white/5" />
-               <svg className="absolute inset-0 w-full h-full -rotate-90">
-                 <circle cx="64" cy="64" r="61" fill="transparent" stroke="url(#streak-gradient)" strokeWidth="6" strokeDasharray="383" strokeDashoffset={383 * 0.3} className="transition-all duration-1000" strokeLinecap="round" />
-                 <defs>
-                   <linearGradient id="streak-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                     <stop offset="0%" stopColor="#f59e0b" />
-                     <stop offset="100%" stopColor="#ef4444" />
-                   </linearGradient>
-                 </defs>
-               </svg>
-               <div className="text-center">
-                 <div className="text-3xl font-black text-white text-white">{mentorInsights?.stats?.streak || 1}</div>
-                 <div className="text-[10px] text-amber-600 text-amber-500 font-bold uppercase tracking-widest mt-1">Days</div>
-               </div>
-               
-               {/* Glowing dots */}
-               <div className="absolute top-0 right-4 w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_10px_#fbbf24]" />
-             </div>
-             <p className="text-[11px] text-amber-600 text-amber-500/80 font-bold">Keep building every day!</p>
-          </div>
 
         </div>
       </div>
@@ -241,69 +167,17 @@ export function CapstoneProjects() {
 
 /* --- Sub Components --- */
 
-function MetricCard({ label, value, trend, icon, trendColor }: any) {
-  return (
-    <div className="bg-transparent bg-obsidian">
-      <div className="flex items-center justify-between mb-1">
-        <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 text-slate-400">{label}</p>
-        {icon}
-      </div>
-      <div className="text-2xl font-semibold text-white text-white">{value}</div>
-      <div className={cn("text-[10px] font-bold", trendColor)}>{trend}</div>
-    </div>
-  );
-}
-
-function PathCard({ icon, title, count, active }: any) {
-  return (
-    <div className={cn(
-      "flex-none w-48 rounded-2xl border p-4 cursor-pointer transition-all",
-      active ? "bg-transparent bg-white/[0.04] border-slate-300 border-white/20 shadow-md shadow-lg" : "bg-transparent bg-white/[0.01] border-white/10 border-white/[0.04] hover:bg-transparent hover:bg-white/[0.03]"
-    )}>
-      <div className={cn("w-10 h-10 rounded-xl mb-3 flex items-center justify-center", active ? "bg-slate-200 bg-white/10" : "bg-transparent bg-white/5")}>
-        {icon}
-      </div>
-      <h4 className="text-sm font-semibold text-white text-white mb-1">{title}</h4>
-      <p className="text-[10px] text-slate-500">{count}</p>
-    </div>
-  );
-}
-
 function ProjectCard({ match, featured, onStart }: any) {
   return (
     <div className={cn(
       "rounded-2xl border bg-transparent bg-obsidian",
       featured ? "border-brand/40 shadow-brand/10 shadow-[0_0_20px_rgba(202,138,247,0.1)]" : "border-white/10 border-white/[0.06] hover:border-slate-300 hover:border-white/20"
     )}>
-      {/* Decorative Image Area */}
-      <div className="h-32 w-full relative overflow-hidden bg-transparent bg-slate-900 border-b border-white/10 border-white/[0.05]">
-        {/* Abstract UI placeholder */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-200 to-slate-100 from-slate-800 to-black opacity-80" />
-        <div className={cn("absolute inset-0 opacity-20 opacity-30 mix-blend-overlay", featured ? "bg-brand" : "bg-cyan-500")} />
-        
-        {/* Fake UI elements */}
-        <div className="absolute top-4 left-4 right-4 bottom-4 border border-slate-300 border-white/10 rounded-lg flex flex-col overflow-hidden bg-white/60 bg-black/40 backdrop-blur-sm">
-           <div className="h-4 border-b border-slate-300 border-white/10 flex items-center px-2 gap-1 bg-slate-200/50 bg-white/5">
-             <div className="w-1.5 h-1.5 rounded-full bg-red-400/80 bg-red-400/50" />
-             <div className="w-1.5 h-1.5 rounded-full bg-amber-400/80 bg-amber-400/50" />
-             <div className="w-1.5 h-1.5 rounded-full bg-green-400/80 bg-green-400/50" />
-           </div>
-           <div className="flex-1 p-2 flex gap-2">
-              <div className="w-1/4 h-full bg-slate-300/50 bg-white/5 rounded-md" />
-              <div className="flex-1 space-y-2">
-                 <div className="w-3/4 h-2 bg-slate-300/50 bg-white/10 rounded" />
-                 <div className="w-1/2 h-2 bg-slate-300/50 bg-white/10 rounded" />
-              </div>
-           </div>
+      <div className="p-3 border-b border-white/10 border-white/[0.05] flex items-center justify-between bg-black/20">
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 bg-white/5 border border-white/10 text-[9px] font-bold uppercase tracking-wider text-slate-300">
+          {featured ? <><Sparkles className="w-3 h-3 text-brand" /> High Impact</> : <><Target className="w-3 h-3 text-cyan-400" /> Recommended</>}
         </div>
-
-        {/* Top Badge */}
-        <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 bg-black/60 backdrop-blur-md border border-white/10 border-white/10 text-[9px] font-bold uppercase tracking-wider text-slate-800 text-white shadow-sm">
-          {featured ? <><Sparkles className="w-3 h-3 text-brand" /> High Impact</> : <><Target className="w-3 h-3 text-cyan-600 text-cyan-400" /> Recommended</>}
-        </div>
-        
-        {/* Action button */}
-        <button className="absolute top-3 right-3 w-7 h-7 rounded-full bg-white/90 bg-black/60 backdrop-blur-md border border-white/10 border-white/10 flex items-center justify-center text-slate-400 text-white hover:bg-transparent hover:bg-white/20 transition shadow-sm">
+        <button className="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:bg-white/10 transition">
           <MoreHorizontal className="w-4 h-4" />
         </button>
       </div>
@@ -384,16 +258,4 @@ function ActiveProjectItem({ match, onComplete }: any) {
   );
 }
 
-function StatRow({ icon, label, value }: any) {
-  return (
-    <div className="flex items-center justify-between text-sm">
-      <div className="flex items-center gap-3 text-slate-400 text-slate-400">
-        <div className="w-6 h-6 rounded flex items-center justify-center bg-transparent bg-white/[0.02] border border-white/10 border-white/[0.05]">
-          {icon}
-        </div>
-        <span>{label}</span>
-      </div>
-      <span className="font-bold text-white text-white">{value}</span>
-    </div>
-  );
-}
+

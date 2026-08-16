@@ -9,6 +9,7 @@ companyPrepRouter.use(authenticate);
 companyPrepRouter.get("/companies", companyPrepController.listCompanyTypes);
 companyPrepRouter.get("/companies/:companyTypeId", companyPrepController.getCompanyType);
 companyPrepRouter.post("/companies/:companyTypeId/start-prep", companyPrepController.startPrep);
+companyPrepRouter.post("/analyze-jd", companyPrepController.analyzeJobDescription);
 companyPrepRouter.get("/questions", companyPrepController.listQuestions);
 companyPrepRouter.patch("/questions/:questionId/status", companyPrepController.updateQuestionStatus);
 companyPrepRouter.post("/questions/:questionId/save-note", companyPrepController.saveQuestionToNotes);

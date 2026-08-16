@@ -1,17 +1,13 @@
-import { useState, useEffect, type FormEvent, type ReactNode } from "react";
-import { isAxiosError } from "axios";
+import { useState, useEffect, type FormEvent } from "react";
 import {
-  AlertCircle, CheckCircle2, Copy, FileText, Loader2, Sparkles, Wand2, 
-  Target, Shield, Zap, ChevronRight, RotateCcw, Brain, Activity,
-  Briefcase, Code, BarChart3, MessageSquare, AlertTriangle, Info,
-  Check, X, Download
+  CheckCircle2, FileText, Loader2, Sparkles, Wand2, 
+  Target, Shield, Brain, Download
 } from "lucide-react";
 import { tailorResume, uploadTailor } from "../../../lib/api/resume";
 import { logBehavior } from "../../../lib/api/behavior";
 import { cn } from "../../../lib/utils/cn";
-import type { ResumeTailorResult, ResumeTailorTone, ResumeMode, ResumeBulletRewrite } from "@studybuddy/shared";
+import type { ResumeTailorResult } from "@studybuddy/shared";
 import * as pdfjsLib from "pdfjs-dist";
-import { motion as Motion, AnimatePresence } from "framer-motion";
 
 // Standard Vite way to load the worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
@@ -19,33 +15,15 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url
 ).toString();
 
-const toneOptions: Array<{ value: ResumeTailorTone; label: string; description: string }> = [
-  { value: "impact", label: "Impact", description: "Outcome-first" },
-  { value: "technical", label: "Technical", description: "Engineering depth" },
-  { value: "concise", label: "Concise", description: "Direct and clean" }
-];
-
-const modeOptions: Array<{ value: ResumeMode; label: string; icon: ReactNode }> = [
-  { value: "startup", label: "Startup", icon: <Zap size={14} /> },
-  { value: "faang", label: "FAANG", icon: <Shield size={14} /> },
-  { value: "internship", label: "Internship", icon: <Target size={14} /> },
-  { value: "technical", label: "Technical", icon: <Code size={14} /> },
-  { value: "ats_optimized", label: "ATS Focus", icon: <Activity size={14} /> }
-];
-
 export function ResumeTailorWorkspace({ initialResult }: { initialResult?: any }) {
   const [targetRole, setTargetRole] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [currentResume, setCurrentResume] = useState("");
-  const [tone, setTone] = useState<ResumeTailorTone>("impact");
-  const [mode, setMode] = useState<ResumeMode>("technical");
   const [result, setResult] = useState<ResumeTailorResult | null>(initialResult || null);
   const [isLoading, setLoading] = useState(false);
   const [isParsing, setIsParsing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  // Collaborative edit state
-  const [acceptedBullets, setAcceptedBullets] = useState<Set<number>>(new Set());
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [jdFile, setJdFile] = useState<File | null>(null);
 
@@ -61,7 +39,6 @@ export function ResumeTailorWorkspace({ initialResult }: { initialResult?: any }
 
     setLoading(true);
     setError(null);
-    setAcceptedBullets(new Set());
 
     try {
       if (resumeFile && jdFile) {
@@ -74,12 +51,12 @@ export function ResumeTailorWorkspace({ initialResult }: { initialResult?: any }
           targetRole,
           jobDescription,
           currentResume,
-          tone,
-          mode
+          tone: "impact",
+          mode: "technical"
         });
         setResult(tailored);
       }
-      await logBehavior("resume_tailored", { targetRole, tone, mode });
+      await logBehavior("resume_tailored", { targetRole, tone: "impact", mode: "technical" });
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Tailoring failed.");
     } finally {
@@ -126,13 +103,6 @@ export function ResumeTailorWorkspace({ initialResult }: { initialResult?: any }
     } else {
         setJobDescription(`[Attached File: ${file.name}]`);
     }
-  };
-
-  const toggleBullet = (index: number) => {
-    const next = new Set(acceptedBullets);
-    if (next.has(index)) next.delete(index);
-    else next.add(index);
-    setAcceptedBullets(next);
   };
 
   const handleDownload = () => {
@@ -205,7 +175,7 @@ ${result.keywordAdditions.join(', ')}
   };
 
   return (
-    <div className="grid gap-8 xl:grid-cols-[400px_1fr] h-full items-start">
+    <div className="grid gap-8 xl:grid-cols-[360px_1fr] h-full items-start">
       {/* Input Sidebar */}
       <aside className="space-y-6">
         <div className="p-6 rounded-2xl border border-white/[0.04] bg-white/[0.02] space-y-6">
@@ -263,50 +233,11 @@ ${result.keywordAdditions.join(', ')}
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Repositioning Mode</label>
-              <div className="grid grid-cols-2 gap-2">
-                {modeOptions.map(m => (
-                  <button
-                    key={m.value}
-                    type="button"
-                    onClick={() => setMode(m.value)}
-                    className={cn(
-                      "flex items-center gap-2 px-3 py-2 rounded-lg border text-[10px] font-bold transition-all",
-                      mode === m.value ? "border-brand/40 bg-brand/5 text-brand" : "border-white/5 text-slate-500 hover:text-slate-300"
-                    )}
-                  >
-                    {m.icon}
-                    {m.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Output Tone</label>
-              <div className="flex gap-2">
-                {toneOptions.map(t => (
-                  <button
-                    key={t.value}
-                    type="button"
-                    onClick={() => setTone(t.value)}
-                    className={cn(
-                      "flex-1 py-2 rounded-lg border text-[10px] font-bold transition-all",
-                      tone === t.value ? "border-cyan-500/40 bg-cyan-500/5 text-cyan-400" : "border-white/5 text-slate-500 hover:text-slate-300"
-                    )}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
             {error && <p className="text-[10px] text-red-400 font-medium">{error}</p>}
 
             <button
               disabled={!canSubmit}
-              className="w-full py-3 rounded-xl bg-brand text-[11px] font-black uppercase tracking-widest text-black hover:bg-brand/90 transition-all disabled:opacity-30 flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-xl bg-brand text-[11px] font-black uppercase tracking-widest text-white hover:bg-brand-light transition-all disabled:opacity-30 flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(99,102,241,0.2)]"
             >
               {isLoading ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
               {isLoading ? "Positioning..." : "Execute Analysis"}
@@ -316,7 +247,7 @@ ${result.keywordAdditions.join(', ')}
       </aside>
 
       {/* Output Area */}
-      <div className="min-h-[600px] rounded-3xl border border-white/[0.04] bg-white/[0.01] overflow-hidden flex flex-col">
+      <div className="min-h-[500px] rounded-3xl border border-white/[0.04] bg-white/[0.01] overflow-hidden flex flex-col relative">
         {!result ? (
           <div className="flex-1 flex flex-col items-center justify-center p-20 text-center space-y-6">
             <div className="w-16 h-16 rounded-full bg-brand/5 border border-brand/10 flex items-center justify-center text-brand animate-pulse">
@@ -333,207 +264,60 @@ ${result.keywordAdditions.join(', ')}
             </div>
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto custom-scrollbar">
-            {/* Intelligence Header */}
-            <div className="p-8 border-b border-white/[0.04] bg-white/[0.01] flex flex-col gap-8 relative">
-              <div className="absolute top-8 right-8">
-                <button
-                  onClick={handleDownload}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 text-xs font-bold text-slate-300 hover:bg-white/10 transition-all border border-white/5"
-                >
-                  <Download size={14} /> Download Document
-                </button>
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h3 className="text-xl font-bold text-white tracking-tight">Tailored Intelligence Report</h3>
+                <p className="text-xs text-slate-400 mt-1">Strategic repositioning for {targetRole}</p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-4">
-                <div className="space-y-4">
-                  <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Role Fit Analysis</p>
-                  <p className="text-sm text-slate-300 leading-relaxed italic">"{result.roleFitSummary}"</p>
-                </div>
-              <div className="space-y-4">
-                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">ATS Readiness</p>
-                <div className="flex items-end gap-4">
-                  <span className={cn(
-                    "text-5xl font-light tracking-tighter",
-                    result.atsIntelligence.score > 80 ? "text-emerald-400" : result.atsIntelligence.score > 50 ? "text-amber-400" : "text-red-400"
-                  )}>{result.atsIntelligence.score}%</span>
-                  <div className="pb-1 space-y-1">
-                    <p className="text-[10px] text-slate-400 font-medium">Keywords: {result.keywordAdditions.length} found</p>
-                    <p className={cn("text-[9px] font-bold uppercase", 
-                      result.atsIntelligence.formattingSafety.status === "safe" ? "text-emerald-500" : "text-red-400")}>
-                      {result.atsIntelligence.formattingSafety.status} Formatting
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-4">
-                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Target Narrative</p>
-                <div className="space-y-2">
-                  <p className="text-xs font-bold text-brand">{result.targetHeadline}</p>
-                  <p className="text-[10px] text-slate-500 line-clamp-3">{result.tailoredSummary}</p>
-                </div>
-              </div>
+              <button
+                onClick={handleDownload}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-brand/10 text-brand-light text-xs font-bold uppercase tracking-widest hover:bg-brand/20 transition-all border border-brand/20 shadow-[0_0_15px_rgba(99,102,241,0.15)]"
+              >
+                <Download size={14} /> Download Document
+              </button>
             </div>
-          </div>
 
-            {/* Main Tabs/Grid */}
-            <div className="p-8 space-y-12">
-              {/* Collaborative Bullet Editor */}
-              <section className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-black uppercase tracking-widest text-white flex items-center gap-2">
-                    <MessageSquare size={14} className="text-cyan-400" />
-                    Strategic Bullet Repositioning
-                  </h3>
-                  <span className="text-[9px] text-slate-500 italic">Toggle to accept/reject edits</span>
-                </div>
-                
-                <div className="space-y-4">
-                  {result.bulletRewrites.map((rewrite, i) => (
-                    <div key={i} className="group relative rounded-2xl border border-white/[0.04] bg-white/[0.02] overflow-hidden transition-all hover:border-white/[0.08]">
-                      <div className="grid md:grid-cols-2 gap-0 border-b border-white/[0.04]">
-                        <div className="p-4 bg-red-500/[0.02]">
-                          <p className="text-[8px] font-black uppercase text-red-500/50 mb-2">Original Context</p>
-                          <p className="text-[11px] text-slate-500 leading-relaxed">{rewrite.before}</p>
-                        </div>
-                        <div className={cn("p-4 transition-colors", acceptedBullets.has(i) ? "bg-emerald-500/5" : "bg-cyan-500/[0.02]")}>
-                          <div className="flex items-center justify-between mb-2">
-                            <p className="text-[8px] font-black uppercase text-cyan-400 mb-0">AI Positioned Bullet</p>
-                            <div className="flex gap-2">
-                              <div className="flex items-center gap-1">
-                                <span className="text-[8px] text-slate-400 font-bold">IMPACT</span>
-                                <div className="w-10 h-1 bg-white/5 overflow-hidden"><div className="h-full bg-emerald-500" style={{ width: `${rewrite.impactScore}%` }} /></div>
-                              </div>
-                            </div>
-                          </div>
-                          <p className={cn("text-[11px] leading-relaxed transition-all", acceptedBullets.has(i) ? "text-emerald-300 font-medium" : "text-slate-200")}>
-                            {rewrite.after}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="px-4 py-2 flex items-center justify-between bg-black/20">
-                        <p className="text-[9px] text-slate-400 flex items-center gap-1">
-                          <Info size={10} />
-                          {rewrite.reason}
-                        </p>
-                        <button 
-                          onClick={() => toggleBullet(i)}
-                          className={cn(
-                            "px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-tighter transition-all flex items-center gap-1.5",
-                            acceptedBullets.has(i) ? "bg-emerald-500 text-black" : "bg-white/5 text-slate-400 hover:text-white"
-                          )}
-                        >
-                          {acceptedBullets.has(i) ? <Check size={10} /> : <RotateCcw size={10} />}
-                          {acceptedBullets.has(i) ? "Accepted" : "Apply Edit"}
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              {/* Project & Interview Intelligence */}
-              <div className="grid md:grid-cols-2 gap-8">
-                {/* Project Framing */}
-                <section className="space-y-6">
-                  <h3 className="text-xs font-black uppercase tracking-widest text-white flex items-center gap-2">
-                    <Code size={14} className="text-purple-400" />
-                    Engineering Storytelling
-                  </h3>
-                  <div className="space-y-4">
-                    {result.projectAnalysis.map((proj, i) => (
-                      <div key={i} className="p-5 rounded-2xl border border-white/[0.04] bg-white/[0.02] space-y-4">
-                        <div className="flex items-center justify-between">
-                          <h4 className="text-[11px] font-bold text-slate-200">{proj.projectName}</h4>
-                          <span className="text-[8px] px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 font-bold uppercase">Architecture</span>
-                        </div>
-                        <div className="space-y-3">
-                          <div className="p-3 rounded-lg bg-black/40 border border-white/5">
-                            <p className="text-[9px] font-black uppercase text-slate-400 mb-2">Strategic Narrative</p>
-                            <p className="text-[11px] text-slate-400 leading-relaxed italic">"{proj.strategicFraming}"</p>
-                          </div>
-                          <div className="p-3 rounded-lg bg-brand/5 border border-brand/10">
-                            <p className="text-[9px] font-black uppercase text-brand mb-2">Storytelling Rewrite</p>
-                            <p className="text-[11px] text-slate-200 leading-relaxed">{proj.engineeringStorytelling}</p>
-                          </div>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          {proj.impactMetricsSuggested.map((m, j) => (
-                            <span key={j} className="px-2 py-1 rounded-md bg-white/5 text-[9px] text-slate-500 border border-white/5">
-                              {m}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-
-                {/* Interview Alignment */}
-                <section className="space-y-6">
-                  <h3 className="text-xs font-black uppercase tracking-widest text-white flex items-center gap-2">
-                    <Activity size={14} className="text-emerald-400" />
-                    Interview Alignment
-                  </h3>
-                  <div className="space-y-4">
-                    <div className="p-5 rounded-2xl border border-white/[0.04] bg-white/[0.02] space-y-4">
-                      <p className="text-[9px] font-black uppercase text-slate-400">Likely Questions</p>
-                      <div className="space-y-2">
-                        {result.interviewAlignment.likelyQuestions.map((q, i) => (
-                          <div key={i} className="flex gap-3 text-[11px] text-slate-300 group">
-                            <span className="text-emerald-500/50">?</span>
-                            <p>{q}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="p-5 rounded-2xl border border-red-500/10 bg-red-500/[0.02] space-y-4">
-                      <p className="text-[9px] font-black uppercase text-red-400/50 flex items-center gap-2">
-                        <AlertTriangle size={10} />
-                        Weak Discussion Areas
-                      </p>
-                      <div className="space-y-2">
-                        {result.interviewAlignment.weakDiscussionAreas.map((w, i) => (
-                          <div key={i} className="flex gap-3 text-[11px] text-slate-400">
-                            <span className="text-red-500/30">•</span>
-                            <p>{w}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </section>
+            <div className="space-y-6">
+              <div className="p-6 rounded-2xl border border-emerald-500/10 bg-emerald-500/5 space-y-3">
+                <p className="text-[10px] font-black uppercase text-emerald-400 tracking-widest flex items-center gap-2">
+                  <CheckCircle2 size={14} /> Resume Analysis Complete
+                </p>
+                <p className="text-sm text-emerald-100/70 leading-relaxed">
+                  Your resume has been successfully aligned against the target job description. We've compiled the repositioned bullets, updated summary, and missing ATS keywords into a single exportable document.
+                </p>
+                <p className="text-sm text-emerald-100/70 leading-relaxed italic">
+                  "{result.roleFitSummary}"
+                </p>
               </div>
 
-              {/* Keyword & ATS Health */}
-              <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                 <div className="p-6 rounded-2xl border border-white/[0.04] bg-white/[0.02] space-y-4">
-                  <h3 className="text-xs font-black uppercase tracking-widest text-white flex items-center gap-2">
-                    <BarChart3 size={14} className="text-cyan-400" />
-                    Missing Proof Points
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {result.missingProofPoints.map((p, i) => (
-                      <span key={i} className="px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/5 text-[10px] text-slate-400 flex items-center gap-2">
-                        <Info size={10} className="text-cyan-500" />
-                        {p}
-                      </span>
-                    ))}
-                  </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-6 rounded-2xl border border-white/[0.04] bg-white/[0.02]">
+                  <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2">ATS Readiness Score</p>
+                  <p className={cn(
+                    "text-4xl font-light tracking-tighter",
+                    result.atsIntelligence.score > 80 ? "text-emerald-400" : result.atsIntelligence.score > 50 ? "text-amber-400" : "text-red-400"
+                  )}>{result.atsIntelligence.score}%</p>
                 </div>
-                <div className="p-6 rounded-2xl border border-white/[0.04] bg-white/[0.02] space-y-4">
-                  <h3 className="text-xs font-black uppercase tracking-widest text-white flex items-center gap-2">
-                    <Zap size={14} className="text-amber-400" />
-                    ATS Keywords to Add
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {result.keywordAdditions.map((k, i) => (
-                      <span key={i} className="px-3 py-1.5 rounded-xl bg-amber-500/5 border border-amber-500/10 text-[10px] text-amber-200/70 font-medium">
-                        {k}
-                      </span>
-                    ))}
-                  </div>
+                <div className="p-6 rounded-2xl border border-white/[0.04] bg-white/[0.02]">
+                  <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2">Keywords Added</p>
+                  <p className="text-4xl font-light tracking-tighter text-cyan-400">
+                    {result.keywordAdditions.length}
+                  </p>
                 </div>
-              </section>
+              </div>
+
+              <div className="p-6 rounded-2xl border border-white/[0.04] bg-white/[0.02] flex flex-col items-center justify-center text-center py-12 space-y-4">
+                <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400">
+                  <FileText size={20} />
+                </div>
+                <div className="space-y-1">
+                  <h4 className="text-sm font-bold text-slate-200">View Full Document</h4>
+                  <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                    Click the download button above to retrieve your full tailored resume content, repositioned bullets, and strategic gap analysis.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         )}

@@ -213,6 +213,14 @@ export function NotesPage() {
             </div>
             <div className="flex items-center gap-4">
               <button
+                type="button"
+                className="px-6 py-4 bg-white/[0.05] hover:bg-white/[0.1] text-white border border-white/10 text-xs font-black uppercase tracking-[0.2em] transition-all active:scale-95 flex items-center gap-3 rounded-2xl"
+                onClick={() => alert("Audio Memo mode: Voice recording will start. (Aural Mode Mock)")}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+                Record Audio
+              </button>
+              <button
                 onClick={() => setIsCreateModalOpen(true)}
                 className="px-8 py-4 bg-[#ffffff] text-slate-950 text-xs font-black uppercase tracking-[0.2em] hover:bg-transparent transition-all active:scale-95 shadow-[0_20px_40px_rgba(255,255,255,0.1)] flex items-center gap-3 rounded-2xl"
               >

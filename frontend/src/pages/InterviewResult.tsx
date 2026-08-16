@@ -96,6 +96,22 @@ export function InterviewResult() {
         </div>
       )}
 
+      {/* Visual Timeline Mock */}
+      <div className="p-4 bg-[#1a1a1a] rounded-lg border border-[#2a2a2a] mb-8">
+        <div className="text-xs font-bold text-gray-500 mb-4 uppercase tracking-wider">Interview Timeline</div>
+        <div className="flex w-full h-3 rounded-full overflow-hidden bg-gray-800 gap-0.5">
+          <div className="h-full bg-green-500 hover:bg-green-400 cursor-pointer" style={{ width: '25%' }} title="0:00 - Introduction (Strong)" />
+          <div className="h-full bg-orange-500 hover:bg-orange-400 cursor-pointer" style={{ width: '40%' }} title="0:25 - Technical Deep Dive (Hesitation)" />
+          <div className="h-full bg-red-500 hover:bg-red-400 cursor-pointer" style={{ width: '15%' }} title="0:65 - System Design (Struggled)" />
+          <div className="h-full bg-green-500 hover:bg-green-400 cursor-pointer" style={{ width: '20%' }} title="0:80 - Closing (Strong)" />
+        </div>
+        <div className="flex justify-between mt-2 text-[10px] font-mono text-gray-500">
+          <span>0:00</span>
+          <span>End</span>
+        </div>
+        <p className="text-xs text-gray-400 mt-3 italic">Hover over segments to see contextual feedback.</p>
+      </div>
+
       <button
         onClick={() => navigate("/app/interview")}
         className="px-6 py-3 bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition-colors"

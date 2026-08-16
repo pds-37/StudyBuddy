@@ -355,11 +355,11 @@ Shape: { "technicalAccuracy": 80, "clarity": 75, "scalabilityThinking": 60, "deb
             interviewRelevance: {
               importance: 95,
               commonQuestions: [
-                `Define the core mechanics of ${concept} in modern software engineering.`,
-                `How would you explain ${concept} tradeoffs under high throughput SDE setups?`
+                `Define the core mechanics of ${concept} in modern professional scenarios.`,
+                `How would you explain ${concept} tradeoffs under high throughput setups?`
               ],
               realWorldUsage: [
-                `Crucial during SDE ${session.targetRole} architectural assessments.`
+                `Crucial during ${session.targetRole} assessments.`
               ]
             }
           }

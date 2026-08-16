@@ -43,3 +43,9 @@ export const startPrepSchema = z.object({
   role: companyPrepRoleSchema.default("Software Engineer"),
   targetDate: z.string().datetime().optional()
 });
+
+export const analyzeJobDescriptionSchema = z.object({
+  companyName: z.string().min(1).max(100),
+  jobDescription: z.string().min(50).max(10000),
+  role: companyPrepRoleSchema.default("Software Engineer")
+});

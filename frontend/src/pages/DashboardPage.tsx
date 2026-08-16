@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { motion as Motion, AnimatePresence } from "framer-motion";
 import {
   AlertTriangle,
   ArrowRight,
@@ -20,10 +21,9 @@ import {
   Zap,
   Layers,
 } from "lucide-react";
-import { getMentorToday, recordMentorTaskFeedback, updateMentorTaskStatus } from "../lib/api/mentor";
+import { getMentorToday, updateMentorTaskStatus } from "../lib/api/mentor";
 import { logBehavior } from "../lib/api/behavior";
 import { cn } from "../lib/utils/cn";
-import { useCopilotStore } from "../store/copilot-store";
 import { useAppStore } from "../store/app-store";
 import { demoTodayPlan } from "../lib/demo/student-demo";
 import type { MentorTask, MentorTodayPlan } from "@studybuddy/shared";
@@ -54,10 +54,7 @@ export function DashboardPage() {
   const [plan, setPlan] = useState<MentorTodayPlan | null>(null);
   const [loading, setLoading] = useState(true);
   const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
-  const [stuckTaskId, setStuckTaskId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const setIsWidgetOpen = useCopilotStore((state) => state.setIsWidgetOpen);
-  const sendMessage = useCopilotStore((state) => state.sendMessage);
 
   const loadPlan = async () => {
     if (isDemoMode) {
@@ -72,7 +69,7 @@ export function DashboardPage() {
       const nextPlan = await getMentorToday();
       setPlan(nextPlan);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load mentor plan");
+      setError(err instanceof Error ? err.message : "Failed to load learning plan");
     } finally {
       setLoading(false);
     }
@@ -102,40 +99,12 @@ export function DashboardPage() {
     }
     try {
       setUpdatingTaskId(task.id);
-      const nextPlan = await recordMentorTaskFeedback(task.id, { type: "start" });
       await logBehavior("task_started", { taskId: task.id, type: task.type }).catch(() => undefined);
-      setPlan(nextPlan);
-      navigate(`/study/${task.id}`);
+      navigate(task.href); // Navigate to task.href directly
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to start task");
     } finally {
       setUpdatingTaskId(null);
-    }
-  };
-
-  const handleStuck = async (task: MentorTask) => {
-    if (isDemoMode) {
-      const note = `I am stuck on "${task.title}". Break it into the smallest next step and explain what I should do first.`;
-      setIsWidgetOpen(true);
-      void sendMessage(note);
-      setPlan((current) => current ? {
-        ...current,
-        tasks: current.tasks.map((item) => item.id === task.id ? { ...item, stuckCount: (item.stuckCount ?? 0) + 1, mentorNote: "Demo signal captured: Veda would now break this into a smaller step." } : item)
-      } : current);
-      return;
-    }
-    try {
-      setStuckTaskId(task.id);
-      const note = `I am stuck on "${task.title}". Break it into the smallest next step and explain what I should do first.`;
-      const nextPlan = await recordMentorTaskFeedback(task.id, { type: "stuck", note });
-      await logBehavior("task_stuck", { taskId: task.id, type: task.type }).catch(() => undefined);
-      setPlan(nextPlan);
-      setIsWidgetOpen(true);
-      void sendMessage(note);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to capture stuck signal");
-    } finally {
-      setStuckTaskId(null);
     }
   };
 
@@ -207,26 +176,15 @@ export function DashboardPage() {
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             {activeTask ? (
-              <>
-                <button
-                  type="button"
-                  onClick={() => void startTask(activeTask)}
-                  disabled={updatingTaskId === activeTask.id}
-                  className="w-full sm:w-auto relative group/btn inline-flex items-center justify-center gap-2 rounded-xl bg-white text-slate-950 px-8 py-4 text-sm font-black uppercase tracking-widest shadow-[0_0_20px_rgba(255,255,255,0.15)] hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50"
-                >
-                  {updatingTaskId === activeTask.id ? <Loader2 size={16} className="animate-spin" /> : <PlayCircle size={16} />}
-                  Start Work
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void handleStuck(activeTask)}
-                  disabled={stuckTaskId === activeTask.id}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.02] text-slate-400 hover:text-white hover:bg-white/5 px-8 py-4 text-sm font-black uppercase tracking-widest transition-all active:scale-[0.98] disabled:opacity-50"
-                >
-                  {stuckTaskId === activeTask.id ? <Loader2 size={16} className="animate-spin" /> : <AlertTriangle size={16} />}
-                  I'm Stuck
-                </button>
-              </>
+              <button
+                type="button"
+                onClick={() => void startTask(activeTask)}
+                disabled={updatingTaskId === activeTask.id}
+                className="w-full sm:w-auto relative group/btn inline-flex items-center justify-center gap-2 rounded-xl bg-white text-slate-950 px-8 py-4 text-sm font-black uppercase tracking-widest shadow-[0_0_20px_rgba(255,255,255,0.15)] hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50"
+              >
+                {updatingTaskId === activeTask.id ? <Loader2 size={16} className="animate-spin" /> : <PlayCircle size={16} />}
+                Start Work
+              </button>
             ) : (
               <button
                 type="button"
@@ -295,17 +253,24 @@ export function DashboardPage() {
               No tasks scheduled for today.
             </div>
           ) : (
-            plan?.tasks.map((task) => (
-              <TaskRow
-                key={task.id}
-                task={task}
-                updating={updatingTaskId === task.id}
-                stucking={stuckTaskId === task.id}
-                onToggle={() => void completeTask(task)}
-                onStart={() => void startTask(task)}
-                onStuck={() => void handleStuck(task)}
-              />
-            ))
+            <AnimatePresence>
+              {plan?.tasks.map((task) => (
+                <Motion.div
+                  key={task.id}
+                  initial={{ opacity: 0, height: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, height: "auto", scale: 1 }}
+                  exit={{ opacity: 0, height: 0, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <TaskRow
+                    task={task}
+                    updating={updatingTaskId === task.id}
+                    onToggle={() => void completeTask(task)}
+                    onStart={() => void startTask(task)}
+                  />
+                </Motion.div>
+              ))}
+            </AnimatePresence>
           )}
         </div>
       </div>
@@ -316,17 +281,13 @@ export function DashboardPage() {
 function TaskRow({
   task,
   updating,
-  stucking,
   onToggle,
   onStart,
-  onStuck
 }: {
   task: MentorTask;
   updating: boolean;
-  stucking: boolean;
   onToggle: () => void;
   onStart: () => void;
-  onStuck: () => void;
 }) {
   const Icon = taskIcons[task.type];
   const isDone = task.status === "completed";
@@ -378,14 +339,6 @@ function TaskRow({
             {task.description}
           </p>
 
-          {/* Mentor Note */}
-          {task.mentorNote && (
-            <div className="mt-3 rounded-lg border border-white/[0.05] bg-white/[0.02] px-3 py-2 text-xs text-slate-400 flex items-start gap-2">
-              <MessageSquare size={14} className="text-brand shrink-0 mt-0.5" />
-              <span>{task.mentorNote}</span>
-            </div>
-          )}
-
           {/* Actions */}
           <div className="mt-4 flex flex-wrap gap-2">
             <button
@@ -396,15 +349,6 @@ function TaskRow({
             >
               {updating ? <Loader2 size={13} className="animate-spin" /> : <PlayCircle size={13} />}
               Start
-            </button>
-            <button
-              type="button"
-              onClick={onStuck}
-              disabled={stucking || isDone}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 px-3 py-2 text-xs font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {stucking ? <Loader2 size={13} className="animate-spin" /> : <AlertTriangle size={13} />}
-              I'm Stuck
             </button>
           </div>
         </div>

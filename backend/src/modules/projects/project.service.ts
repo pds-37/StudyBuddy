@@ -124,7 +124,7 @@ async function generateCustomProject(userId: string, ideaPrompt: string): Promis
   const prompt = `You are an expert technical product manager and engineering mentor.
 The user wants to build a custom project based on this idea: "${ideaPrompt}"
 User's Skills: ${user.currentSkills.join(", ")}
-Target Role: ${user.targetRoles[0] || "Software Engineer"}
+Target Role: ${user.targetRoles[0] || "Professional"}
 
 Generate a detailed, realistic capstone project specification that fulfills this idea while maximizing its value for the user's target role and skills.
 Return ONLY valid JSON in this exact structure:
@@ -183,9 +183,10 @@ async function getMentorInsights(userId: string): Promise<ProjectMentorInsights>
   const inProgress = matches.filter(m => m.status === "in_progress").length;
   const recommended = matches.filter(m => m.status === "recommended").length;
   
-  const prompt = `You are an AI Project Mentor for a software engineer.
-User Target Role: ${user?.targetRoles[0] || "Software Engineer"}
+  const prompt = `You are an AI Project Mentor for a professional.
+User Target Role: ${user?.targetRoles[0] || "Professional"}
 User Skills: ${user?.currentSkills.join(", ")}
+User Experience Level: ${user?.experienceLevel || "beginner"}
 Projects Completed: ${completed}
 Projects In Progress: ${inProgress}
 Projects Recommended: ${recommended}

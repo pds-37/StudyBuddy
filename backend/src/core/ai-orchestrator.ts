@@ -201,7 +201,29 @@ function localMentorResponse(messages: CopilotMessage[], userContext: string) {
     };
   }
 
-  // 4. Default: Concept / Technical study query
+  // 4. Visual Diagrams / Multimodal fallback
+  if (/\b(diagram|flowchart|visual|draw|architecture|system)\b/i.test(query)) {
+    return {
+      content: [
+        warningHeader,
+        "## 📊 Visual System Architecture",
+        "Even in offline mode, I can generate **Mermaid flowcharts** and structural diagrams for you.",
+        "Here is a generic high-level web architecture diagram based on your request:",
+        "```mermaid\ngraph TD\n  Client[Web / Mobile Client] -->|HTTPS| LB[Load Balancer]\n  LB --> API1[API Gateway Node]\n  LB --> API2[API Gateway Node]\n  API1 --> Auth{Auth Service}\n  API2 --> Auth\n  Auth -->|Valid| DB[(Primary Database)]\n  Auth -->|Invalid| Error[401 Unauthorized]\n  DB -.-> Cache[(Redis Cache)]\n```",
+        "You can ask me to draw database schemas, component trees, or state machines!"
+      ].join("\n\n"),
+      metadata: {
+        behaviorAnalysis: "User requested visual/spatial learning mode. Generated an architectural Mermaid diagram.",
+        nextBestAction: {
+          label: "Build an interactive diagram",
+          description: "Try asking me for a 'class diagram' or 'sequence diagram'.",
+          type: "explore"
+        }
+      }
+    };
+  }
+
+  // 5. Default: Concept / Technical study query
   const focus = queryRaw.length > 0 ? queryRaw : "your next study step";
 
   return {
@@ -658,6 +680,67 @@ export class AIOrchestrator {
         targetRoles: [],
         experienceLevel: "beginner",
         currentSkills: []
+      };
+    }
+  }
+
+  /**
+   * Analyzes a Job Description to extract topics, tech stack, and generate a prep plan profile.
+   */
+  static async analyzeJobDescription(companyName: string, jobDescription: string, userSkills: string[]): Promise<any> {
+    const prompt = `You are Veda, an expert engineering hiring manager. Analyze the following Job Description for ${companyName} and extract the required technical topics, patterns, and interview signals.
+    Also, calculate a match score (0-100) based on how well the required skills align with the candidate's current skills.
+
+    Job Description:
+    ${jobDescription}
+
+    Candidate Skills:
+    ${userSkills.join(", ")}
+    
+    Return ONLY valid JSON matching this schema:
+    {
+      "matchScore": number,
+      "focusAreas": ["Array of 4-6 broad technical focus areas"],
+      "extractedTopics": ["Array of specific topics, e.g. 'Arrays', 'System Design', 'React', 'AWS'"],
+      "procedure": [
+        {
+          "order": number,
+          "name": "Stage name (e.g. Recruiter screen, Online assessment)",
+          "format": "Brief description of format",
+          "duration": "e.g. 45-60 minutes",
+          "evaluationSignals": ["List of what they evaluate"],
+          "preparationTips": ["List of prep tips"],
+          "eliminationRisk": "low | medium | high"
+        }
+      ],
+      "questionMix": [
+        { "topic": "Topic name", "weight": number (weights must sum to 100) }
+      ]
+    }`;
+
+    const response = await this.generateStructuredResponse(prompt, "general");
+    try {
+      const cleaned = response.trim().replace(/^```json\s*/i, "").replace(/```$/, "").trim();
+      return JSON.parse(cleaned);
+    } catch (err) {
+      console.error("Failed to parse analyzeJobDescription response:", response);
+      // Fallback
+      return {
+        matchScore: 50,
+        focusAreas: ["DSA Basics", "System Design", "Behavioral"],
+        extractedTopics: ["Arrays", "System Design", "Behavioral"],
+        procedure: [
+          {
+            order: 1,
+            name: "Recruiter Screen",
+            format: "Resume walk-through",
+            duration: "30 minutes",
+            evaluationSignals: ["Communication", "Role fit"],
+            preparationTips: ["Prepare an intro"],
+            eliminationRisk: "low"
+          }
+        ],
+        questionMix: [{ topic: "Arrays", weight: 100 }]
       };
     }
   }

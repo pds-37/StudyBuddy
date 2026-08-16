@@ -172,15 +172,23 @@ export function OnboardingPage() {
                 try {
                   const res = await profileApi.uploadOnboardingResume(file);
                   if (res.profile) {
-                    setData((d) => ({
-                      ...d,
-                      name: res.profile.name || d.name,
-                      targetRoles: res.profile.targetRoles || d.targetRoles,
-                      experienceLevel: res.profile.experienceLevel || d.experienceLevel,
-                      currentSkills: res.profile.currentSkills || d.currentSkills,
-                    }));
-                    // Skip to step 4 (after skills)
-                    setStep(4);
+                    setData((d) => {
+                      const newTargetRoles = res.profile.targetRoles?.length ? res.profile.targetRoles : d.targetRoles;
+                      const newSkills = res.profile.currentSkills?.length ? res.profile.currentSkills : d.currentSkills;
+                      
+                      // Decide which step to jump to based on what we successfully extracted
+                      if (!newTargetRoles.length) setStep(1);
+                      else if (!newSkills.length) setStep(3);
+                      else setStep(4);
+
+                      return {
+                        ...d,
+                        name: res.profile.name || d.name,
+                        targetRoles: newTargetRoles,
+                        experienceLevel: res.profile.experienceLevel || d.experienceLevel,
+                        currentSkills: newSkills,
+                      };
+                    });
                   }
                 } catch (err) {
                   setError("Failed to parse resume.");

@@ -1,6 +1,7 @@
 import { type RequestHandler } from "express";
 import { companyPrepService } from "./company-prep.service.js";
 import {
+  analyzeJobDescriptionSchema,
   companyPrepQuerySchema,
   companyTypeParamSchema,
   questionParamSchema,
@@ -85,11 +86,27 @@ const startPrep: RequestHandler = async (request, response, next) => {
   }
 };
 
+const analyzeJobDescription: RequestHandler = async (request, response, next) => {
+  try {
+    const body = analyzeJobDescriptionSchema.parse(request.body);
+    const companyType = await companyPrepService.analyzeJobDescription(
+      request.userId ?? "",
+      body.companyName,
+      body.jobDescription,
+      body.role
+    );
+    response.status(201).json({ companyType });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const companyPrepController = {
   listCompanyTypes,
   getCompanyType,
   listQuestions,
   updateQuestionStatus,
   saveQuestionToNotes,
-  startPrep
+  startPrep,
+  analyzeJobDescription
 };

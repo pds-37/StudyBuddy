@@ -13,13 +13,13 @@ async function startPanelSession(userId: string): Promise<any> {
   }
 
   const role = user.targetRoles[0];
-  const skillsList = user.currentSkills.join(", ") || "Software Engineering, Problem Solving";
+  const skillsList = user.currentSkills.join(", ") || "Professional Skills, Problem Solving";
 
   // 1. Generate 3 highly targeted panel questions
-  const prompt = `You are Veda, orchestrating a simulated SDE hiring committee for the role of "${role}".
+  const prompt = `You are Veda, orchestrating a simulated hiring committee for the role of "${role}".
 Candidate's skills: ${skillsList}.
 
-Generate exactly 3 highly customized interview questions representing distinct SDE angles:
+Generate exactly 3 highly customized interview questions representing distinct professional angles:
 - Question 1: System Design / Architectural Tradeoffs (critical microservices, DB deadlocks, scaling, caching).
 - Question 2: Coding Scenario / Production Incident Recovery (debugging memory leaks, resolving server spikes, star method failure recovery).
 - Question 3: Behavioral / STAR Framework (team friction, scaling communication, project prioritization trade-offs).

@@ -72,3 +72,12 @@ export async function startCompanyPrep(
   );
   return response.data.prepPlan;
 }
+
+export async function analyzeJobDescription(data: {
+  companyName: string;
+  jobDescription: string;
+  role: CompanyPrepRole;
+}): Promise<CompanyTypeDetail> {
+  const response = await apiClient.post<{ companyType: CompanyTypeDetail }>("/company-prep/analyze-jd", data);
+  return response.data.companyType;
+}

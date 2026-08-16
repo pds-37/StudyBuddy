@@ -15,7 +15,8 @@ import {
   Users
 } from "lucide-react";
 import type { CompanyPrepRole, CompanyTypeCard } from "@studybuddy/shared";
-import { COMPANY_PREP_ROLES, getCompanyTypes } from "../lib/api/company-prep";
+import { COMPANY_PREP_ROLES, getCompanyTypes, analyzeJobDescription } from "../lib/api/company-prep";
+import { AnalyzeJobDescriptionModal } from "../features/company-prep/components/AnalyzeJobDescriptionModal";
 import { cn } from "../lib/utils/cn";
 
 const difficultyStyles = {
@@ -32,7 +33,7 @@ function matchTone(score: number) {
 }
 
 export function CompaniesPage() {
-  const [role, setRole] = useState<CompanyPrepRole>("Software Engineer");
+  const [role, setRole] = useState<CompanyPrepRole>(COMPANY_PREP_ROLES[0]);
   const [search, setSearch] = useState("");
   const [companyTypes, setCompanyTypes] = useState<CompanyTypeCard[]>([]);
   const [loading, setLoading] = useState(true);
@@ -78,6 +79,11 @@ export function CompaniesPage() {
     !best || item.matchScore > best.matchScore ? item : best
   , null);
 
+  const customTargets = filtered.filter(item => item.id.startsWith("custom-jd"));
+  const generalTypes = filtered.filter(item => !item.id.startsWith("custom-jd"));
+
+  const [showJDModal, setShowJDModal] = useState(false);
+
   return (
     <section className="space-y-8 pb-10">
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
@@ -98,12 +104,19 @@ export function CompaniesPage() {
           <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-400">
             Mass recruiters, product giants, fintech teams, startups, AI labs, cloud platforms, and consumer-scale companies all test different signals. Pick a company type, see the full hiring flow, and drill the questions that match it.
           </p>
+
+          <button
+            onClick={() => setShowJDModal(true)}
+            className="mt-6 flex items-center gap-2 rounded-full bg-cyan-400 px-6 py-3 text-sm font-bold text-black transition hover:bg-cyan-300"
+          >
+            <Sparkles size={16} /> Target Custom Job Description
+          </button>
         </div>
 
         <div className="rounded-[28px] border border-white/10 bg-[#080B12] p-6">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand/15 text-brand">
-              <Sparkles size={20} />
+              <Target size={20} />
             </div>
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">Best current match</p>
@@ -172,86 +185,122 @@ export function CompaniesPage() {
       )}
 
       {!loading && !error && (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {filtered.map((item, index) => (
-            <Motion.article
-              key={item.id}
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.04 }}
-              className="group rounded-[24px] border border-white/10 bg-[#080B12]/90 p-5 transition hover:-translate-y-1 hover:border-cyan-300/30"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex min-w-0 gap-3">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/[0.04] text-cyan-200 ring-1 ring-white/10">
-                    <Building2 size={22} />
-                  </div>
-                  <div className="min-w-0">
-                    <h2 className="text-lg font-bold text-white">{item.name}</h2>
-                    <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500">{item.summary}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className={cn("text-3xl font-black", matchTone(item.matchScore))}>{item.matchScore}%</p>
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">match</p>
-                </div>
+        <div className="space-y-8">
+          {customTargets.length > 0 && (
+            <div>
+              <h2 className="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-cyan-400">
+                <Target size={16} /> Your Custom JD Targets
+              </h2>
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {customTargets.map((item, index) => (
+                  <CompanyCard key={item.id} item={item} role={role} index={index} />
+                ))}
               </div>
+            </div>
+          )}
 
-              <div className="mt-5 flex flex-wrap gap-2">
-                <span className={cn("rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider", difficultyStyles[item.difficulty])}>
-                  {item.difficulty}
-                </span>
-                <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                  {item.selectivity}
-                </span>
-                <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                  {item.questionCount} questions
-                </span>
-                {item.targeting && (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-200">
-                    <CheckCircle2 size={12} /> Targeting
-                  </span>
-                )}
-              </div>
-
-              <div className="mt-5 space-y-4">
-                <div>
-                  <p className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
-                    <Target size={12} /> Focus areas
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {item.focusAreas.slice(0, 4).map((area) => (
-                      <span key={area} className="rounded-lg bg-white/[0.04] px-2.5 py-1 text-[11px] text-slate-300">
-                        {area}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <p className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
-                    <Users size={12} /> Examples
-                  </p>
-                  <p className="line-clamp-1 text-xs text-slate-400">{item.exampleCompanies.join(", ")}</p>
-                </div>
-
-                <div className="flex items-center justify-between border-t border-white/10 pt-4">
-                  <div className="flex items-center gap-2 text-[11px] text-slate-500">
-                    <ShieldCheck size={14} className="text-emerald-300" />
-                    {item.weakAreas.length ? `${item.weakAreas[0]} needs work` : "No major gap detected"}
-                  </div>
-                  <Link
-                    to={`/companies/${item.id}?role=${encodeURIComponent(role)}`}
-                    className="inline-flex items-center gap-2 rounded-full bg-transparent px-4 py-2 text-xs font-black text-[#080B12] transition hover:bg-cyan-100"
-                  >
-                    Prep <ArrowRight size={14} />
-                  </Link>
-                </div>
-              </div>
-            </Motion.article>
-          ))}
+          <div>
+            <h2 className="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-slate-500">
+              <Building2 size={16} /> General Archetypes
+            </h2>
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {generalTypes.map((item, index) => (
+                <CompanyCard key={item.id} item={item} role={role} index={index} />
+              ))}
+            </div>
+          </div>
         </div>
       )}
+
+      {showJDModal && (
+        <AnalyzeJobDescriptionModal
+          onClose={() => setShowJDModal(false)}
+          onAnalyze={analyzeJobDescription}
+          onSuccess={(detail) => {
+            setShowJDModal(false);
+            window.location.href = `/companies/${detail.id}?role=${encodeURIComponent(role)}`;
+          }}
+        />
+      )}
     </section>
+  );
+}
+
+function CompanyCard({ item, role, index }: { item: CompanyTypeCard; role: CompanyPrepRole; index: number }) {
+  return (
+    <Motion.article
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.04 }}
+      className="group rounded-[24px] border border-white/10 bg-[#080B12]/90 p-5 transition hover:-translate-y-1 hover:border-cyan-300/30"
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex min-w-0 gap-3">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/[0.04] text-cyan-200 ring-1 ring-white/10">
+            <Building2 size={22} />
+          </div>
+          <div className="min-w-0">
+            <h2 className="text-lg font-bold text-white">{item.name}</h2>
+            <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500">{item.summary}</p>
+          </div>
+        </div>
+        <div className="text-right">
+          <p className={cn("text-3xl font-black", matchTone(item.matchScore))}>{item.matchScore}%</p>
+          <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">match</p>
+        </div>
+      </div>
+
+      <div className="mt-5 flex flex-wrap gap-2">
+        <span className={cn("rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider", difficultyStyles[item.difficulty])}>
+          {item.difficulty}
+        </span>
+        <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+          {item.selectivity}
+        </span>
+        <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+          {item.questionCount} questions
+        </span>
+        {item.targeting && (
+          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-200">
+            <CheckCircle2 size={12} /> Targeting
+          </span>
+        )}
+      </div>
+
+      <div className="mt-5 space-y-4">
+        <div>
+          <p className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+            <Target size={12} /> Focus areas
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {item.focusAreas.slice(0, 4).map((area) => (
+              <span key={area} className="rounded-lg bg-white/[0.04] px-2.5 py-1 text-[11px] text-slate-300">
+                {area}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <p className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+            <Users size={12} /> Examples
+          </p>
+          <p className="line-clamp-1 text-xs text-slate-400">{item.exampleCompanies.join(", ")}</p>
+        </div>
+
+        <div className="flex items-center justify-between border-t border-white/10 pt-4">
+          <div className="flex items-center gap-2 text-[11px] text-slate-500">
+            <ShieldCheck size={14} className="text-emerald-300" />
+            {item.weakAreas.length ? `${item.weakAreas[0]} needs work` : "No major gap detected"}
+          </div>
+          <Link
+            to={`/companies/${item.id}?role=${encodeURIComponent(role)}`}
+            className="inline-flex items-center gap-2 rounded-full bg-transparent px-4 py-2 text-xs font-black text-[#080B12] transition hover:bg-cyan-100"
+          >
+            Prep <ArrowRight size={14} />
+          </Link>
+        </div>
+      </div>
+    </Motion.article>
   );
 }

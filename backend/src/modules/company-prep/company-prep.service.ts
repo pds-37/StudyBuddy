@@ -581,6 +581,89 @@ async function getVedaContext(userId: string) {
   return lines.join("\n");
 }
 
+async function analyzeJobDescription(
+  userId: string,
+  companyName: string,
+  jobDescription: string,
+  role: CompanyPrepRole = DEFAULT_ROLE
+) {
+  await ensureSeedData();
+  const context = await getUserPrepContext(userId);
+  
+  const { AIOrchestrator } = await import("../../core/ai-orchestrator.js");
+  const aiResult = await AIOrchestrator.analyzeJobDescription(companyName, jobDescription, context.userSkills);
+
+  const customTypeId = `custom-jd-${Date.now()}`;
+  
+  // Create a custom CompanyType profile
+  const customProfile = await CompanyTypeModel.create({
+    typeId: customTypeId,
+    name: `${companyName} (${role})`,
+    summary: `Custom Job Description Analysis for ${companyName}`,
+    hiringFrequency: "medium",
+    selectivity: "selective",
+    difficulty: "medium",
+    roleTags: [role],
+    focusAreas: aiResult.focusAreas,
+    exampleCompanies: [companyName],
+    procedure: aiResult.procedure,
+    questionMix: aiResult.questionMix,
+    lastUpdated: new Date().toISOString().slice(0, 7)
+  });
+
+  // Find relevant existing questions
+  const allQuestions = await PrepQuestionModel.find();
+  const matchedQuestions = allQuestions.filter((q) => {
+    return q.topics.some(topic => 
+      aiResult.extractedTopics.map(normalize).includes(normalize(topic))
+    );
+  });
+
+  // Add custom tags to the matched questions so they show up for this companyType
+  if (matchedQuestions.length > 0) {
+    await Promise.all(matchedQuestions.map(q => 
+      PrepQuestionModel.updateOne(
+        { _id: q._id },
+        { 
+          $push: { 
+            companyTypes: {
+              companyTypeId: customTypeId,
+              frequency: 90,
+              lastSeen: new Date().toISOString().slice(0, 7),
+              stage: "JD Match"
+            }
+          }
+        }
+      )
+    ));
+  }
+
+  // Generate the prep plan target
+  const plan = buildCompanyPrepPlan({
+    companyTypeId: customTypeId,
+    role,
+    matchScore: aiResult.matchScore,
+    weakAreas: aiResult.extractedTopics.filter((topic: string) => conceptAliasScore(topic, new Set(context.userSkills.map(normalize)), context.conceptScores) < 55).slice(0, 5),
+    strongAreas: aiResult.extractedTopics.filter((topic: string) => conceptAliasScore(topic, new Set(context.userSkills.map(normalize)), context.conceptScores) >= 65).slice(0, 5),
+    questions: matchedQuestions.map(q => toPrepQuestion(q))
+  });
+
+  await CompanyPrepTargetModel.create({
+    userId,
+    companyTypeId: customTypeId,
+    role,
+    matchScore: plan.matchScore,
+    weakAreas: plan.weakAreas,
+    strongAreas: plan.strongAreas,
+    prepQuestionIds: plan.questionIds,
+    completedQuestionIds: [],
+    targetDate: null,
+    status: "active"
+  });
+
+  return getCompanyTypeDetail(userId, customTypeId, role);
+}
+
 export const companyPrepService = {
   ensureSeedData,
   listCompanyTypes,
@@ -589,7 +672,8 @@ export const companyPrepService = {
   updateQuestionStatus,
   saveQuestionToNotes,
   startPrep,
-  getVedaContext
+  getVedaContext,
+  analyzeJobDescription
 };
 
 export const __companyPrepTestUtils = {

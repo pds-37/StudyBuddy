@@ -1,6 +1,10 @@
 export type NoteFlashcard = {
   question: string;
   answer: string;
+  imageUrl?: string;
+  diagram?: string;
+  answerImageUrl?: string;
+  answerDiagram?: string;
 };
 
 export type NoteAIMetadata = {
@@ -137,6 +141,9 @@ export type RecallPrompt = {
   nextReviewAt?: string;
   imageUrl?: string;
   diagram?: string;
+  expectedAnswer?: string;
+  answerImageUrl?: string;
+  answerDiagram?: string;
 };
 
 export type RecallReviewResult = {

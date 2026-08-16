@@ -25,7 +25,7 @@ const CURATED_JOBS: EnrichedJobListing[] = [
   },
   {
     id: "curated-software-engineer-intern",
-    title: "Software Engineer Intern",
+    title: "Candidate Intern",
     company: "Early Career Network",
     location: "India",
     requiredSkills: ["Data Structures", "Algorithms", "JavaScript", "Git"],

@@ -102,7 +102,7 @@ export function SettingsPage() {
         <p className="mt-2 text-slate-500 font-medium">Manage your student profile, SaaS plan, and Veda workspace limits.</p>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-12 relative z-10">
+      <div className="max-w-4xl mx-auto w-full relative z-10">
         <div className="space-y-12">
           {/* Profile Section */}
           <section className="space-y-6">
@@ -122,14 +122,6 @@ export function SettingsPage() {
                   <h3 className="text-xl font-bold text-white">{user?.name || "System User"}</h3>
                   <p className="text-slate-500 text-sm">{user?.email}</p>
                 </div>
-                <button className="px-6 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white hover:bg-white/10 transition-all">
-                  Edit Profile
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <SettingInput label="Target Role" value={user?.targetRoles?.[0] || "Not set"} disabled />
-                <SettingInput label="Consistency Score" value={`${user?.behaviorProfile?.consistencyScore ?? 0}%`} disabled />
               </div>
             </div>
           </section>
@@ -161,14 +153,14 @@ export function SettingsPage() {
 
 
           {/* Zookeeper AI Master Orchestrator Routing Matrix */}
-          <section className="space-y-6">
+          <section className="space-y-6 opacity-60 pointer-events-none">
             <div className="flex items-center gap-3 px-2">
               <Server className="w-5 h-5 text-amber-400" />
               <h2 className="text-lg font-bold text-white uppercase tracking-widest text-[11px]">Zookeeper Master AI Control Center</h2>
             </div>
 
-            <form onSubmit={handleSaveRoutes} className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 space-y-8">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5 pb-6">
+            <div className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 space-y-8 relative overflow-hidden">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                   <h3 className="text-sm font-bold text-white">Zookeeper Per-Feature AI Routing</h3>
                   <p className="mt-1 text-xs text-slate-500">
@@ -176,170 +168,21 @@ export function SettingsPage() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2 p-3 rounded-2xl bg-white/[0.01] border border-white/5">
-                  <Activity className="w-4 h-4 text-emerald-400 animate-pulse" />
-                  <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                    Zookeeper Status: <span className="text-emerald-400 font-bold">Active</span>
+                  <Activity className="w-4 h-4 text-slate-500" />
+                  <div className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                    Status: <span className="text-amber-500 font-bold">Coming Soon</span>
                   </div>
                 </div>
               </div>
-
-              {loadingRoutes ? (
-                <div className="text-slate-400 text-xs animate-pulse">Consulting routing configuration...</div>
-              ) : (
-                <>
-                  {/* Routing Topology Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <RouteCard 
-                      title="AI Mentor Copilot" 
-                      description="Empathetic chat coach, low-latency, friendly style." 
-                      value={aiRoutes.mentor} 
-                      onChange={(val) => setAiRoutes({ ...aiRoutes, mentor: val })}
-                    />
-                    <RouteCard 
-                      title="Strategic Roadmaps" 
-                      description="Context-heavy curriculum builder and logical structuring." 
-                      value={aiRoutes.roadmap} 
-                      onChange={(val) => setAiRoutes({ ...aiRoutes, roadmap: val })}
-                    />
-                    <RouteCard 
-                      title="Active Recall Quizzes" 
-                      description="Rapid conceptual and code-based quiz card generator." 
-                      value={aiRoutes.quiz} 
-                      onChange={(val) => setAiRoutes({ ...aiRoutes, quiz: val })}
-                    />
-                    <RouteCard 
-                      title="ATS Resume Tailoring" 
-                      description="Large prompt parsing, ATS evaluations, and storytelling edits." 
-                      value={aiRoutes.resume} 
-                      onChange={(val) => setAiRoutes({ ...aiRoutes, resume: val })}
-                    />
-                    <RouteCard 
-                      title="Mock Interview Rounds" 
-                      description="SDE technical evaluation, algorithmic pressure mode, and scoring." 
-                      value={aiRoutes.interview} 
-                      onChange={(val) => setAiRoutes({ ...aiRoutes, interview: val })}
-                    />
-                    <RouteCard 
-                      title="Note Graph Ingestion" 
-                      description="Analyzes notes to extract concepts, graph edges, and review cards." 
-                      value={aiRoutes.note} 
-                      onChange={(val) => setAiRoutes({ ...aiRoutes, note: val })}
-                    />
-                    <RouteCard 
-                      title="Skill Readiness Analyst" 
-                      description="Aggregates consistency metrics to score career preparedness." 
-                      value={aiRoutes.skills} 
-                      onChange={(val) => setAiRoutes({ ...aiRoutes, skills: val })}
-                    />
-                    <RouteCard 
-                      title="Project Coordinator" 
-                      description="Analyzes student blockers to suggest architectural projects." 
-                      value={aiRoutes.project} 
-                      onChange={(val) => setAiRoutes({ ...aiRoutes, project: val })}
-                    />
-                  </div>
-
-                  <div className="flex items-center gap-4 pt-4">
-                    <button
-                      type="submit"
-                      disabled={savingRoutes}
-                      className="inline-flex items-center justify-center gap-3 rounded-xl bg-amber-500 hover:bg-amber-600 px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-950 transition-all active:scale-[0.98] disabled:opacity-50"
-                    >
-                      {savingRoutes ? "Calibrating Zookeeper..." : "Apply Zookeeper Routing"}
-                    </button>
-                    {routeSuccess && (
-                      <span className="text-emerald-400 text-xs font-bold animate-pulse flex items-center gap-2">
-                        <GitBranch size={12} className="text-emerald-400" />
-                        ✓ Topology updated successfully!
-                      </span>
-                    )}
-                  </div>
-                </>
-              )}
-            </form>
-          </section>
-
-          {/* Interface Section */}
-          <section className="space-y-6">
-            <div className="flex items-center gap-3 px-2">
-              <Zap className="w-5 h-5 text-amber-400" />
-              <h2 className="text-lg font-bold text-white uppercase tracking-widest text-[11px]">Interface & Experience</h2>
-            </div>
-            
-            <div className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 space-y-6">
-              <SettingToggle 
-                label="Reduced Motion" 
-                description="Minimize animations for better performance."
-                enabled={false}
-              />
-              <SettingToggle 
-                label="Compact Mode" 
-                description="Show more content with smaller text and density."
-                enabled={true}
-              />
-            </div>
-          </section>
-
-          {/* Roadmap Calibration Section */}
-          <section className="space-y-6">
-            <div className="flex items-center gap-3 px-2">
-              <RefreshCw className="w-5 h-5 text-amber-400" />
-              <h2 className="text-lg font-bold text-white uppercase tracking-widest text-[11px]">Roadmap Calibration</h2>
-            </div>
-            
-            <div className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 space-y-6">
-              <div>
-                <h3 className="text-sm font-bold text-white">Struggling with your current pace?</h3>
-                <p className="mt-1 text-xs text-slate-500">
-                  Recalibrate your strategic SDE timeline, target role parameters, skill assumptions, and daily workload limits to better align with your pacing.
-                </p>
+              <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center z-10">
+                <div className="text-sm font-bold text-white uppercase tracking-widest px-6 py-3 rounded-2xl bg-white/5 border border-white/10">
+                  Feature In Development
+                </div>
               </div>
-              
-              <Link
-                to="/onboarding"
-                className="inline-flex items-center justify-center gap-3 rounded-xl bg-amber-500 hover:bg-amber-600 px-6 py-3.5 text-xs font-black uppercase tracking-widest text-slate-950 hover:text-slate-955 transition-all active:scale-[0.98]"
-              >
-                <RefreshCw size={14} />
-                Recalibrate SDE Trajectory
-              </Link>
             </div>
           </section>
 
-          {/* Infrastructure Section */}
-          <section className="space-y-6">
-            <div className="flex items-center gap-3 px-2">
-              <Database className="w-5 h-5 text-cyan-400" />
-              <h2 className="text-lg font-bold text-white uppercase tracking-widest text-[11px]">Veda Infrastructure</h2>
-            </div>
-            
-            <div className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 space-y-4">
-              <InfrastructureItem icon={Cloud} label="AI Orchestration" status="Connected" color="text-emerald-400" />
-              <InfrastructureItem icon={Shield} label="Knowledge Persistence" status="Encrypted" color="text-cyan-400" />
-              <InfrastructureItem icon={Bell} label="Push Notifications" status="Active" color="text-brand" />
-              <InfrastructureItem icon={BarChart3} label="Student Intelligence" status="Live" color="text-amber-400" />
-            </div>
-          </section>
         </div>
-
-        {/* Sidebar help */}
-        <aside className="space-y-8">
-          <div className="p-8 rounded-[3rem] bg-brand/5 border border-brand/20 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-10 opacity-5">
-              <Zap size={150} className="text-brand" />
-            </div>
-            <div className="relative z-10">
-              <h4 className="text-sm font-black text-white uppercase tracking-widest mb-2 flex items-center gap-2">
-                Need Support?
-              </h4>
-              <p className="text-xs text-slate-400 leading-relaxed font-medium mb-6">
-                Our team is ready to help you optimize your career workspace.
-              </p>
-              <button className="w-full py-4 rounded-2xl bg-white/10 text-white text-[10px] font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all">
-                Contact Mentors
-              </button>
-            </div>
-          </div>
-        </aside>
       </div>
     </div>
   );
