@@ -304,20 +304,13 @@ export function JobsList({ refreshTrigger }: JobsListProps) {
                        )}
                        {job.applyUrl && (
                         <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => alert("Please install the StudyBuddy Chrome Extension to use Auto-Apply.")}
-                            className="flex items-center gap-2 px-5 py-3 rounded-xl bg-white/5 border border-brand/30 text-brand font-bold text-sm hover:bg-brand/10 transition-all"
-                          >
-                            <Zap size={16} />
-                            Auto-Apply
-                          </button>
                           <a
                             href={job.applyUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-2 px-6 py-3 rounded-xl bg-brand text-white font-black text-sm hover:bg-brand/90 transition-all shadow-[0_10px_20px_rgba(124,92,255,0.2)]"
                           >
-                            Manual Apply
+                            Apply Now
                             <ExternalLink size={16} />
                           </a>
                         </div>
